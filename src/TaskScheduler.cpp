@@ -8,7 +8,7 @@ TaskScheduler::TaskScheduler()
   count = 0;
   first_function_struct = nullptr;
   numberOverflows = 0;
-  lastScheduleTime = get_us;
+  lastScheduleTime = 0;
 }
 
 void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
@@ -55,30 +55,43 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
 
   if (prio > maxPrio) maxPrio = prio; //Maximale Priorität updaten
   function_struct_ptr->countOver = numberOverflows;
-  function_struct_ptr->lastExecTime = get_us; //ab hier wird die nächste ausfürzeit berechnet
+  function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
   count = count + 1; //Funktionszähler inkrementieren 
 }
 
 void TaskScheduler::schedule()
 {
+  uint8_t flag = 0;
   function_struct *function_struct_ptr; //Pointer auf Structs zu den Funktionen mit dem ich arbeite
-  uint32_t currmicros = get_us; //jetzige Systemzeit ermitteln
+  #ifndef Debug_TS                      //Wenn ich nicht debugge
+    uint32_t currmicros = get_us;       //jetzige Systemzeit ermitteln
+  #else                                 //Wenn ich debugge
+    uint32_t currmicros = get_us;       //Schnellerer Überlauf
+  #endif
 
   if(currmicros < lastScheduleTime) //Wenn dieser Pimmelticker übergelaufen ist
   {
       numberOverflows++;
+      function_struct_ptr = first_function_struct;
+      while(function_struct_ptr != nullptr)
+      {
+        function_struct_ptr->lastExecTime = (1000000.0 / function_struct_ptr->frequency) - (UINT32_MAX - function_struct_ptr->lastExecTime);
+        function_struct_ptr = function_struct_ptr->next;
+      }
   }
+
+  lastScheduleTime = currmicros;
 
 #ifdef Task_Fair
   currPrio = 0; //jetzt angeschaute Priorität auf Null initialisieren
-  for (uint8_t i = 0; i < maxPrio; i++) //id hochzählen
+  for (uint16_t i = 0; i < maxPrio; i++) //id hochzählen
   {
     function_struct_ptr = first_function_struct; //Beim ersten anfangen
     while(function_struct_ptr != nullptr) //functions durchzählen
     {
       if (function_struct_ptr->id == i) //Wenn ID übereinstimmt
       {
-        if ((function_struct_ptr->lastExecTime + (1.0 / function_struct_ptr->frequency) * 1000000.0 ) < currmicros || function_struct_ptr->countOver < numberOverflows) //Wenn es wieder Zeit für eine Ausführung ist
+        if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros) //Wenn es wieder Zeit für eine Ausführung ist
         {
           if((function_struct_ptr->numberOfExecs > 0 || !(function_struct_ptr->limitedAmount))) //Wenn noch Ausführungen übrig sind
           {
@@ -89,6 +102,8 @@ void TaskScheduler::schedule()
             {
               function_struct_ptr->numberOfExecs--; //Zähler um eins dekrementieren
             }
+            flag = 1;
+            break;
           }
           else //Wenn keine Ausführungen mehr übrig sind
           {
@@ -98,6 +113,7 @@ void TaskScheduler::schedule()
       }
       function_struct_ptr = function_struct_ptr->next; //Zum nächsten Element der verketteten Liste übergehen
     }
+    if(flag > 0) break;
   }
 #endif
 }

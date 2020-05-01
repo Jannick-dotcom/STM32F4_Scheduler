@@ -37,13 +37,6 @@ Rennstall Projekt
 
 
 
-`void setID(void (*function)(), uint8_t ID);`  
-    ** ID verändern **  
-    `void (*function)()` ->   Funktion die verändert werden soll  
-    `uint8_t ID`         ->   Neue ID  
-
-
-
 `void schedule();`  
     ** Alleinige Ausführung in einer endlosen Schleife **  
     Hier werden die davor hinzugefügten Funktionen getriggert  

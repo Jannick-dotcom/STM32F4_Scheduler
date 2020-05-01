@@ -6,6 +6,7 @@ CAN can1(PB_8,PB_9); //rd, td, freq[Hz]
 #include "TaskScheduler.h"
 TaskScheduler Tasker1;
 DigitalOut blue(PB_7);
+DigitalOut test(PG_2);
 DigitalOut red(PB_14);
 DigitalOut green(PB_0);
 
@@ -21,6 +22,7 @@ void testCan()
 void testLed()
 {
   blue.write(!blue.read());
+  test.write(!test.read());
 }
 
 void testLed2()
@@ -34,13 +36,15 @@ void sendToPC()
 }
 
 int main() {
-  Tasker1.addFunction(testLed,1,10);     //Blinkt mit f/2 Hz
-  Tasker1.addFunction(testLed2,5,20);    //Blinkt mit f/2 Hz
+  Tasker1.addFunction(testLed,1,2000000);     //Blinkt mit f/2 Hz
+  //Tasker1.addFunction(testLed2,5,2);    //Blinkt mit f/2 Hz
 
-  Tasker1.addFunction(sendToPC, 10, 0.5);// 0,5 Hz communikation mit PC
+  //Tasker1.addFunction(sendToPC, 10, 0.5);// 0,5 Hz communikation mit PC
   
   while(1)
   {
+    //test.write(0);
     Tasker1.schedule();
+    //test.write(1);
   }
 }
