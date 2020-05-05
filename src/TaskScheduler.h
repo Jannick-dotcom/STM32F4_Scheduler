@@ -5,7 +5,7 @@
 //#define Task_Priority     //nach Prioritätsreihenfolge ausführen
 
 #define On_PIO              //IDE spezifizieren
-#define Debug_TS            //Debugging signalisieren
+//#define Debug_TS            //Debugging signalisieren
 
 #ifdef Debug_TS
   #warning Debugging ist aktiviert
@@ -60,6 +60,7 @@ public:
   //Setter Methods
   void setPriority(/*Funktion*/void (*function)(), uint8_t prio);
   void setFrequency(/*Funktion*/void (*function)(), float exec_freq);
+
   void schedule(); //Execute in the Loop
 };
 #endif //Task_Scheduler

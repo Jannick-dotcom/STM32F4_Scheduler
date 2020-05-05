@@ -66,21 +66,21 @@ void TaskScheduler::schedule()
   #ifndef Debug_TS                      //Wenn ich nicht debugge
     uint32_t currmicros = get_us;       //jetzige Systemzeit ermitteln
   #else                                 //Wenn ich debugge
-    uint32_t currmicros = get_us;       //Schnellerer Überlauf
+    uint32_t currmicros = get_us * 10;  //Schnellerer Überlauf
   #endif
 
   if(currmicros < lastScheduleTime) //Wenn dieser Pimmelticker übergelaufen ist
   {
-      numberOverflows++;
-      function_struct_ptr = first_function_struct;
-      while(function_struct_ptr != nullptr)
+      numberOverflows++;                //Anzahl Overflows hochzählen
+      function_struct_ptr = first_function_struct;  //Das erste Element auf einen Temp pointer
+      while(function_struct_ptr != nullptr)         //Solange nicht das Letzte Element
       {
-        function_struct_ptr->lastExecTime = (1000000.0 / function_struct_ptr->frequency) - (UINT32_MAX - function_struct_ptr->lastExecTime);
-        function_struct_ptr = function_struct_ptr->next;
+        function_struct_ptr->lastExecTime = (1000000.0 / function_struct_ptr->frequency) - (UINT32_MAX - function_struct_ptr->lastExecTime); //Letzte Ausführzeit berechnen, als hätte der Overflow nie Stattgefunden
+        function_struct_ptr = function_struct_ptr->next;  //Nächstes Element
       }
   }
 
-  lastScheduleTime = currmicros;
+  lastScheduleTime = currmicros;        //Diese Zeit als letzte Zeit speichern an der der Scheduler gelaufen ist
 
 #ifdef Task_Fair
   currPrio = 0; //jetzt angeschaute Priorität auf Null initialisieren
@@ -113,7 +113,7 @@ void TaskScheduler::schedule()
       }
       function_struct_ptr = function_struct_ptr->next; //Zum nächsten Element der verketteten Liste übergehen
     }
-    if(flag > 0) break;
+    if(flag > 0) break;                                 //Wenn ausführung einer Funktion gemacht auch aus dieser FOR springen
   }
 #endif
 }
@@ -144,14 +144,14 @@ void TaskScheduler::setFrequency(/*Funktion*/void (*function)(), float exec_freq
   function_struct* temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if(temp != nullptr) //Wenn die übergebene Funktion gültig ist
   {
-    temp->frequency = exec_freq; //Die Priorität ändern
+    temp->frequency = exec_freq; //Die Frequenz ändern
   }
 }
 
 function_struct* TaskScheduler::searchFunction(/*Funktion*/void (*function)())
 {
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
-  while(temp->function == function) //Solange Funktion noch nicht gefunden wurde
+  while(temp->function != function) //Solange Funktion noch nicht gefunden wurde
   {
     if(temp == nullptr) break; //wenn am ende der liste angekommen aufhören und zurück in main springen
     temp = temp->next;  //wenn nicht nächstes element anschauen
