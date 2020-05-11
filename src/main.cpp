@@ -36,10 +36,15 @@ void sendToPC()
 }
 
 int main() {
+<<<<<<< HEAD
   Tasker1.addFunction(testLed,1,20);     //Blinkt mit f/2 Hz
   //Tasker1.addFunction(testLed2,5,2);    //Blinkt mit f/2 Hz
+=======
+  Tasker1.addFunction(testLed,1,2000);     //Blinkt mit f/2 Hz
+  Tasker1.addFunction(testLed2,5,2);    //Blinkt mit f/2 Hz
+>>>>>>> d70cc9b0e66ecccc3388889a82b3943428bd6aba
 
-  //Tasker1.addFunction(sendToPC, 10, 0.5);// 0,5 Hz communikation mit PC
+  Tasker1.addFunction(sendToPC, 10, 0.5);// 0,5 Hz communikation mit PC
   
   while(1)
   {

@@ -180,14 +180,14 @@ void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_fre
   function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
-    temp->frequency = exec_freq; //Die Priorität ändern
+    temp->frequency = exec_freq; //Die Frequenz ändern
   }
 }
 
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
 {
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
-  while (temp->function == function)             //Solange Funktion noch nicht gefunden wurde
+  while(temp->function != function) //Solange Funktion noch nicht gefunden wurde
   {
     if (temp == nullptr)
       break;           //wenn am ende der liste angekommen aufhören und zurück in main springen
