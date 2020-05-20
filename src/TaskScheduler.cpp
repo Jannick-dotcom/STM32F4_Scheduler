@@ -9,9 +9,9 @@ T maxInt(T val)
 TaskScheduler::TaskScheduler()
 {
   //Basiswerte Initialisieren
-  //maxPrio = 0;
-  //currPrio = 0;
-  //count = 0;
+  maxPrio = 0;
+  currPrio = 0;
+  count = 0;
   first_function_struct = nullptr;
   //numberOverflows = 0;
   lastScheduleTime = 0;
@@ -56,7 +56,7 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   function_struct_ptr->limitedAmount = Execcount > 0; //Nur wenn die Anzahl der execs > 0 -> führe Funktion nur so oft aus
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
-  //function_struct_ptr->id = count;
+  function_struct_ptr->id = count;
 
   /*if (prio > maxPrio)
   {

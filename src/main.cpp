@@ -1,7 +1,6 @@
 #include <mbed.h>
 Serial pc(PD_8, PD_9); // tx, rx
-CAN can1(PB_8,PB_9); //rd, td, freq[Hz]
-
+CAN can1(PB_8, PB_9);  //rd, td, freq[Hz]
 
 #include "TaskScheduler.h"
 TaskScheduler Tasker1;
@@ -10,46 +9,41 @@ DigitalOut test(PG_2);
 DigitalOut red(PB_14);
 DigitalOut green(PB_0);
 
+uint32_t R0R12[13];
+uint32_t SPLRPC[3];
+uint32_t PSR_CTRL[4];
 
-uint8_t counter = 0;
-
-void testCan()
+extern "C" int saveRegisters(uint32_t *value)
 {
-  pc.printf("%i",can1.write(CANMessage(1, &counter, 1)));
-  counter++;
+  uint16_t stackptr;
+  asm("STR SP,  ")
+  asm("STR PC, #value");
+  return 1;
 }
 
-void testLed()
+extern "C" int reloadRegisters(uint32_t *value)
 {
-  blue.write(!blue.read());
-  test.write(!test.read());
+  asm("LDR PC, #value");
+  return 1;
 }
 
-void testLed2()
+int main()
 {
-  red.write(!red.read());
-}
+  wait_ms(2000);
 
-void sendToPC()
-{
-  pc.printf("So I bims\n");
-}
+  saveRegisters(R0R12);
 
-int main() {
-<<<<<<< HEAD
-  Tasker1.addFunction(testLed,1,20);     //Blinkt mit f/2 Hz
-  //Tasker1.addFunction(testLed2,5,2);    //Blinkt mit f/2 Hz
-=======
-  Tasker1.addFunction(testLed,1,2000);     //Blinkt mit f/2 Hz
-  Tasker1.addFunction(testLed2,5,2);    //Blinkt mit f/2 Hz
->>>>>>> d70cc9b0e66ecccc3388889a82b3943428bd6aba
+  pc.printf("Okay\n");
 
-  Tasker1.addFunction(sendToPC, 10, 0.5);// 0,5 Hz communikation mit PC
-  
-  while(1)
+  int i = 0;
+  while (1)
   {
-    //test.write(0);
-    Tasker1.schedule();
-    //test.write(1);
+    if (i < 100)
+    {
+      pc.printf("reloading!\n");
+      reloadRegisters(R0R12);
+      i++;
+    }
+    wait_ms(50);
   }
 }

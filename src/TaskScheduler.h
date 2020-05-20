@@ -1,8 +1,8 @@
 #ifndef Task_Scheduler
 #define Task_Scheduler
 
-//#define Task_Fair  //nach priorität und hinzufügunsreihenfolge ausführen
-#define Task_other //nach Prioritätsreihenfolge ausführen
+#define Task_Fair  //nach priorität und hinzufügunsreihenfolge ausführen
+//#define Task_other //nach Prioritätsreihenfolge ausführen
 
 #define On_PIO //IDE spezifizieren
 //#define On_Arduino
@@ -35,16 +35,19 @@ struct function_struct
   uint16_t numberOfExecs; //Wie oft soll die Funktion noch ausgeführt werden
   //uint32_t countOver;       //Anzahl der Overflows bei der letzten ausführung
   uint64_t lastExecTime; //Letzter Zeitpunkt der ausführung
-  //uint16_t id;           //ID des Tasks
+  uint16_t id;           //ID des Tasks
+
+  //KontextSwitch
+  uint32_t stackpointer;  //Variable um den Stackpointer zwischenzuspeichern
 };
 
 class TaskScheduler
 {
   /////////Variables
 private:
-  //uint8_t maxPrio;                        //Variable für die maximale Prio
-  //uint8_t currPrio;                       //Zählvariable für Priorität
-  //uint8_t count;                          //count of the functions added
+  uint8_t maxPrio;                        //Variable für die maximale Prio
+  uint8_t currPrio;                       //Zählvariable für Priorität
+  uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
   //uint32_t numberOverflows; //Anzahl der Overflows seit Start
