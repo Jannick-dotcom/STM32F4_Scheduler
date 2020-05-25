@@ -1,9 +1,74 @@
 #include "TaskScheduler.h"
 
-template <class T>
-T maxInt(T val)
+template <class T>  //Für alle Datentypen
+T maxInt(T val)      
 {
+  //einfach -1 zurückgeben -> Zweierkomplement (0b1111111...) -> unsigned -> maximale Zahl
   return -1;
+}
+
+//Kontext Switch
+uint8_t switchEnable;
+function_struct* nowExecFunc;
+function_struct* nextExecFunc;
+
+extern "C" void SysTick_Handler(void)  //interrupt von SysTick
+{
+  if(switchEnable)
+  {
+    if(nowExecFunc != nullptr)
+    {
+      //Save now running one
+      asm("MOV %0, r4" :"=r" (nowExecFunc->taskRegisters.R4)); //Move r0 to value
+      asm("MOV %0, r5" :"=r" (nowExecFunc->taskRegisters.R5)); //Move r0 to value
+      asm("MOV %0, r6" :"=r" (nowExecFunc->taskRegisters.R6)); //Move r0 to value
+      asm("MOV %0, r7" :"=r" (nowExecFunc->taskRegisters.R7)); //Move r0 to value
+      asm("MOV %0, r8" :"=r" (nowExecFunc->taskRegisters.R8)); //Move r0 to value
+      asm("MOV %0, r9" :"=r" (nowExecFunc->taskRegisters.R9)); //Move r0 to value
+      asm("MOV %0, r10" :"=r" (nowExecFunc->taskRegisters.R10)); //Move r0 to value
+      asm("MOV %0, r11" :"=r" (nowExecFunc->taskRegisters.R11)); //Move r0 to value
+
+      asm("mrs r0, msp");
+
+      asm("mrs r1, psp");
+      asm("msr msp, r1");
+      asm("isb");
+
+      asm("mrs %0, msp"
+        : "=r"(nowExecFunc->taskRegisters.SP));
+
+      asm("msr msp, r0");
+      asm("isb");
+
+      asm("mrs r0, msp");
+      asm("msr msp, %0"
+          :
+          : "r"(nowExecFunc->taskRegisters.SP));
+      asm("isb");
+    }
+    if(nextExecFunc != nullptr)
+    {
+      //Restore next one
+      asm("MOV r4, %0" :"=r" (nextExecFunc->taskRegisters.R4)); //Move value to r0
+      asm("MOV r5, %0" :"=r" (nextExecFunc->taskRegisters.R5)); //Move value to r0
+      asm("MOV r6, %0" :"=r" (nextExecFunc->taskRegisters.R6)); //Move value to r0
+      asm("MOV r7, %0" :"=r" (nextExecFunc->taskRegisters.R7)); //Move value to r0
+      asm("MOV r8, %0" :"=r" (nextExecFunc->taskRegisters.R8)); //Move value to r0
+      asm("MOV r9, %0" :"=r" (nextExecFunc->taskRegisters.R9)); //Move value to r0
+      asm("MOV r10, %0" :"=r" (nextExecFunc->taskRegisters.R10)); //Move value to r0
+      asm("MOV r11, %0" :"=r" (nextExecFunc->taskRegisters.R11)); //Move value to r0
+      asm("mrs %0, msp"
+        : "=r"(nextExecFunc->taskRegisters.SP));
+
+      asm("msr msp, r0");
+      asm("isb");
+
+      asm("msr psp, %0"
+          :
+          : "r"(nextExecFunc->taskRegisters.SP));
+      asm("isb");
+    }
+  }
 }
 
 TaskScheduler::TaskScheduler()
@@ -13,8 +78,15 @@ TaskScheduler::TaskScheduler()
   currPrio = 0;
   count = 0;
   first_function_struct = nullptr;
-  //numberOverflows = 0;
   lastScheduleTime = 0;
+
+  //Für Context Switch
+  #ifdef Task_contextSwitch
+  switchEnable = 0;                   //Jetzt noch kein Kontext switch erlauben
+  nowExecFunc = nullptr;
+  nextExecFunc = nullptr;
+  SysTick_Config(SystemCoreClock/1000); //Configure SysTick to generate an interrupt every millisecond
+  #endif
 }
 
 void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
@@ -57,17 +129,31 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
+  function_struct_ptr->Stack = (uint32_t *)malloc(36);   //9 Register * 4 Byte = 36 Byte
+  if(function_struct_ptr->Stack = nullptr)    //Out of HEAP!!!
+  {
+    while(1);
+  }
+  function_struct_ptr->Stackpointer = (uint32_t)(function_struct_ptr->Stack) + 4; //Pointer auf das Letzte Element -> da decreasing Stack
+  function_struct_ptr->taskState = 0; //New Task
+  *(function_struct_ptr->Stack + (9 - 1)) = 0x01000000;
+  *(function_struct_ptr->Stack + (9 - 1) - 1) = (uint32_t)function_struct_ptr->function;
+  *(function_struct_ptr->Stack + (9 - 1) - 2) = 0xFFFFFFFD;
+  *(function_struct_ptr->Stack + (9 - 1) - 3) = 0x00;
+  *(function_struct_ptr->Stack + (9 - 1) - 4) = 0x00;
+  *(function_struct_ptr->Stack + (9 - 1) - 5) = 0x00;
+  *(function_struct_ptr->Stack + (9 - 1) - 6) = 0x00;
+  *(function_struct_ptr->Stack + (9 - 1) - 7) = 0x00;
 
-  /*if (prio > maxPrio)
+  if (prio > maxPrio)
   {
     maxPrio = prio; //Maximale Priorität updaten
-  }*/
-  //function_struct_ptr->countOver = numberOverflows;
+  }
   function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
-  //count = count + 1;                     //Funktionszähler inkrementieren
+  count = count + 1;                     //Funktionszähler inkrementieren
 }
 
-void TaskScheduler::schedule()
+void TaskScheduler::schedule() 
 {
   function_struct *function_struct_ptr; //Pointer auf Structs zu den Funktionen mit dem ich arbeite
 #ifndef Debug_TS                        //Wenn debugging nicht aktiviert
@@ -78,7 +164,6 @@ void TaskScheduler::schedule()
 
   if (currmicros < lastScheduleTime) //Wenn timer übergelaufen ist
   {
-    //numberOverflows++;                //Anzahl der Overflows Inkrementieren
     function_struct_ptr = first_function_struct; //Das erste Struct nehmen
     while (function_struct_ptr != nullptr)       //Solange Funktionen angelegt wurden
     {
@@ -134,13 +219,17 @@ void TaskScheduler::schedule()
     {
       if ((function_struct_ptr->numberOfExecs > 0 || !(function_struct_ptr->limitedAmount))) //Wenn noch Ausführungen übrig sind
       {
+        #ifdef Task_contextSwitch
+        nextExecFunc = function_struct_ptr;
+        switchEnable = 1;
+        #else
         function_struct_ptr->lastExecTime = currmicros; //Die Zeit vor Anfang der Ausführung speichern
-        //function_struct_ptr->countOver = numberOverflows;
         (function_struct_ptr->function)();      //Hier die Funktion ausführen
         if (function_struct_ptr->limitedAmount) //Wenn die Funktion nur eine begrenzte Anzahl ausgeführt werden soll
         {
           function_struct_ptr->numberOfExecs--; //Zähler um eins dekrementieren
         }
+        #endif
         break;
       }
       else //Wenn keine Ausführungen mehr übrig sind
