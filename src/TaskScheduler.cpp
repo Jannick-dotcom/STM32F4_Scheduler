@@ -1,126 +1,58 @@
 #include "TaskScheduler.h"
 
-template <class T>  //Für alle Datentypen
-T maxInt(T val)      
+extern uint8_t switchEnable;
+extern function_struct *currentTask;
+extern Ticker systemSwitchEvent;
+extern void xPortPendSVHandler(void);
+extern __attribute__((isr, naked)) void systemSwitchEvent_Handler(void);
+
+template <class T> //Für alle Datentypen
+T maxInt(T val)
 {
   //einfach -1 zurückgeben -> Zweierkomplement (0b1111111...) -> unsigned -> maximale Zahl
   return -1;
-}
-
-//Kontext Switch
-uint8_t switchEnable;
-function_struct* nowExecFunc;
-function_struct* nextExecFunc;
-
-extern "C" void SysTick_Handler(void)  //interrupt von SysTick
-{
-  if(switchEnable)
-  {
-    if(nowExecFunc != nullptr)
-    {
-      //Save now running one
-      asm("MOV %0, r4" :"=r" (nowExecFunc->taskRegisters.R4)); //Move r0 to value
-      asm("MOV %0, r5" :"=r" (nowExecFunc->taskRegisters.R5)); //Move r0 to value
-      asm("MOV %0, r6" :"=r" (nowExecFunc->taskRegisters.R6)); //Move r0 to value
-      asm("MOV %0, r7" :"=r" (nowExecFunc->taskRegisters.R7)); //Move r0 to value
-      asm("MOV %0, r8" :"=r" (nowExecFunc->taskRegisters.R8)); //Move r0 to value
-      asm("MOV %0, r9" :"=r" (nowExecFunc->taskRegisters.R9)); //Move r0 to value
-      asm("MOV %0, r10" :"=r" (nowExecFunc->taskRegisters.R10)); //Move r0 to value
-      asm("MOV %0, r11" :"=r" (nowExecFunc->taskRegisters.R11)); //Move r0 to value
-
-      asm("mrs r0, msp");
-
-      asm("mrs r1, psp");
-      asm("msr msp, r1");
-      asm("isb");
-
-      asm("mrs %0, msp"
-        : "=r"(nowExecFunc->taskRegisters.SP));
-
-      asm("msr msp, r0");
-      asm("isb");
-
-      asm("mrs r0, msp");
-      asm("msr msp, %0"
-          :
-          : "r"(nowExecFunc->taskRegisters.SP));
-      asm("isb");
-    }
-    if(nextExecFunc != nullptr)
-    {
-      //Restore next one
-      asm("MOV r4, %0" :"=r" (nextExecFunc->taskRegisters.R4)); //Move value to r0
-      asm("MOV r5, %0" :"=r" (nextExecFunc->taskRegisters.R5)); //Move value to r0
-      asm("MOV r6, %0" :"=r" (nextExecFunc->taskRegisters.R6)); //Move value to r0
-      asm("MOV r7, %0" :"=r" (nextExecFunc->taskRegisters.R7)); //Move value to r0
-      asm("MOV r8, %0" :"=r" (nextExecFunc->taskRegisters.R8)); //Move value to r0
-      asm("MOV r9, %0" :"=r" (nextExecFunc->taskRegisters.R9)); //Move value to r0
-      asm("MOV r10, %0" :"=r" (nextExecFunc->taskRegisters.R10)); //Move value to r0
-      asm("MOV r11, %0" :"=r" (nextExecFunc->taskRegisters.R11)); //Move value to r0
-      asm("mrs %0, msp"
-        : "=r"(nextExecFunc->taskRegisters.SP));
-
-      asm("msr msp, r0");
-      asm("isb");
-
-      asm("msr psp, %0"
-          :
-          : "r"(nextExecFunc->taskRegisters.SP));
-      asm("isb");
-    }
-  }
 }
 
 TaskScheduler::TaskScheduler()
 {
   //Basiswerte Initialisieren
   maxPrio = 0;
-  currPrio = 0;
+  //currPrio = 0;
   count = 0;
   first_function_struct = nullptr;
   lastScheduleTime = 0;
 
   //Für Context Switch
+  switchEnable = 0; //Jetzt noch kein Kontext switch erlauben
+  currentTask = nullptr;
   #ifdef Task_contextSwitch
-  switchEnable = 0;                   //Jetzt noch kein Kontext switch erlauben
-  nowExecFunc = nullptr;
-  nextExecFunc = nullptr;
-  SysTick_Config(SystemCoreClock/1000); //Configure SysTick to generate an interrupt every millisecond
+  //Hier muss ich noch den MAIN Task hinzufügen!!!!!!!!!!!!
   #endif
 }
 
 void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
 {
   function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
-  function_struct_ptr = first_function_struct;    //Beim ersten Struct anfangen
-  function_struct *prev = nullptr;                //Previous pointer erstellen
+  function_struct_ptr = new function_struct;      //ein neues erstellen
+
+  if (function_struct_ptr == nullptr) //Wenn kein HEAP Platz mehr frei ist...
+  {
+    return; //Aus der Funktion rausspringen
+  }
 
   if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
   {
-    function_struct_ptr = new function_struct; //ein neues erstellen
-    if (function_struct_ptr == nullptr)        //Wenn kein HEAP Platz mehr frei ist...
-    {
-      return; //Aus der Funktion rausspringen
-    }
     first_function_struct = function_struct_ptr; //Funktion als erste setzen
+    function_struct_ptr->next = function_struct_ptr;
+    function_struct_ptr->prev = function_struct_ptr;
   }
   else //wenn bereits eine funktion hinzugefügt wurde
   {
-    while (function_struct_ptr != nullptr) //Solange bereits erstellte structs drin sind
-    {
-      prev = function_struct_ptr;                      //Den letzten Struct speichern
-      function_struct_ptr = function_struct_ptr->next; //Das nächste nehmen
-    }
-    function_struct_ptr = new function_struct; //ein neues erstellen
-    if (function_struct_ptr == nullptr)        //Wenn kein HEAP Platz mehr frei ist...
-    {
-      return; //Aus der Funktion rausspringen
-    }
+    function_struct_ptr->next = first_function_struct;
+    first_function_struct->prev->next = function_struct_ptr;
+    function_struct_ptr->prev = first_function_struct->prev;
+    first_function_struct->prev = function_struct_ptr;
   }
-
-  function_struct_ptr->prev = prev;                      //Das vorherige setzen
-  function_struct_ptr->prev->next = function_struct_ptr; //Das nächste des vorherigen auf dieses setzen
-  function_struct_ptr->next = nullptr;                   //nächstes als noch nicht gesetzt festlegen
 
   //alle Werte übertragen
   function_struct_ptr->function = function;
@@ -129,21 +61,22 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
-  function_struct_ptr->Stack = (uint32_t *)malloc(36);   //9 Register * 4 Byte = 36 Byte
-  if(function_struct_ptr->Stack = nullptr)    //Out of HEAP!!!
+  function_struct_ptr->Stack = (uint32_t *)(malloc(stackSize * 4)); //9 Register * 4 Byte = 60 Byte
+  if (function_struct_ptr->Stack == nullptr)                        //Out of HEAP!!!
   {
-    while(1);
+    delete function_struct_ptr;
+    return;
   }
-  function_struct_ptr->Stackpointer = (uint32_t)(function_struct_ptr->Stack) + 4; //Pointer auf das Letzte Element -> da decreasing Stack
-  function_struct_ptr->taskState = 0; //New Task
-  *(function_struct_ptr->Stack + (9 - 1)) = 0x01000000;
-  *(function_struct_ptr->Stack + (9 - 1) - 1) = (uint32_t)function_struct_ptr->function;
-  *(function_struct_ptr->Stack + (9 - 1) - 2) = 0xFFFFFFFD;
-  *(function_struct_ptr->Stack + (9 - 1) - 3) = 0x00;
-  *(function_struct_ptr->Stack + (9 - 1) - 4) = 0x00;
-  *(function_struct_ptr->Stack + (9 - 1) - 5) = 0x00;
-  *(function_struct_ptr->Stack + (9 - 1) - 6) = 0x00;
-  *(function_struct_ptr->Stack + (9 - 1) - 7) = 0x00;
+  function_struct_ptr->Stackpointer = (uint32_t)(function_struct_ptr->Stack) + (stackSize * 8 - 4); //Pointer auf das Letzte Element -> da decreasing Stack
+  function_struct_ptr->State = NEW;                                                               //New Task
+  *(function_struct_ptr->Stack + (stackSize - 1)) = 0x01000000;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 1) = (uint32_t)function_struct_ptr->function;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 2) = 0xFFFFFFFD;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 3) = 0x00;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 4) = 0x00;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 5) = 0x00;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 6) = 0x00;
+  *(function_struct_ptr->Stack + (stackSize - 1) - 7) = 0x00;
 
   if (prio > maxPrio)
   {
@@ -153,20 +86,22 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   count = count + 1;                     //Funktionszähler inkrementieren
 }
 
-void TaskScheduler::schedule() 
+void TaskScheduler::schedule()
 {
+  uint16_t endOfList = 0;               //Merker für das traversieren der Liste
   function_struct *function_struct_ptr; //Pointer auf Structs zu den Funktionen mit dem ich arbeite
-#ifndef Debug_TS                        //Wenn debugging nicht aktiviert
   uint32_t currmicros = get_us;         //jetzige Systemzeit ermitteln und mit ihr weiterarbeiten
-#else                                   //Wenn debugging aktiviert
-  uint32_t currmicros = get_us * 10; //Schnellerer Überlauf
-#endif
 
-  if (currmicros < lastScheduleTime) //Wenn timer übergelaufen ist
+  if (currmicros < lastScheduleTime)    //Wenn timer übergelaufen ist
   {
     function_struct_ptr = first_function_struct; //Das erste Struct nehmen
-    while (function_struct_ptr != nullptr)       //Solange Funktionen angelegt wurden
+    while (1)                                    //Solange Funktionen angelegt wurden
     {
+      if (!(function_struct_ptr == first_function_struct && endOfList != 0))  //Wenn wieder beim ersten angelangt
+      {
+        break;  //aus der Schleife raus
+      }
+      endOfList++;    //Merker hochzählen
       function_struct_ptr->lastExecTime = (1000000.0 / function_struct_ptr->frequency) - (maxInt(currmicros) - function_struct_ptr->lastExecTime); //neu berechnen wann diese Funktion zuletzt ausgeführt wurde
       function_struct_ptr = function_struct_ptr->next;                                                                                             //nächste funktion nehmen
     }
@@ -174,72 +109,22 @@ void TaskScheduler::schedule()
 
   lastScheduleTime = currmicros; //Jetzige Schedule Zeit speichern
 
-#ifdef Task_Fair
-  //currPrio = 0;                          //jetzt angeschaute Priorität auf Null initialisieren
-  uint8_t flag = 0;
-  for (uint16_t i = 0; i < maxPrio; i++) //id hochzählen
+  function_struct_ptr = first_function_struct;
+  endOfList = 0;
+  while (!endOfList)
   {
-    function_struct_ptr = first_function_struct; //Beim ersten anfangen
-    while (function_struct_ptr != nullptr)       //functions durchzählen
+    if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros)
     {
-      if (function_struct_ptr->priority == i) //Wenn Prio übereinstimmt
-      {
-        if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros) //Wenn es wieder Zeit für eine Ausführung ist
-        {
-          if ((function_struct_ptr->numberOfExecs > 0 || !(function_struct_ptr->limitedAmount))) //Wenn noch Ausführungen übrig sind
-          {
-            function_struct_ptr->lastExecTime = currmicros; //Die Zeit vor Anfang der Ausführung speichern
-            //function_struct_ptr->countOver = numberOverflows;
-            (function_struct_ptr->function)();      //Hier die Funktion ausführen
-            if (function_struct_ptr->limitedAmount) //Wenn die Funktion nur eine begrenzte Anzahl ausgeführt werden soll
-            {
-              function_struct_ptr->numberOfExecs--; //Zähler um eins dekrementieren
-            }
-            flag = 1; //auch aus nächster Schleife rausspringen merker
-            break;    //aus while schleife springen
-          }
-          else //Wenn keine Ausführungen mehr übrig sind
-          {
-            removeFunction(function_struct_ptr->function); //Speicher der gespeicherten Daten zu der Funktion wieder freigeben
-          }
-        }
-      }
-      function_struct_ptr = function_struct_ptr->next; //Zum nächsten Element der verketteten Liste übergehen
+      function_struct_ptr->lastExecTime = currmicros;
+      (*function_struct_ptr->function)();
+      break;
     }
-    if (flag > 0)
-      break; //Wenn merker gesetzt auch aus for schleife springen
-  }
-#endif
-
-#ifdef Task_other
-  function_struct_ptr = first_function_struct; //Beim ersten anfangen
-  while (function_struct_ptr != nullptr)       //functions durchzählen
-  {
-    if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros) //Wenn es wieder Zeit für eine Ausführung ist
+    function_struct_ptr = function_struct_ptr->next;
+    if (function_struct_ptr == first_function_struct)
     {
-      if ((function_struct_ptr->numberOfExecs > 0 || !(function_struct_ptr->limitedAmount))) //Wenn noch Ausführungen übrig sind
-      {
-        #ifdef Task_contextSwitch
-        nextExecFunc = function_struct_ptr;
-        switchEnable = 1;
-        #else
-        function_struct_ptr->lastExecTime = currmicros; //Die Zeit vor Anfang der Ausführung speichern
-        (function_struct_ptr->function)();      //Hier die Funktion ausführen
-        if (function_struct_ptr->limitedAmount) //Wenn die Funktion nur eine begrenzte Anzahl ausgeführt werden soll
-        {
-          function_struct_ptr->numberOfExecs--; //Zähler um eins dekrementieren
-        }
-        #endif
-        break;
-      }
-      else //Wenn keine Ausführungen mehr übrig sind
-      {
-        removeFunction(function_struct_ptr->function); //Speicher der gespeicherten Daten zu der Funktion wieder freigeben
-      }
+      endOfList = 1;
     }
-    function_struct_ptr = function_struct_ptr->next; //Zum nächsten Element der verketteten Liste übergehen
   }
-#endif
 }
 
 void TaskScheduler::removeFunction(void (*function)())
@@ -251,7 +136,7 @@ void TaskScheduler::removeFunction(void (*function)())
     temp->prev->next = temp->next; //Link von vorherigem zum nächsten
     //jetzt können wir dieses Element komplett vom speicher löschen
     delete temp; //Speicher wieder freigeben
-    //count--;
+    count--;
   }
 }
 
@@ -273,14 +158,27 @@ void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_fre
   }
 }
 
+void TaskScheduler::activateContextSwitch()
+{
+  switchEnable = 1; //Jetzt Kontext switch erlauben
+  currentTask = first_function_struct;
+  currentTask->State = NEW;
+  systemSwitchEvent.attach(&systemSwitchEvent_Handler, 0.01);
+  (*currentTask->function)();
+}
+
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
 {
+  uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
-  while(temp->function != function) //Solange Funktion noch nicht gefunden wurde
+  while (temp->function != function)             //Solange Funktion noch nicht gefunden wurde
   {
-    if (temp == nullptr)
-      break;           //wenn am ende der liste angekommen aufhören und zurück in main springen
-    temp = temp->next; //wenn nicht nächstes element anschauen
+    if (!(temp == first_function_struct && i != 0))
+    {
+      temp = temp->next; //wenn nicht nächstes element anschauen
+      i++;
+    }
+    return nullptr; //wenn am ende der liste angekommen aufhören und zurück in main springen
   }
   //Hier haben wir das richtige element schon gefunden -> temp
   return temp; //Element übergeben

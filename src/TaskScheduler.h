@@ -1,15 +1,19 @@
 #ifndef Task_Scheduler
 #define Task_Scheduler
 
-//#define Task_Fair  //nach priorität und hinzufügunsreihenfolge ausführen
+////////////Scheduler Mode////////////////////
+#define Task_Fair  //nach priorität und hinzufügunsreihenfolge ausführen
 #define Task_other //nach Prioritätsreihenfolge ausführen
 
+////////////ContextSwitch/////////////////////
 #define Task_contextSwitch  //Content switching aktivieren
-//#include "test.h"
+#define stackSize 16 //60
 
+////////////IDE///////////////////////////////
 #define On_PIO //IDE spezifizieren
 //#define On_Arduino
-//#define Debug_TS            //Debugging TimerOverflow
+
+//////////////////////////////////////////////
 
 #ifdef Debug_TS
 #warning TimerOverflow Debugging ist aktiviert
@@ -25,6 +29,12 @@
 #include <stdint.h>
 #define get_us us_ticker_read()
 #endif
+
+typedef enum {
+  NEW,
+  RUNNING,
+  STOPPED
+} taskState;
 
 struct function_struct
 {
@@ -42,7 +52,8 @@ struct function_struct
   uint16_t id;            //ID des Tasks
 
   //KontextSwitch
-  uint8_t taskState;      //Status des Tasks
+  uint32_t arr[40];
+  taskState State;        //Status des Tasks
   uint32_t *Stack;
   uint32_t Stackpointer;
 };
@@ -50,13 +61,14 @@ struct function_struct
 class TaskScheduler
 {
   /////////Variables
-private:
+public:
   uint8_t maxPrio;                        //Variable für die maximale Prio
-  uint8_t currPrio;                       //Zählvariable für Priorität
+  //uint8_t currPrio;                       //Zählvariable für Priorität
   uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
 
   uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
+                                          //Wichtig für Overflow Handling
 
 public:
   //Constructor
@@ -78,8 +90,10 @@ public:
   //Setter Methods
   void setPriority(/*Funktion*/ void (*function)(), uint8_t prio);
   void setFrequency(/*Funktion*/ void (*function)(), float exec_freq);
+  
+  void activateContextSwitch(void);
 
   //Main Loop Method
-  void schedule() __attribute__((optimize(0))); //Execute in the Loop
+  void schedule(); //Execute in the Loop
 };
 #endif //Task_Scheduler

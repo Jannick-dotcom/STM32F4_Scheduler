@@ -1,28 +1,41 @@
 #include <mbed.h>
 Serial pc(PD_8, PD_9); // tx, rx
-CAN can1(PB_8, PB_9);  //rd, td, freq[Hz]
 
 #include "TaskScheduler.h"
 TaskScheduler Tasker1;
 
-DigitalOut blue(PB_7);
-DigitalOut test(PG_2);
-DigitalOut red(PB_14);
-DigitalOut green(PB_0);
-
 void task1(void)
 {
-  while(1)
+  while (1)
   {
-    pc.printf("task1");
+    pc.printf("task1\n");
+  }
+}
+
+void task2(void)
+{
+  while (1)
+  {
+    pc.printf("\t\t task2\n");
+  }
+}
+
+void task3(void)
+{
+  while (1)
+  {
+    pc.printf("\ttask3\n");
   }
 }
 
 int main()
 {
-  Tasker1.addFunction(task1, 3, 10);
+  Tasker1.addFunction(task1, 1, 1);
+  Tasker1.addFunction(task2, 2, 1);
+  Tasker1.addFunction(task3, 2, 1);
+  Tasker1.activateContextSwitch();
   while (1)
   {
-    Tasker1.schedule();
+    //Tasker1.schedule();
   }
 }
