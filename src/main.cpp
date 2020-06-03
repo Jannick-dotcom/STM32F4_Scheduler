@@ -16,7 +16,7 @@ void task2(void)
 {
   while (1)
   {
-    pc.printf("\t\t task2\n");
+    pc.printf("\ttask2\n");
   }
 }
 
@@ -24,7 +24,7 @@ void task3(void)
 {
   while (1)
   {
-    pc.printf("\ttask3\n");
+    pc.printf("\t\ttask3\n");
   }
 }
 
@@ -33,9 +33,6 @@ int main()
   Tasker1.addFunction(task1, 1, 1);
   Tasker1.addFunction(task2, 2, 1);
   Tasker1.addFunction(task3, 2, 1);
-  Tasker1.activateContextSwitch();
-  while (1)
-  {
-    //Tasker1.schedule();
-  }
+  //Tasker1.activateContextSwitch();
+  while(1);
 }

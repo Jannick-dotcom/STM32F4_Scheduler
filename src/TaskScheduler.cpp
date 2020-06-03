@@ -25,9 +25,6 @@ TaskScheduler::TaskScheduler()
   //Für Context Switch
   switchEnable = 0; //Jetzt noch kein Kontext switch erlauben
   currentTask = nullptr;
-  #ifdef Task_contextSwitch
-  //Hier muss ich noch den MAIN Task hinzufügen!!!!!!!!!!!!
-  #endif
 }
 
 void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
@@ -162,7 +159,8 @@ void TaskScheduler::activateContextSwitch()
 {
   switchEnable = 1; //Jetzt Kontext switch erlauben
   currentTask = first_function_struct;
-  currentTask->State = NEW;
+  currentTask->State = RUNNING;
+
   systemSwitchEvent.attach(&systemSwitchEvent_Handler, 0.01);
   (*currentTask->function)();
 }

@@ -63,10 +63,9 @@ class TaskScheduler
   /////////Variables
 public:
   uint8_t maxPrio;                        //Variable für die maximale Prio
-  //uint8_t currPrio;                       //Zählvariable für Priorität
+  //uint8_t currPrio;                     //Zählvariable für Priorität
   uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
-
   uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
                                           //Wichtig für Overflow Handling
 
