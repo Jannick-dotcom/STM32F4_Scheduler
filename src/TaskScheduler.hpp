@@ -7,7 +7,7 @@
 
 ////////////ContextSwitch/////////////////////
 #define Task_contextSwitch  //Content switching aktivieren
-#define stackSize 16 //60
+#define stackSize 80
 
 ////////////IDE///////////////////////////////
 #define On_PIO //IDE spezifizieren
@@ -36,6 +36,7 @@ typedef enum {
   STOPPED
 } taskState;
 
+
 struct function_struct
 {
   //Verkettete Liste
@@ -52,10 +53,8 @@ struct function_struct
   uint16_t id;            //ID des Tasks
 
   //KontextSwitch
-  uint32_t arr[40];
   taskState State;        //Status des Tasks
-  uint32_t *Stack;
-  uint32_t Stackpointer;
+  uint32_t *Stack;        //Stackpointer
 };
 
 class TaskScheduler

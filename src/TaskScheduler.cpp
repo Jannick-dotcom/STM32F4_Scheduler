@@ -1,10 +1,7 @@
-#include "TaskScheduler.h"
+#include "TaskScheduler.hpp"
 
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
-extern Ticker systemSwitchEvent;
-extern void xPortPendSVHandler(void);
-extern __attribute__((isr, naked)) void systemSwitchEvent_Handler(void);
 
 template <class T> //Für alle Datentypen
 T maxInt(T val)
@@ -58,22 +55,33 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
-  function_struct_ptr->Stack = (uint32_t *)(malloc(stackSize * 4)); //9 Register * 4 Byte = 60 Byte
+  function_struct_ptr->Stack = (uint32_t *)((malloc(stackSize * 4)));
   if (function_struct_ptr->Stack == nullptr)                        //Out of HEAP!!!
   {
     delete function_struct_ptr;
     return;
   }
-  function_struct_ptr->Stackpointer = (uint32_t)(function_struct_ptr->Stack) + (stackSize * 8 - 4); //Pointer auf das Letzte Element -> da decreasing Stack
-  function_struct_ptr->State = NEW;                                                               //New Task
-  *(function_struct_ptr->Stack + (stackSize - 1)) = 0x01000000;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 1) = (uint32_t)function_struct_ptr->function;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 2) = 0xFFFFFFFD;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 3) = 0x00;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 4) = 0x00;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 5) = 0x00;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 6) = 0x00;
-  *(function_struct_ptr->Stack + (stackSize - 1) - 7) = 0x00;
+  function_struct_ptr->State = NEW;                                                                  //New Task
+  //////////////Software saved Registers/////////////////////////////////////////////////////////////////////
+  *(function_struct_ptr->Stack + 8) = 0x00000000;                                                    //R12
+  *(function_struct_ptr->Stack + 7) = 0x00000000;                                                    //R11
+  *(function_struct_ptr->Stack + 6) = 0x00000000;                                                    //R10
+  *(function_struct_ptr->Stack + 5) = 0x00000000;                                                    //R9
+  *(function_struct_ptr->Stack + 4) = 0x00000000;                                                    //R8
+  *(function_struct_ptr->Stack + 3) = 0x00000000;                                                    //R7
+  *(function_struct_ptr->Stack + 2) = 0x00000000;                                                    //R6
+  *(function_struct_ptr->Stack + 1) = 0x00000000;                                                    //R5
+  *(function_struct_ptr->Stack + 0) = 0x00000000;                                                    //R4
+  function_struct_ptr->Stack = function_struct_ptr->Stack + 9;                //Stack verschieben
+  //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
+  *(function_struct_ptr->Stack + 7) = 0x01000000;                                                    //XPSR
+  *(function_struct_ptr->Stack + 6) = (uint32_t)function_struct_ptr->function;                       //PC
+  *(function_struct_ptr->Stack + 5) = 0xFFFFFFFD;                                                    //LR
+  *(function_struct_ptr->Stack + 4) = 0x00000000;                                                    //R12
+  *(function_struct_ptr->Stack + 3) = 0x00000000;                                                    //R3
+  *(function_struct_ptr->Stack + 2) = 0x00000000;                                                    //R2
+  *(function_struct_ptr->Stack + 1) = 0x00000000;                                                    //R1
+  *(function_struct_ptr->Stack + 0) = 0x00000000;                                                    //R0
 
   if (prio > maxPrio)
   {
@@ -132,6 +140,7 @@ void TaskScheduler::removeFunction(void (*function)())
     temp->next->prev = temp->prev; //Link von nächstem auf vorherigen
     temp->prev->next = temp->next; //Link von vorherigem zum nächsten
     //jetzt können wir dieses Element komplett vom speicher löschen
+    delete temp->Stack;
     delete temp; //Speicher wieder freigeben
     count--;
   }
@@ -159,10 +168,7 @@ void TaskScheduler::activateContextSwitch()
 {
   switchEnable = 1; //Jetzt Kontext switch erlauben
   currentTask = first_function_struct;
-  currentTask->State = RUNNING;
-
-  systemSwitchEvent.attach(&systemSwitchEvent_Handler, 0.01);
-  (*currentTask->function)();
+  SysTick_Config(SystemCoreClock / 1000);
 }
 
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
