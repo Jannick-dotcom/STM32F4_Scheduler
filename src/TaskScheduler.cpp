@@ -24,14 +24,14 @@ TaskScheduler::TaskScheduler()
   currentTask = nullptr;
 }
 
-void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
+uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
 {
   function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
   function_struct_ptr = new function_struct;      //ein neues erstellen
 
   if (function_struct_ptr == nullptr) //Wenn kein HEAP Platz mehr frei ist...
   {
-    return; //Aus der Funktion rausspringen
+    return 0; //Aus der Funktion rausspringen
   }
 
   if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
@@ -59,29 +59,30 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   if (function_struct_ptr->Stack == nullptr)                        //Out of HEAP!!!
   {
     delete function_struct_ptr;
-    return;
+    return 0;
   }
   function_struct_ptr->State = NEW;                                                                  //New Task
   //////////////Software saved Registers/////////////////////////////////////////////////////////////////////
-  *(function_struct_ptr->Stack + 8) = 0x00000000;                                                    //R12
-  *(function_struct_ptr->Stack + 7) = 0x00000000;                                                    //R11
-  *(function_struct_ptr->Stack + 6) = 0x00000000;                                                    //R10
-  *(function_struct_ptr->Stack + 5) = 0x00000000;                                                    //R9
-  *(function_struct_ptr->Stack + 4) = 0x00000000;                                                    //R8
-  *(function_struct_ptr->Stack + 3) = 0x00000000;                                                    //R7
-  *(function_struct_ptr->Stack + 2) = 0x00000000;                                                    //R6
-  *(function_struct_ptr->Stack + 1) = 0x00000000;                                                    //R5
-  *(function_struct_ptr->Stack + 0) = 0x00000000;                                                    //R4
-  function_struct_ptr->Stack = function_struct_ptr->Stack + 9;                //Stack verschieben
-  //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
-  *(function_struct_ptr->Stack + 7) = 0x01000000;                                                    //XPSR
-  *(function_struct_ptr->Stack + 6) = (uint32_t)function_struct_ptr->function;                       //PC
-  *(function_struct_ptr->Stack + 5) = 0xFFFFFFFD;                                                    //LR
-  *(function_struct_ptr->Stack + 4) = 0x00000000;                                                    //R12
-  *(function_struct_ptr->Stack + 3) = 0x00000000;                                                    //R3
-  *(function_struct_ptr->Stack + 2) = 0x00000000;                                                    //R2
-  *(function_struct_ptr->Stack + 1) = 0x00000000;                                                    //R1
-  *(function_struct_ptr->Stack + 0) = 0x00000000;                                                    //R0
+  //function_struct_ptr->Stack += 40;
+  uint32_t *stackptr = function_struct_ptr->Stack;
+    //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
+  *(stackptr + 7) = 0x01000000;                                                    //XPSR
+  *(stackptr + 6) = (uint32_t)function_struct_ptr->function & (uint32_t)~1;        //PC
+  *(stackptr + 5) = 0xFFFFFFFD;                                                    //LR
+  *(stackptr + 4) = 0x00000012;                                                    //R12
+  *(stackptr + 3) = 0x00000003;                                                    //R3
+  *(stackptr + 2) = 0x00000002;                                                    //R2
+  *(stackptr + 1) = 0x00000001;                                                    //R1
+  *(stackptr + 0) = 0x00000000;                                                    //R0
+
+  *(stackptr + 15) = 0x00000011;                                                   //R11
+  *(stackptr + 14) = 0x00000010;                                                   //R10
+  *(stackptr + 13) = 0x00000009;                                                   //R9
+  *(stackptr + 12) = 0x00000008;                                                   //R8
+  *(stackptr + 11) = 0x00000007;                                                   //R7
+  *(stackptr + 10) = 0x00000006;                                                   //R6
+  *(stackptr + 9)  = 0x00000005;                                                   //R5
+  *(stackptr + 8)  = 0x00000004;                                                   //R4
 
   if (prio > maxPrio)
   {
@@ -89,6 +90,7 @@ void TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_fre
   }
   function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
   count = count + 1;                     //Funktionszähler inkrementieren
+  return 1;
 }
 
 void TaskScheduler::schedule()
@@ -168,7 +170,9 @@ void TaskScheduler::activateContextSwitch()
 {
   switchEnable = 1; //Jetzt Kontext switch erlauben
   currentTask = first_function_struct;
+  currentTask->State = NEW;
   SysTick_Config(SystemCoreClock / 1000);
+  NVIC_SetPriority(SysTick_IRQn, 0);
 }
 
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())

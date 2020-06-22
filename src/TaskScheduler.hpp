@@ -49,7 +49,7 @@ struct function_struct
   float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
   bool limitedAmount;     //Soll eine begrenzte Anzahl an Ausführungen haben?
   uint16_t numberOfExecs; //Wie oft soll die Funktion noch ausgeführt werden
-  uint64_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
+  uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
   uint16_t id;            //ID des Tasks
 
   //KontextSwitch
@@ -65,6 +65,7 @@ public:
   //uint8_t currPrio;                     //Zählvariable für Priorität
   uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
+
   uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
                                           //Wichtig für Overflow Handling
 
@@ -73,13 +74,17 @@ public:
   TaskScheduler(); //Create a Task Scheduler
 
   //Function Methods
-  void addFunction(
+  //return Wert 1 wenn erfolgreich
+  uint8_t addFunction(
     /*Funktion*/ void (*function)(), 
     /*Prioritaet*/ uint8_t prio, 
     /*Executions per sec*/ float exec_freq, 
     /*Number of execs*/ uint16_t Execcount = 0);
+    //Eine Funktion zur Liste hinzufügen
 
-  void removeFunction(/*Funktion*/ void (*function)()); //Eine Funktion aus der Liste löschen
+  void removeFunction(
+    /*Funktion*/ void (*function)()); 
+    //Eine Funktion aus der Liste löschen
 
 private:
   function_struct *searchFunction(/*Funktion*/ void (*function)());
