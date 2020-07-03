@@ -55,34 +55,33 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
-  function_struct_ptr->Stack = (uint32_t *)((malloc(stackSize * 4)));
+  function_struct_ptr->Stack = new test;//(uint32_t *)((malloc(stackSize * sizeof(uint32_t))));
   if (function_struct_ptr->Stack == nullptr)                        //Out of HEAP!!!
   {
     delete function_struct_ptr;
     return 0;
   }
   function_struct_ptr->State = NEW;                                                                  //New Task
-  //////////////Software saved Registers/////////////////////////////////////////////////////////////////////
-  //function_struct_ptr->Stack += 40;
-  uint32_t *stackptr = function_struct_ptr->Stack;
-    //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
-  *(stackptr + 7) = 0x01000000;                                                    //XPSR
-  *(stackptr + 6) = (uint32_t)function_struct_ptr->function & (uint32_t)~1;        //PC
-  *(stackptr + 5) = 0xFFFFFFFD;                                                    //LR
-  *(stackptr + 4) = 0x00000012;                                                    //R12
-  *(stackptr + 3) = 0x00000003;                                                    //R3
-  *(stackptr + 2) = 0x00000002;                                                    //R2
-  *(stackptr + 1) = 0x00000001;                                                    //R1
-  *(stackptr + 0) = 0x00000000;                                                    //R0
+  //////////////Software saved Registers///////////////////////////////////////////////////////////////////////
+  uint32_t *stackptr = (uint32_t *)(function_struct_ptr->Stack);
+  //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
+  *(stackptr + 15) = 0x01000000;                                                  //XPSR
+  *(stackptr + 14) = (uint32_t)function_struct_ptr->function & (uint32_t)~1;      //PC
+  *(stackptr + 13) = (uint32_t)function_struct_ptr->function;                     //LR
+  *(stackptr + 12) = 0x00000012;                                                  //R12
+  *(stackptr + 11) = 0x00000003;                                                  //R3
+  *(stackptr + 10) = 0x00000002;                                                  //R2
+  *(stackptr + 9) = 0x00000001;                                                   //R1
+  *(stackptr + 8) = 0x00000000;                                                   //R0
 
-  *(stackptr + 15) = 0x00000011;                                                   //R11
-  *(stackptr + 14) = 0x00000010;                                                   //R10
-  *(stackptr + 13) = 0x00000009;                                                   //R9
-  *(stackptr + 12) = 0x00000008;                                                   //R8
-  *(stackptr + 11) = 0x00000007;                                                   //R7
-  *(stackptr + 10) = 0x00000006;                                                   //R6
-  *(stackptr + 9)  = 0x00000005;                                                   //R5
-  *(stackptr + 8)  = 0x00000004;                                                   //R4
+  *(stackptr + 7) = 0x00000011;                                                   //R11
+  *(stackptr + 6) = 0x00000010;                                                   //R10
+  *(stackptr + 5) = 0x00000009;                                                   //R9
+  *(stackptr + 4) = 0x00000008;                                                   //R8
+  *(stackptr + 3) = 0x00000007;                                                   //R7
+  *(stackptr + 2) = 0x00000006;                                                   //R6
+  *(stackptr + 1)  = 0x00000005;                                                  //R5
+  *(stackptr + 0)  = 0x00000004;                                                  //R4
 
   if (prio > maxPrio)
   {
@@ -172,7 +171,11 @@ void TaskScheduler::activateContextSwitch()
   currentTask = first_function_struct;
   currentTask->State = NEW;
   SysTick_Config(SystemCoreClock / 1000);
-  NVIC_SetPriority(SysTick_IRQn, 0);
+  //  Set the Priority of the PendSV interrupt to minimum
+	*(unsigned long int volatile *) 0xE000ED20 |= (0xFFU << 16);
+  //  Set the Priority of Systick
+  *(unsigned long int volatile *)0xE000ED20 = ((*(unsigned long int volatile *)0xE000ED20) & 0x00FFFFFF) | 0x40000000;
+
 }
 
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
