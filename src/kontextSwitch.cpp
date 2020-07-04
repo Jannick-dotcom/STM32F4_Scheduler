@@ -82,7 +82,7 @@ extern "C" void PendSV_Handler()
             currentTask->State = RUNNING;
         }
     }
-    asm("MOV r0, #0xFFFFFFFD");
+    asm("MOV LR, #0xFFFFFFFD");
     enable_interrupts();
-    asm("bx r0");
+    //asm("bx r0");
 }
