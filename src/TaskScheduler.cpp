@@ -55,7 +55,7 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
-  function_struct_ptr->Stack = new test;//(uint32_t *)((malloc(stackSize * sizeof(uint32_t))));
+  /*function_struct_ptr->Stack = (uint32_t *)((malloc(stackSize * sizeof(uint32_t))));
   if (function_struct_ptr->Stack == nullptr)                        //Out of HEAP!!!
   {
     delete function_struct_ptr;
@@ -82,7 +82,7 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   *(stackptr + 2) = 0x00000006;                                                   //R6
   *(stackptr + 1)  = 0x00000005;                                                  //R5
   *(stackptr + 0)  = 0x00000004;                                                  //R4
-
+*/
   if (prio > maxPrio)
   {
     maxPrio = prio; //Maximale Priorität updaten
@@ -165,17 +165,22 @@ void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_fre
   }
 }
 
-void TaskScheduler::activateContextSwitch()
+void TaskScheduler::setContextSwitch(uint8_t enable)
 {
-  switchEnable = 1; //Jetzt Kontext switch erlauben
+  switchEnable = enable; //Jetzt Kontext switch erlauben
+}
+
+void TaskScheduler::startOS(void)
+{
   currentTask = first_function_struct;
   currentTask->State = NEW;
+  setContextSwitch(true);
   SysTick_Config(SystemCoreClock / 1000);
-  //  Set the Priority of the PendSV interrupt to minimum
-	*(unsigned long int volatile *) 0xE000ED20 |= (0xFFU << 16);
-  //  Set the Priority of Systick
-  *(unsigned long int volatile *)0xE000ED20 = ((*(unsigned long int volatile *)0xE000ED20) & 0x00FFFFFF) | 0x40000000;
-
+  NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
+	NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
+  __set_PSP(__get_MSP());
+  __set_CONTROL(0x03); /* Switch to Unprivilleged Thread Mode with PSP */
+  __ISB();
 }
 
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())

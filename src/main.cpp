@@ -12,8 +12,9 @@ void task1(void)
   while (1)
   {
     red.write(!red.read());
-    //i++;
-    //printf("task1\n");
+    //Tasker1.setContextSwitch(false);
+    printf("task1\n");
+    //Tasker1.setContextSwitch(true);
   }
 }
 
@@ -23,8 +24,9 @@ void task2(void)
   while (1)
   {
     blue.write(!blue.read());
-    i++;
-    //printf("\ttask2\n");
+    //Tasker1.setContextSwitch(false);
+    printf("\ttask2\n");
+    //Tasker1.setContextSwitch(true);
   }
 }
 
@@ -34,8 +36,9 @@ void task3(void)
   while (1)
   {
     green.write(!green.read());
-    //i++;
+    //Tasker1.setContextSwitch(false);
     printf("\t\ttask3\n");
+    //Tasker1.setContextSwitch(true);
   }
 }
 
@@ -44,8 +47,7 @@ int main()
   Tasker1.addFunction(task1, 1, 100);
   Tasker1.addFunction(task2, 2, 100);
   Tasker1.addFunction(task3, 2, 100);
-  Tasker1.activateContextSwitch();
-  //task2();
+  Tasker1.startOS();
   while (1)
   {
     //Tasker1.schedule();

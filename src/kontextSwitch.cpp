@@ -5,39 +5,47 @@
 uint8_t switchEnable = 0;
 function_struct *currentTask = nullptr;
 
+#define func (uint32_t)currentTask->function & ~1UL
 
 /*
  * Enables all interrupts
  */
-extern "C" void enable_interrupts() 
+extern "C" inline void enable_interrupts() 
 {
-	__asm("CPSIE I");
+	asm("CPSIE I");
 }
 
 /*
  * Disables all interrupts
  */
-extern "C" void disable_interrupts() 
+extern "C" inline void disable_interrupts() 
 {
-	__asm("CPSID I");
+	asm("CPSID I");
 }
 
 extern "C" void SysTick_Handler(void)
 {
     // Set the 28th Bit to trigger PendSV interrupt
-	*(unsigned long int volatile *)0xE000ED04 = (1U << 28);
+    //0xE000E008 = base address
+    //0xE000E00C = base address + 0x04
+	//*(unsigned long int volatile *)0xE000E00C |= (1U << 28);  //Interrupt control and state register
+    
+    if(switchEnable) SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    //trigger Pendsv
     enable_interrupts();
 }
 
-extern "C" void pendsv_handler() 
+extern "C" void PendSV_Handler() 
 {
     disable_interrupts();
-    if (switchEnable && (currentTask != NULL))
+    if (currentTask != NULL)
     {
         if ((currentTask->State == RUNNING)) //Hier Task anhalten
         {
-            asm("MOV r0, %0" : : "r"(currentTask->Stack));
-            asm("STMIA r0, {r4-r11}");
+            asm("MRS r0, PSP");
+            asm("STMDB r0!, {r4-r11}");
+            asm("MSR PSP, r0");
+            asm("MOV %0, r0" : "=r"(currentTask->Stack));
 
             currentTask->State = STOPPED;
             currentTask = currentTask->next; //Nächsten Task
@@ -46,24 +54,35 @@ extern "C" void pendsv_handler()
         // *******************************************************************************
 
         if (currentTask->State == NEW)
-        {
-            asm("MOV r0, %0" : : "r"(currentTask->Stack));
-            asm("LDMIA r0, {r4-r11}");
-            asm("ADD r0, #32");
+        {   
+            asm("MOV r4, #0");                                 //R0
+            asm("MOV r5, #1");                                 //R1
+            asm("MOV r6, #2");                                  //R2
+            asm("MOV r7, #3");                                  //R3
+            asm("MOV r8, #0x12");                               //R12
+            asm("MOV r9, %0" : : "r"(func));                    //LR
+            asm("MOV r10, %0" : : "r"(func));                   //PC
+            asm("MOV r11, #0x01000000");                        //XPSR
+
+            //asm("PUSH {r0-r7}");
+
+            asm("MRS r0, PSP");
+            asm("STMDB r0!, {r4-r11}");
             asm("MSR PSP, r0");
+            
             currentTask->State = RUNNING;
         }
 
         if (currentTask->State == STOPPED) //Hier Task fortsetzen
         {
             asm("MOV r0, %0" : : "r"(currentTask->Stack));
-            asm("LDMIA r0, {r4-r11}");
-            asm("ADD r0, #32");
-            asm("MSR PSP, r0");         
+            //asm("POP {r4-r11}");
+            asm("LDMIA r0!, {r4-r11}");
+            asm("MSR PSP, r0");
             currentTask->State = RUNNING;
         }
-        //asm("MOV r0, #0xFFFFFFFD");
-        //asm("bx r0");
     }
+    asm("MOV r0, #0xFFFFFFFD");
     enable_interrupts();
+    asm("bx r0");
 }

@@ -7,7 +7,6 @@
 
 ////////////ContextSwitch/////////////////////
 #define Task_contextSwitch  //Content switching aktivieren
-#define stackSize 16
 
 ////////////IDE///////////////////////////////
 #define On_PIO //IDE spezifizieren
@@ -100,7 +99,8 @@ public:
   void setPriority(/*Funktion*/ void (*function)(), uint8_t prio);
   void setFrequency(/*Funktion*/ void (*function)(), float exec_freq);
   
-  void activateContextSwitch(void);
+  void setContextSwitch(uint8_t enable);
+  void startOS(void);
 
   //Main Loop Method
   void schedule(); //Execute in the Loop
