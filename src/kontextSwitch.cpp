@@ -2,10 +2,23 @@
 #include <stm32f4xx_hal.h>
 #include "TaskScheduler.hpp"
 //Kontext Switch
-uint8_t switchEnable = 0;
-function_struct *currentTask = nullptr;
+volatile uint8_t switchEnable = 0;
+volatile function_struct *currentTask = nullptr;
 
 #define func (uint32_t)currentTask->function & ~1UL
+
+void TaskScheduler::startOS(void)
+{
+  currentTask = first_function_struct;
+  currentTask->State = NEW;
+  setContextSwitch(true);
+  SysTick_Config(SystemCoreClock / 1000);
+  NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
+	NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
+  __set_PSP(__get_MSP());
+  __set_CONTROL(0x03); /* Switch to Unprivilleged Thread Mode with PSP */
+  __ISB();
+}
 
 /*
  * Enables all interrupts

@@ -60,9 +60,9 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   {
     delete function_struct_ptr;
     return 0;
-  }
+  }*/
   function_struct_ptr->State = NEW;                                                                  //New Task
-  //////////////Software saved Registers///////////////////////////////////////////////////////////////////////
+  /*/////////////Software saved Registers///////////////////////////////////////////////////////////////////////
   uint32_t *stackptr = (uint32_t *)(function_struct_ptr->Stack);
   //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
   *(stackptr + 15) = 0x01000000;                                                  //XPSR
@@ -168,19 +168,6 @@ void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_fre
 void TaskScheduler::setContextSwitch(uint8_t enable)
 {
   switchEnable = enable; //Jetzt Kontext switch erlauben
-}
-
-void TaskScheduler::startOS(void)
-{
-  currentTask = first_function_struct;
-  currentTask->State = NEW;
-  setContextSwitch(true);
-  SysTick_Config(SystemCoreClock / 1000);
-  NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
-	NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
-  __set_PSP(__get_MSP());
-  __set_CONTROL(0x03); /* Switch to Unprivilleged Thread Mode with PSP */
-  __ISB();
 }
 
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())

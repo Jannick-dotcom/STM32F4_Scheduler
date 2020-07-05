@@ -8,38 +8,21 @@
 ////////////ContextSwitch/////////////////////
 #define Task_contextSwitch  //Content switching aktivieren
 
-////////////IDE///////////////////////////////
-#define On_PIO //IDE spezifizieren
-//#define On_Arduino
-
 //////////////////////////////////////////////
 
 #ifdef Debug_TS
 #warning TimerOverflow Debugging ist aktiviert
 #endif
 
-#ifdef On_Arduino
-#include <Arduino.h>
-#define get_us micros
-#endif
-
-#ifdef On_PIO
 #include <mbed.h>
 #include <stdint.h>
 #define get_us us_ticker_read()
-#endif
 
 typedef enum {
   NEW,
   RUNNING,
   STOPPED
 } taskState;
-
-struct test
-{
-  uint32_t vals[16];
-};
-
 
 struct function_struct
 {
@@ -57,9 +40,9 @@ struct function_struct
   uint16_t id;            //ID des Tasks
 
   //KontextSwitch
-  taskState State;        //Status des Tasks
+  volatile taskState State;        //Status des Tasks
   //uint32_t *Stack;        //Stackpointer
-  test *Stack;
+  volatile uint32_t *Stack;
 };
 
 class TaskScheduler
@@ -72,7 +55,7 @@ public:
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
 
   uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
-                                          //Wichtig für Overflow Handling
+  //Wichtig für Overflow Handling
 
 public:
   //Constructor
@@ -99,8 +82,8 @@ public:
   void setPriority(/*Funktion*/ void (*function)(), uint8_t prio);
   void setFrequency(/*Funktion*/ void (*function)(), float exec_freq);
   
-  void setContextSwitch(uint8_t enable);
-  void startOS(void);
+  void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
+  void startOS(void);                     //RTOS Starten
 
   //Main Loop Method
   void schedule(); //Execute in the Loop
