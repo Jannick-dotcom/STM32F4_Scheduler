@@ -3,6 +3,9 @@
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Returns the maximum Unsigned Value of a Type
+////////////////////////////////////////////////////////////////////////////////////////
 template <class T> //Für alle Datentypen
 T maxInt(T val)
 {
@@ -10,6 +13,9 @@ T maxInt(T val)
   return -1;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Constructor - Here we Create a TaskScheduler Object
+////////////////////////////////////////////////////////////////////////////////////////
 TaskScheduler::TaskScheduler()
 {
   //Basiswerte Initialisieren
@@ -24,8 +30,16 @@ TaskScheduler::TaskScheduler()
   currentTask = nullptr;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Adds a new Task to the List of executable ones
+////////////////////////////////////////////////////////////////////////////////////////
 uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
 {
+  if (function == nullptr || exec_freq <= 0)  //Make sure the parameters are correct
+  {
+    return 0;
+  }
+  
   function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
   function_struct_ptr = new function_struct;      //ein neues erstellen
 
@@ -55,34 +69,9 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
-  /*function_struct_ptr->Stack = (uint32_t *)((malloc(stackSize * sizeof(uint32_t))));
-  if (function_struct_ptr->Stack == nullptr)                        //Out of HEAP!!!
-  {
-    delete function_struct_ptr;
-    return 0;
-  }*/
-  function_struct_ptr->State = NEW;                                                                  //New Task
-  /*/////////////Software saved Registers///////////////////////////////////////////////////////////////////////
-  uint32_t *stackptr = (uint32_t *)(function_struct_ptr->Stack);
-  //////////////Hardware Saved Registers/////////////////////////////////////////////////////////////////////
-  *(stackptr + 15) = 0x01000000;                                                  //XPSR
-  *(stackptr + 14) = (uint32_t)function_struct_ptr->function & (uint32_t)~1;      //PC
-  *(stackptr + 13) = (uint32_t)function_struct_ptr->function;                     //LR
-  *(stackptr + 12) = 0x00000012;                                                  //R12
-  *(stackptr + 11) = 0x00000003;                                                  //R3
-  *(stackptr + 10) = 0x00000002;                                                  //R2
-  *(stackptr + 9) = 0x00000001;                                                   //R1
-  *(stackptr + 8) = 0x00000000;                                                   //R0
 
-  *(stackptr + 7) = 0x00000011;                                                   //R11
-  *(stackptr + 6) = 0x00000010;                                                   //R10
-  *(stackptr + 5) = 0x00000009;                                                   //R9
-  *(stackptr + 4) = 0x00000008;                                                   //R8
-  *(stackptr + 3) = 0x00000007;                                                   //R7
-  *(stackptr + 2) = 0x00000006;                                                   //R6
-  *(stackptr + 1)  = 0x00000005;                                                  //R5
-  *(stackptr + 0)  = 0x00000004;                                                  //R4
-*/
+  function_struct_ptr->State = NEW;               //New Task
+  
   if (prio > maxPrio)
   {
     maxPrio = prio; //Maximale Priorität updaten
@@ -92,6 +81,9 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   return 1;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Here the normal Tasks get executed after another
+////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::schedule()
 {
   uint16_t endOfList = 0;               //Merker für das traversieren der Liste
@@ -122,7 +114,7 @@ void TaskScheduler::schedule()
     if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros)
     {
       function_struct_ptr->lastExecTime = currmicros;
-      (*function_struct_ptr->function)();
+      if(!switchEnable) (*function_struct_ptr->function)();
       break;
     }
     function_struct_ptr = function_struct_ptr->next;
@@ -133,8 +125,16 @@ void TaskScheduler::schedule()
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Here we remove a Task from the List of executable ones
+////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::removeFunction(void (*function)())
 {
+  if (function == nullptr)  //Make sure the parameters are correct
+  {
+    return;
+  }
+
   function_struct *temp = searchFunction(function); //Funktion suchen
   if (temp != nullptr)                              //Wenn die gefundene Funktion gültig ist
   {
@@ -147,8 +147,16 @@ void TaskScheduler::removeFunction(void (*function)())
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Sets new Priority of a Task
+////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::setPriority(/*Funktion*/ void (*function)(), uint8_t prio)
 {
+  if (function == nullptr)  //Make sure the parameters are correct
+  {
+    return;
+  }
+
   function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
@@ -156,8 +164,16 @@ void TaskScheduler::setPriority(/*Funktion*/ void (*function)(), uint8_t prio)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Sets new Frequency of a Task
+////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_freq)
 {
+  if (function == nullptr || exec_freq <= 0)  //Make sure the parameters are correct
+  {
+    return;
+  }
+
   function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
@@ -165,15 +181,26 @@ void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_fre
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Activate or Deactivate context switching
+////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::setContextSwitch(uint8_t enable)
 {
   switchEnable = enable; //Jetzt Kontext switch erlauben
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Search a task in the list of executable ones
+////////////////////////////////////////////////////////////////////////////////////////
 function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
+  if (function == nullptr)  //Make sure the parameters are correct
+  {
+    return 0;
+  }
+
   while (temp->function != function)             //Solange Funktion noch nicht gefunden wurde
   {
     if (!(temp == first_function_struct && i != 0))
