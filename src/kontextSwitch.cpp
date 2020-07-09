@@ -6,20 +6,6 @@ volatile uint8_t switchEnable = 0;
 volatile function_struct *currentTask = nullptr;
 
 #define func (uint32_t)currentTask->function & ~1UL     //Use the function pointer with lowest bit zero
-////////////////////////////////////////////////////////////////////////////////////////
-//Set all the Interrupts and Values for the OS
-void TaskScheduler::startOS(void)
-{
-  currentTask = first_function_struct;      //The current Task is the first one in the List
-  currentTask->State = NEW;                 //The current Task is a new Task
-  setContextSwitch(true);                   //Activate context switching
-  SysTick_Config(SystemCoreClock / 1000);   //Set the frequency of the systick interrupt
-  NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
-  NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
-  __set_PSP(__get_MSP());                   //Init the PSP
-  __set_CONTROL(0x03); /* Switch to Unprivilleged Thread Mode with PSP */
-  asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Enables all interrupts
@@ -35,6 +21,24 @@ extern "C" inline void enable_interrupts()
 extern "C" inline void disable_interrupts() 
 {
 	asm("CPSID I");     //Instruction for disabling interrupts
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Set all the Interrupts and Values for the OS
+////////////////////////////////////////////////////////////////////////////////////////
+void TaskScheduler::startOS(void)
+{
+    currentTask = first_function_struct;      //The current Task is the first one in the List
+    currentTask->State = NEW;                 //The current Task is a new Task
+    setContextSwitch(true);                   //Activate context switching
+    SysTick_Config(SystemCoreClock / 100);   //Set the frequency of the systick interrupt
+
+    NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
+    NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
+    __set_PSP(__get_MSP());                   //Init the PSP
+    __set_CONTROL(0x03); /* Switch to Unprivilleged Thread Mode with PSP */
+    asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+    enable_interrupts();  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -63,13 +67,14 @@ extern "C" void PendSV_Handler()                                //In C Language
             asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
 
             currentTask->State = STOPPED;    //Save function state
+
             currentTask = currentTask->next; //Nächsten Task
         }
 
         if (currentTask->State == NEW)      //New Task
         {   
-            asm("MOV r4, #0");                                 //R0
-            asm("MOV r5, #1");                                 //R1
+            asm("MOV r4, #0");                                  //R0
+            asm("MOV r5, #1");                                  //R1
             asm("MOV r6, #2");                                  //R2
             asm("MOV r7, #3");                                  //R3
             asm("MOV r8, #0x12");                               //R12

@@ -1,0 +1,5 @@
+-Delay function -> cooperative Multitasking -> stop execution and continue in a few milliseconds
+	->Implement a Scheduler to select the next executed Task
+
+
+-Mutex

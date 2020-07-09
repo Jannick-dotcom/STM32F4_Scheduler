@@ -1,18 +1,6 @@
 #ifndef Task_Scheduler
 #define Task_Scheduler
 
-////////////Scheduler Mode////////////////////
-#define Task_Fair  //nach priorität und hinzufügunsreihenfolge ausführen
-#define Task_other //nach Prioritätsreihenfolge ausführen
-
-////////////ContextSwitch/////////////////////
-#define Task_contextSwitch  //Content switching aktivieren
-
-//////////////////////////////////////////////
-
-#ifdef Debug_TS
-#warning TimerOverflow Debugging ist aktiviert
-#endif
 
 #include <mbed.h>
 #include <stdint.h>
@@ -34,14 +22,12 @@ struct function_struct
   void (*function)();     //Auszuführende Funktion
   uint8_t priority;       //Priorität
   float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
-  bool limitedAmount;     //Soll eine begrenzte Anzahl an Ausführungen haben?
-  uint16_t numberOfExecs; //Wie oft soll die Funktion noch ausgeführt werden
+  uint16_t executable;    //Wie oft soll die Funktion noch ausgeführt werden
   uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
   uint16_t id;            //ID des Tasks
 
   //KontextSwitch
   volatile taskState State;        //Status des Tasks
-  //uint32_t *Stack;        //Stackpointer
   volatile uint32_t *Stack;
 };
 
@@ -50,7 +36,6 @@ class TaskScheduler
   /////////Variables
 public:
   uint8_t maxPrio;                        //Variable für die maximale Prio
-  //uint8_t currPrio;                     //Zählvariable für Priorität
   uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
 
@@ -70,7 +55,7 @@ public:
     /*Number of execs*/ uint16_t Execcount = 0);
     //Eine Funktion zur Liste hinzufügen
 
-  void removeFunction(
+  void disableFunction(
     /*Funktion*/ void (*function)()); 
     //Eine Funktion aus der Liste löschen
 
@@ -83,9 +68,9 @@ public:
   void setFrequency(/*Funktion*/ void (*function)(), float exec_freq);
   
   void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
-  void startOS(void);                     //RTOS Starten
+  void startOS(void);                     //RTOS Starten (preemtive Multitasking)
 
   //Main Loop Method
-  void schedule(); //Execute in the Loop
+  void schedule(); //Execute in the Loop (cooperative Multitasking)
 };
 #endif //Task_Scheduler

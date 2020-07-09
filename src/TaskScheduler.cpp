@@ -64,8 +64,7 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
 
   //alle Werte übertragen
   function_struct_ptr->function = function;
-  function_struct_ptr->numberOfExecs = Execcount;
-  function_struct_ptr->limitedAmount = Execcount > 0; //Nur wenn die Anzahl der execs > 0 -> führe Funktion nur so oft aus
+  function_struct_ptr->executable = 1;
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
@@ -128,23 +127,14 @@ void TaskScheduler::schedule()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Here we remove a Task from the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::removeFunction(void (*function)())
+void TaskScheduler::disableFunction(void (*function)())
 {
   if (function == nullptr)  //Make sure the parameters are correct
   {
     return;
   }
-
   function_struct *temp = searchFunction(function); //Funktion suchen
-  if (temp != nullptr)                              //Wenn die gefundene Funktion gültig ist
-  {
-    temp->next->prev = temp->prev; //Link von nächstem auf vorherigen
-    temp->prev->next = temp->next; //Link von vorherigem zum nächsten
-    //jetzt können wir dieses Element komplett vom speicher löschen
-    delete temp->Stack;
-    delete temp; //Speicher wieder freigeben
-    count--;
-  }
+  temp->executable = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +198,10 @@ function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
       temp = temp->next; //wenn nicht nächstes element anschauen
       i++;
     }
-    return nullptr; //wenn am ende der liste angekommen aufhören und zurück in main springen
+    else
+    {
+      return nullptr; //wenn am ende der liste angekommen aufhören und zurück in main springen
+    }
   }
   //Hier haben wir das richtige element schon gefunden -> temp
   return temp; //Element übergeben
