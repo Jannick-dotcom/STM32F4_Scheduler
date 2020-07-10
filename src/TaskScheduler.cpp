@@ -64,12 +64,13 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
 
   //alle Werte übertragen
   function_struct_ptr->function = function;
-  function_struct_ptr->executable = 1;
+  function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
 
   function_struct_ptr->State = NEW;               //New Task
+  function_struct_ptr->continueInMS = 0;
   
   if (prio > maxPrio)
   {
@@ -127,20 +128,23 @@ void TaskScheduler::schedule()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Here we remove a Task from the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::disableFunction(void (*function)())
+void TaskScheduler::changeFunctionEnabled(void (*function)(), bool act)
 {
   if (function == nullptr)  //Make sure the parameters are correct
   {
     return;
   }
   function_struct *temp = searchFunction(function); //Funktion suchen
-  temp->executable = 0;
+  if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
+  {
+    temp->executable = act;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Sets new Priority of a Task
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::setPriority(/*Funktion*/ void (*function)(), uint8_t prio)
+void TaskScheduler::setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio)
 {
   if (function == nullptr)  //Make sure the parameters are correct
   {
@@ -157,7 +161,7 @@ void TaskScheduler::setPriority(/*Funktion*/ void (*function)(), uint8_t prio)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Sets new Frequency of a Task
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::setFrequency(/*Funktion*/ void (*function)(), float exec_freq)
+void TaskScheduler::setFunctionFrequency(/*Funktion*/ void (*function)(), float exec_freq)
 {
   if (function == nullptr || exec_freq <= 0)  //Make sure the parameters are correct
   {
@@ -188,7 +192,7 @@ function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
   if (function == nullptr)  //Make sure the parameters are correct
   {
-    return 0;
+    return nullptr;
   }
 
   while (temp->function != function)             //Solange Funktion noch nicht gefunden wurde
@@ -205,4 +209,12 @@ function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
   }
   //Hier haben wir das richtige element schon gefunden -> temp
   return temp; //Element übergeben
+}
+
+void TaskScheduler::delay(uint32_t milliseconds)
+{
+  currentTask->continueInMS = milliseconds;   //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+  currentTask->executable = false;
+  asm("SVC 0x00");
+  //Hier noch den PendSV handler callen
 }

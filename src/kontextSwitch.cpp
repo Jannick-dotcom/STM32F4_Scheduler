@@ -4,6 +4,7 @@
 //Kontext Switch
 volatile uint8_t switchEnable = 0;
 volatile function_struct *currentTask = nullptr;
+volatile function_struct *nextTask = nullptr;
 
 #define func (uint32_t)currentTask->function & ~1UL     //Use the function pointer with lowest bit zero
 
@@ -31,7 +32,7 @@ void TaskScheduler::startOS(void)
     currentTask = first_function_struct;      //The current Task is the first one in the List
     currentTask->State = NEW;                 //The current Task is a new Task
     setContextSwitch(true);                   //Activate context switching
-    SysTick_Config(SystemCoreClock / 100);   //Set the frequency of the systick interrupt
+    SysTick_Config(SystemCoreClock / 1000);   //Set the frequency of the systick interrupt
 
     NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
     NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
@@ -42,10 +43,43 @@ void TaskScheduler::startOS(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+//System Call interrupt
+////////////////////////////////////////////////////////////////////////////////////////
+extern "C" void SVC_Handler(void)
+{
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    //Set the PendSV to pending
+    enable_interrupts();                    //enable interrupts if not already enabled
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 //Set the PendSV exception to pending
 ////////////////////////////////////////////////////////////////////////////////////////
 extern "C" void SysTick_Handler(void)                           //In C Language
 {    
+    //nextTask = currentTask->next;     //Nächsten Task Initialisieren bevor gesucht wird
+    nextTask = nullptr;
+    
+    volatile function_struct *temp = currentTask->next;
+    do
+    {
+        if(temp->continueInMS > 0) //Wenn verbleibende Delay Zeit größer als 0
+        {
+            temp->continueInMS--;    //dekrementieren
+            temp = temp->next;  //Nächsten Task
+        }
+        else
+        {
+            temp->executable = true;
+        }
+        
+        if(temp->executable == true)
+        {
+            nextTask = temp;
+            break;
+        }
+
+    } while(temp != currentTask);  //Solange ich noch nicht wieder beim ersten angekommen bin    
+
     if(switchEnable) SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;       //If switchEnable set, set the PendSV to pending
     //trigger Pendsv
     enable_interrupts();                                        //enable all interrupts
@@ -57,7 +91,7 @@ extern "C" void SysTick_Handler(void)                           //In C Language
 extern "C" void PendSV_Handler()                                //In C Language
 {
     disable_interrupts();
-    if (currentTask != NULL)                //If the current task is a Task
+    if (currentTask != nullptr && nextTask != nullptr)                //If the current task is a Task
     {
         if ((currentTask->State == RUNNING)) //Hier Task anhalten
         {
@@ -67,8 +101,7 @@ extern "C" void PendSV_Handler()                                //In C Language
             asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
 
             currentTask->State = STOPPED;    //Save function state
-
-            currentTask = currentTask->next; //Nächsten Task
+            currentTask = nextTask;
         }
 
         if (currentTask->State == NEW)      //New Task

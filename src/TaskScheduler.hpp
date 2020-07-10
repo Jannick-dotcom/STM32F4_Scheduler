@@ -1,7 +1,6 @@
 #ifndef Task_Scheduler
 #define Task_Scheduler
 
-
 #include <mbed.h>
 #include <stdint.h>
 #define get_us us_ticker_read()
@@ -21,20 +20,24 @@ struct function_struct
   //Must have Variablen
   void (*function)();     //Auszuführende Funktion
   uint8_t priority;       //Priorität
-  float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
-  uint16_t executable;    //Wie oft soll die Funktion noch ausgeführt werden
-  uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
   uint16_t id;            //ID des Tasks
 
-  //KontextSwitch
+  //nur für normalen Schedule betrieb
+  float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
+  bool executable;    //Funktion ausführen?
+  uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
+  
+
+  //nur für KontextSwitch
   volatile taskState State;        //Status des Tasks
-  volatile uint32_t *Stack;
+  volatile uint32_t *Stack;         //Stack pointer
+  volatile uint32_t continueInMS;   //Delay amount
 };
 
 class TaskScheduler
 {
   /////////Variables
-public:
+private:
   uint8_t maxPrio;                        //Variable für die maximale Prio
   uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
@@ -55,20 +58,22 @@ public:
     /*Number of execs*/ uint16_t Execcount = 0);
     //Eine Funktion zur Liste hinzufügen
 
-  void disableFunction(
-    /*Funktion*/ void (*function)()); 
-    //Eine Funktion aus der Liste löschen
+  void changeFunctionEnabled(
+    /*Funktion*/ void (*function)(),
+    /*Aktivieren oder Deaktivieren*/ bool act); 
+    //Eine Funktion aus der Liste de/aktivieren
 
 private:
   function_struct *searchFunction(/*Funktion*/ void (*function)());
 
 public:
   //Setter Methods
-  void setPriority(/*Funktion*/ void (*function)(), uint8_t prio);
-  void setFrequency(/*Funktion*/ void (*function)(), float exec_freq);
+  void setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio);
+  void setFunctionFrequency(/*Funktion*/ void (*function)(), float exec_freq);
   
   void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
   void startOS(void);                     //RTOS Starten (preemtive Multitasking)
+  void delay(uint32_t milliseconds);      //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
 
   //Main Loop Method
   void schedule(); //Execute in the Loop (cooperative Multitasking)
