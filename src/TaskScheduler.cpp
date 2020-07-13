@@ -126,7 +126,7 @@ void TaskScheduler::schedule()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//Here we remove a Task from the List of executable ones
+//Here we en/disable a Task from the List
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::changeFunctionEnabled(void (*function)(), bool act)
 {
@@ -138,6 +138,21 @@ void TaskScheduler::changeFunctionEnabled(void (*function)(), bool act)
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
     temp->executable = act;
+  }
+}
+
+void TaskScheduler::removeFunction(void (*function)())
+{
+  if(function == nullptr)
+  {
+    return;
+  }
+  function_struct *temp = searchFunction(function);
+  if(temp != nullptr)
+  {
+    if(temp->next != nullptr) temp->next->prev = temp->prev;
+    if(temp->prev != nullptr) temp->prev->next = temp->next;
+    delete temp;
   }
 }
 
@@ -211,7 +226,7 @@ function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
   return temp; //Element übergeben
 }
 
-void TaskScheduler::delay(uint32_t milliseconds)
+void TaskScheduler::delay(float milliseconds)
 {
   currentTask->continueInMS = milliseconds;   //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;

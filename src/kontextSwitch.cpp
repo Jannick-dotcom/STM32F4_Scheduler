@@ -1,12 +1,14 @@
-
 #include <stm32f4xx_hal.h>
 #include "TaskScheduler.hpp"
 //Kontext Switch
-volatile uint8_t switchEnable = 0;
-volatile function_struct *currentTask = nullptr;
-volatile function_struct *nextTask = nullptr;
+uint8_t switchEnable = 0;
+function_struct *currentTask = nullptr;
+function_struct *nextTask = nullptr;
+float sysTickFreq = 1000.0; //11Hz - ... how often context switches
 
 #define func (uint32_t)currentTask->function & ~1UL     //Use the function pointer with lowest bit zero
+#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
+#define sysTickMillisPerInt (float)(1000.0 / sysTickFreq)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Enables all interrupts
@@ -30,58 +32,75 @@ extern "C" inline void disable_interrupts()
 void TaskScheduler::startOS(void)
 {
     currentTask = first_function_struct;      //The current Task is the first one in the List
-    currentTask->State = NEW;                 //The current Task is a new Task
+    //currentTask->State = NEW;                 //The current Task is a new Task
     setContextSwitch(true);                   //Activate context switching
-    SysTick_Config(SystemCoreClock / 1000);   //Set the frequency of the systick interrupt
+    SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
 
-    NVIC_SetPriority(PendSV_IRQn, 0xff); /* Lowest possible priority */
-    NVIC_SetPriority(SysTick_IRQn, 0x00); /* Highest possible priority */
+    NVIC_SetPriority(PendSV_IRQn, 0xff);      //Lowest possible priority 
+    NVIC_SetPriority(SysTick_IRQn, 0x00);     //Highest possible priority
+
     __set_PSP(__get_MSP());                   //Init the PSP
-    __set_CONTROL(0x03); /* Switch to Unprivilleged Thread Mode with PSP */
+    __set_CONTROL(0x03);                      // Switch to Unprivilleged Thread Mode with PSP
+
     asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
     enable_interrupts();  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//System Call interrupt
+//Finding a next Task
 ////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void SVC_Handler(void)
+function_struct *findNextFunction(function_struct *currF)
 {
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    //Set the PendSV to pending
-    enable_interrupts();                    //enable interrupts if not already enabled
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-//Set the PendSV exception to pending
-////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void SysTick_Handler(void)                           //In C Language
-{    
-    //nextTask = currentTask->next;     //Nächsten Task Initialisieren bevor gesucht wird
-    nextTask = nullptr;
-    
-    volatile function_struct *temp = currentTask->next;
+    function_struct *nextF = currF->next;
     do
     {
-        if(temp->continueInMS > 0) //Wenn verbleibende Delay Zeit größer als 0
+        if(nextF->continueInMS > 0) //Wenn verbleibende Delay Zeit größer als 0
         {
-            temp->continueInMS--;    //dekrementieren
-            temp = temp->next;  //Nächsten Task
+            if(nextF->continueInMS < sysTickMillisPerInt)
+            {
+                nextF->continueInMS = 0;
+            }
+            else
+            {
+                nextF->continueInMS -= sysTickMillisPerInt;    //dekrementieren
+            }
+            nextF = nextF->next;  //Nächsten Task
         }
         else
         {
-            temp->executable = true;
+            nextF->executable = true;        //Wenn keine Delay Zeit mehr, task auf executable setzen
         }
         
-        if(temp->executable == true)
+        if(nextF->executable == true)    //Wenn Task Executable ist
         {
-            nextTask = temp;
-            break;
+            break;              //Aus Schleife springen
         }
 
-    } while(temp != currentTask);  //Solange ich noch nicht wieder beim ersten angekommen bin    
+    } while(nextF != currF);  //Solange ich noch nicht wieder beim ersten angekommen bin 
+    return nextF;
+}
 
-    if(switchEnable) SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;       //If switchEnable set, set the PendSV to pending
-    //trigger Pendsv
+////////////////////////////////////////////////////////////////////////////////////////
+//System Call interrupt (Supervisor Call) from Delay
+////////////////////////////////////////////////////////////////////////////////////////
+extern "C" void SVC_Handler(void)
+{
+    nextTask = findNextFunction(currentTask);
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    //Set the PendSV to pending
+    enable_interrupts();                    //enable interrupts
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Set the PendSV exception to pending (Systick is a 24 bit counter) minimum 11Hz
+////////////////////////////////////////////////////////////////////////////////////////
+extern "C" void SysTick_Handler(void)                           //In C Language
+{    
+    nextTask = nullptr;
+    if(switchEnable && currentTask->priority > 1) 
+    {
+        nextTask = findNextFunction(currentTask);
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;       //If switchEnable set, set the PendSV to pending
+    }   
     enable_interrupts();                                        //enable all interrupts
 }
 
@@ -91,44 +110,50 @@ extern "C" void SysTick_Handler(void)                           //In C Language
 extern "C" void PendSV_Handler()                                //In C Language
 {
     disable_interrupts();
-    if (currentTask != nullptr && nextTask != nullptr)                //If the current task is a Task
+    if ((currentTask->State == RUNNING)) //Hier Task anhalten
     {
-        if ((currentTask->State == RUNNING)) //Hier Task anhalten
-        {
-            asm("MRS r0, PSP");     //Get Process Stack Pointer
-            asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
-            asm("MSR PSP, r0");     //Set Modified Stack pointer
-            asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
+        asm("MRS r0, PSP");     //Get Process Stack Pointer
+        asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
+        asm("MSR PSP, r0");     //Set Modified Stack pointer
+        asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
 
-            currentTask->State = STOPPED;    //Save function state
-            currentTask = nextTask;
-        }
+        currentTask->State = STOPPED;    //Save function state
+        currentTask = nextTask;
+    }
 
-        if (currentTask->State == NEW)      //New Task
-        {   
-            asm("MOV r4, #0");                                  //R0
-            asm("MOV r5, #1");                                  //R1
-            asm("MOV r6, #2");                                  //R2
-            asm("MOV r7, #3");                                  //R3
-            asm("MOV r8, #0x12");                               //R12
-            asm("MOV r9, %0" : : "r"(func));                    //LR
-            asm("MOV r10, %0" : : "r"(func));                   //PC
-            asm("MOV r11, #0x01000000");                        //XPSR
+    if (currentTask->State == NEW)      //New Task
+    {   
+        asm("MOV r4, #0");                                  //R0
+        asm("MOV r5, #1");                                  //R1
+        asm("MOV r6, #2");                                  //R2
+        asm("MOV r7, #3");                                  //R3
+        asm("MOV r8, #0x12");                               //R12
+        asm("MOV r9, %0" : : "r"(func));                    //LR
+        asm("MOV r10, %0" : : "r"(func));                   //PC
+        asm("MOV r11, #0x01000000");                        //XPSR
 
-            asm("MRS r0, PSP");             //get PSP
-            asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
-            asm("MSR PSP, r0");             //set PSP
-            
-            currentTask->State = RUNNING;   //Save state as running
-        }
+        asm("MRS r0, PSP");             //get PSP
+        asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
+        asm("MSR PSP, r0");             //set PSP
 
-        if (currentTask->State == STOPPED) //Hier Task fortsetzen
-        {
-            asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
-            asm("LDMIA r0!, {r4-r11}");                     //load registers from memory
-            asm("MSR PSP, r0");                             //set PSP
-            currentTask->State = RUNNING;                   //Save state as running
-        }
+        asm("MOV r4, #4");
+        asm("MOV r5, #5");
+        asm("MOV r6, #6");
+        asm("MOV r7, #7");
+        asm("MOV r8, #8");
+        asm("MOV r9, #9");
+        asm("MOV r10, #10");
+        asm("MOV r11, #11");
+
+        currentTask->State = RUNNING;   //Save state as running
+    }
+
+    if (currentTask->State == STOPPED) //Hier Task fortsetzen
+    {
+        asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
+        asm("LDMIA r0!, {r4-r11}");                     //load registers from memory
+        asm("MSR PSP, r0");                             //set PSP
+        currentTask->State = RUNNING;                   //Save state as running
     }
     asm("MOV LR, #0xFFFFFFFD");                             //Set the LR to 0xFFFFFFFD to signal Process mode with psp
     enable_interrupts();                                    //Enable all interrupts

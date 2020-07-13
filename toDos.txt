@@ -1,14 +1,9 @@
--Delay function 		-> cooperative Multitasking 
-				-> stop execution and continue in a few milliseconds
-				-> Implement a Scheduler to select the next executed Task
-
-
--Mutex			maybe translating of Memory addresses?
-		
--Hardware funktionen	pins
-				can
-				etc
+-Changing of Switching Rate to maximize the throughput
 			
 -Find a Name for the OS		-> ST RS RTOS
-							-> StallaRTOS -> Stallardo not running on fuel, it's running on StallaRTOS
+							-> StallaRTOS -> Stallardo not only running on fuel, it's running on StallaRTOS √
 							-> ((Renn(stall))aR)TOS
+							-> OSama bin Janniq
+							-> Xonax
+							-> IOnOS
+							-> 

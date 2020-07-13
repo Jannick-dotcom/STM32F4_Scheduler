@@ -5,9 +5,12 @@ TaskScheduler Tasker1;
 
 int i = 0;
 
-void taskMain(void)
+void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 {
-  while(1);
+  while(1)
+  {
+    //Tasker1.delay(1000);
+  }
 }
 
 void task1(void)
@@ -16,7 +19,7 @@ void task1(void)
   while (1)
   {
     red.write(!red.read());
-    Tasker1.delay(200);
+    Tasker1.delay(125);
   }
 }
 
@@ -26,7 +29,7 @@ void task2(void)
   while (1)
   {
     blue.write(!blue.read());
-    Tasker1.delay(100);
+    Tasker1.delay(250);
   }
 }
 
@@ -36,14 +39,14 @@ void task3(void)
   while (1)
   {
     green.write(!green.read());
-    Tasker1.delay(300);
+    Tasker1.delay(500);
   }
 }
 
 int main()
 {
-  Tasker1.addFunction(taskMain, 1, 100);
-  Tasker1.addFunction(task1, 1, 100);
+  Tasker1.addFunction(taskMain, 2, 100);
+  Tasker1.addFunction(task1, 2, 100);
   Tasker1.addFunction(task2, 2, 100);
   Tasker1.addFunction(task3, 2, 100);
   Tasker1.startOS();

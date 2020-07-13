@@ -19,7 +19,7 @@ struct function_struct
 
   //Must have Variablen
   void (*function)();     //Auszuführende Funktion
-  uint8_t priority;       //Priorität
+  uint8_t priority;       //Priorität 0 und 1 werden nicht unterbrochen außer sie wünschen es durch ein Delay
   uint16_t id;            //ID des Tasks
 
   //nur für normalen Schedule betrieb
@@ -31,7 +31,7 @@ struct function_struct
   //nur für KontextSwitch
   volatile taskState State;        //Status des Tasks
   volatile uint32_t *Stack;         //Stack pointer
-  volatile uint32_t continueInMS;   //Delay amount
+  volatile float continueInMS;   //Delay amount
 };
 
 class TaskScheduler
@@ -63,9 +63,13 @@ public:
     /*Aktivieren oder Deaktivieren*/ bool act); 
     //Eine Funktion aus der Liste de/aktivieren
 
+  void removeFunction(
+    /*Funktion*/ void (*function)());
+    //Eine Funktion aus der Liste löschen
+
 private:
   function_struct *searchFunction(/*Funktion*/ void (*function)());
-
+  
 public:
   //Setter Methods
   void setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio);
@@ -73,7 +77,7 @@ public:
   
   void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
   void startOS(void);                     //RTOS Starten (preemtive Multitasking)
-  void delay(uint32_t milliseconds);      //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
+  void delay(float milliseconds);      //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
 
   //Main Loop Method
   void schedule(); //Execute in the Loop (cooperative Multitasking)
