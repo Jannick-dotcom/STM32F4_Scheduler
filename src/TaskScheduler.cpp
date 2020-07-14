@@ -35,11 +35,11 @@ TaskScheduler::TaskScheduler()
 ////////////////////////////////////////////////////////////////////////////////////////
 uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
 {
-  if (function == nullptr || exec_freq <= 0)  //Make sure the parameters are correct
+  if (function == nullptr || exec_freq <= 0) //Make sure the parameters are correct
   {
     return 0;
   }
-  
+
   function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
   function_struct_ptr = new function_struct;      //ein neues erstellen
 
@@ -69,9 +69,9 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = count;
 
-  function_struct_ptr->State = NEW;               //New Task
+  function_struct_ptr->State = NEW; //New Task
   function_struct_ptr->continueInMS = 0;
-  
+
   if (prio > maxPrio)
   {
     maxPrio = prio; //Maximale Priorität updaten
@@ -90,16 +90,16 @@ void TaskScheduler::schedule()
   function_struct *function_struct_ptr; //Pointer auf Structs zu den Funktionen mit dem ich arbeite
   uint32_t currmicros = get_us;         //jetzige Systemzeit ermitteln und mit ihr weiterarbeiten
 
-  if (currmicros < lastScheduleTime)    //Wenn timer übergelaufen ist
+  if (currmicros < lastScheduleTime) //Wenn timer übergelaufen ist
   {
     function_struct_ptr = first_function_struct; //Das erste Struct nehmen
     while (1)                                    //Solange Funktionen angelegt wurden
     {
-      if (!(function_struct_ptr == first_function_struct && endOfList != 0))  //Wenn wieder beim ersten angelangt
+      if (!(function_struct_ptr == first_function_struct && endOfList != 0)) //Wenn wieder beim ersten angelangt
       {
-        break;  //aus der Schleife raus
+        break; //aus der Schleife raus
       }
-      endOfList++;    //Merker hochzählen
+      endOfList++;                                                                                                                                 //Merker hochzählen
       function_struct_ptr->lastExecTime = (1000000.0 / function_struct_ptr->frequency) - (maxInt(currmicros) - function_struct_ptr->lastExecTime); //neu berechnen wann diese Funktion zuletzt ausgeführt wurde
       function_struct_ptr = function_struct_ptr->next;                                                                                             //nächste funktion nehmen
     }
@@ -114,7 +114,8 @@ void TaskScheduler::schedule()
     if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros)
     {
       function_struct_ptr->lastExecTime = currmicros;
-      if(!switchEnable) (*function_struct_ptr->function)();
+      if (!switchEnable)
+        (*function_struct_ptr->function)();
       break;
     }
     function_struct_ptr = function_struct_ptr->next;
@@ -130,7 +131,7 @@ void TaskScheduler::schedule()
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::changeFunctionEnabled(void (*function)(), bool act)
 {
-  if (function == nullptr)  //Make sure the parameters are correct
+  if (function == nullptr) //Make sure the parameters are correct
   {
     return;
   }
@@ -143,15 +144,17 @@ void TaskScheduler::changeFunctionEnabled(void (*function)(), bool act)
 
 void TaskScheduler::removeFunction(void (*function)())
 {
-  if(function == nullptr)
+  if (function == nullptr)
   {
     return;
   }
   function_struct *temp = searchFunction(function);
-  if(temp != nullptr)
+  if (temp != nullptr)
   {
-    if(temp->next != nullptr) temp->next->prev = temp->prev;
-    if(temp->prev != nullptr) temp->prev->next = temp->next;
+    if (temp->next != nullptr)
+      temp->next->prev = temp->prev;
+    if (temp->prev != nullptr)
+      temp->prev->next = temp->next;
     delete temp;
   }
 }
@@ -161,7 +164,7 @@ void TaskScheduler::removeFunction(void (*function)())
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio)
 {
-  if (function == nullptr)  //Make sure the parameters are correct
+  if (function == nullptr) //Make sure the parameters are correct
   {
     return;
   }
@@ -178,7 +181,7 @@ void TaskScheduler::setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::setFunctionFrequency(/*Funktion*/ void (*function)(), float exec_freq)
 {
-  if (function == nullptr || exec_freq <= 0)  //Make sure the parameters are correct
+  if (function == nullptr || exec_freq <= 0) //Make sure the parameters are correct
   {
     return;
   }
@@ -205,12 +208,12 @@ function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
-  if (function == nullptr)  //Make sure the parameters are correct
+  if (function == nullptr)                       //Make sure the parameters are correct
   {
     return nullptr;
   }
 
-  while (temp->function != function)             //Solange Funktion noch nicht gefunden wurde
+  while (temp->function != function) //Solange Funktion noch nicht gefunden wurde
   {
     if (!(temp == first_function_struct && i != 0))
     {
@@ -226,10 +229,24 @@ function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
   return temp; //Element übergeben
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Delay for an amount of milliseconds
+////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::delay(float milliseconds)
 {
-  currentTask->continueInMS = milliseconds;   //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+  currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;
   asm("SVC 0x00");
-  //Hier noch den PendSV handler callen
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Remove the Function after it ended
+////////////////////////////////////////////////////////////////////////////////////////
+void function_struct::removeFunction()
+{
+  if (this->next != nullptr)
+    this->next->prev = this->prev;
+  if (this->prev != nullptr)
+    this->prev->next = this->next;
+  delete this;
 }

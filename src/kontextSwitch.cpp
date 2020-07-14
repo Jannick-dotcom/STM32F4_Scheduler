@@ -27,6 +27,18 @@ extern "C" inline void disable_interrupts()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+//If a Task Returns call the remove function of this task
+////////////////////////////////////////////////////////////////////////////////////////
+void taskDeleteOnEnd(void)
+{
+    function_struct *temp = currentTask->next;
+    currentTask->removeFunction();
+    currentTask = temp;
+    asm("SVC 0x00");
+    enable_interrupts();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 //Set all the Interrupts and Values for the OS
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::startOS(void)
@@ -128,7 +140,7 @@ extern "C" void PendSV_Handler()                                //In C Language
         asm("MOV r6, #2");                                  //R2
         asm("MOV r7, #3");                                  //R3
         asm("MOV r8, #0x12");                               //R12
-        asm("MOV r9, %0" : : "r"(func));                    //LR
+        asm("MOV r9, %0" : : "r"(taskDeleteOnEnd));         //LR
         asm("MOV r10, %0" : : "r"(func));                   //PC
         asm("MOV r11, #0x01000000");                        //XPSR
 

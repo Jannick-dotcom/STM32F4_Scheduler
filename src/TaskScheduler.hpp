@@ -32,6 +32,8 @@ struct function_struct
   volatile taskState State;        //Status des Tasks
   volatile uint32_t *Stack;         //Stack pointer
   volatile float continueInMS;   //Delay amount
+
+  void removeFunction();
 };
 
 class TaskScheduler

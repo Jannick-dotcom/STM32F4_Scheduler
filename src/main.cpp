@@ -7,19 +7,15 @@ int i = 0;
 
 void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 {
-  while(1)
-  {
-    //Tasker1.delay(1000);
-  }
+  while(1);
 }
 
 void task1(void)
 {
   DigitalOut red(PB_14);
-  while (1)
-  {
+  for(uint8_t i = 0; i < 10; i++) {
     red.write(!red.read());
-    Tasker1.delay(125);
+    Tasker1.delay(1000);
   }
 }
 
