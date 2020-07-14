@@ -250,3 +250,24 @@ void function_struct::removeFunction()
     this->prev->next = this->next;
   delete this;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Return the State of the Task
+////////////////////////////////////////////////////////////////////////////////////////
+taskState TaskScheduler::getFunctionState(/*Funktion*/ void (*function)())
+{
+  if (function == nullptr) //Make sure the parameters are correct
+  {
+    return STOPPED;
+  }
+
+  function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
+  if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
+  {
+    return temp->State;
+  }
+  else
+  {
+    return STOPPED;
+  }
+}

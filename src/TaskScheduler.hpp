@@ -77,6 +77,10 @@ public:
   void setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio);
   void setFunctionFrequency(/*Funktion*/ void (*function)(), float exec_freq);
   
+  //Getter Methods
+  taskState getFunctionState(/*Funktion*/ void (*function)());
+
+  //Context Switch
   void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
   void startOS(void);                     //RTOS Starten (preemtive Multitasking)
   void delay(float milliseconds);      //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
