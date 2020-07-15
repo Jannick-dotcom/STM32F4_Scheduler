@@ -53,10 +53,10 @@ public:
 
   //Function Methods
   //return Wert 1 wenn erfolgreich
-  uint8_t addFunction(
+  function_struct *addFunction(
     /*Funktion*/ void (*function)(), 
     /*Prioritaet*/ uint8_t prio, 
-    /*Executions per sec*/ float exec_freq, 
+    /*Executions per sec*/ float exec_freq = 1, //Must be bigger than 0 !
     /*Number of execs*/ uint16_t Execcount = 0);
     //Eine Funktion zur Liste hinzufügen
 

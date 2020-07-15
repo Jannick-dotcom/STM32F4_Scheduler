@@ -4,7 +4,8 @@
 uint8_t switchEnable = 0;
 function_struct *currentTask = nullptr;
 function_struct *nextTask = nullptr;
-float sysTickFreq = 1000.0; //11Hz - ... how often context switches
+function_struct *taskMainStruct = nullptr;
+volatile float sysTickFreq = 1000.0; //11Hz - ... how often context switches
 
 #define func (uint32_t)currentTask->function & ~1UL     //Use the function pointer with lowest bit zero
 #define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
@@ -63,33 +64,27 @@ void TaskScheduler::startOS(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 function_struct *findNextFunction(function_struct *currF)
 {
-    function_struct *nextF = currF->next;
+    function_struct *temp = currF->next;
+    function_struct *nextF = nullptr;
+    uint8_t flagFound = 0;
     do
-    {
-        if(nextF->continueInMS > 0) //Wenn verbleibende Delay Zeit größer als 0
+    {    
+        if(temp->executable == true && !flagFound && temp->priority < 255)//Wenn Task Executable ist und noch keine Funktion gefunden wurde
         {
-            if(nextF->continueInMS < sysTickMillisPerInt)
-            {
-                nextF->continueInMS = 0;
-            }
-            else
-            {
-                nextF->continueInMS -= sysTickMillisPerInt;    //dekrementieren
-            }
-            nextF = nextF->next;  //Nächsten Task
+            flagFound = 1;
+            nextF = temp;
         }
-        else
-        {
-            nextF->executable = true;        //Wenn keine Delay Zeit mehr, task auf executable setzen
-        }
-        
-        if(nextF->executable == true)    //Wenn Task Executable ist
-        {
-            break;              //Aus Schleife springen
-        }
+        temp = temp->next;
+    } while(temp != currF);  //Solange ich noch nicht wieder beim ersten angekommen bin 
 
-    } while(nextF != currF);  //Solange ich noch nicht wieder beim ersten angekommen bin 
-    return nextF;
+    if(nextF != nullptr)    //Wenn ein Task ausführbar ist
+    {
+        return nextF;       //Diesen returnen
+    }
+    else                    //Ansonsten
+    {
+        return taskMainStruct;  //Den Task zum Rechenzeit verscherbeln nehmen
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -108,6 +103,44 @@ extern "C" void SVC_Handler(void)
 extern "C" void SysTick_Handler(void)                           //In C Language
 {    
     nextTask = nullptr;
+    function_struct *temp = currentTask->next;
+    uint32_t minDelayT = -1;
+    do
+    {
+        if(temp->continueInMS > 0) //Wenn verbleibende Delay Zeit größer als 0
+        {
+            if(temp->continueInMS < sysTickMillisPerInt)
+            {
+                temp->continueInMS = 0;
+            }
+            else
+            {
+                temp->continueInMS -= sysTickMillisPerInt;    //dekrementieren
+            }
+        }
+        else
+        {
+            temp->executable = true;        //Wenn keine Delay Zeit mehr, task auf executable setzen
+        }
+
+        if(minDelayT > temp->continueInMS)
+        {
+            minDelayT = temp->continueInMS;
+        }
+
+        temp = temp->next;  //Nächsten Task
+    } while (temp != currentTask);
+    
+    if(minDelayT < 90 && minDelayT > 0) 
+    {
+        sysTickFreq = 1000.0 / (float)minDelayT;
+    }
+    else 
+    {
+        sysTickFreq = 1000.0;
+    }
+    SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
+
     if(switchEnable && currentTask->priority > 1) 
     {
         nextTask = findNextFunction(currentTask);

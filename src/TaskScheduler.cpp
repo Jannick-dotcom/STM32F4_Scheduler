@@ -2,6 +2,7 @@
 
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
+extern function_struct *taskMainStruct;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Returns the maximum Unsigned Value of a Type
@@ -11,6 +12,14 @@ T maxInt(T val)
 {
   //einfach -1 zurückgeben -> Zweierkomplement (0b1111111...) -> unsigned -> maximale Zahl
   return -1;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Just if no other Tasks have to be executed run this
+////////////////////////////////////////////////////////////////////////////////////////
+void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
+{
+  while(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -26,6 +35,7 @@ TaskScheduler::TaskScheduler()
   lastScheduleTime = 0;
 
   //Für Context Switch
+  taskMainStruct = addFunction(taskMain, 255, 1);
   switchEnable = 0; //Jetzt noch kein Kontext switch erlauben
   currentTask = nullptr;
 }
@@ -33,11 +43,11 @@ TaskScheduler::TaskScheduler()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds a new Task to the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
+function_struct *TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
 {
   if (function == nullptr || exec_freq <= 0) //Make sure the parameters are correct
   {
-    return 0;
+    return nullptr;
   }
 
   function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
@@ -45,7 +55,7 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
 
   if (function_struct_ptr == nullptr) //Wenn kein HEAP Platz mehr frei ist...
   {
-    return 0; //Aus der Funktion rausspringen
+    return nullptr; //Aus der Funktion rausspringen
   }
 
   if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
@@ -78,7 +88,7 @@ uint8_t TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_
   }
   function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
   count = count + 1;                     //Funktionszähler inkrementieren
-  return 1;
+  return function_struct_ptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +121,7 @@ void TaskScheduler::schedule()
   endOfList = 0;
   while (!endOfList)
   {
-    if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros)
+    if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < currmicros && function_struct_ptr->priority < 255)
     {
       function_struct_ptr->lastExecTime = currmicros;
       if (!switchEnable)
@@ -149,14 +159,15 @@ void TaskScheduler::removeFunction(void (*function)())
     return;
   }
   function_struct *temp = searchFunction(function);
-  if (temp != nullptr)
+  temp->removeFunction();
+  /*if (temp != nullptr)
   {
     if (temp->next != nullptr)
       temp->next->prev = temp->prev;
     if (temp->prev != nullptr)
       temp->prev->next = temp->next;
     delete temp;
-  }
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
