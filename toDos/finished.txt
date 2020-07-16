@@ -1,0 +1,11 @@
+-Changing of Switching Rate to maximize the throughput √
+
+-Hide the taskMain Task √
+
+-Make Tasks able to read other Tasks State √
+			
+-Find a Name for the OS		-> StallaRTOS
+							-> [Renn{stall]a[R}TOS]
+							-> OSama bin Janniq
+							-> Jannix
+							-> 

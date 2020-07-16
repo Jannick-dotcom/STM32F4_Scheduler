@@ -35,7 +35,7 @@ TaskScheduler::TaskScheduler()
   lastScheduleTime = 0;
 
   //Für Context Switch
-  taskMainStruct = addFunction(taskMain, 255, 1);
+  taskMainStruct = addFunction(taskMain, 0, 255, 1);
   switchEnable = 0; //Jetzt noch kein Kontext switch erlauben
   currentTask = nullptr;
 }
@@ -43,9 +43,9 @@ TaskScheduler::TaskScheduler()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds a new Task to the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *TaskScheduler::addFunction(void (*function)(), uint8_t prio, float exec_freq, uint16_t Execcount)
+function_struct *TaskScheduler::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
 {
-  if (function == nullptr || exec_freq <= 0) //Make sure the parameters are correct
+  if (function == nullptr || exec_freq <= 0 && searchFunction(id) == nullptr) //Make sure the parameters are correct
   {
     return nullptr;
   }
@@ -77,7 +77,7 @@ function_struct *TaskScheduler::addFunction(void (*function)(), uint8_t prio, fl
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
   function_struct_ptr->frequency = exec_freq;
-  function_struct_ptr->id = count;
+  function_struct_ptr->id = id;
 
   function_struct_ptr->State = NEW; //New Task
   function_struct_ptr->continueInMS = 0;
@@ -139,48 +139,27 @@ void TaskScheduler::schedule()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Here we en/disable a Task from the List
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::changeFunctionEnabled(void (*function)(), bool act)
+void TaskScheduler::changeFunctionEnabled(uint16_t id, bool act)
 {
-  if (function == nullptr) //Make sure the parameters are correct
-  {
-    return;
-  }
-  function_struct *temp = searchFunction(function); //Funktion suchen
+  function_struct *temp = searchFunction(id); //Funktion suchen
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
     temp->executable = act;
   }
 }
 
-void TaskScheduler::removeFunction(void (*function)())
+void TaskScheduler::removeFunction(uint16_t id)
 {
-  if (function == nullptr)
-  {
-    return;
-  }
-  function_struct *temp = searchFunction(function);
+  function_struct *temp = searchFunction(id);
   temp->removeFunction();
-  /*if (temp != nullptr)
-  {
-    if (temp->next != nullptr)
-      temp->next->prev = temp->prev;
-    if (temp->prev != nullptr)
-      temp->prev->next = temp->next;
-    delete temp;
-  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Sets new Priority of a Task
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio)
+void TaskScheduler::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 {
-  if (function == nullptr) //Make sure the parameters are correct
-  {
-    return;
-  }
-
-  function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
+  function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
     temp->priority = prio; //Die Priorität ändern
@@ -190,14 +169,14 @@ void TaskScheduler::setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t
 ////////////////////////////////////////////////////////////////////////////////////////
 //Sets new Frequency of a Task
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::setFunctionFrequency(/*Funktion*/ void (*function)(), float exec_freq)
+void TaskScheduler::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
 {
-  if (function == nullptr || exec_freq <= 0) //Make sure the parameters are correct
+  if (exec_freq <= 0) //Make sure the parameters are correct
   {
     return;
   }
 
-  function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
+  function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
     temp->frequency = exec_freq; //Die Frequenz ändern
@@ -215,16 +194,12 @@ void TaskScheduler::setContextSwitch(uint8_t enable)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Search a task in the list of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *TaskScheduler::searchFunction(/*Funktion*/ void (*function)())
+function_struct *TaskScheduler::searchFunction(/*ID*/ uint16_t id)
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
-  if (function == nullptr)                       //Make sure the parameters are correct
-  {
-    return nullptr;
-  }
 
-  while (temp->function != function) //Solange Funktion noch nicht gefunden wurde
+  while (temp->id != id) //Solange Funktion noch nicht gefunden wurde
   {
     if (!(temp == first_function_struct && i != 0))
     {
@@ -265,14 +240,9 @@ void function_struct::removeFunction()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Return the State of the Task
 ////////////////////////////////////////////////////////////////////////////////////////
-taskState TaskScheduler::getFunctionState(/*Funktion*/ void (*function)())
+taskState TaskScheduler::getFunctionState(/*Funktion*/ uint16_t id)
 {
-  if (function == nullptr) //Make sure the parameters are correct
-  {
-    return STOPPED;
-  }
-
-  function_struct *temp = searchFunction(function); //Hier die Funktion speichern von der die Priorität geändert werden soll
+  function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                              //Wenn die übergebene Funktion gültig ist
   {
     return temp->State;

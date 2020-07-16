@@ -3,19 +3,14 @@ Serial pc(PD_8, PD_9); // tx, rx
 #include "TaskScheduler.hpp"
 TaskScheduler Tasker1;
 
-int i = 0;
-
-// void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
-// {
-//   while(1);
-// }
+//int i = 0;
 
 void task1(void)
 {
   DigitalOut red(PB_14);
   for(uint8_t i = 0; i < 10; i++) {
     red.write(!red.read());
-    Tasker1.delay(1000);
+    Tasker1.delay(100);
   }
 }
 
@@ -25,7 +20,7 @@ void task2(void)
   while (1)
   {
     blue.write(!blue.read());
-    Tasker1.delay(250);
+    Tasker1.delay(200);
   }
 }
 
@@ -41,10 +36,10 @@ void task3(void)
 
 int main()
 {
-  // Tasker1.addFunction(taskMain, 2);
-  Tasker1.addFunction(task1, 1);
-  Tasker1.addFunction(task2, 1);
-  Tasker1.addFunction(task3, 1);
+  //Tasker1.addFunction(taskMain, 2);
+  Tasker1.addFunction(task1, 1, 1);
+  Tasker1.addFunction(task2, 2, 1);
+  Tasker1.addFunction(task3, 3, 1);
   Tasker1.startOS();
 
   //Should never get here

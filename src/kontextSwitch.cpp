@@ -5,11 +5,13 @@ uint8_t switchEnable = 0;
 function_struct *currentTask = nullptr;
 function_struct *nextTask = nullptr;
 function_struct *taskMainStruct = nullptr;
-volatile float sysTickFreq = 1000.0; //11Hz - ... how often context switches
 
+#define defaultSysTickFreq 1000.0
 #define func (uint32_t)currentTask->function & ~1UL     //Use the function pointer with lowest bit zero
 #define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
 #define sysTickMillisPerInt (float)(1000.0 / sysTickFreq)
+
+volatile float sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Enables all interrupts
@@ -28,24 +30,11 @@ extern "C" inline void disable_interrupts()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//If a Task Returns call the remove function of this task
-////////////////////////////////////////////////////////////////////////////////////////
-void taskDeleteOnEnd(void)
-{
-    function_struct *temp = currentTask->next;
-    currentTask->removeFunction();
-    currentTask = temp;
-    asm("SVC 0x00");
-    enable_interrupts();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
 //Set all the Interrupts and Values for the OS
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::startOS(void)
 {
     currentTask = first_function_struct;      //The current Task is the first one in the List
-    //currentTask->State = NEW;                 //The current Task is a new Task
     setContextSwitch(true);                   //Activate context switching
     SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
 
@@ -53,9 +42,9 @@ void TaskScheduler::startOS(void)
     NVIC_SetPriority(SysTick_IRQn, 0x00);     //Highest possible priority
 
     __set_PSP(__get_MSP());                   //Init the PSP
-    __set_CONTROL(0x03);                      // Switch to Unprivilleged Thread Mode with PSP
-
+    __set_CONTROL(0x03);                      //Switch to Unprivilleged Thread Mode with PSP
     asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+    
     enable_interrupts();  
 }
 
@@ -66,13 +55,13 @@ function_struct *findNextFunction(function_struct *currF)
 {
     function_struct *temp = currF->next;
     function_struct *nextF = nullptr;
-    uint8_t flagFound = 0;
+    uint8_t prioMin = 255;
     do
     {    
-        if(temp->executable == true && !flagFound && temp->priority < 255)//Wenn Task Executable ist und noch keine Funktion gefunden wurde
+        if(temp->executable == true && temp->priority < prioMin)
         {
-            flagFound = 1;
             nextF = temp;
+            prioMin = temp->priority;
         }
         temp = temp->next;
     } while(temp != currF);  //Solange ich noch nicht wieder beim ersten angekommen bin 
@@ -88,7 +77,19 @@ function_struct *findNextFunction(function_struct *currF)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//System Call interrupt (Supervisor Call) from Delay
+//If a Task Returns, this function gets executed and calls the remove function of this task
+////////////////////////////////////////////////////////////////////////////////////////
+void taskDeleteOnEnd(void)
+{
+    function_struct *temp = currentTask->next;             //Get the function to be executed next
+    currentTask->removeFunction();                         //Remove the returned function
+    currentTask = temp;                                    //Now set the current Task to the next one
+    enable_interrupts();                                   //Enable the interrupts
+    asm("SVC 0x01");                                       //Create a system call to the SVC Handler
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//System Call (Supervisor Call) from Delay or after a task finishes
 ////////////////////////////////////////////////////////////////////////////////////////
 extern "C" void SVC_Handler(void)
 {
@@ -137,11 +138,11 @@ extern "C" void SysTick_Handler(void)                           //In C Language
     }
     else 
     {
-        sysTickFreq = 1000.0;
+        sysTickFreq = defaultSysTickFreq;
     }
     SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
 
-    if(switchEnable && currentTask->priority > 1) 
+    if(switchEnable && currentTask->priority > 0) 
     {
         nextTask = findNextFunction(currentTask);
         SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;       //If switchEnable set, set the PendSV to pending

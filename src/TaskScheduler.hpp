@@ -19,7 +19,7 @@ struct function_struct
 
   //Must have Variablen
   void (*function)();     //Auszuführende Funktion
-  uint8_t priority;       //Priorität 0 und 1 werden nicht unterbrochen außer sie wünschen es durch ein Delay
+  uint8_t priority;       //Priorität 0 wird nicht unterbrochen außer sie wünschen es durch ein Delay
   uint16_t id;            //ID des Tasks
 
   //nur für normalen Schedule betrieb
@@ -55,30 +55,31 @@ public:
   //return Wert 1 wenn erfolgreich
   function_struct *addFunction(
     /*Funktion*/ void (*function)(), 
-    /*Prioritaet*/ uint8_t prio, 
+    /*ID of task*/ uint16_t ID,
+    /*Prioritaet*/ uint8_t prio,                //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
     /*Executions per sec*/ float exec_freq = 1, //Must be bigger than 0 !
     /*Number of execs*/ uint16_t Execcount = 0);
     //Eine Funktion zur Liste hinzufügen
 
   void changeFunctionEnabled(
-    /*Funktion*/ void (*function)(),
+    /*Funktion*/ uint16_t id,
     /*Aktivieren oder Deaktivieren*/ bool act); 
     //Eine Funktion aus der Liste de/aktivieren
 
   void removeFunction(
-    /*Funktion*/ void (*function)());
+    /*Funktion*/ uint16_t id);
     //Eine Funktion aus der Liste löschen
 
 private:
-  function_struct *searchFunction(/*Funktion*/ void (*function)());
+  function_struct *searchFunction(/*Funktion*/ uint16_t id);
   
 public:
   //Setter Methods
-  void setFunctionPriority(/*Funktion*/ void (*function)(), uint8_t prio);
-  void setFunctionFrequency(/*Funktion*/ void (*function)(), float exec_freq);
+  void setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio);
+  void setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq);
   
   //Getter Methods
-  taskState getFunctionState(/*Funktion*/ void (*function)());
+  taskState getFunctionState(/*Funktion*/ uint16_t id);
 
   //Context Switch
   void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
