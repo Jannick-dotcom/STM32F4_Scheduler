@@ -1,9 +1,8 @@
 #include <mbed.h>
 Serial pc(PD_8, PD_9); // tx, rx
+
 #include "TaskScheduler.hpp"
 TaskScheduler Tasker1;
-
-//int i = 0;
 
 void task1(void)
 {

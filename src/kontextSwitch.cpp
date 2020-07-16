@@ -53,15 +53,15 @@ void TaskScheduler::startOS(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 function_struct *findNextFunction(function_struct *currF)
 {
-    function_struct *temp = currF->next;
+    function_struct *temp = currF->next;    //Start with task after current one
     function_struct *nextF = nullptr;
-    uint8_t prioMin = 255;
+    uint8_t prioMin = 255;  //Use only tasks with prio < 255
     do
     {    
-        if(temp->executable == true && temp->priority < prioMin)
+        if(temp->executable == true && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
-            nextF = temp;
-            prioMin = temp->priority;
+            nextF = temp;                   //set nextF to right now highest priority task
+            prioMin = temp->priority;       //save prio
         }
         temp = temp->next;
     } while(temp != currF);  //Solange ich noch nicht wieder beim ersten angekommen bin 

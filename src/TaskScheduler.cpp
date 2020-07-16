@@ -28,9 +28,6 @@ void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 TaskScheduler::TaskScheduler()
 {
   //Basiswerte Initialisieren
-  maxPrio = 0;
-  //currPrio = 0;
-  count = 0;
   first_function_struct = nullptr;
   lastScheduleTime = 0;
 
@@ -82,12 +79,7 @@ function_struct *TaskScheduler::addFunction(void (*function)(), uint16_t id, uin
   function_struct_ptr->State = NEW; //New Task
   function_struct_ptr->continueInMS = 0;
 
-  if (prio > maxPrio)
-  {
-    maxPrio = prio; //Maximale Priorität updaten
-  }
   function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
-  count = count + 1;                     //Funktionszähler inkrementieren
   return function_struct_ptr;
 }
 

@@ -40,25 +40,23 @@ class TaskScheduler
 {
   /////////Variables
 private:
-  uint8_t maxPrio;                        //Variable für die maximale Prio
-  uint8_t count;                          //count of the functions added
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
 
-  uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
   //Wichtig für Overflow Handling
+  uint32_t lastScheduleTime;              //Die letzte Zeit an der der Scheduler ausgeführt wurde
 
 public:
   //Constructor
   TaskScheduler(); //Create a Task Scheduler
 
   //Function Methods
-  //return Wert 1 wenn erfolgreich
+  //returns pointer to added struct or nullptr if not successful
   function_struct *addFunction(
     /*Funktion*/ void (*function)(), 
-    /*ID of task*/ uint16_t ID,
+    /*ID of task*/ uint16_t id,                 //The ID must be different for different tasks
     /*Prioritaet*/ uint8_t prio,                //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
-    /*Executions per sec*/ float exec_freq = 1, //Must be bigger than 0 !
-    /*Number of execs*/ uint16_t Execcount = 0);
+    /*Executions per sec*/ float exec_freq = 1, //Must be bigger than 0 ! //not used by context switch
+    /*Number of execs*/ uint16_t Execcount = 0);//not used by context switch
     //Eine Funktion zur Liste hinzufügen
 
   void changeFunctionEnabled(
@@ -75,8 +73,8 @@ private:
   
 public:
   //Setter Methods
-  void setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio);
-  void setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq);
+  void setFunctionPriority(/*Funktion*/ uint16_t id, /*New Priority*/ uint8_t prio);
+  void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
   
   //Getter Methods
   taskState getFunctionState(/*Funktion*/ uint16_t id);
@@ -84,7 +82,7 @@ public:
   //Context Switch
   void setContextSwitch(uint8_t enable);  //Kontext Switching aktivieren oder Deaktivieren
   void startOS(void);                     //RTOS Starten (preemtive Multitasking)
-  void delay(float milliseconds);      //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
+  void delay(float milliseconds);         //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
 
   //Main Loop Method
   void schedule(); //Execute in the Loop (cooperative Multitasking)
