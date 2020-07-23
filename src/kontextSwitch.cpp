@@ -93,6 +93,7 @@ void taskDeleteOnEnd(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 extern "C" void SVC_Handler(void)
 {
+    asm("LDR R0, [SP, #-2]");
     nextTask = findNextFunction(currentTask);
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    //Set the PendSV to pending
     enable_interrupts();                    //enable interrupts

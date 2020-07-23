@@ -1,3 +1,7 @@
 -Check the Delay and Taskdelete svc calls
 
--Change the searchFunction method that we are finding the right one when we have multiple instances of a Task √??
+-Check if we can infinitely end and start tasks (after some are stopped)
+
+-Add floating point register saving
+
+-Restart Tasks after Bug

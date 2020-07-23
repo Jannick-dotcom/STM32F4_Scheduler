@@ -1,6 +1,5 @@
 #include <mbed.h>
 Serial pc(PD_8, PD_9); // tx, rx
-
 #include "TaskScheduler.hpp"
 TaskScheduler Tasker1;
 
@@ -35,15 +34,14 @@ void task3(void)
 
 int main()
 {
-  //Tasker1.addFunction(taskMain, 2);
   Tasker1.addFunction(task1, 1, 1);
   Tasker1.addFunction(task2, 2, 1);
   Tasker1.addFunction(task3, 3, 1);
-  Tasker1.startOS();
+  //Tasker1.startOS();
 
   //Should never get here
   while (1)
   {
-    //Tasker1.schedule();
+    Tasker1.schedule();
   }
 }
