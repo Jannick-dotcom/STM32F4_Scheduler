@@ -37,11 +37,11 @@ int main()
   Tasker1.addFunction(task1, 1, 1);
   Tasker1.addFunction(task2, 2, 1);
   Tasker1.addFunction(task3, 3, 1);
-  //Tasker1.startOS();
+  Tasker1.startOS();
 
   //Should never get here
   while (1)
   {
-    Tasker1.schedule();
+    //Tasker1.schedule();
   }
 }

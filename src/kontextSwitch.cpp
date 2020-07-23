@@ -81,11 +81,12 @@ function_struct *findNextFunction(function_struct *currF)
 ////////////////////////////////////////////////////////////////////////////////////////
 void taskDeleteOnEnd(void)
 {
+    disable_interrupts();
     function_struct *temp = currentTask->next;             //Get the function to be executed next
     currentTask->removeFunction();                         //Remove the returned function
     currentTask = temp;                                    //Now set the current Task to the next one
-    enable_interrupts();                                   //Enable the interrupts
-    asm("SVC 0x01");                                       //Create a system call to the SVC Handler
+    asm("MOV R7, #1");
+    asm("SVC 0x00");                                       //Create a system call to the SVC Handler
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +94,9 @@ void taskDeleteOnEnd(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 extern "C" void SVC_Handler(void)
 {
-    asm("LDR R0, [SP, #-2]");
+    uint8_t handleMode = 0;
+    asm("MOV R7, %0" : : "r"(handleMode));  //->Now in the handleMode var we have the id what we should do
+    //1-end 2-delay
     nextTask = findNextFunction(currentTask);
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    //Set the PendSV to pending
     enable_interrupts();                    //enable interrupts

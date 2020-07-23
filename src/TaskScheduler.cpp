@@ -42,7 +42,7 @@ TaskScheduler::TaskScheduler()
 ////////////////////////////////////////////////////////////////////////////////////////
 function_struct *TaskScheduler::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
 {
-  if (function == nullptr || exec_freq <= 0 && searchFunction(id) == nullptr) //Make sure the parameters are correct
+  if (function == nullptr || exec_freq <= 0 || searchFunction(id) != nullptr) //Make sure the parameters are correct
   {
     return nullptr;
   }
@@ -191,6 +191,11 @@ function_struct *TaskScheduler::searchFunction(/*ID*/ uint16_t id)
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
 
+  if(first_function_struct == nullptr)
+  {
+    return nullptr;
+  }
+
   while (temp->id != id) //Solange Funktion noch nicht gefunden wurde
   {
     if (!(temp == first_function_struct && i != 0))
@@ -212,9 +217,13 @@ function_struct *TaskScheduler::searchFunction(/*ID*/ uint16_t id)
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::delay(float milliseconds)
 {
-  currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-  currentTask->executable = false;
-  asm("SVC 0x00");
+  if(switchEnable)                            //Wenn context Switching nicht aktiviert ist auch keine Delays erlauben
+  {
+    currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+    currentTask->executable = false;
+    asm("MOV R7, #2");      //Signal to SVC that he got called from delay
+    asm("SVC 0x00");
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

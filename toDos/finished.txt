@@ -1,3 +1,5 @@
+-Check the Delay and Taskdelete svc calls √
+
 -Change the searchFunction method that we are finding the right one when we have multiple instances of a Task √
 		->Not search by function pointer, search by ID
 
@@ -14,8 +16,9 @@
 							-> 94OS
 							-> StallardOS					3
 							-> STAjaRTOS
-							-> InvasiOS
+							-> InvasiOS						1
 							-> InvatOS
 
-TaskScheduler		
-RTOS				5 <-
+-Decide which system we should use
+	TaskScheduler		0
+	RTOS				5 <-
