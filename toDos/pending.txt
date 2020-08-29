@@ -1,5 +1,4 @@
--Check if we can infinitely end and start tasks (after some are stopped)
-
 -Add floating point register saving
 
 -Restart Tasks after Bug
+    -Add fault handlers

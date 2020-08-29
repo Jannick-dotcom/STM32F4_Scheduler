@@ -1,17 +1,27 @@
-#include <stm32f4xx_hal.h>
 #include "TaskScheduler.hpp"
 //Kontext Switch
-uint8_t switchEnable = 0;
 function_struct *currentTask = nullptr;
 function_struct *nextTask = nullptr;
-function_struct *taskMainStruct = nullptr;
+function_struct *taskMainStruct;
 
 #define defaultSysTickFreq 1000.0
-#define func (uint32_t)currentTask->function & ~1UL     //Use the function pointer with lowest bit zero
-#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
-#define sysTickMillisPerInt (float)(1000.0 / sysTickFreq)
+#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
+#define sysTickTicks (uint32_t)(coreFreq / sysTickFreq)
 
-volatile float sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
+volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
+volatile uint32_t sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq);
+
+extern "C" inline void pendPendSV()
+{
+    *((uint32_t*)0xE000ED04 + 0x04) |= (1<<28);
+}
+
+extern "C" inline void SysTick_Config(uint32_t ticks)
+{
+    *(uint32_t*)0xE000E010 |= 7;
+    uint32_t tmp = ticks & 0x00FFFFFF;
+    *(uint32_t*)0xE000E014 = tmp;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Enables all interrupts
@@ -34,45 +44,39 @@ extern "C" inline void disable_interrupts()
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::startOS(void)
 {
-    currentTask = first_function_struct;      //The current Task is the first one in the List
-    setContextSwitch(true);                   //Activate context switching
-    SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
+    if(first_function_struct != nullptr)
+    {
+        currentTask = first_function_struct;      //The current Task is the first one in the List
+        SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
 
-    NVIC_SetPriority(PendSV_IRQn, 0xff);      //Lowest possible priority 
-    NVIC_SetPriority(SysTick_IRQn, 0x00);     //Highest possible priority
-
-    __set_PSP(__get_MSP());                   //Init the PSP
-    __set_CONTROL(0x03);                      //Switch to Unprivilleged Thread Mode with PSP
-    asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
-    
-    enable_interrupts();  
+        *(uint32_t*)0xE000ED20 |= 0x00ff0000;     //Setup the Priorities for PendSV and Systick
+        pendPendSV();                             //Set the PendSV to pending
+        
+        enable_interrupts();
+        asm("SVC #4"); 
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Finding a next Task
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *findNextFunction(function_struct *currF)
+inline void findNextFunction(void)
 {
-    function_struct *temp = currF->next;    //Start with task after current one
-    function_struct *nextF = nullptr;
+    function_struct *temp = taskMainStruct;    //Start with task after current one
     uint8_t prioMin = 255;  //Use only tasks with prio < 255
     do
     {    
         if(temp->executable == true && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
-            nextF = temp;                   //set nextF to right now highest priority task
+            nextTask = temp;                   //set nextF to right now highest priority task
             prioMin = temp->priority;       //save prio
         }
         temp = temp->next;
-    } while(temp != currF);  //Solange ich noch nicht wieder beim ersten angekommen bin 
+    } while(temp != taskMainStruct);  //Solange ich noch nicht wieder beim ersten angekommen bin 
 
-    if(nextF != nullptr)    //Wenn ein Task ausführbar ist
+    if(nextTask == nullptr)    //Wenn ein Task ausführbar ist
     {
-        return nextF;       //Diesen returnen
-    }
-    else                    //Ansonsten
-    {
-        return taskMainStruct;  //Den Task zum Rechenzeit verscherbeln nehmen
+        nextTask = taskMainStruct;
     }
 }
 
@@ -82,84 +86,29 @@ function_struct *findNextFunction(function_struct *currF)
 void taskDeleteOnEnd(void)
 {
     disable_interrupts();
-    function_struct *temp = currentTask->next;             //Get the function to be executed next
-    currentTask->removeFunction();                         //Remove the returned function
-    currentTask = temp;                                    //Now set the current Task to the next one
+    delete currentTask;                         //Remove the returned function
+    currentTask = taskMainStruct;
     asm("MOV R7, #1");
-    asm("SVC 0x00");                                       //Create a system call to the SVC Handler
+    enable_interrupts();
+    asm("SVC #1");                                       //Create a system call to the SVC Handler
+    //taskMainStruct->function();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//System Call (Supervisor Call) from Delay or after a task finishes
+//Here the magic happens
+//Depending on the Task state, switching happens
 ////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void SVC_Handler(void)
+extern "C" inline void switchTask(void)
 {
-    uint8_t handleMode = 0;
-    asm("MOV R7, %0" : : "r"(handleMode));  //->Now in the handleMode var we have the id what we should do
-    //1-end 2-delay
-    nextTask = findNextFunction(currentTask);
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    //Set the PendSV to pending
-    enable_interrupts();                    //enable interrupts
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-//Set the PendSV exception to pending (Systick is a 24 bit counter) minimum 11Hz
-////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void SysTick_Handler(void)                           //In C Language
-{    
-    nextTask = nullptr;
-    function_struct *temp = currentTask->next;
-    uint32_t minDelayT = -1;
-    do
+    if(currentTask == nullptr) //make sure Tasks are available
     {
-        if(temp->continueInMS > 0) //Wenn verbleibende Delay Zeit größer als 0
-        {
-            if(temp->continueInMS < sysTickMillisPerInt)
-            {
-                temp->continueInMS = 0;
-            }
-            else
-            {
-                temp->continueInMS -= sysTickMillisPerInt;    //dekrementieren
-            }
-        }
-        else
-        {
-            temp->executable = true;        //Wenn keine Delay Zeit mehr, task auf executable setzen
-        }
-
-        if(minDelayT > temp->continueInMS)
-        {
-            minDelayT = temp->continueInMS;
-        }
-
-        temp = temp->next;  //Nächsten Task
-    } while (temp != currentTask);
-    
-    if(minDelayT < 90 && minDelayT > 0) 
-    {
-        sysTickFreq = 1000.0 / (float)minDelayT;
+        currentTask = taskMainStruct;
     }
-    else 
+    if(nextTask == nullptr)
     {
-        sysTickFreq = defaultSysTickFreq;
+        nextTask = taskMainStruct;
     }
-    SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
 
-    if(switchEnable && currentTask->priority > 0) 
-    {
-        nextTask = findNextFunction(currentTask);
-        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;       //If switchEnable set, set the PendSV to pending
-    }   
-    enable_interrupts();                                        //enable all interrupts
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-//Switch the context
-////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void PendSV_Handler()                                //In C Language
-{
-    disable_interrupts();
     if ((currentTask->State == RUNNING)) //Hier Task anhalten
     {
         asm("MRS r0, PSP");     //Get Process Stack Pointer
@@ -167,7 +116,7 @@ extern "C" void PendSV_Handler()                                //In C Language
         asm("MSR PSP, r0");     //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
 
-        currentTask->State = STOPPED;    //Save function state
+        currentTask->State = PAUSED;    //Save function state
         currentTask = nextTask;
     }
 
@@ -177,12 +126,12 @@ extern "C" void PendSV_Handler()                                //In C Language
         asm("MOV r5, #1");                                  //R1
         asm("MOV r6, #2");                                  //R2
         asm("MOV r7, #3");                                  //R3
-        asm("MOV r8, #0x12");                               //R12
+        asm("MOV r8, #12");                                 //R12
         asm("MOV r9, %0" : : "r"(taskDeleteOnEnd));         //LR
-        asm("MOV r10, %0" : : "r"(func));                   //PC
+        asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function));   //PC
         asm("MOV r11, #0x01000000");                        //XPSR
 
-        asm("MRS r0, PSP");             //get PSP
+        asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
         asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
         asm("MSR PSP, r0");             //set PSP
 
@@ -198,14 +147,134 @@ extern "C" void PendSV_Handler()                                //In C Language
         currentTask->State = RUNNING;   //Save state as running
     }
 
-    if (currentTask->State == STOPPED) //Hier Task fortsetzen
+    if (currentTask->State == PAUSED) //Hier Task fortsetzen
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
         asm("LDMIA r0!, {r4-r11}");                     //load registers from memory
         asm("MSR PSP, r0");                             //set PSP
         currentTask->State = RUNNING;                   //Save state as running
+        nextTask = nullptr;
     }
-    asm("MOV LR, #0xFFFFFFFD");                             //Set the LR to 0xFFFFFFFD to signal Process mode with psp
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//System Call (Supervisor Call) from Delay or after a task finishes
+////////////////////////////////////////////////////////////////////////////////////////
+extern "C" void SVC_Handler(unsigned int * svc_args)
+{
+    disable_interrupts();
+    uint8_t handleMode = ( ( char * )svc_args[ 6 ] )[ -2 ];
+    
+    switch (handleMode)
+    {
+    case 0:
+        break;
+    
+    case 1: //Task has Ended
+        currentTask = nullptr;
+        nextTask = nullptr;
+        switchTask();
+        break;
+    
+    case 2: //Delay
+        nextTask = nullptr;
+        switchTask();
+
+    case 3: //Switch to privileged mode
+        asm("MRS R0, CONTROL");
+        asm("AND R0, #-2");
+        asm("MSR CONTROL, R0");
+        asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+
+    case 4: //Switch to unprivileged mode
+        asm("MRS R0, CONTROL");
+        asm("ORR R0, #1");
+        asm("MSR CONTROL, R0");
+        asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+
+    default:
+        break;
+    }
+
     enable_interrupts();                                    //Enable all interrupts
-    asm("bx LR");                                           //Jump to LR address
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Set the PendSV exception to pending (Systick is a 24 bit counter) minimum 11Hz
+////////////////////////////////////////////////////////////////////////////////////////
+extern "C" void SysTick_Handler(void)                           //In C Language
+{    
+    disable_interrupts();
+    nextTask = nullptr;
+    function_struct *temp = taskMainStruct;
+    uint32_t minDelayT = -1;
+    do
+    {
+        if(temp == nullptr)
+        {
+            minDelayT = 0;
+            break;
+        }
+
+        if(temp->continueInMS < sysTickMillisPerInt)
+        {
+            temp->continueInMS = 0;
+            temp->executable = true;        //Wenn keine Delay Zeit mehr, task auf executable setzen
+        }
+        else
+        {
+            temp->continueInMS -= sysTickMillisPerInt;    //dekrementieren
+        }
+        if(minDelayT > temp->continueInMS)
+        {
+            minDelayT = temp->continueInMS;
+        }
+        temp = temp->next;  //Nächsten Task
+    } while (temp != taskMainStruct);
+    
+    #ifdef useSystickAltering
+        if(minDelayT < 90 && minDelayT > 0) 
+        {
+            sysTickFreq = 1000.0 / (float)minDelayT;
+        }
+        else 
+        {
+            sysTickFreq = defaultSysTickFreq;
+        }
+        sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq)
+        SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
+    #endif
+
+    if(currentTask->priority > 0) 
+    {
+        function_struct *temp = taskMainStruct;    //Start with task after current one
+        uint8_t prioMin = 255;  //Use only tasks with prio < 255
+        do
+        {    
+            if(temp->executable == true && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+            {
+                nextTask = temp;                   //set nextF to right now highest priority task
+                prioMin = temp->priority;       //save prio
+            }
+            temp = temp->next;
+        } while(temp != taskMainStruct);  //Solange ich noch nicht wieder beim ersten angekommen bin 
+
+        if(nextTask == nullptr)    //Wenn ein Task ausführbar ist
+        {
+            nextTask = taskMainStruct;
+        }
+        pendPendSV();       //If switchEnable set, set the PendSV to pending
+    }
+    enable_interrupts();                                        //enable all interrupts
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Switch the context
+////////////////////////////////////////////////////////////////////////////////////////
+extern "C" void PendSV_Handler()                                //In C Language
+{
+    disable_interrupts();
+    switchTask();
+    //asm("MOV LR, #0xFFFFFFFD");                             //Set the LR to 0xFFFFFFFD to signal Process mode with psp
+    enable_interrupts();                                    //Enable all interrupts
 }

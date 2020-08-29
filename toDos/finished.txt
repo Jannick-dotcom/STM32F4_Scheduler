@@ -1,3 +1,5 @@
+-Check if we can infinitely end and start tasks (after some are stopped) √
+
 -Check the Delay and Taskdelete svc calls √
 
 -Change the searchFunction method that we are finding the right one when we have multiple instances of a Task √
@@ -12,12 +14,14 @@
 -Find a Name for the OS		-> StallaRTOS					3
 							-> [Renn{stall]a[R}TOS]
 							-> OSama bin Janniq				1
-							-> JannixKannix
+							-> Jannix
 							-> 94OS
 							-> StallardOS					3
 							-> STAjaRTOS
 							-> InvasiOS						1
-							-> InvatOS
+							-> InnovatOS
+							-> ErresOS
+							-> RSOS
 
 -Decide which system we should use
 	TaskScheduler		0
