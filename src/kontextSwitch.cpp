@@ -1,4 +1,5 @@
-#include "TaskScheduler.hpp"
+#include "TaskScheduler.h"
+#include <stm32f4xx_hal.h>
 //Kontext Switch
 function_struct *currentTask = nullptr;
 function_struct *nextTask = nullptr;
@@ -6,21 +7,20 @@ function_struct *taskMainStruct;
 
 #define defaultSysTickFreq 1000.0
 #define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
-#define sysTickTicks (uint32_t)(coreFreq / sysTickFreq)
+// #define sysTickTicks (uint32_t)(coreFreq / sysTickFreq)
+#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
 
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 volatile uint32_t sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq);
 
 extern "C" inline void pendPendSV()
 {
-    *((uint32_t*)0xE000ED04 + 0x04) |= (1<<28);
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-extern "C" inline void SysTick_Config(uint32_t ticks)
+extern "C" inline void Jannix_SysTick_Config(uint32_t ticks)
 {
-    *(uint32_t*)0xE000E010 |= 7;
-    uint32_t tmp = ticks & 0x00FFFFFF;
-    *(uint32_t*)0xE000E014 = tmp;
+    SysTick_Config(ticks);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -47,13 +47,17 @@ void TaskScheduler::startOS(void)
     if(first_function_struct != nullptr)
     {
         currentTask = first_function_struct;      //The current Task is the first one in the List
-        SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
+        Jannix_SysTick_Config(sysTickTicks);      //Set the frequency of the systick interrupt
 
-        *(uint32_t*)0xE000ED20 |= 0x00ff0000;     //Setup the Priorities for PendSV and Systick
+        NVIC_SetPriority(SysTick_IRQn, 0x00);
+        NVIC_SetPriority(PendSV_IRQn, 0x00);
         pendPendSV();                             //Set the PendSV to pending
+
+        asm("MOV R0, #3");
+        asm("MSR CONTROL, R0");
+        asm("ISB");
         
         enable_interrupts();
-        asm("SVC #4"); 
     }
 }
 
@@ -88,10 +92,8 @@ void taskDeleteOnEnd(void)
     disable_interrupts();
     delete currentTask;                         //Remove the returned function
     currentTask = taskMainStruct;
-    asm("MOV R7, #1");
     enable_interrupts();
     asm("SVC #1");                                       //Create a system call to the SVC Handler
-    //taskMainStruct->function();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -160,14 +162,21 @@ extern "C" inline void switchTask(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //System Call (Supervisor Call) from Delay or after a task finishes
 ////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void SVC_Handler(unsigned int * svc_args)
+extern "C" void SVC_Handler(uint32_t * svc_args)
 {
     disable_interrupts();
-    uint8_t handleMode = ( ( char * )svc_args[ 6 ] )[ -2 ];
-    
+    uint32_t handleMode;
+    asm("MRS r0, PSP");
+    asm("LDR r0, [r0, #24]");
+    asm("LDR r0, [r0, #-2]");
+    asm("AND r0, #0xff");
+    asm("MOV %0, r0" : "=r"(handleMode));   //Save Stack pointer
     switch (handleMode)
     {
     case 0:
+        currentTask = nullptr;
+        nextTask = nullptr;
+        pendPendSV();
         break;
     
     case 1: //Task has Ended
@@ -179,18 +188,21 @@ extern "C" void SVC_Handler(unsigned int * svc_args)
     case 2: //Delay
         nextTask = nullptr;
         switchTask();
+        break;
 
     case 3: //Switch to privileged mode
         asm("MRS R0, CONTROL");
         asm("AND R0, #-2");
         asm("MSR CONTROL, R0");
         asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+        break;
 
     case 4: //Switch to unprivileged mode
         asm("MRS R0, CONTROL");
         asm("ORR R0, #1");
         asm("MSR CONTROL, R0");
         asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+        break;
 
     default:
         break;

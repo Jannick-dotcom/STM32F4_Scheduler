@@ -3,21 +3,25 @@
 //    Powered by:
 //
 //    OSama
-//      bin
-//        Janniq *.*
+//        bin
+//          Janniq 
+//              *.*
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef Task_Scheduler
-#define Task_Scheduler
+#ifndef Task_Scheduler_h
+#define Task_Scheduler_h
 
 // #define useSystickAltering
 
 #include <stdint.h>
-#define get_us us_ticker_read()
+#include <stm32f4xx_hal.h>
+#include "GPIO.h"
 
-#define sizeStack 300
+#define sizeStack 300      //300 * uint32_t
+#define countTasks 10
 #define coreFreq 180000000 //180MHz
+#define Jannix_HSE_VALUE 25000000 //Frequency of ext osc / if no -> 16MHz
 
 typedef enum {
   NEW,
@@ -38,6 +42,7 @@ struct function_struct
   void (*function)();     //Auszuführende Funktion
   uint8_t priority;       //Priorität 0 wird nicht unterbrochen außer sie wünschen es durch ein Delay
   uint16_t id;            //ID des Tasks
+  uint8_t used;           //Ist dieser TCB schon belegt?
 
   //nur für normalen Schedule betrieb
   //float frequency;        //Soll ... mal pro Sekunde ausgeführt werden

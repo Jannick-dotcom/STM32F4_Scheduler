@@ -1,4 +1,4 @@
-#include "TaskScheduler.hpp"
+#include "TaskScheduler.h"
 
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
@@ -41,9 +41,7 @@ function_struct *TaskScheduler::addFunction(void (*function)(), uint16_t id, uin
 
   function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
   
-  asm("SVC #4");
   function_struct_ptr = new function_struct;      //ein neues erstellen
-  asm("SVC #5");
 
   if (function_struct_ptr == nullptr) //Wenn kein HEAP Platz mehr frei ist...
   {
@@ -141,8 +139,7 @@ void TaskScheduler::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;
-  asm("MOV R7, #2");      //Signal to SVC that he got called from delay
-  asm("SVC 0x00");
+  asm("SVC #2");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -168,4 +165,42 @@ function_struct::~function_struct() //Destructor
     this->next->prev = this->prev;
     this->prev->next = this->next;
   }
+}
+
+void SystemClock_Config(void)
+{
+  RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_OscInitTypeDef RCC_OscInitStruct;
+
+  // Enable Power Control clock
+  __PWR_CLK_ENABLE();
+
+  // The voltage scaling allows optimizing the power consumption when the
+  // device is clocked below the maximum system frequency, to update the
+  // voltage scaling value regarding system frequency refer to product
+  // datasheet.
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+  // Enable HSE Oscillator and activate PLL with HSE as source
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+
+  // This assumes the HSE_VALUE is a multiple of 1MHz. If this is not
+  // your case, you have to recompute these PLL constants.
+  RCC_OscInitStruct.PLL.PLLM = (Jannix_HSE_VALUE/1000000u);
+  RCC_OscInitStruct.PLL.PLLN = 400;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
+  HAL_RCC_OscConfig(&RCC_OscInitStruct);
+
+  // Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2
+  // clocks dividers
+  RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 }
