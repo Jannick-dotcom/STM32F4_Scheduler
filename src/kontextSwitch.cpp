@@ -7,7 +7,6 @@ function_struct *taskMainStruct;
 
 #define defaultSysTickFreq 1000.0
 #define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
-// #define sysTickTicks (uint32_t)(coreFreq / sysTickFreq)
 #define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
 
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
@@ -47,17 +46,16 @@ void TaskScheduler::startOS(void)
     if(first_function_struct != nullptr)
     {
         currentTask = first_function_struct;      //The current Task is the first one in the List
-        Jannix_SysTick_Config(sysTickTicks);      //Set the frequency of the systick interrupt
 
-        NVIC_SetPriority(SysTick_IRQn, 0x00);
-        NVIC_SetPriority(PendSV_IRQn, 0x00);
-        pendPendSV();                             //Set the PendSV to pending
-
-        asm("MOV R0, #3");
+        asm("MOV R0, #2");
         asm("MSR CONTROL, R0");
         asm("ISB");
-        
+
+        asm("MRS R0, MSP");
+        asm("MSR PSP, R0");
+
         enable_interrupts();
+        asm("SVC #5");
     }
 }
 
@@ -87,10 +85,11 @@ inline void findNextFunction(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //If a Task Returns, this function gets executed and calls the remove function of this task
 ////////////////////////////////////////////////////////////////////////////////////////
-void taskDeleteOnEnd(void)
+void taskOnEnd(void)
 {
     disable_interrupts();
-    delete currentTask;                         //Remove the returned function
+    //delete currentTask;                         //Remove the returned function
+    currentTask->used = 0;
     currentTask = taskMainStruct;
     enable_interrupts();
     asm("SVC #1");                                       //Create a system call to the SVC Handler
@@ -115,6 +114,7 @@ extern "C" inline void switchTask(void)
     {
         asm("MRS r0, PSP");     //Get Process Stack Pointer
         asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
+        //asm("VSTMDB r0!, {s16-s31}");
         asm("MSR PSP, r0");     //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
 
@@ -129,7 +129,7 @@ extern "C" inline void switchTask(void)
         asm("MOV r6, #2");                                  //R2
         asm("MOV r7, #3");                                  //R3
         asm("MOV r8, #12");                                 //R12
-        asm("MOV r9, %0" : : "r"(taskDeleteOnEnd));         //LR
+        asm("MOV r9, %0" : : "r"(taskOnEnd));               //LR
         asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function));   //PC
         asm("MOV r11, #0x01000000");                        //XPSR
 
@@ -152,6 +152,7 @@ extern "C" inline void switchTask(void)
     if (currentTask->State == PAUSED) //Hier Task fortsetzen
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
+        //asm("VLDMIA r0!, {s16-s31}");
         asm("LDMIA r0!, {r4-r11}");                     //load registers from memory
         asm("MSR PSP, r0");                             //set PSP
         currentTask->State = RUNNING;                   //Save state as running
@@ -162,7 +163,7 @@ extern "C" inline void switchTask(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //System Call (Supervisor Call) from Delay or after a task finishes
 ////////////////////////////////////////////////////////////////////////////////////////
-extern "C" void SVC_Handler(uint32_t * svc_args)
+extern "C" void SVC_Handler(void)
 {
     disable_interrupts();
     uint32_t handleMode;
@@ -170,7 +171,7 @@ extern "C" void SVC_Handler(uint32_t * svc_args)
     asm("LDR r0, [r0, #24]");
     asm("LDR r0, [r0, #-2]");
     asm("AND r0, #0xff");
-    asm("MOV %0, r0" : "=r"(handleMode));   //Save Stack pointer
+    asm("MOV %0, r0" : "=r"(handleMode)); 
     switch (handleMode)
     {
     case 0:
@@ -202,6 +203,17 @@ extern "C" void SVC_Handler(uint32_t * svc_args)
         asm("ORR R0, #1");
         asm("MSR CONTROL, R0");
         asm("ISB");                               //After modifying the control Register flush all instructions (I don't understand why but ok)
+        break;
+
+    case 5:                                       //Start the os
+        while(SysTick_Config(sysTickTicks));
+
+        NVIC_SetPriority(SysTick_IRQn, 0x00);
+        NVIC_SetPriority(PendSV_IRQn, 0x00);
+        NVIC_EnableIRQ(PendSV_IRQn);
+        NVIC_EnableIRQ(SysTick_IRQn);
+        NVIC_EnableIRQ(SVCall_IRQn);
+        pendPendSV();
         break;
 
     default:

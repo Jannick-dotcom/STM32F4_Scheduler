@@ -13,9 +13,11 @@
 #define Task_Scheduler_h
 
 // #define useSystickAltering
+void Jannix_SetSysClock(void);
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
+#include <system_stm32f4xx.h>
 #include "GPIO.h"
 
 #define sizeStack 300      //300 * uint32_t
@@ -63,6 +65,7 @@ class TaskScheduler
   /////////Variables
 private:
   function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
+  uint8_t TCBsCreated;
 
 public:
   //Constructor
@@ -78,6 +81,8 @@ public:
     /*Number of execs*/ uint16_t Execcount = 0);//not used by context switch
     //Eine Funktion zur Liste hinzufügen
 
+  void createTCBs(void);      //create the structs for all the functions (count is "countTasks")
+
   void changeFunctionEnabled(
     /*Funktion*/ uint16_t id,
     /*Aktivieren oder Deaktivieren*/ bool act); 
@@ -85,6 +90,7 @@ public:
 
 private:
   function_struct *searchFunction(/*Funktion*/ uint16_t id);
+  function_struct *searchFreeFunction(void);
   
 public:
   //Setter Methods
