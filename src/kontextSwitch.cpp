@@ -43,14 +43,15 @@ extern "C" inline void disable_interrupts()
 ////////////////////////////////////////////////////////////////////////////////////////
 void TaskScheduler::startOS(void)
 {
+    Jannix_SetSysClock();
+    SystemCoreClockUpdate();
     if(first_function_struct != nullptr)
     {
         currentTask = first_function_struct;      //The current Task is the first one in the List
-
         asm("MOV R0, #2");
         asm("MSR CONTROL, R0");
         asm("ISB");
-
+        
         asm("MRS R0, MSP");
         asm("MSR PSP, R0");
 
@@ -62,13 +63,13 @@ void TaskScheduler::startOS(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Finding a next Task
 ////////////////////////////////////////////////////////////////////////////////////////
-inline void findNextFunction(void)
+void findNextFunction(void)
 {
     function_struct *temp = taskMainStruct;    //Start with task after current one
     uint8_t prioMin = 255;  //Use only tasks with prio < 255
     do
     {    
-        if(temp->executable == true && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if(temp->executable == true && temp->priority < prioMin && temp->used == true) //Get task with lowest prio number -> highest priority
         {
             nextTask = temp;                   //set nextF to right now highest priority task
             prioMin = temp->priority;       //save prio
@@ -89,7 +90,8 @@ void taskOnEnd(void)
 {
     disable_interrupts();
     //delete currentTask;                         //Remove the returned function
-    currentTask->used = 0;
+    currentTask->used = false;
+    currentTask->executable = false;
     currentTask = taskMainStruct;
     enable_interrupts();
     asm("SVC #1");                                       //Create a system call to the SVC Handler
@@ -130,7 +132,7 @@ extern "C" inline void switchTask(void)
         asm("MOV r7, #3");                                  //R3
         asm("MOV r8, #12");                                 //R12
         asm("MOV r9, %0" : : "r"(taskOnEnd));               //LR
-        asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function));   //PC
+        asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier));   //PC
         asm("MOV r11, #0x01000000");                        //XPSR
 
         asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
@@ -213,6 +215,7 @@ extern "C" void SVC_Handler(void)
         NVIC_EnableIRQ(PendSV_IRQn);
         NVIC_EnableIRQ(SysTick_IRQn);
         NVIC_EnableIRQ(SVCall_IRQn);
+
         pendPendSV();
         break;
 
@@ -271,22 +274,8 @@ extern "C" void SysTick_Handler(void)                           //In C Language
 
     if(currentTask->priority > 0) 
     {
-        function_struct *temp = taskMainStruct;    //Start with task after current one
-        uint8_t prioMin = 255;  //Use only tasks with prio < 255
-        do
-        {    
-            if(temp->executable == true && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
-            {
-                nextTask = temp;                   //set nextF to right now highest priority task
-                prioMin = temp->priority;       //save prio
-            }
-            temp = temp->next;
-        } while(temp != taskMainStruct);  //Solange ich noch nicht wieder beim ersten angekommen bin 
-
-        if(nextTask == nullptr)    //Wenn ein Task ausführbar ist
-        {
-            nextTask = taskMainStruct;
-        }
+        findNextFunction();
+        
         pendPendSV();       //If switchEnable set, set the PendSV to pending
     }
     enable_interrupts();                                        //enable all interrupts

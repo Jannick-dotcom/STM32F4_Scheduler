@@ -21,9 +21,9 @@ void Jannix_SetSysClock(void);
 #include "GPIO.h"
 
 #define sizeStack 300      //300 * uint32_t
-#define countTasks 10
-#define coreFreq 180000000 //180MHz
-#define Jannix_HSE_VALUE 25000000 //Frequency of ext osc / if no -> 16MHz
+#define countTasks 3
+// #define coreFreq 180000000 //180MHz
+// #define Jannix_HSE_VALUE 25000000 //Frequency of ext osc / if no -> 16MHz
 
 typedef enum {
   NEW,
@@ -44,11 +44,11 @@ struct function_struct
   void (*function)();     //Auszuführende Funktion
   uint8_t priority;       //Priorität 0 wird nicht unterbrochen außer sie wünschen es durch ein Delay
   uint16_t id;            //ID des Tasks
-  uint8_t used;           //Ist dieser TCB schon belegt?
+  volatile bool used;           //Ist dieser TCB schon belegt?
 
   //nur für normalen Schedule betrieb
   //float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
-  bool executable;    //Funktion ausführen?
+  volatile bool executable;    //Funktion ausführen?
   //uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
 
   //nur für KontextSwitch
@@ -57,7 +57,7 @@ struct function_struct
   
   volatile uint32_t continueInMS;   //Delay amount
 
-  ~function_struct();
+  // ~function_struct();
 };
 
 class TaskScheduler

@@ -4,10 +4,12 @@ TaskScheduler Tasker1;
 void task1(void)
 {
     JannixGPIO red(14, PORTB, Output);
-    while (1)
+    uint8_t i = 0;
+    while (i < 10)
     {
         red = !red;
-        Tasker1.delay(100);
+        Tasker1.delay(500);
+        i++;
     }
 }
 
@@ -17,7 +19,7 @@ void task2(void)
     while (1)
     {
         blue = !blue;
-        Tasker1.delay(200);
+        Tasker1.delay(250);
     }
 }
 
@@ -27,14 +29,12 @@ void task3(void)
     while (1)
     {
         green = !green;
-        Tasker1.delay(400);
+        Tasker1.delay(125);
     }
 }
 
 int main()
 {
-    Jannix_SetSysClock();
-    //HAL_Init();
     Tasker1.addFunction(task1, 2, 1);
     Tasker1.addFunction(task2, 3, 2);
     Tasker1.addFunction(task3, 4, 3);

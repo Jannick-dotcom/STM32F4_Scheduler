@@ -1,4 +1,4 @@
 -Add floating point register saving
 
--Restart Tasks after Bug
-    -Add fault handlers
+-Restart Tasks after Bug 
+    -Add fault handlers √

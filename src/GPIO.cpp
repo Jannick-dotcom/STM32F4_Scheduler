@@ -20,7 +20,7 @@ JannixGPIO::JannixGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
     __GPIOG_CLK_ENABLE();
 
     GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.Pin = this->pin;
+    GPIO_InitStruct.Pin = 1 << this->pin;
     GPIO_InitStruct.Mode = this->dir;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     GPIO_InitStruct.Pull = this->pull;
@@ -33,8 +33,8 @@ uint16_t JannixGPIO::operator=(bool state)
     if (this->dir == Output)
     {
         this->state = state;
-        HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], this->pin, GPIO_PinState(state));
-        return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], this->pin);
+        HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
+        return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
     }
     else if(this->dir == Input)
     {
