@@ -1,5 +1,5 @@
-#include "TaskScheduler.h"
-TaskScheduler Tasker1;
+#include "Jannix.h"
+Jannix Tasker1;
 
 void task1(void)
 {

@@ -60,7 +60,7 @@ struct function_struct
   // ~function_struct();
 };
 
-class TaskScheduler
+class Jannix
 {
   /////////Variables
 private:
@@ -69,7 +69,7 @@ private:
 
 public:
   //Constructor
-  TaskScheduler(); //Create a Task Scheduler
+  Jannix(); //Create a Task Scheduler
 
   //Function Methods
   //returns pointer to added struct or nullptr if not successful
@@ -81,16 +81,15 @@ public:
     /*Number of execs*/ uint16_t Execcount = 0);//not used by context switch
     //Eine Funktion zur Liste hinzufügen
 
-  void createTCBs(void);      //create the structs for all the functions (count is "countTasks")
-
   void changeFunctionEnabled(
     /*Funktion*/ uint16_t id,
     /*Aktivieren oder Deaktivieren*/ bool act); 
     //Eine Funktion aus der Liste de/aktivieren
 
 private:
-  function_struct *searchFunction(/*Funktion*/ uint16_t id);
-  function_struct *searchFreeFunction(void);
+  function_struct *searchFunction(/*Funktion*/ uint16_t id);  //Search a TCB that matches the provided function
+  function_struct *searchFreeFunction(void);      //Search a TCB that isn't used
+  void createTCBs(void);      //create the structs for all the functions (count is "countTasks")
   
 public:
   //Setter Methods

@@ -1,4 +1,4 @@
-#include "TaskScheduler.h"
+#include "Jannix.h"
 
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
@@ -14,9 +14,9 @@ void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//Constructor - Here we Create a TaskScheduler Object
+//Constructor - Here we Create a Jannix Object
 ////////////////////////////////////////////////////////////////////////////////////////
-TaskScheduler::TaskScheduler()
+Jannix::Jannix()
 {
   //Basiswerte Initialisieren
   first_function_struct = nullptr;
@@ -32,7 +32,7 @@ TaskScheduler::TaskScheduler()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds new Tasks to the List
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::createTCBs()
+void Jannix::createTCBs()
 {
   if (TCBsCreated >= countTasks) //Wenn schon genug TCBs erstellt wurden, nicht nochmal erstellen
   {
@@ -81,7 +81,7 @@ void TaskScheduler::createTCBs()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds a new Task to the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *TaskScheduler::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
+function_struct *Jannix::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
 {
   if (function == nullptr || exec_freq <= 0 || searchFunction(id) != nullptr) //Make sure the parameters are correct
   {
@@ -135,7 +135,7 @@ function_struct *TaskScheduler::addFunction(void (*function)(), uint16_t id, uin
 ////////////////////////////////////////////////////////////////////////////////////////
 //Here we en/disable a Task from the List
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::changeFunctionEnabled(uint16_t id, bool act)
+void Jannix::changeFunctionEnabled(uint16_t id, bool act)
 {
   function_struct *temp = searchFunction(id); //Funktion suchen
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
@@ -147,7 +147,7 @@ void TaskScheduler::changeFunctionEnabled(uint16_t id, bool act)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Sets new Priority of a Task
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
+void Jannix::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 {
   function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
@@ -159,7 +159,7 @@ void TaskScheduler::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Search a task in the list of executable ones/*
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *TaskScheduler::searchFunction(/*ID*/ uint16_t id)
+function_struct *Jannix::searchFunction(/*ID*/ uint16_t id)
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
@@ -188,7 +188,7 @@ function_struct *TaskScheduler::searchFunction(/*ID*/ uint16_t id)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Search a free task in the list
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *TaskScheduler::searchFreeFunction(void)
+function_struct *Jannix::searchFreeFunction(void)
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
@@ -217,7 +217,7 @@ function_struct *TaskScheduler::searchFreeFunction(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Delay for an amount of milliseconds
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::delay(uint32_t milliseconds)
+void Jannix::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;
@@ -227,7 +227,7 @@ void TaskScheduler::delay(uint32_t milliseconds)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Return the State of the Task
 ////////////////////////////////////////////////////////////////////////////////////////
-taskState TaskScheduler::getFunctionState(/*Funktion*/ uint16_t id)
+taskState Jannix::getFunctionState(/*Funktion*/ uint16_t id)
 {
   function_struct *temp = searchFunction(id); //Hier die Funktion suchen
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist

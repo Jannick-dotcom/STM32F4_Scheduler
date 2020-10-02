@@ -1,4 +1,4 @@
-#include "TaskScheduler.h"
+#include "Jannix.h"
 #include <stm32f4xx_hal.h>
 //Kontext Switch
 function_struct *currentTask = nullptr;
@@ -41,7 +41,7 @@ extern "C" inline void disable_interrupts()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Set all the Interrupts and Values for the OS
 ////////////////////////////////////////////////////////////////////////////////////////
-void TaskScheduler::startOS(void)
+void Jannix::startOS(void)
 {
     Jannix_SetSysClock();
     SystemCoreClockUpdate();
