@@ -1,15 +1,15 @@
-#include "Jannix.h"
+#include "Jannix.hpp"
 Jannix Tasker1;
+#include <random>
 
 void task1(void)
 {
     JannixGPIO red(14, PORTB, Output);
     uint8_t i = 0;
-    while (i < 10)
+    for (i= 0; i < 10; i++)
     {
         red = !red;
         Tasker1.delay(500);
-        i++;
     }
 }
 

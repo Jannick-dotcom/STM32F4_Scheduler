@@ -1,41 +1,17 @@
-#include "Jannix.h"
-#include <stm32f4xx_hal.h>
-//Kontext Switch
-function_struct *currentTask = nullptr;
-function_struct *nextTask = nullptr;
-function_struct *taskMainStruct;
+#include "Jannix.hpp"
+// #include <stm32f4xx_hal.h>
 
-#define defaultSysTickFreq 1000.0
-#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
-#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
+extern uint8_t switchEnable;
+extern function_struct *currentTask;
+extern function_struct *taskMainStruct;
+extern function_struct *nextTask;
 
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 volatile uint32_t sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq);
 
-extern "C" inline void pendPendSV()
-{
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-}
-
 extern "C" inline void Jannix_SysTick_Config(uint32_t ticks)
 {
     SysTick_Config(ticks);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-//Enables all interrupts
-////////////////////////////////////////////////////////////////////////////////////////
-extern "C" inline void enable_interrupts() 
-{
-	asm("CPSIE I");     //Instruction for enabling interrupts
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-//Disables all interrupts
-////////////////////////////////////////////////////////////////////////////////////////
-extern "C" inline void disable_interrupts() 
-{
-	asm("CPSID I");     //Instruction for disabling interrupts
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +32,7 @@ void Jannix::startOS(void)
         asm("MSR PSP, R0");
 
         enable_interrupts();
-        asm("SVC #5");
+        Jannix_start();
     }
 }
 
@@ -89,12 +65,11 @@ void findNextFunction(void)
 void taskOnEnd(void)
 {
     disable_interrupts();
-    //delete currentTask;                         //Remove the returned function
     currentTask->used = false;
     currentTask->executable = false;
     currentTask = taskMainStruct;
     enable_interrupts();
-    asm("SVC #1");                                       //Create a system call to the SVC Handler
+    Jannix_endTask();                                      //Create a system call to the SVC Handler
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +91,7 @@ extern "C" inline void switchTask(void)
     {
         asm("MRS r0, PSP");     //Get Process Stack Pointer
         asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
-        //asm("VSTMDB r0!, {s16-s31}");
+        // asm("VSTMDB r0!, {s16-s31}");
         asm("MSR PSP, r0");     //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack));   //Save Stack pointer
 
@@ -168,7 +143,7 @@ extern "C" inline void switchTask(void)
 extern "C" void SVC_Handler(void)
 {
     disable_interrupts();
-    uint32_t handleMode;
+    uint8_t handleMode;
     asm("MRS r0, PSP");
     asm("LDR r0, [r0, #24]");
     asm("LDR r0, [r0, #-2]");
@@ -176,7 +151,7 @@ extern "C" void SVC_Handler(void)
     asm("MOV %0, r0" : "=r"(handleMode)); 
     switch (handleMode)
     {
-    case 0:
+    case 0: //No Task
         currentTask = nullptr;
         nextTask = nullptr;
         pendPendSV();
@@ -208,6 +183,7 @@ extern "C" void SVC_Handler(void)
         break;
 
     case 5:                                       //Start the os
+        // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
         while(SysTick_Config(sysTickTicks));
 
         NVIC_SetPriority(SysTick_IRQn, 0x00);
@@ -217,6 +193,11 @@ extern "C" void SVC_Handler(void)
         NVIC_EnableIRQ(SVCall_IRQn);
 
         pendPendSV();
+        break;
+
+    case 6: //Enter Bootloader
+        *((unsigned long *)0x2001FFF0) = 0xDEADBEEF; // End of RAM
+        NVIC_SystemReset();
         break;
 
     default:

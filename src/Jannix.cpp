@@ -1,16 +1,17 @@
-#include "Jannix.h"
+#include "Jannix.hpp"
+#include "JannixHelpers.hpp"
 
-extern uint8_t switchEnable;
-extern function_struct *currentTask;
-extern function_struct *taskMainStruct;
+//Kontext Switch
+function_struct *currentTask = nullptr;
+function_struct *nextTask = nullptr;
+function_struct *taskMainStruct = nullptr;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Just if no other Tasks have to be executed run this
 ////////////////////////////////////////////////////////////////////////////////////////
 void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 {
-  while (1)
-    ;
+  while (1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +27,6 @@ Jannix::Jannix()
   //Für Context Switch
   taskMainStruct = addFunction(taskMain, 0, 255, 1);
   createTCBs();
-  currentTask = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ void Jannix::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;
-  asm("SVC #2");
+  Jannix_delay();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -239,15 +239,6 @@ taskState Jannix::getFunctionState(/*Funktion*/ uint16_t id)
     return STOPPED;
   }
 }
-
-// function_struct::~function_struct() //Destructor
-// {
-//   if (this != taskMainStruct)
-//   {
-//     this->next->prev = this->prev;
-//     this->prev->next = this->next;
-//   }
-// }
 
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC 0x8 // Use external clock (ST Link MCO)

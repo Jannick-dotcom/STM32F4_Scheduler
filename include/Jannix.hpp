@@ -18,12 +18,14 @@ void Jannix_SetSysClock(void);
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
+#include "JannixHelpers.hpp"
 #include "GPIO.h"
 
 #define sizeStack 300      //300 * uint32_t
 #define countTasks 3
-// #define coreFreq 180000000 //180MHz
-// #define Jannix_HSE_VALUE 25000000 //Frequency of ext osc / if no -> 16MHz
+#define defaultSysTickFreq 1000.0
+#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
+#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
 
 typedef enum {
   NEW,
