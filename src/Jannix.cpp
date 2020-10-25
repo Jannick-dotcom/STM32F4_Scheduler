@@ -370,3 +370,25 @@ void Jannix_SetSysClock(void)
   //}
   //}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Set all the Interrupts and Values for the OS
+////////////////////////////////////////////////////////////////////////////////////////
+void Jannix::startOS(void)
+{
+    Jannix_SetSysClock();
+    SystemCoreClockUpdate();
+    if(first_function_struct != nullptr)
+    {
+        currentTask = first_function_struct;      //The current Task is the first one in the List
+        asm("MOV R0, #2");
+        asm("MSR CONTROL, R0");
+        asm("ISB");
+        
+        asm("MRS R0, MSP");
+        asm("MSR PSP, R0");
+
+        enable_interrupts();
+        Jannix_start();
+    }
+}

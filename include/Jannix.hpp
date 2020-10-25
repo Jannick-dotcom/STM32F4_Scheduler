@@ -13,13 +13,14 @@
 #define Task_Scheduler_h
 
 // #define useSystickAltering
-void Jannix_SetSysClock(void);
+// void Jannix_SetSysClock(void);
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include "JannixHelpers.hpp"
 #include "GPIO.h"
+#include "can.h"
 
 #define sizeStack 300      //300 * uint32_t
 #define countTasks 3
@@ -78,9 +79,7 @@ public:
   function_struct *addFunction(
     /*Funktion*/ void (*function)(), 
     /*ID of task*/ uint16_t id,                 //The ID must be different for different tasks
-    /*Prioritaet*/ uint8_t prio,                //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
-    /*Executions per sec*/ float exec_freq = 1, //Must be bigger than 0 ! //not used by context switch
-    /*Number of execs*/ uint16_t Execcount = 0);//not used by context switch
+    /*Prioritaet*/ uint8_t prio);                //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
     //Eine Funktion zur Liste hinzufügen
 
   void changeFunctionEnabled(

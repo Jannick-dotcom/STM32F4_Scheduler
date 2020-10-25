@@ -4,58 +4,49 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
-extern const GPIO_TypeDef *portsToGPIOBase[];
-typedef enum ports
-{
-    PORTA = 0,
-    PORTB,
-    PORTC,
-    PORTD,
-    PORTE,
-    PORTF,
-    PORTG
-} ports;
+#include "GPIO.h"
 
-typedef enum pinDir
-{
-    Input = GPIO_MODE_INPUT,
-    Output = GPIO_MODE_OUTPUT_PP,
-    Analog = GPIO_MODE_ANALOG
-} pinMode;
+#define CAN1_t_pin 1////////////////////!!!!
+#define CAN1_r_pin 1
+#define CAN2_t_pin 1
+#define CAN2_r_pin 1
 
-typedef enum pullMode
+
+
+typedef struct{
+    uint8_t ID;
+    uint8_t Val;
+} JannixCanMessage;
+
+typedef enum CANports
 {
-    nopull = GPIO_NOPULL,
-    pullup = GPIO_PULLUP,
-    pulldown = GPIO_PULLDOWN
-} pullMode;
+    JannixCAN1 = 0,
+    JannixCAN2
+} CANports;
+
+typedef enum CANBauds
+{
+    CAN500k = 0,
+    CAN1M = 1
+} CANBauds;
+
+
 
 class JannixCAN
 {
 private:
-    uint8_t state;
-    uint32_t pin;
-    ports port;
-    pinDir dir;
-    pullMode pull;
-
+    CAN_HandleTypeDef canhandle;
+    CAN_TxHeaderTypeDef TxHeader;
+    CAN_RxHeaderTypeDef RxHeader;
+    JannixGPIO *CANT;
+    JannixGPIO *CANR;
 public:
     JannixCAN(
-        /*Portnumber*/ uint8_t number,
-        /*Portname*/ ports port,
-        /*Direction*/ pinDir dir,
-        /*PullResistor*/ pullMode pull = nopull);
+        /*Portname*/ CANports port,
+        /*CANPortnumber*/ CANBauds baud);
 
-    uint16_t operator=(bool state);                                            //Operator for writing on the pin
-    uint16_t operator!() { return !this->state; };                             //Inverting the state
-    uint16_t operator&&(JannixCAN &ref) { return this->state && ref.state; }; //Logical operator
-    uint16_t operator||(JannixCAN &ref) { return this->state || ref.state; }; //Logical operator
-    uint16_t operator!=(JannixCAN &ref) { return this->state != ref.state; }; //Comparison
-    uint16_t operator<(JannixCAN &ref) { return this->state < ref.state; };
-    uint16_t operator>(JannixCAN &ref) { return this->state > ref.state; };
-    uint16_t operator<=(JannixCAN &ref) { return this->state <= ref.state; };
-    uint16_t operator>=(JannixCAN &ref) { return this->state >= ref.state; };
-    uint16_t operator==(JannixCAN &ref) { return this->state == ref.state; };
+    bool getMessage(JannixCanMessage *msg);
+    void sendMessage(JannixCanMessage *msg);
 };
 
 #endif
