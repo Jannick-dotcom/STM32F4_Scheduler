@@ -1,5 +1,5 @@
-# STM32F4_RTOS
-Rennstall Projekt
+# STM32F4_ROS
+Rennstall Operating System
 
 Unterschied zu mbed???
 -Braucht ein Bruchteil der Zeit zum Kompilieren
