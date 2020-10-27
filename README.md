@@ -1,5 +1,5 @@
-# STM32F4_ROS
-Rennstall Operating System
+# STM32F4_SOS
+Stallardo Operating System
 
 Unterschied zu mbed???
 -Braucht ein Bruchteil der Zeit zum Kompilieren
