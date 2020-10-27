@@ -1,5 +1,6 @@
-# STM32F4_SOS
+# STM32F4_SOS_94
 Stallardo Operating System
+StallardOS
 
 Unterschied zu mbed???
 -Braucht ein Bruchteil der Zeit zum Kompilieren
