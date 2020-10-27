@@ -2,7 +2,7 @@
 
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG};
 
-JannixGPIO::JannixGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)   //Nur digital bis jetzt
+StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)   //Nur digital bis jetzt
 {
     this->pin = number;
     this->port = port;
@@ -28,7 +28,7 @@ JannixGPIO::JannixGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)   
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
 }
 
-uint16_t JannixGPIO::operator=(bool state)
+uint16_t StallardOSGPIO::operator=(bool state)
 {
     if (this->dir == Output)
     {

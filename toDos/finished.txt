@@ -12,16 +12,16 @@
 -Make Tasks able to read other Tasks State √
 			
 -Find a Name for the OS		-> StallaRTOS					3
-							-> [Renn{stall]a[R}TOS]
-							-> OSama bin Janniq				1
-							-> Jannix						5
-							-> 94OS
-							-> StallardOS					3
-							-> STAjaRTOS
-							-> InvasiOS						1
-							-> InnovatOS
-							-> ErresOS
-							-> RSOS
+					-> [Renn{stall]a[R}TOS]
+					-> OSama bin Janniq				1
+					-> Jannix						5
+					-> 94OS
+					-> StallardOS					3
+					-> STAjaRTOS
+					-> InvasiOS						1
+					-> InnovatOS
+					-> ErresOS
+					-> RSOS
 
 -Decide which system we should use
 	TaskScheduler		0

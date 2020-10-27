@@ -1,17 +1,17 @@
-#include "Jannix.hpp"
-Jannix Tasker1;
-JannixCAN canPimmel(JannixCAN1, CAN500k);
+#include "StallardOS.hpp"
+StallardOS Tasker1;
+StallardOSCAN canPimmel(StallardOSCAN1, CAN500k);
 #include <random>
 
 void task1(void)
 {
-    JannixGPIO red(14, PORTB, Output);
+    StallardOSGPIO red(14, PORTB, Output);
     uint8_t i = 0;
-    JannixCanMessage sntmsg;
+    StallardOSCanMessage sntmsg;
     sntmsg.ID = 123;
     sntmsg.Val = 0xFF;
     
-    JannixCanMessage rcvmsg;
+    StallardOSCanMessage rcvmsg;
     canPimmel.sendMessage(&sntmsg);
     while(!canPimmel.getMessage(&rcvmsg));
 
@@ -28,7 +28,7 @@ void task1(void)
 
 void task2(void)
 {
-    JannixGPIO blue(7, PORTB, Output);
+    StallardOSGPIO blue(7, PORTB, Output);
     while (1)
     {
         blue = !blue;
@@ -38,7 +38,7 @@ void task2(void)
 
 void task3(void)
 {
-    JannixGPIO green(0, PORTB, Output);
+    StallardOSGPIO green(0, PORTB, Output);
     while (1)
     {
         green = !green;

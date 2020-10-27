@@ -1,22 +1,22 @@
-#ifndef Jannix_Analog
-#define Jannix_Analog
+#ifndef StallardOS_Analog
+#define StallardOS_Analog
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
 
-class JannixAnalog
+class StallardOSAnalog
 {
 private:
     uint8_t state;
     uint32_t pin;
 
 public:
-    JannixAnalog(
+    StallardOSAnalog(
         /*ADCNumber*/ uint8_t number
         );
 };
 
-JannixAnalog::JannixAnalog(uint8_t number)
+StallardOSAnalog::StallardOSAnalog(uint8_t number)
 {
     this->pin = (1 << number);
 

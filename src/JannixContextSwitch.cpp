@@ -1,4 +1,4 @@
-#include "Jannix.hpp"
+#include "StallardOS.hpp"
 // #include <stm32f4xx_hal.h>
 
 extern uint8_t switchEnable;
@@ -9,7 +9,7 @@ extern function_struct *nextTask;
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 volatile uint32_t sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq);
 
-extern "C" inline void Jannix_SysTick_Config(uint32_t ticks)
+extern "C" inline void StallardOS_SysTick_Config(uint32_t ticks)
 {
     SysTick_Config(ticks);
 }
@@ -47,7 +47,7 @@ void taskOnEnd(void)
     currentTask->executable = false;
     currentTask = taskMainStruct;
     enable_interrupts();
-    Jannix_endTask();                                      //Create a system call to the SVC Handler
+    StallardOS_endTask();                                      //Create a system call to the SVC Handler
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

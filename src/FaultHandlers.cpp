@@ -1,11 +1,11 @@
-#include "Jannix.hpp"
+#include "StallardOS.hpp"
 
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
 extern function_struct *taskMainStruct;
 extern function_struct *nextTask;
 
-inline void JannixGeneralFaultHandler() //restarts a Task when a fault occurs
+inline void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 {
     disable_interrupts();
     currentTask->Stack = currentTask->vals + sizeStack - 4; //End of Stack
@@ -37,25 +37,25 @@ inline void JannixGeneralFaultHandler() //restarts a Task when a fault occurs
 
 extern "C" void HardFault_Handler()
 {
-    JannixGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 extern "C" void NMI_Handler()
 {
-    JannixGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 extern "C" void MemManage_Handler()
 {
-    JannixGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 extern "C" void BusFault_Handler()
 {
-    JannixGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 extern "C" void UsageFault_Handler()
 {
-    JannixGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }

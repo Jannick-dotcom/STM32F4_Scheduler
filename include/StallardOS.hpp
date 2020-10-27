@@ -13,12 +13,12 @@
 #define Task_Scheduler_h
 
 // #define useSystickAltering
-// void Jannix_SetSysClock(void);
+// void StallardOS_SetSysClock(void);
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
-#include "JannixHelpers.hpp"
+#include "StallardOSHelpers.hpp"
 #include "GPIO.h"
 #include "can.h"
 
@@ -63,7 +63,7 @@ struct function_struct
   // ~function_struct();
 };
 
-class Jannix
+class StallardOS
 {
   /////////Variables
 private:
@@ -72,7 +72,7 @@ private:
 
 public:
   //Constructor
-  Jannix(); //Create a Task Scheduler
+  StallardOS(); //Create a Task Scheduler
 
   //Function Methods
   //returns pointer to added struct or nullptr if not successful

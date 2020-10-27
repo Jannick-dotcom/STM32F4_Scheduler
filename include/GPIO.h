@@ -1,5 +1,5 @@
-#ifndef Jannix_GPIO_h
-#define Jannix_GPIO_h
+#ifndef StallardOS_GPIO_h
+#define StallardOS_GPIO_h
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
@@ -32,7 +32,7 @@ typedef enum pullMode
 } pullMode;
 
 
-class JannixGPIO
+class StallardOSGPIO
 {
 private:
     uint8_t state;
@@ -42,7 +42,7 @@ private:
     pullMode pull;
 
 public:
-    JannixGPIO(
+    StallardOSGPIO(
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
         /*Direction*/ pinDir dir,
@@ -50,14 +50,14 @@ public:
 
     uint16_t operator=(bool state);                                            //Operator for writing on the pin
     uint16_t operator!() { return !this->state; };                             //Inverting the state
-    uint16_t operator&&(JannixGPIO &ref) { return this->state && ref.state; }; //Logical operator
-    uint16_t operator||(JannixGPIO &ref) { return this->state || ref.state; }; //Logical operator
-    uint16_t operator!=(JannixGPIO &ref) { return this->state != ref.state; }; //Comparison
-    uint16_t operator<(JannixGPIO &ref) { return this->state < ref.state; };
-    uint16_t operator>(JannixGPIO &ref) { return this->state > ref.state; };
-    uint16_t operator<=(JannixGPIO &ref) { return this->state <= ref.state; };
-    uint16_t operator>=(JannixGPIO &ref) { return this->state >= ref.state; };
-    uint16_t operator==(JannixGPIO &ref) { return this->state == ref.state; };
+    uint16_t operator&&(StallardOSGPIO &ref) { return this->state && ref.state; }; //Logical operator
+    uint16_t operator||(StallardOSGPIO &ref) { return this->state || ref.state; }; //Logical operator
+    uint16_t operator!=(StallardOSGPIO &ref) { return this->state != ref.state; }; //Comparison
+    uint16_t operator<(StallardOSGPIO &ref) { return this->state < ref.state; };
+    uint16_t operator>(StallardOSGPIO &ref) { return this->state > ref.state; };
+    uint16_t operator<=(StallardOSGPIO &ref) { return this->state <= ref.state; };
+    uint16_t operator>=(StallardOSGPIO &ref) { return this->state >= ref.state; };
+    uint16_t operator==(StallardOSGPIO &ref) { return this->state == ref.state; };
 };
 
 #endif

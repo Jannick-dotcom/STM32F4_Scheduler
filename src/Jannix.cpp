@@ -1,5 +1,5 @@
-#include "Jannix.hpp"
-#include "JannixHelpers.hpp"
+#include "StallardOS.hpp"
+#include "StallardOSHelpers.hpp"
 
 //Kontext Switch
 function_struct *currentTask = nullptr;
@@ -15,9 +15,9 @@ void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//Constructor - Here we Create a Jannix Object
+//Constructor - Here we Create a StallardOS Object
 ////////////////////////////////////////////////////////////////////////////////////////
-Jannix::Jannix()
+StallardOS::StallardOS()
 {
   //Basiswerte Initialisieren
   first_function_struct = nullptr;
@@ -25,14 +25,14 @@ Jannix::Jannix()
   TCBsCreated = 0;
 
   //Für Context Switch
-  taskMainStruct = addFunction(taskMain, 0, 255, 1);
+  taskMainStruct = addFunction(taskMain, 0, 255);
   createTCBs();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds new Tasks to the List
 ////////////////////////////////////////////////////////////////////////////////////////
-void Jannix::createTCBs()
+void StallardOS::createTCBs()
 {
   if (TCBsCreated >= countTasks) //Wenn schon genug TCBs erstellt wurden, nicht nochmal erstellen
   {
@@ -81,9 +81,9 @@ void Jannix::createTCBs()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds a new Task to the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *Jannix::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
+function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio)
 {
-  if (function == nullptr || exec_freq <= 0 || searchFunction(id) != nullptr) //Make sure the parameters are correct
+  if (function == nullptr || searchFunction(id) != nullptr) //Make sure the parameters are correct
   {
     return nullptr;
   }
@@ -135,7 +135,7 @@ function_struct *Jannix::addFunction(void (*function)(), uint16_t id, uint8_t pr
 ////////////////////////////////////////////////////////////////////////////////////////
 //Here we en/disable a Task from the List
 ////////////////////////////////////////////////////////////////////////////////////////
-void Jannix::changeFunctionEnabled(uint16_t id, bool act)
+void StallardOS::changeFunctionEnabled(uint16_t id, bool act)
 {
   function_struct *temp = searchFunction(id); //Funktion suchen
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
@@ -147,7 +147,7 @@ void Jannix::changeFunctionEnabled(uint16_t id, bool act)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Sets new Priority of a Task
 ////////////////////////////////////////////////////////////////////////////////////////
-void Jannix::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
+void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 {
   function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
@@ -159,7 +159,7 @@ void Jannix::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Search a task in the list of executable ones/*
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *Jannix::searchFunction(/*ID*/ uint16_t id)
+function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
@@ -188,7 +188,7 @@ function_struct *Jannix::searchFunction(/*ID*/ uint16_t id)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Search a free task in the list
 ////////////////////////////////////////////////////////////////////////////////////////
-function_struct *Jannix::searchFreeFunction(void)
+function_struct *StallardOS::searchFreeFunction(void)
 {
   uint16_t i = 0;
   function_struct *temp = first_function_struct; //temporärer pointer erzeugen
@@ -217,17 +217,17 @@ function_struct *Jannix::searchFreeFunction(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Delay for an amount of milliseconds
 ////////////////////////////////////////////////////////////////////////////////////////
-void Jannix::delay(uint32_t milliseconds)
+void StallardOS::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;
-  Jannix_delay();
+  StallardOS_delay();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //Return the State of the Task
 ////////////////////////////////////////////////////////////////////////////////////////
-taskState Jannix::getFunctionState(/*Funktion*/ uint16_t id)
+taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 {
   function_struct *temp = searchFunction(id); //Hier die Funktion suchen
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
@@ -353,7 +353,7 @@ uint8_t SetSysClock_PLL_HSI(void)
   return 1; // OK
 }
 
-void Jannix_SetSysClock(void)
+void StallardOS_SetSysClock(void)
 {
   /* 1- Try to start with HSE and external clock */
   //if (SetSysClock_PLL_HSE(1) == 0)
@@ -374,9 +374,9 @@ void Jannix_SetSysClock(void)
 ////////////////////////////////////////////////////////////////////////////////////////
 //Set all the Interrupts and Values for the OS
 ////////////////////////////////////////////////////////////////////////////////////////
-void Jannix::startOS(void)
+void StallardOS::startOS(void)
 {
-    Jannix_SetSysClock();
+    StallardOS_SetSysClock();
     SystemCoreClockUpdate();
     if(first_function_struct != nullptr)
     {
@@ -389,6 +389,6 @@ void Jannix::startOS(void)
         asm("MSR PSP, R0");
 
         enable_interrupts();
-        Jannix_start();
+        StallardOS_start();
     }
 }

@@ -1,12 +1,12 @@
-#ifndef JannixHelpers_H
-#define JannixHelpers_H
+#ifndef StallardOSHelpers_H
+#define StallardOSHelpers_H
 
 #include <stm32f4xx_hal.h>
 
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_noTask()
+inline void StallardOS_noTask()
 {
     asm("SVC #0");
 }
@@ -14,7 +14,7 @@ inline void Jannix_noTask()
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_sudo()
+inline void StallardOS_sudo()
 {
     asm("SVC #3");
 }
@@ -22,7 +22,7 @@ inline void Jannix_sudo()
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_unSudo()
+inline void StallardOS_unSudo()
 {
     asm("SVC #4");
 }
@@ -30,7 +30,7 @@ inline void Jannix_unSudo()
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_start()
+inline void StallardOS_start()
 {
     asm("SVC #5");
 }
@@ -38,7 +38,7 @@ inline void Jannix_start()
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_delay()
+inline void StallardOS_delay()
 {
     asm("SVC #2");
 }
@@ -46,7 +46,7 @@ inline void Jannix_delay()
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_endTask()
+inline void StallardOS_endTask()
 {
     asm("SVC #1"); 
 }
@@ -54,7 +54,7 @@ inline void Jannix_endTask()
 #ifdef __cplusplus
 extern "C" 
 #endif
-inline void Jannix_goBootloader()
+inline void StallardOS_goBootloader()
 {
     asm("SVC #6");
 }

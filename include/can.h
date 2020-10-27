@@ -1,5 +1,5 @@
-#ifndef JannixCAN_h
-#define JannixCAN_h
+#ifndef StallardOSCAN_h
+#define StallardOSCAN_h
 
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
@@ -16,12 +16,12 @@
 typedef struct{
     uint8_t ID;
     uint8_t Val;
-} JannixCanMessage;
+} StallardOSCanMessage;
 
 typedef enum CANports
 {
-    JannixCAN1 = 0,
-    JannixCAN2
+    StallardOSCAN1 = 0,
+    StallardOSCAN2
 } CANports;
 
 typedef enum CANBauds
@@ -32,21 +32,21 @@ typedef enum CANBauds
 
 
 
-class JannixCAN
+class StallardOSCAN
 {
 private:
     CAN_HandleTypeDef canhandle;
     CAN_TxHeaderTypeDef TxHeader;
     CAN_RxHeaderTypeDef RxHeader;
-    JannixGPIO *CANT;
-    JannixGPIO *CANR;
+    StallardOSGPIO *CANT;
+    StallardOSGPIO *CANR;
 public:
-    JannixCAN(
+    StallardOSCAN(
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);
 
-    bool getMessage(JannixCanMessage *msg);
-    void sendMessage(JannixCanMessage *msg);
+    bool getMessage(StallardOSCanMessage *msg);
+    void sendMessage(StallardOSCanMessage *msg);
 };
 
 #endif

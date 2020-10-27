@@ -1,17 +1,17 @@
 #include "can.h"
 
-JannixCAN::JannixCAN(CANports port, CANBauds baud)
+StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
-    if (port == JannixCAN1)
+    if (port == StallardOSCAN1)
     {
-        CANR = new JannixGPIO(CAN1_r_pin, PORTB, Output);
-        CANT = new JannixGPIO(CAN1_t_pin, PORTB, Output);
+        CANR = new StallardOSGPIO(CAN1_r_pin, PORTB, Output);
+        CANT = new StallardOSGPIO(CAN1_t_pin, PORTB, Output);
         canhandle.Instance = CAN1;
     }
-    else if (port == JannixCAN2)
+    else if (port == StallardOSCAN2)
     {
-        CANR = new JannixGPIO(CAN2_r_pin, PORTB, Output);
-        CANT = new JannixGPIO(CAN2_t_pin, PORTB, Output);
+        CANR = new StallardOSGPIO(CAN2_r_pin, PORTB, Output);
+        CANT = new StallardOSGPIO(CAN2_t_pin, PORTB, Output);
         canhandle.Instance = CAN2;
     }
 
@@ -54,7 +54,7 @@ JannixCAN::JannixCAN(CANports port, CANBauds baud)
     }
 }
 
-bool JannixCAN::getMessage(JannixCanMessage *msg)
+bool StallardOSCAN::getMessage(StallardOSCanMessage *msg)
 {
     /* Get RX message */
     if (HAL_CAN_GetRxMessage(&canhandle, CAN_RX_FIFO0, &RxHeader, &(msg->Val)) != HAL_OK)
@@ -68,7 +68,7 @@ bool JannixCAN::getMessage(JannixCanMessage *msg)
     }
 }
 
-void JannixCAN::sendMessage(JannixCanMessage *msg)
+void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, &(msg->Val), (uint32_t*)CAN_TX_MAILBOX0);
     return;
