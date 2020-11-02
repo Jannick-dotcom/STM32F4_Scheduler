@@ -1,4 +1,5 @@
 #include "StallardOScan.hpp"
+#include "StallardOSFaultHandlers.hpp"
 
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
@@ -29,14 +30,11 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 
     if (HAL_CAN_Init(&canhandle) != HAL_OK)
     {
-        while (1)
-            ; //ERROR
+        StallardOSGeneralFaultHandler();
     }
     if (HAL_CAN_Start(&canhandle) != HAL_OK)
     {
-        /* Start Error */
-        while (1)
-            ;
+        StallardOSGeneralFaultHandler();
     }
 
     TxHeader.StdId = 0x321;

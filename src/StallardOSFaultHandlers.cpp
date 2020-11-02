@@ -1,6 +1,5 @@
 #include "StallardOS.hpp"
 
-extern uint8_t switchEnable;
 extern function_struct *currentTask;
 extern function_struct *taskMainStruct;
 extern function_struct *nextTask;
