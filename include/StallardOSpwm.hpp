@@ -3,7 +3,7 @@
 
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
-#include "GPIO.h"
+#include "StallardOSGPIO.hpp"
 
 class StallardOSPWM
 {

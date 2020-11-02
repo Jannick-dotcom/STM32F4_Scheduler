@@ -1,4 +1,4 @@
-#include "can.h"
+#include "StallardOScan.hpp"
 
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {

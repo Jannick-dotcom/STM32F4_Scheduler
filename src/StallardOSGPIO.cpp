@@ -1,4 +1,4 @@
-#include "GPIO.h"
+#include "StallardOSGPIO.hpp"
 
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG};
 

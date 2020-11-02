@@ -19,8 +19,8 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include "StallardOSHelpers.hpp"
-#include "GPIO.h"
-#include "can.h"
+#include "StallardOSGPIO.hpp"
+#include "StallardOScan.hpp"
 
 #define sizeStack 300      //300 * uint32_t
 #define countTasks 3
