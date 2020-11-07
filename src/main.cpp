@@ -1,24 +1,10 @@
 #include "StallardOS.hpp"
 StallardOS Tasker1;
-StallardOSCAN canPimmel(StallardOSCAN1, CAN500k);
-#include <random>
 
 void task1(void)
 {
     StallardOSGPIO red(14, PORTB, Output);
     uint8_t i = 0;
-    StallardOSCanMessage sntmsg;
-    sntmsg.ID = 123;
-    sntmsg.Val = 0xFF;
-    
-    StallardOSCanMessage rcvmsg;
-    canPimmel.sendMessage(&sntmsg);
-    while(!canPimmel.getMessage(&rcvmsg));
-
-    if(rcvmsg.Val > 0xF && rcvmsg.ID == 666)
-    {
-        //do shit
-    }
     for (i= 0; i < 10; i++)
     {
         red = !red;
