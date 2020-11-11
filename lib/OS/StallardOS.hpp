@@ -4,16 +4,12 @@
 //
 //    OSama
 //        bin
-//          Janniq 
-//              *.*
+//          Janniq
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef Task_Scheduler_h
 #define Task_Scheduler_h
-
-// #define useSystickAltering
-// void StallardOS_SetSysClock(void);
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
@@ -23,11 +19,19 @@
 #include "StallardOScan.hpp"
 //#include "StallardOSFaultHandlers.hpp"
 
+#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
+#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
+
+/********************************************
+ * User Customization
+********************************************/
+
 #define sizeStack 300      //300 * uint32_t
 #define countTasks 3
 #define defaultSysTickFreq 1000.0
-#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
-#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
+// #define useSystickAltering
+
+/////////////////////////////////////////////
 
 typedef enum {
   NEW,

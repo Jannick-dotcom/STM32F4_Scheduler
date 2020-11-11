@@ -1,3 +1,6 @@
 -Jannix HW libs
     -PWM
-    -AnalogIn
+    -CAN message getting
+    -RS232
+
+Count Tasks and define the amount

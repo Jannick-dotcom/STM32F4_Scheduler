@@ -11,8 +11,6 @@
 #define CAN2_t_pin 1
 #define CAN2_r_pin 1
 
-
-
 typedef struct{
     uint8_t ID;
     uint8_t Val;
@@ -30,8 +28,6 @@ typedef enum CANBauds
     CAN1M = 1
 } CANBauds;
 
-
-
 class StallardOSCAN
 {
 private:
@@ -40,12 +36,16 @@ private:
     CAN_RxHeaderTypeDef RxHeader;
     StallardOSGPIO *CANT;
     StallardOSGPIO *CANR;
+
+    StallardOSCanMessage messages[20];
+
+    void setMessage(StallardOSCanMessage msg);
 public:
     StallardOSCAN(
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);
 
-    bool getMessage(StallardOSCanMessage *msg);
+    bool getMessage(StallardOSCanMessage *msg, uint8_t id);
     void sendMessage(StallardOSCanMessage *msg);
 };
 

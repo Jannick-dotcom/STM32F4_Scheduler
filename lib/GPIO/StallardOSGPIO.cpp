@@ -36,13 +36,9 @@ uint16_t StallardOSGPIO::operator=(bool state)
         HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
         return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
     }
-    else if(this->dir == Input)
+    else
     {
         this->pull = pullMode(int(state));
         return state;
-    }
-    else
-    {
-        return 0; //Hier noch analog Zeugs einfügen
     }
 }

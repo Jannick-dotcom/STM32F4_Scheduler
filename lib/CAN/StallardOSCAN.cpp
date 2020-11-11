@@ -47,12 +47,12 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
     {
         /* Notification Error */
-        while (1)
-            ;
+        StallardOSGeneralFaultHandler();
     }
+    HAL_CAN_Start(&canhandle);
 }
 
-bool StallardOSCAN::getMessage(StallardOSCanMessage *msg)
+bool StallardOSCAN::getMessage(StallardOSCanMessage *msg, uint8_t id)
 {
     /* Get RX message */
     if (HAL_CAN_GetRxMessage(&canhandle, CAN_RX_FIFO0, &RxHeader, &(msg->Val)) != HAL_OK)
@@ -70,4 +70,15 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, &(msg->Val), (uint32_t*)CAN_TX_MAILBOX0);
     return;
+}
+
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+    CAN_RxHeaderTypeDef rxhead;
+    StallardOSCanMessage rxmsg;
+    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxhead, &(rxmsg.Val));
+    rxmsg.ID = rxhead.StdId;
+    //////////////////////////////////////////////
+    //Add message to the StallardOSCAN fifo !!
+    //////////////////////////////////////////////
 }

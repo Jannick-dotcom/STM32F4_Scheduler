@@ -1,17 +1,5 @@
--Check if we can infinitely end and start tasks (after some are stopped) √
-
--Check the Delay and Taskdelete svc calls √
-
--Change the searchFunction method that we are finding the right one when we have multiple instances of a Task √
-		->Not search by function pointer, search by ID
-
--Changing of Switching Rate to maximize the throughput √
-
--Hide the taskMain Task (The Task that gets executed when all others are in a delay)√
-
--Make Tasks able to read other Tasks State √
-			
--Find a Name for the OS		-> StallaRTOS					3
+-Find a Name for the OS		
+					-> StallaRTOS					3
 					-> [Renn{stall]a[R}TOS]
 					-> OSama bin Janniq				1
 					-> Jannix						5
