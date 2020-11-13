@@ -27,7 +27,7 @@
 ********************************************/
 
 #define sizeStack 300      //300 * uint32_t
-#define countTasks 3
+#define countTasks 4
 #define defaultSysTickFreq 1000.0
 // #define useSystickAltering
 
