@@ -18,7 +18,8 @@ typedef enum CANBauds
     CAN1M = 1
 } CANBauds;
 
-typedef struct{
+typedef struct
+{
     CANports interface;
     uint8_t ID = 0;
     uint8_t Val = 0;
@@ -36,6 +37,7 @@ private:
     StallardOSGPIO *CANR;
 
     void setMessage(StallardOSCanMessage msg);
+
 public:
     static StallardOSCanMessage messages[CAN_FIFO_size];
 

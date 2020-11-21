@@ -3,11 +3,14 @@ StallardOS Tasker1;
 
 void task1(void)
 {
+    StallardOSCanMessage test;
+    StallardOSCAN adcan(StallardOSCAN1, CAN500k);
     StallardOSGPIO red(14, PORTB, Output);
-    uint8_t i = 0;
-    for (i= 0; i < 10; i++)
+    while (1)
     {
-        red = !red;
+        test.ID = 123;
+        test.Val = red;
+        adcan.sendMessage(&test);
         Tasker1.delay(500);
     }
 }
