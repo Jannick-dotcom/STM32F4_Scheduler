@@ -1,6 +1,6 @@
 -Jannix HW libs
     -PWM
-    -CAN message getting
     -RS232
-
-Count Tasks and define the amount
+    -I²C
+    -SPI
+    -make the OS internal FOC Task check the messages

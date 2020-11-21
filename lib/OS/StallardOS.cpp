@@ -1,5 +1,4 @@
 #include "StallardOS.hpp"
-#include "StallardOSHelpers.hpp"
 
 //Kontext Switch
 function_struct *currentTask = nullptr;
@@ -11,7 +10,10 @@ function_struct *taskMainStruct = nullptr;
 ////////////////////////////////////////////////////////////////////////////////////////
 void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 {
-  while (1);
+  while (1)
+  {
+    
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,4 @@
 #include "StallardOScan.hpp"
-#include "StallardOSFaultHandlers.hpp"
 
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
@@ -16,7 +15,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         canhandle.Instance = CAN2;
     }
 
-    canhandle.Init.Prescaler = 5; //////////////////////////////////
+    canhandle.Init.Prescaler = 5; //////////////////////////////////!!!!
     canhandle.Init.Mode = CAN_MODE_NORMAL;
     canhandle.Init.SyncJumpWidth = CAN_SJW_1TQ;
     canhandle.Init.TimeSeg1 = CAN_BS1_1TQ;
@@ -55,15 +54,18 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 bool StallardOSCAN::getMessage(StallardOSCanMessage *msg, uint8_t id)
 {
     /* Get RX message */
-    if (HAL_CAN_GetRxMessage(&canhandle, CAN_RX_FIFO0, &RxHeader, &(msg->Val)) != HAL_OK)
+    for(uint8_t i = 0; i < CAN_FIFO_size; i++)
     {
-        return false;
+        if(messages[i].isread == 0 && this->interface == messages[i].interface)
+        {
+            if(id == messages[i].ID)
+            {
+                msg = &messages[i];
+                return true;
+            }
+        }
     }
-    else
-    {
-        msg->ID = RxHeader.IDE;
-        return true;
-    }
+    return false;
 }
 
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
@@ -75,10 +77,21 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef rxhead;
-    StallardOSCanMessage rxmsg;
-    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxhead, &(rxmsg.Val));
-    rxmsg.ID = rxhead.StdId;
-    //////////////////////////////////////////////
-    //Add message to the StallardOSCAN fifo !!
-    //////////////////////////////////////////////
+    
+    for(uint8_t i = 0; i < CAN_FIFO_size; i++)
+    {
+        if(StallardOSCAN::messages[i].isread == 1)
+        {
+            HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxhead, &(StallardOSCAN::messages[i].Val));
+            StallardOSCAN::messages[i].ID = rxhead.StdId;
+            StallardOSCAN::messages[i].interface = (hcan->Instance == CAN1 ? StallardOSCAN1 : StallardOSCAN2);
+            StallardOSCAN::messages[i].isread = 0;
+            return;
+        }
+    }
+    //Wenn wir hier angelangen haben wir eine Nachricht verloren, weil FIFO voll!!
+    for(uint8_t i = 0; i < CAN_FIFO_size; i++)
+    {
+        StallardOSCAN::messages[i].isread = 1;  //Alle Nachrichten "löschen"
+    }
 }

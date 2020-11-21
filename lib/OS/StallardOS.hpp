@@ -1,72 +1,17 @@
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//    Powered by:
-//
-//    OSama
-//        bin
-//          Janniq
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef Task_Scheduler_h
-#define Task_Scheduler_h
+#ifndef StallardOS_h
+#define StallardOS_h
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
+
 #include "StallardOSHelpers.hpp"
+
 #include "StallardOSGPIO.hpp"
+#include "StallardOSpwm.hpp"
+#include "StallardOSanalog.hpp"
 #include "StallardOScan.hpp"
-//#include "StallardOSFaultHandlers.hpp"
-
-#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
-#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
-
-/********************************************
- * User Customization
-********************************************/
-
-#define sizeStack 300      //300 * uint32_t
-#define countTasks 4
-#define defaultSysTickFreq 1000.0
-// #define useSystickAltering
-
-/////////////////////////////////////////////
-
-typedef enum {
-  NEW,
-  RUNNING,
-  PAUSED,
-  STOPPED
-} taskState;
-
-struct function_struct
-{
-  uint32_t vals[sizeStack];
-
-  //Verkettete Liste
-  function_struct *prev; //für verkettete liste
-  function_struct *next; //für verkettete liste
-
-  //Must have Variablen
-  void (*function)();     //Auszuführende Funktion
-  uint8_t priority;       //Priorität 0 wird nicht unterbrochen außer sie wünschen es durch ein Delay
-  uint16_t id;            //ID des Tasks
-  volatile bool used;           //Ist dieser TCB schon belegt?
-
-  //nur für normalen Schedule betrieb
-  //float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
-  volatile bool executable;    //Funktion ausführen?
-  //uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
-
-  //nur für KontextSwitch
-  volatile taskState State;        //Status des Tasks
-  volatile uint32_t *Stack;         //Stack pointer
-  
-  volatile uint32_t continueInMS;   //Delay amount
-
-  // ~function_struct();
-};
+#include "StallardOSSerial.hpp"
 
 class StallardOS
 {
@@ -110,4 +55,4 @@ public:
   void delay(uint32_t milliseconds);         //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
 
 };
-#endif //Task_Scheduler
+#endif //StallardOS_h

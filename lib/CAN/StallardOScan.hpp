@@ -1,20 +1,10 @@
 #ifndef StallardOSCAN_h
 #define StallardOSCAN_h
 
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
-
+#include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 
-#define CAN1_t_pin 1////////////////////!!!!
-#define CAN1_r_pin 1
-#define CAN2_t_pin 1
-#define CAN2_r_pin 1
-
-typedef struct{
-    uint8_t ID;
-    uint8_t Val;
-} StallardOSCanMessage;
+extern void StallardOSGeneralFaultHandler();
 
 typedef enum CANports
 {
@@ -28,19 +18,27 @@ typedef enum CANBauds
     CAN1M = 1
 } CANBauds;
 
+typedef struct{
+    CANports interface;
+    uint8_t ID = 0;
+    uint8_t Val = 0;
+    uint8_t isread = 1;
+} StallardOSCanMessage;
+
 class StallardOSCAN
 {
 private:
     CAN_HandleTypeDef canhandle;
+    CANports interface;
     CAN_TxHeaderTypeDef TxHeader;
     CAN_RxHeaderTypeDef RxHeader;
     StallardOSGPIO *CANT;
     StallardOSGPIO *CANR;
 
-    StallardOSCanMessage messages[20];
-
     void setMessage(StallardOSCanMessage msg);
 public:
+    static StallardOSCanMessage messages[CAN_FIFO_size];
+
     StallardOSCAN(
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);

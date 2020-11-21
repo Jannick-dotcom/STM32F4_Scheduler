@@ -1,5 +1,4 @@
 #include "StallardOS.hpp"
-// #include <stm32f4xx_hal.h>
 
 extern uint8_t switchEnable;
 extern function_struct *currentTask;
@@ -227,7 +226,7 @@ extern "C" void SysTick_Handler(void)                           //In C Language
         {
             sysTickFreq = defaultSysTickFreq;
         }
-        sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq)
+        sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq);
         SysTick_Config(sysTickTicks);             //Set the frequency of the systick interrupt
     #endif
 

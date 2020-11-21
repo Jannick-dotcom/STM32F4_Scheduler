@@ -20,11 +20,12 @@ for ((i=1; i<=$CNTLNS; i++)) do
         CNT=$((CNT+1))
     fi
 done
-echo ${allThreadIDs[@]}
-echo "Anzahl:  $CNT"
+CNT=$((CNT+1))
 
-LINE=$(grep -n "#define countTasks" lib/OS/StallardOS.hpp | cut -d ":" -f1)
-#hier noch irgendwie einfügen dass nur gezählt wird, wenn IDs unterschiedlich
+echo "Count of processes:  $CNT"
+PATHTODAT=$(find -name StallardOSconfig.h)
+echo $PATHTODAT
+LINE=$(grep -n "#define countTasks" $PATHTODAT | cut -d ":" -f1)
 
-sed -i $LINE'd' ./lib/OS/StallardOS.hpp
-sed -i $LINE"i #define countTasks "$CNT lib/OS/StallardOS.hpp;
+sed -i $LINE'd' $PATHTODAT
+sed -i $LINE"i #define countTasks "$CNT $PATHTODAT

@@ -1,8 +1,6 @@
 #ifndef StallardOSPWM_h
 #define StallardOSPWM_h
 
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
 #include "StallardOSGPIO.hpp"
 
 class StallardOSpwm

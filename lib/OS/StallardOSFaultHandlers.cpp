@@ -1,4 +1,5 @@
-#include "StallardOS.hpp"
+#include "StallardOSHelpers.hpp"
+#include <stdint.h>
 
 extern function_struct *currentTask;
 extern function_struct *taskMainStruct;

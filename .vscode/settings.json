@@ -4,5 +4,6 @@
         "random": "cpp",
         "cmath": "cpp",
         "cstdlib": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

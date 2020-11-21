@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"functional": "cpp",
+			"random": "cpp",
+			"cmath": "cpp",
+			"cstdlib": "cpp"
+		}
+	}
+}

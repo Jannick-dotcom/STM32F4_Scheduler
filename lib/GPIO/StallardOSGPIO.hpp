@@ -1,8 +1,8 @@
 #ifndef StallardOS_GPIO_h
 #define StallardOS_GPIO_h
 
-#include <stdint.h>
 #include <stm32f4xx_hal.h>
+#include <system_stm32f4xx.h>
 
 extern const GPIO_TypeDef *portsToGPIOBase[];
 

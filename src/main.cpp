@@ -37,17 +37,6 @@ int main()
     Tasker1.addFunction(task1, 2, 1);
     Tasker1.addFunction(task2, 3, 2);
     Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task1, 2, 1);
-    Tasker1.addFunction(task1, 2, 1);
-    Tasker1.addFunction(task2, 3, 2);
-    Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task3, 5, 3);
-    Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(task3, 4, 3);
     Tasker1.startOS();
 
     //Should never get here

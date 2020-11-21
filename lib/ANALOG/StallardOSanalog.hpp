@@ -1,9 +1,10 @@
 #ifndef StallardOS_Analog
 #define StallardOS_Analog
 
-#include <stdint.h>
+// #include "StallardOS.hpp"
 #include <stm32f4xx_hal.h>
-#include "StallardOSFaultHandlers.hpp"
+
+extern void StallardOSGeneralFaultHandler();
 
 typedef enum StallardOSADC
 {
