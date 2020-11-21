@@ -284,7 +284,7 @@ uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_OscInitStruct.PLL.PLLN = 360;           // VCO output clock = 360 MHz (1 MHz * 360)
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2; // PLLCLK = 180 MHz (360 MHz / 2)
     RCC_OscInitStruct.PLL.PLLQ = 7;             //
-    RCC_OscInitStruct.PLL.PLLR = 2;             //
+    // RCC_OscInitStruct.PLL.PLLR = 2;             //
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
       return 0; // FAIL
@@ -292,10 +292,10 @@ uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
   }
 
   // Activate the OverDrive to reach the 180 MHz Frequency
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
-  {
-    return 0; // FAIL
-  }
+  // if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  // {
+  //   return 0; // FAIL
+  // }
 
   /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */
   RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
@@ -335,7 +335,7 @@ uint8_t SetSysClock_PLL_HSI(void)
   RCC_OscInitStruct.PLL.PLLN = 360;           // VCO output clock = 360 MHz (1 MHz * 360)
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2; // PLLCLK = 180 MHz (360 MHz / 2)
   RCC_OscInitStruct.PLL.PLLQ = 7;             //
-  RCC_OscInitStruct.PLL.PLLR = 6;             //
+  // RCC_OscInitStruct.PLL.PLLR = 6;             //
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     return 0; // FAIL
