@@ -1,8 +1,8 @@
 #include "StallardOSSerial.hpp"
 
-StallardOSSerial::StallardOSSerial(serialPorts serPort, uint32_t baud)
+StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 {
-    //huart.Instance = serPort;////////////////////////////////
+    huart.Instance = serPort;
     huart.Init.BaudRate = baud;
     huart.Init.WordLength = UART_WORDLENGTH_8B;
     huart.Init.StopBits = UART_STOPBITS_1;
@@ -14,6 +14,14 @@ StallardOSSerial::StallardOSSerial(serialPorts serPort, uint32_t baud)
     {
         StallardOSGeneralFaultHandler();
     }
-    char datSend[] = "Hello World";
-    HAL_UART_Transmit(&huart, (uint8_t*)datSend, sizeof(datSend), 0);
+}
+
+void StallardOSSerial::send(const char *dat, uint16_t bytes)
+{
+    HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0);
+}
+
+void StallardOSSerial::read(char *dat, uint16_t bytes)
+{
+    HAL_UART_Receive(&huart, (uint8_t*)dat, bytes, 0);
 }

@@ -1,6 +1,6 @@
--Jannix HW libs
+-Jannix HW libs (✓)
     -PWM
-    -RS232
+    -RS232 ✓
     -I²C
     -SPI
     -make the OS internal FOC Task check the messages
