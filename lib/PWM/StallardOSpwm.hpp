@@ -2,6 +2,13 @@
 #define StallardOSPWM_h
 
 #include "StallardOSGPIO.hpp"
+#include "StallardOSconfig.h"
+
+#include <stm32f4xx_hal.h>
+#include <system_stm32f4xx.h>
+#include <stdint.h>
+
+extern void StallardOSGeneralFaultHandler();
 
 class StallardOSpwm
 {
@@ -12,9 +19,11 @@ private:
     uint32_t freq;
 
     StallardOSGPIO *gpio;
+    TIM_HandleTypeDef htim;
 
 public:
     StallardOSpwm(
+        /*Timer to be used*/ TIM_TypeDef* instance,
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
         /*Frequency*/ uint16_t freq);

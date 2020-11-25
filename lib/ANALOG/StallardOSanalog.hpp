@@ -1,8 +1,9 @@
 #ifndef StallardOS_Analog
 #define StallardOS_Analog
 
-// #include "StallardOS.hpp"
 #include <stm32f4xx_hal.h>
+#include <system_stm32f4xx.h>
+#include <stdint.h>
 
 extern void StallardOSGeneralFaultHandler();
 

@@ -1,6 +1,7 @@
 -Jannix HW libs (✓)
-    -PWM
+    -PWM ✓
     -RS232 ✓
-    -I²C
-    -SPI
-    -make the OS internal FOC Task check the messages
+    -I²C ✓
+    -make the OS internal FlashOverCan Task check the messages
+
+    -(SPI)

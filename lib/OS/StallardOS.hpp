@@ -12,6 +12,7 @@
 #include "StallardOSanalog.hpp"
 #include "StallardOScan.hpp"
 #include "StallardOSSerial.hpp"
+#include "StallardOSi2c.hpp"
 
 class StallardOS
 {
