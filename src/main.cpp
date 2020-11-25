@@ -13,6 +13,7 @@ void task1(void)
         test.ID = 123;
         test.Val = red;
         adcan.sendMessage(&test);
+        adcan.receiveMessage(&test, 123);
         Tasker1.delay(500);
     }
 }

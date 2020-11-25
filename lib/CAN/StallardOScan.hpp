@@ -36,7 +36,8 @@ private:
     StallardOSGPIO *CANT;
     StallardOSGPIO *CANR;
 
-    void setMessage(StallardOSCanMessage msg);
+    // void setMessage(StallardOSCanMessage msg);
+    static bool getMessage(StallardOSCanMessage *msg, uint8_t id, CANports interface, StallardOSCanMessage *messages);
 
 public:
     static StallardOSCanMessage messages[CAN_FIFO_size];
@@ -45,7 +46,7 @@ public:
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);
 
-    bool getMessage(StallardOSCanMessage *msg, uint8_t id);
+    bool receiveMessage(StallardOSCanMessage *msg, uint8_t id);
     void sendMessage(StallardOSCanMessage *msg);
 };
 

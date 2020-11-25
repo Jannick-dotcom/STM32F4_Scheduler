@@ -51,12 +51,17 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     HAL_CAN_Start(&canhandle);
 }
 
-bool StallardOSCAN::getMessage(StallardOSCanMessage *msg, uint8_t id)
+bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
+{
+    return getMessage(msg, id, this->interface, this->messages);
+}
+
+static bool getMessage(StallardOSCanMessage *msg, uint8_t id, CANports interface, StallardOSCanMessage *messages)
 {
     /* Get RX message */
     for(uint8_t i = 0; i < CAN_FIFO_size; i++)
     {
-        if(messages[i].isread == 0 && this->interface == messages[i].interface)
+        if(messages[i].isread == 0 && interface == messages[i].interface)
         {
             if(id == messages[i].ID)
             {
@@ -65,6 +70,7 @@ bool StallardOSCAN::getMessage(StallardOSCanMessage *msg, uint8_t id)
             }
         }
     }
+    msg = nullptr;
     return false;
 }
 
