@@ -4,7 +4,7 @@
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 
-extern void StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 typedef enum CANports
 {

@@ -5,7 +5,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 
-extern void StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 typedef enum StallardOSADC
 {

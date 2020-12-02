@@ -1,12 +1,12 @@
 #ifndef StallardOSSerial_h
 #define StallardOSSerial_h
 
-#include "StallardOSconfig.h"
-extern void StallardOSGeneralFaultHandler();
-
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include <stdint.h>
+#include "StallardOSconfig.h"
+
+extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSSerial
 {

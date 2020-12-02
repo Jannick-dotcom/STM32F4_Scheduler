@@ -13,7 +13,7 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance)
     hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
     if (HAL_I2C_Init(&hi2c) != HAL_OK)
     {
-        //Error_Handler();
+        StallardOSGeneralFaultHandler();
     }
 }
 
