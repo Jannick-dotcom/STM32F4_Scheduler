@@ -1,6 +1,6 @@
 #include "StallardOSGPIO.hpp"
 
-const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG};
+const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
 
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
 {
@@ -18,6 +18,8 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     __GPIOE_CLK_ENABLE();
     __GPIOF_CLK_ENABLE();
     __GPIOG_CLK_ENABLE();
+    __GPIOH_CLK_ENABLE();
+    __GPIOI_CLK_ENABLE();
 
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.Pin = 1 << this->pin;

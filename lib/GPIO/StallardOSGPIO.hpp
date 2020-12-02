@@ -15,7 +15,9 @@ typedef enum ports
     PORTD,
     PORTE,
     PORTF,
-    PORTG
+    PORTG,
+    PORTH,
+    PORTI
 } ports;
 
 typedef enum pinDir

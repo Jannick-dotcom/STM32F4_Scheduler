@@ -6,26 +6,33 @@ void tasktest()
     StallardOSGPIO led1(13, PORTF, Output);
     StallardOSGPIO led2(14, PORTF, Output);
     StallardOSGPIO led3(15, PORTF, Output);
-    StallardOSGPIO test(15, PORTA, Output);
+
+    StallardOSGPIO led11(9, PORTI, Output);
+    StallardOSGPIO led21(10, PORTI, Output);
+    StallardOSGPIO led31(11, PORTI, Output);
+    uint8_t count = 0;
     led1 = 1;
     led2 = 1;
     led3 = 1;
+    led11 = 0;
+    led21 = 0;
+    led31 = 0;
     while (1)
     {
-        for (uint8_t i = 1; i < 10; i++)
+        if (!(count % 2))
         {
-            led1 = led2 = led3 = 1;
-            Tasker1.delay(i);
-            led1 = led2 = led3 = 0;
-            Tasker1.delay(10 - i);
+            led1 = !led1;
+            led2 = !led2;
+            led3 = !led3;
         }
-        for (uint8_t i = 9; i > 0; i--)
+        else
         {
-            led1 = led2 = led3 = 1;
-            Tasker1.delay(i);
-            led1 = led2 = led3 = 0;
-            Tasker1.delay(10 - i);
+            led11 = !led11;
+            led21 = !led21;
+            led31 = !led31;
         }
+        count++;
+        Tasker1.delay(30);
     }
 }
 
