@@ -6,6 +6,8 @@
 #define countTasks 4
 #define defaultSysTickFreq 1000.0 //[Hz]
 #define useSystickAltering
+#define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
+#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
 
 #define CAN1_t_pin 1////////////////////!!!!
 #define CAN1_r_pin 1

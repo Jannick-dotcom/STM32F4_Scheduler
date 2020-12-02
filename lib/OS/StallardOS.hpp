@@ -5,7 +5,7 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
-#include "StallardOSHelpers.hpp"
+#include "StallardOSHelpers.h"
 
 #include "StallardOSGPIO.hpp"
 #include "StallardOSpwm.hpp"
@@ -18,7 +18,7 @@ class StallardOS
 {
   /////////Variables
 private:
-  function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
+  struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint8_t TCBsCreated;
 
 public:
@@ -27,7 +27,7 @@ public:
 
   //Function Methods
   //returns pointer to added struct or nullptr if not successful
-  function_struct *addFunction(
+  struct function_struct *addFunction(
     /*Funktion*/ void (*function)(), 
     /*ID of task*/ uint16_t id,                 //The ID must be different for different tasks
     /*Prioritaet*/ uint8_t prio);                //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
@@ -39,8 +39,8 @@ public:
     //Eine Funktion aus der Liste de/aktivieren
 
 private:
-  function_struct *searchFunction(/*Funktion*/ uint16_t id);  //Search a TCB that matches the provided function
-  function_struct *searchFreeFunction(void);      //Search a TCB that isn't used
+  struct function_struct *searchFunction(/*Funktion*/ uint16_t id);  //Search a TCB that matches the provided function
+  struct function_struct *searchFreeFunction(void);      //Search a TCB that isn't used
   void createTCBs(void);      //create the structs for all the functions (count is "countTasks")
   
 public:
