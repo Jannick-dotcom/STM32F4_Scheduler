@@ -2,6 +2,10 @@
 
 StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 {
+    if(baud == 0)
+    {
+        return;
+    }
     huart.Instance = serPort;
     huart.Init.BaudRate = baud;
     huart.Init.WordLength = UART_WORDLENGTH_8B;
@@ -18,10 +22,18 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 
 void StallardOSSerial::send(const char *dat, uint16_t bytes)
 {
+    if(dat == nullptr)
+    {
+        return;
+    }
     HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0);
 }
 
 void StallardOSSerial::read(char *dat, uint16_t bytes)
 {
+    if(dat == nullptr)
+    {
+        return;
+    }
     HAL_UART_Receive(&huart, (uint8_t*)dat, bytes, 0);
 }

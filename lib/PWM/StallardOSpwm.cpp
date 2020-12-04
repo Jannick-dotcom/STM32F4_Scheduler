@@ -3,6 +3,10 @@
 StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, uint16_t freq)
 {
     this->gpio = new StallardOSGPIO(number, port, Output);
+    if(this->gpio == nullptr)
+    {
+        StallardOSGeneralFaultHandler();
+    }
     this->freq = freq;
 
     TIM_SlaveConfigTypeDef sSlaveConfig = {0};

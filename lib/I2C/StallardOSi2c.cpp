@@ -19,10 +19,18 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance)
 
 void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
+    if(data == nullptr)
+    {
+        return;
+    }
     HAL_I2C_Master_Transmit(&hi2c, addr, data, bytes, 0);
 }
 
 uint8_t StallardOSi2c::read(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
+    if(data == nullptr)
+    {
+        return;
+    }
     HAL_I2C_Master_Receive(&hi2c, addr, data, bytes, 0);
 }

@@ -4,6 +4,11 @@ const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIO
 
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
 {
+    if(number > 31) //Error check
+    {
+        StallardOSGeneralFaultHandler();
+    }
+
     this->pin = number;
     this->port = port;
     this->dir = dir;
