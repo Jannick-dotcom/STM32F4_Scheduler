@@ -259,7 +259,7 @@ void SysTick_Handler(void) //In C Language
             break;
         }
 
-        if (temp->continueInMS < sysTickMillisPerInt)
+        if (temp->continueInMS < sysTickMillisPerInt - (countTasks - 1))
         {
             temp->continueInMS = 0;
             temp->executable = 1; //Wenn keine Delay Zeit mehr, task auf executable setzen
