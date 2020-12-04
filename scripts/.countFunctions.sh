@@ -1,12 +1,12 @@
 #!/bin/bash
 
-CNTLNS=$(grep 'addFunction' src/*.cpp | wc -l)
+CNTLNS=$(grep -v '//' src/*.cpp | grep 'addFunction' | wc -l)
 CNT=0
 allThreadIDs=()
 
 for ((i=1; i<=$CNTLNS; i++)) do
     INCR=0
-    THISOCC="$(grep 'addFunction' src/*.cpp | cut -d $'\n' -f$i | cut -d "," -f2)"   #ID der Funktion
+    THISOCC="$(grep -v '//' src/*.cpp | grep 'addFunction' | cut -d $'\n' -f$i | cut -d "," -f2)"   #ID der Funktion
     THISOCC=$(($THISOCC + 0))                                                           #In Zahl umwandeln
     for t in ${allThreadIDs[@]}; do                                                    #Jedes Element durchgehen
         if [ $THISOCC -eq $t ]; then                                                   #Wenn ID gleich ist wie das vom Arrayelement

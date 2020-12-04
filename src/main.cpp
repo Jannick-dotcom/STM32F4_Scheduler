@@ -73,10 +73,10 @@ void task3(void)
 
 int main()
 {
-    // Tasker1.addFunction(task1, 2, 1);
-    // Tasker1.addFunction(task2, 3, 2);
-    // Tasker1.addFunction(task3, 4, 3);
-    //Tasker1.addFunction(tasktest, 1, 1);
+    Tasker1.addFunction(task1, 2, 1);
+    Tasker1.addFunction(task2, 3, 2);
+    Tasker1.addFunction(task3, 4, 3);
+    Tasker1.addFunction(tasktest, 1, 1);
     Tasker1.startOS();
     while (1)
         ;

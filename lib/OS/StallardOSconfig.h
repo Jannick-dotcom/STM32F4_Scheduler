@@ -3,7 +3,7 @@
 ********************************************/
 
 #define sizeStack 300      //300 * uint32_t
-#define countTasks 4
+#define countTasks 1
 #define defaultSysTickFreq 1000.0 //[Hz]
 #define useSystickAltering
 #define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero

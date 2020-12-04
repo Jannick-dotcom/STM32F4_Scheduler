@@ -30,7 +30,8 @@ uint8_t StallardOSi2c::read(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
     if(data == nullptr)
     {
-        return;
+        return 0;
     }
     HAL_I2C_Master_Receive(&hi2c, addr, data, bytes, 0);
+    return 1;
 }

@@ -2,6 +2,7 @@
     -PWM ✓ (calculate the divisors)
     -RS232 ✓
     -I²C ✓
-    
-    -make the OS internal FlashOverCan Task check the messages
     -(SPI)
+    -Test the libs
+
+-make the OS internal FlashOverCan Task check the messages

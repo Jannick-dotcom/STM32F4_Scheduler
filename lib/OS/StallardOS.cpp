@@ -53,7 +53,7 @@ void StallardOS::createTCBs()
     return;
   }
 
-  for (uint8_t i = 0; i < countTasks + 1; i++)
+  for (uint8_t i = 0; i < countTasks; i++)
   {
     struct function_struct *temp;
     temp = new struct function_struct;

@@ -1,6 +1,7 @@
 #include "StallardOSGPIO.hpp"
 
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
+extern "C" void StallardOSGeneralFaultHandler();
 
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
 {
