@@ -10,7 +10,7 @@ extern "C" void StallardOS_endTask();
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
-extern "C" void StallardOS_SetSysClock();
+extern "C" void StallardOS_SetSysClock(uint8_t);
 
 //Kontext Switch
 struct function_struct *currentTask = nullptr;
@@ -24,7 +24,6 @@ void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
 {
   while (1)
   {
-    asm("WFI");
   }
 }
 
@@ -259,7 +258,7 @@ taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 ////////////////////////////////////////////////////////////////////////////////////////
 void StallardOS::startOS(void)
 {
-  StallardOS_SetSysClock();
+  StallardOS_SetSysClock(168);
   SystemCoreClockUpdate();
   enable_interrupts();
   // asm volatile("CPSIE I");

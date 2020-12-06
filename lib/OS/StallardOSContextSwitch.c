@@ -249,9 +249,9 @@ void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
     nextTask = NULL;
-    struct function_struct *temp = taskMainStruct;
+    struct function_struct *temp = taskMainStruct->next;
     uint32_t minDelayT = -1;
-    do
+    while (temp != taskMainStruct)
     {
         if (temp == NULL)
         {
@@ -259,7 +259,7 @@ void SysTick_Handler(void) //In C Language
             break;
         }
 
-        if (temp->continueInMS < sysTickMillisPerInt - (countTasks - 1))
+        if (temp->continueInMS < sysTickMillisPerInt)
         {
             temp->continueInMS = 0;
             temp->executable = 1; //Wenn keine Delay Zeit mehr, task auf executable setzen
@@ -273,7 +273,7 @@ void SysTick_Handler(void) //In C Language
             minDelayT = temp->continueInMS;
         }
         temp = temp->next; //Nächsten Task
-    } while (temp != taskMainStruct);
+    }
 
 #ifdef useSystickAltering
     if (minDelayT < 90 && minDelayT > 0)
