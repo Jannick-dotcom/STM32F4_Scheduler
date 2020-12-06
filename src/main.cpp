@@ -32,7 +32,7 @@ void tasktest()
             led31 = !led31;
         }
         count++;
-        Tasker1.delay(30);
+        Tasker1.delay(300);
     }
 }
 

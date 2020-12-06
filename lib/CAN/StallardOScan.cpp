@@ -6,14 +6,14 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
     if (port == StallardOSCAN1)
     {
-        CANR = new StallardOSGPIO(CAN1_r_pin, PORTB, Output);
-        CANT = new StallardOSGPIO(CAN1_t_pin, PORTB, Output);
+        CANR = new StallardOSGPIO(CAN1_r_pin, CAN1_r_port, Output);
+        CANT = new StallardOSGPIO(CAN1_t_pin, CAN1_t_port, Output);
         canhandle.Instance = CAN1;
     }
     else if (port == StallardOSCAN2)
     {
-        CANR = new StallardOSGPIO(CAN2_r_pin, PORTB, Output);
-        CANT = new StallardOSGPIO(CAN2_t_pin, PORTB, Output);
+        CANR = new StallardOSGPIO(CAN2_r_pin, CAN2_r_port, Output);
+        CANT = new StallardOSGPIO(CAN2_t_pin, CAN2_t_port, Output);
         canhandle.Instance = CAN2;
     }
 
