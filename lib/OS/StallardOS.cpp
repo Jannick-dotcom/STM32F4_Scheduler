@@ -11,6 +11,7 @@ extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
 extern "C" void StallardOS_SetSysClock(uint8_t);
+extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting 
 
 //Kontext Switch
 struct function_struct *currentTask = nullptr;
@@ -94,7 +95,7 @@ void StallardOS::createTCBs()
 ////////////////////////////////////////////////////////////////////////////////////////
 //Adds a new Task to the List of executable ones
 ////////////////////////////////////////////////////////////////////////////////////////
-struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio)
+struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
 {
   if (function == nullptr || searchFunction(id) != nullptr) //Make sure the parameters are correct
   {
@@ -131,9 +132,9 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->function = function;
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
-  // function_struct_ptr->frequency = exec_freq;
+  function_struct_ptr->frequency = exec_freq;
   function_struct_ptr->id = id;
-  // function_struct_ptr->lastExecTime = 0;
+  function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
 
   function_struct_ptr->State = NEW; //New Task
   function_struct_ptr->used = true;
@@ -141,7 +142,6 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
 
   function_struct_ptr->Stack = function_struct_ptr->vals + sizeStack - 4; //End of Stack
 
-  // function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
   return function_struct_ptr;
 }
 
@@ -234,7 +234,13 @@ void StallardOS::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   currentTask->executable = false;
+  
+  #ifdef contextSwitch
   StallardOS_delay();
+  #else
+  uint64_t continueTimeStamp = msCurrentTimeSinceStart + (milliseconds * 1000);
+  while(msCurrentTimeSinceStart < continueTimeStamp);
+  #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -261,10 +267,10 @@ void StallardOS::startOS(void)
   StallardOS_SetSysClock(168);
   SystemCoreClockUpdate();
   enable_interrupts();
-  // asm volatile("CPSIE I");
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
+#ifdef contextSwitch
     NVIC_EnableIRQ(SVCall_IRQn);
     asm("MRS R0, MSP");
     asm("MSR PSP, R0");
@@ -272,6 +278,51 @@ void StallardOS::startOS(void)
     asm("MSR CONTROL, R0");
     asm("ISB");
     StallardOS_start();
-    // __asm volatile ("SVC #0");
+#else
+    while (SysTick_Config(SystemCoreClock / (uint32_t)1000000)) //microsecond counter
+      ;
+    NVIC_SetPriority(SysTick_IRQn, 0x00);
+    NVIC_EnableIRQ(SysTick_IRQn);
+#endif
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Sets new Frequency of a Task
+////////////////////////////////////////////////////////////////////////////////////////
+void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
+{
+  if (exec_freq <= 0) //Make sure the parameters are correct
+  {
+    return;
+  }
+
+  function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
+  if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
+  {
+    temp->frequency = exec_freq; //Die Frequenz ändern
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//Here the normal Tasks get executed after another
+////////////////////////////////////////////////////////////////////////////////////////
+void StallardOS::schedule()
+{
+  uint16_t endOfList = 0;                     //Merker für das traversieren der Liste
+  function_struct *function_struct_ptr;       //Pointer auf Structs zu den Funktionen mit dem ich arbeite
+  lastScheduleTime = msCurrentTimeSinceStart; //Jetzige Schedule Zeit speichern
+
+  function_struct_ptr = first_function_struct->next;
+  endOfList = 0;
+  while (function_struct_ptr != first_function_struct)
+  {
+    if ((function_struct_ptr->lastExecTime + (1000000.0 / function_struct_ptr->frequency)) < msCurrentTimeSinceStart && function_struct_ptr->priority < 255)
+    {
+      function_struct_ptr->lastExecTime = msCurrentTimeSinceStart;
+      (*function_struct_ptr->function)();
+      break;
+    }
+    function_struct_ptr = function_struct_ptr->next;
   }
 }

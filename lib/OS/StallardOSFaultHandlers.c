@@ -8,6 +8,7 @@ extern struct function_struct *nextTask;
 void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 {
     disable_interrupts();
+#ifdef contextSwitch
     currentTask->Stack = currentTask->vals + sizeStack - 4; //End of Stack
     asm("MOV r4, #0");                                  //R0
     asm("MOV r5, #1");                                  //R1
@@ -32,30 +33,31 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
     asm("MOV r11, #11");
 
     currentTask->State = RUNNING;   //Save state as running
+#endif
     enable_interrupts();
 }
 
 void HardFault_Handler()
 {
-    // StallardOSGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 void NMI_Handler()
 {
-    // StallardOSGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 void MemManage_Handler()
 {
-    // StallardOSGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 void BusFault_Handler()
 {
-    // StallardOSGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }
 
 void UsageFault_Handler()
 {
-    // StallardOSGeneralFaultHandler();
+    StallardOSGeneralFaultHandler();
 }

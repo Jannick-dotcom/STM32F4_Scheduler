@@ -7,7 +7,7 @@
 extern struct function_struct *currentTask;
 extern struct function_struct *taskMainStruct;
 extern struct function_struct *nextTask;
-
+volatile uint64_t msCurrentTimeSinceStart = 0; //about 585 000 years of microsecond counting
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 volatile uint32_t sysTickMillisPerInt = 1;
 
@@ -120,7 +120,6 @@ void taskOnEnd(void)
 //Depending on the Task state, switching happens
 ////////////////////////////////////////////////////////////////////////////////////////
 void switchTask(void)
-//#define switchTask() 
 {
     if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
     if (nextTask == NULL) nextTask = taskMainStruct;
@@ -248,6 +247,7 @@ void switchTask(void)
 void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
+#ifdef contextSwitch
     nextTask = NULL;
     struct function_struct *temp = taskMainStruct->next;
     uint32_t minDelayT = -1;
@@ -294,6 +294,9 @@ void SysTick_Handler(void) //In C Language
 
         pendPendSV(); //If switchEnable set, set the PendSV to pending
     }
+#else
+    msCurrentTimeSinceStart++;
+#endif
     enable_interrupts(); //enable all interrupts
 }
 

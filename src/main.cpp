@@ -1,39 +1,34 @@
 #include "StallardOS.hpp"
 StallardOS Tasker1;
 
+StallardOSGPIO led1(13, PORTF, Output);
+StallardOSGPIO led2(14, PORTF, Output);
+StallardOSGPIO led3(15, PORTF, Output);
+
+StallardOSGPIO led11(9, PORTI, Output);
+StallardOSGPIO led21(10, PORTI, Output);
+StallardOSGPIO led31(11, PORTI, Output);
+uint8_t count = 0;
+
 void tasktest()
 {
-    StallardOSGPIO led1(13, PORTF, Output);
-    StallardOSGPIO led2(14, PORTF, Output);
-    StallardOSGPIO led3(15, PORTF, Output);
-
-    StallardOSGPIO led11(9, PORTI, Output);
-    StallardOSGPIO led21(10, PORTI, Output);
-    StallardOSGPIO led31(11, PORTI, Output);
-    uint8_t count = 0;
-    led1 = 1;
-    led2 = 1;
-    led3 = 1;
-    led11 = 0;
-    led21 = 0;
-    led31 = 0;
-    while (1)
+    //while (1)
+    //{
+    if (!(count % 2))
     {
-        if (!(count % 2))
-        {
-            led1 = !led1;
-            led2 = !led2;
-            led3 = !led3;
-        }
-        else
-        {
-            led11 = !led11;
-            led21 = !led21;
-            led31 = !led31;
-        }
-        count++;
-        Tasker1.delay(300);
+        led1 = !led1;
+        led2 = !led2;
+        led3 = !led3;
     }
+    else
+    {
+        led11 = !led11;
+        led21 = !led21;
+        led31 = !led31;
+    }
+    count++;
+    //Tasker1.delay(300);
+    //}
 }
 
 void task1(void)
@@ -76,9 +71,11 @@ int main()
     // Tasker1.addFunction(task1, 2, 1);
     // Tasker1.addFunction(task2, 3, 2);
     // Tasker1.addFunction(task3, 4, 3);
-    Tasker1.addFunction(tasktest, 1, 1);
+    Tasker1.addFunction(tasktest, 1, 1, 30);
     Tasker1.startOS();
     while (1)
-        ;
+    {
+        Tasker1.schedule();
+    }
     //Should never get here
 }

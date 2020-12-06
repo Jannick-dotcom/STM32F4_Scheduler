@@ -26,9 +26,9 @@ struct function_struct
   volatile uint8_t used;           //Ist dieser TCB schon belegt?
 
   //nur für normalen Schedule betrieb
-  //float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
+  float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
   volatile uint8_t executable;    //Funktion ausführen?
-  //uint32_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
+  uint64_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
 
   //nur für KontextSwitch
   volatile taskState State;        //Status des Tasks
