@@ -18,19 +18,20 @@ struct function_struct *currentTask = nullptr;
 struct function_struct *nextTask = nullptr;
 struct function_struct *taskMainStruct = nullptr;
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Just if no other Tasks have to be executed run this
-////////////////////////////////////////////////////////////////////////////////////////
-void taskMain(void) //Hier wird die Überschüssige Zeit verbraten
+/**
+ * Waste Time if all tasks are in delay.
+ *
+ * @param 
+ * @return
+ */
+void taskMain(void)
 {
   while (1)
   {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Constructor - Here we Create a StallardOS Object
-////////////////////////////////////////////////////////////////////////////////////////
+
 StallardOS::StallardOS()
 {
   //Basiswerte Initialisieren
@@ -43,9 +44,12 @@ StallardOS::StallardOS()
   createTCBs();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Adds new Tasks to the List
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Create Task control blocks.
+ *
+ * @param
+ * @return
+ */
 void StallardOS::createTCBs()
 {
   if (TCBsCreated >= countTasks) //Wenn schon genug TCBs erstellt wurden, nicht nochmal erstellen
@@ -92,9 +96,16 @@ void StallardOS::createTCBs()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Adds a new Task to the List of executable ones
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Add a new Task to execute list.
+ *
+ * @param function Task to execute.
+ * @param id unique id of the task.
+ * @param prio priority of the task, lower means higher.
+ * @param exec_freq frequency of execution through the normal scheduler.
+ * @param Execcount amount of executes of this task, no value is endless.
+ * @return pointer to the created tcb.
+ */
 struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, float exec_freq, uint16_t Execcount)
 {
   if (function == nullptr || searchFunction(id) != nullptr) //Make sure the parameters are correct
@@ -145,9 +156,13 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   return function_struct_ptr;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Here we en/disable a Task from the List
-////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Here we en/disable a Task from the List.
+ *
+ * @param id unique id of the task.
+ * @param act boolean value, activation of task.
+ */
 void StallardOS::changeFunctionEnabled(uint16_t id, bool act)
 {
   struct function_struct *temp = searchFunction(id); //Funktion suchen
@@ -157,9 +172,12 @@ void StallardOS::changeFunctionEnabled(uint16_t id, bool act)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Sets new Priority of a Task
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Sets new Priority of a Task
+ *
+ * @param id unique id of the task.
+ * @param prio new priority, lower means higher
+ */
 void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 {
   struct function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
@@ -169,9 +187,12 @@ void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Search a task in the list of executable ones/*
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Search a task in the list
+ *
+ * @param id unique id of the task.
+ * @return pointer to the tcb with the task
+ */
 struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
 {
   uint16_t i = 0;
@@ -198,9 +219,10 @@ struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
   return temp; //Element übergeben
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Search a free task in the list
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * search a tcb that is currently not used
+ *
+ */
 struct function_struct *StallardOS::searchFreeFunction(void)
 {
   uint16_t i = 0;
@@ -227,9 +249,11 @@ struct function_struct *StallardOS::searchFreeFunction(void)
   return temp; //Element übergeben
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Delay for an amount of milliseconds
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * delay for an amount of milliseconds
+ *
+ * @param milliseconds the amount of msec to wait.
+ */
 void StallardOS::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
@@ -243,9 +267,12 @@ void StallardOS::delay(uint32_t milliseconds)
   #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Return the State of the Task
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Check the state of a task
+ *
+ * @param id unique id of the task.
+ * @return state of the task, see taskstate enum
+ */
 taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 {
   struct function_struct *temp = searchFunction(id); //Hier die Funktion suchen
@@ -259,9 +286,10 @@ taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Set all the Interrupts and Values for the OS
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Start the StallardOS operating system
+ *
+ */
 void StallardOS::startOS(void)
 {
   StallardOS_SetSysClock(168);
@@ -287,9 +315,12 @@ void StallardOS::startOS(void)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Sets new Frequency of a Task
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Search a task in the list
+ *
+ * @param id unique id of the task.
+ * @param exec_freq new execution frequency of the task
+ */
 void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
 {
   if (exec_freq <= 0) //Make sure the parameters are correct
@@ -304,9 +335,10 @@ void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Here the normal Tasks get executed after another
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Basic scheduling algorithm
+ *
+ */
 void StallardOS::schedule()
 {
   uint16_t endOfList = 0;                     //Merker für das traversieren der Liste

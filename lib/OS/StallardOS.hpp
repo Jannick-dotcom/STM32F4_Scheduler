@@ -13,10 +13,10 @@
 #include "StallardOScan.hpp"
 #include "StallardOSSerial.hpp"
 #include "StallardOSi2c.hpp"
+#include "StallardOSPID.hpp"
 
 class StallardOS
 {
-  /////////Variables
 private:
   struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint8_t TCBsCreated;
@@ -27,20 +27,16 @@ public:
   //Constructor
   StallardOS(); //Create a Task Scheduler
 
-  //Function Methods
-  //returns pointer to added struct or nullptr if not successful
   struct function_struct *addFunction(
       /*Funktion*/ void (*function)(),
       /*ID of task*/ uint16_t id,                  //The ID must be different for different tasks
       /*Prioritaet*/ uint8_t prio,                 //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
       /*Executions per sec*/ float exec_freq = 1,  //Must be bigger than 0 ! //not used by context switch
       /*Number of execs*/ uint16_t Execcount = 0); //not used by context switch
-  //Eine Funktion zur Liste hinzufügen
 
   void changeFunctionEnabled(
       /*Funktion*/ uint16_t id,
       /*Aktivieren oder Deaktivieren*/ bool act);
-  //Eine Funktion aus der Liste de/aktivieren
 
 private:
   struct function_struct *searchFunction(/*Funktion*/ uint16_t id); //Search a TCB that matches the provided function
@@ -48,14 +44,11 @@ private:
   void createTCBs(void);                                            //create the structs for all the functions (count is "countTasks")
 
 public:
-  //Setter Methods
   void setFunctionPriority(/*Funktion*/ uint16_t id, /*New Priority*/ uint8_t prio);
   void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
 
-  //Getter Methods
   taskState getFunctionState(/*Funktion*/ uint16_t id);
 
-  //Context Switch
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
   void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
   void schedule();                   //Execute in the Loop (cooperative Multitasking)
