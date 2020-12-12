@@ -11,100 +11,140 @@ volatile uint64_t msCurrentTimeSinceStart = 0; //about 585 000 years of microsec
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 volatile uint32_t sysTickMillisPerInt = 1;
 
+/**
+ * No Task available.
+ *
+ * @param
+ * @return
+ */
 void StallardOS_noTask()
 {
     asm("MOV r7, #0");
     asm("SVC #0");
 }
 
+/**
+ * Get super Rights
+ *
+ * @param
+ * @return
+ */
 void StallardOS_sudo()
 {
     asm("MOV r7, #3");
     asm("SVC #3");
 }
 
+/**
+ * Release super Rights.
+ *
+ * @param
+ * @return
+ */
 void StallardOS_unSudo()
 {
     asm("MOV r7, #4");
     asm("SVC #4");
 }
 
+/**
+ * Start the OS.
+ *
+ * @param
+ * @return
+ */
 void StallardOS_start()
 {
     asm("MOV r7, #5");
     asm("SVC #5");
 }
 
+/**
+ * Delay a Task.
+ *
+ * @param
+ * @return
+ */
 void StallardOS_delay()
 {
     asm("MOV r7, #2");
     asm("SVC #2");
 }
 
+/**
+ * end a Task.
+ *
+ * @param
+ * @return
+ */
 void StallardOS_endTask()
 {
     asm("MOV r7, #1");
     asm("SVC #1");
 }
 
+/**
+ * Jump to Bootloader.
+ *
+ * @param
+ * @return
+ */
 void StallardOS_goBootloader()
 {
     asm("MOV r7, #6");
     asm("SVC #6");
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Enables all interrupts
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Enable all interrupts.
+ *
+ * @param
+ * @return
+ */
 void enable_interrupts()
 {
     asm("CPSIE I"); //Instruction for enabling interrupts
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Disables all interrupts
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Disable all interrupts.
+ *
+ * @param
+ * @return
+ */
 void disable_interrupts()
 {
     asm("CPSID I"); //Instruction for disabling interrupts
 }
 
+/**
+ * Set the pendSV Exception to pending.
+ *
+ * @param
+ * @return
+ */
 void pendPendSV()
 {
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Finding a next Task
-////////////////////////////////////////////////////////////////////////////////////////
-void findNextFunction(void)
-{
-    struct function_struct *temp = taskMainStruct; //Start with task after current one
-    uint8_t prioMin = 255;                         //Use only tasks with prio < 255
-    do
-    {
-        if (temp->executable && temp->priority < prioMin && temp->used) //Get task with lowest prio number -> highest priority
-        {
-            nextTask = temp;          //set nextF to right now highest priority task
-            prioMin = temp->priority; //save prio
-        }
-        temp = temp->next;
-    } while (temp != taskMainStruct); //Solange ich noch nicht wieder beim ersten angekommen bin
-
-    if (nextTask == NULL) //Wenn ein Task ausführbar ist
-    {
-        nextTask = taskMainStruct;
-    }
-}
-
+/**
+ * Configure the systick timer to fire every "ticks".
+ *
+ * @param
+ * @return
+ */
 void StallardOS_SysTick_Config(uint32_t ticks)
 {
     SysTick_Config(ticks);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//If a Task Returns, this function gets executed and calls the remove function of this task
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * If a Task Returns, this function gets executed and calls the remove function of this task.
+ *
+ * @param
+ * @return
+ */
 void taskOnEnd(void)
 {
     disable_interrupts();
@@ -115,10 +155,12 @@ void taskOnEnd(void)
     StallardOS_endTask(); //Create a system call to the SVC Handler
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Here the magic happens
-//Depending on the Task state, switching happens
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Switching of a Task happens here.
+ *
+ * @param
+ * @return
+ */
 void switchTask(void)
 {
     if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
@@ -174,9 +216,12 @@ void switchTask(void)
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//System Call (Supervisor Call) from Delay or after a task finishes
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * SuperVisorCall Handler for the supervisor Exception.
+ *
+ * @param
+ * @return
+ */
 void SVC_Handler(void)
 {
     disable_interrupts();
@@ -230,7 +275,7 @@ void SVC_Handler(void)
         break;
 
     case 6:                                          //Enter Bootloader
-        *((unsigned long *)0x2001FFF0) = 0xDEADBEEF; // End of RAM
+        *((uint32_t *)0x2001FFF0) = 0xDEADBEEF; // End of RAM
         NVIC_SystemReset();
         break;
 
@@ -241,9 +286,12 @@ void SVC_Handler(void)
     enable_interrupts(); //Enable all interrupts
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Set the PendSV exception to pending (Systick is a 24 bit counter) minimum 11Hz
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Systick Handler for an Exception every x ms. Minimum is 11 Hz
+ *
+ * @param
+ * @return
+ */
 void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
@@ -251,12 +299,13 @@ void SysTick_Handler(void) //In C Language
     nextTask = NULL;
     struct function_struct *temp = taskMainStruct->next;
     uint32_t minDelayT = -1;
-    while (temp != taskMainStruct)
-    {
-        if (temp == NULL)
+    uint8_t prioMin = -1;                         //Use only tasks with prio < 255
+    while (temp != taskMainStruct && temp != NULL)
+    {   
+        if (temp->used && temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
-            minDelayT = 0;
-            break;
+            nextTask = temp;          //set nextF to right now highest priority task
+            prioMin = temp->priority; //save prio
         }
 
         if (temp->continueInMS < sysTickMillisPerInt)
@@ -268,30 +317,31 @@ void SysTick_Handler(void) //In C Language
         {
             temp->continueInMS -= sysTickMillisPerInt; //dekrementieren
         }
+
+#ifdef useSystickAltering
         if (minDelayT > temp->continueInMS)
         {
             minDelayT = temp->continueInMS;
         }
+#endif
         temp = temp->next; //Nächsten Task
     }
 
 #ifdef useSystickAltering
     if (minDelayT < 90 && minDelayT > 0)
     {
-        sysTickFreq = 1000.0 / (float)minDelayT;
+        sysTickFreq = 1000 / minDelayT;
     }
     else
     {
         sysTickFreq = defaultSysTickFreq;
     }
-    sysTickMillisPerInt = (uint32_t)(1000.0 / sysTickFreq);
+    sysTickMillisPerInt = (uint32_t)(1000 / sysTickFreq);
     SysTick_Config(sysTickTicks); //Set the frequency of the systick interrupt
 #endif
 
     if (currentTask->priority > 0)
     {
-        findNextFunction();
-
         pendPendSV(); //If switchEnable set, set the PendSV to pending
     }
 #else
@@ -300,9 +350,12 @@ void SysTick_Handler(void) //In C Language
     enable_interrupts(); //enable all interrupts
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-//Switch the context
-////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * PendSV Exception Handler.
+ *
+ * @param
+ * @return
+ */
 void PendSV_Handler()
 {
     disable_interrupts();
