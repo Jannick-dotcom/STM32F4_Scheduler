@@ -170,7 +170,7 @@ void switchTask(void)
     {
         asm("MRS r0, PSP");         //Get Process Stack Pointer
         asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
-        // asm("VSTMDB r0!, {s16-s31}");
+        asm("VSTMDB r0!, {s16-s31}");
         asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 

@@ -9,6 +9,7 @@ StallardOSGPIO led11(9, PORTI, Output);
 StallardOSGPIO led21(10, PORTI, Output);
 StallardOSGPIO led31(11, PORTI, Output);
 uint8_t count = 0;
+volatile double erg;
 
 void tasktest()
 {
@@ -31,9 +32,20 @@ void tasktest()
     //}
 }
 
+void task2()
+{
+    volatile double k;
+    for (uint16_t i = 0; i < 1000; i++)
+    {
+        k = 1.5468 / 2.5648 + i;
+    }
+    erg = k;
+}
+
 int main()
 {
     Tasker1.addFunction(tasktest, 1, 1, 30);
+    Tasker1.addFunction(task2, 2, 1, 12);
     Tasker1.startOS();
     while (1)
     {
