@@ -16,7 +16,7 @@ private:
     I2C_HandleTypeDef hi2c;
 
 public:
-    StallardOSi2c(I2C_TypeDef *instance);
+    StallardOSi2c(I2C_TypeDef *instance, uint32_t freq);
     void write(uint16_t addr, uint8_t *data, uint16_t bytes);
     uint8_t read(uint16_t addr, uint8_t *data, uint16_t bytes);
 };
