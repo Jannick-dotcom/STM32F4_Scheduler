@@ -31,7 +31,12 @@ void taskMain(void)
   }
 }
 
-
+/**
+ * Create StallardOS RTOS.
+ *
+ * @param
+ * @return
+ */
 StallardOS::StallardOS()
 {
   //Basiswerte Initialisieren
@@ -302,7 +307,7 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(SVCall_IRQn);
     asm("MRS R0, MSP");
     asm("MSR PSP, R0");
-    asm("MOV R0, #2");
+    asm("MOV R0, #3");
     asm("MSR CONTROL, R0");
     asm("ISB");
     StallardOS_start();

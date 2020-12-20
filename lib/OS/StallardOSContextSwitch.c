@@ -208,7 +208,7 @@ void switchTask(void)
     if (currentTask->State == PAUSED) //Hier Task fortsetzen
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack)); //get saved Stack pointer
-        //asm("VLDMIA r0!, {s16-s31}");
+        asm("VLDMIA r0!, {s16-s31}");
         asm("LDMIA r0!, {r4-r11}");   //load registers from memory
         asm("MSR PSP, r0");           //set PSP
         currentTask->State = RUNNING; //Save state as running
@@ -274,7 +274,7 @@ void SVC_Handler(void)
         pendPendSV();
         break;
 
-    case 6:                                          //Enter Bootloader
+    case 6: //Enter Bootloader
         *((uint32_t *)0x2001FFF0) = 0xDEADBEEF; // End of RAM
         NVIC_SystemReset();
         break;
