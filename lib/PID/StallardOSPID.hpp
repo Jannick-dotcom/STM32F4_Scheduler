@@ -1,4 +1,4 @@
-class StallardoPID
+class StallardosPID
 {
     double pid_max = 200.0; //Max Output of PID-Controller
 
@@ -8,6 +8,6 @@ class StallardoPID
     double pid_i_mem, pid_setpoint, pid_input, pid_output, pid_last_d_error;
 
 public:
-    StallardoPID(double p_gain, double i_gain, double d_gain);
+    StallardosPID(double p_gain, double i_gain, double d_gain);
     double calculate_pid(double setpoint, double input);
 };

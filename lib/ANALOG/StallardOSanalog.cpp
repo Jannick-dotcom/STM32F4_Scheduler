@@ -1,5 +1,11 @@
 #include "StallardOSanalog.hpp"
 
+/**
+ * create a Analog input instance.
+ *
+ * @param number which ADC number to use
+ * @param channel channelnumber of the adc
+ */
 StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
 {
     const ADC_TypeDef *StallardOSAnalog_to_ADC_Typedef[] = {ADC1, ADC2, ADC3};
@@ -34,6 +40,11 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
     this->channel = channel;
 }
 
+/**
+ * get a analog reading.
+ *
+ * @return analog value
+ */
 uint32_t StallardOSAnalog::getValue()
 {
     return HAL_ADC_GetValue(&hadc1);

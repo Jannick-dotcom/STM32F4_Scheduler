@@ -1,5 +1,10 @@
 #include "StallardOSSerial.hpp"
-
+/**
+ * create a serial instance.
+ *
+ * @param serPort which Serial to use
+ * @param baud baud rate
+ */
 StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 {
     if(baud == 0)
@@ -20,6 +25,12 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
     }
 }
 
+/**
+ * send Data.
+ *
+ * @param dat Data to be sent
+ * @param bytes Number of bytes to send
+ */
 void StallardOSSerial::send(const char *dat, uint16_t bytes)
 {
     if(dat == nullptr)
@@ -29,6 +40,12 @@ void StallardOSSerial::send(const char *dat, uint16_t bytes)
     HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0);
 }
 
+/**
+ * read Data.
+ *
+ * @param[out] dat container for the read data
+ * @param bytes number of bytes to read
+ */
 void StallardOSSerial::read(char *dat, uint16_t bytes)
 {
     if(dat == nullptr)

@@ -1,13 +1,28 @@
 #include "StallardOSPID.hpp"
 
-StallardoPID::StallardoPID(double p_gain, double i_gain, double d_gain)
+/**
+ * create a pid controller.
+ *
+ * @param p_gain  gain of the p part
+ * @param i_gain  gain of the i part
+ * @param d_gain  gain of the d part
+ */
+StallardosPID::StallardosPID(double p_gain, double i_gain, double d_gain)
 {
     this->pid_p_gain = p_gain;
     this->pid_i_gain = i_gain;
     this->pid_d_gain = d_gain;
 }
 
-double StallardoPID::calculate_pid(double setpoint, double input)
+
+/**
+ * calculate the output.
+ *
+ * @param setpoint setpoint if the controller
+ * @param input input of the pid controller
+ * @return output of the pid controller
+ */
+double StallardosPID::calculate_pid(double setpoint, double input)
 {
     double pid_error_temp;
     this->pid_setpoint = setpoint;

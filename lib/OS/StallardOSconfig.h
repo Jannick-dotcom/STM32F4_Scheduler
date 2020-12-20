@@ -2,7 +2,7 @@
  * User Customization
 ********************************************/
 
-#define contextSwitch
+// #define contextSwitch
 
 #define sizeStack 300      //300 * uint32_t (Stack size for Tasks)
 #define countTasks 2

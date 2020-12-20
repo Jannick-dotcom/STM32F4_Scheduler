@@ -1,5 +1,9 @@
 #include "StallardOSi2c.hpp"
-
+/**
+ * Create a i2c insance.
+ *
+ * @param instance i2c to use
+ */
 StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance)
 {
     hi2c.Instance = instance;
@@ -17,6 +21,13 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance)
     }
 }
 
+/**
+ * Send i2c data.
+ *
+ * @param addr  to which address to send
+ * @param data  data to send
+ * @param bytes size of the data container
+ */
 void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
     if(data == nullptr)

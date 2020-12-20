@@ -17,6 +17,7 @@ private:
     ports port;
     uint32_t duty;
     uint32_t freq;
+    uint8_t bitcount;
 
     StallardOSGPIO *gpio;
     TIM_HandleTypeDef htim;
@@ -26,7 +27,8 @@ public:
         /*Timer to be used*/ TIM_TypeDef* instance,
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
-        /*Frequency*/ uint16_t freq);
+        /*Frequency*/ uint16_t freq,
+        /*Number of bits to use*/ uint8_t bitcount);
 
     ~StallardOSpwm();   //Destructor
 

@@ -2,6 +2,12 @@
 
 StallardOSCanMessage STallardOS_CAN_messages[CAN_FIFO_size];
 
+/**
+ * create a CAN instance.
+ *
+ * @param port which can port to use
+ * @param baud which can baudrate to use
+ */
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
     if (port == StallardOSCAN1)
@@ -53,6 +59,13 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     HAL_CAN_Start(&canhandle);
 }
 
+/**
+ * receive a can message.
+ *
+ * @param[out] msg the message container to be filled
+ * @param[in] id the id of the message to receive
+ * @return true if a message is received, false otherwise
+ */
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
     // return StallardOSCAN::getMessage(msg, id, this->interface);
@@ -72,6 +85,11 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
     return false;
 }
 
+/**
+ * send a can message.
+ *
+ * @param msg message to send
+ */
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, &(msg->Val), (uint32_t*)CAN_TX_MAILBOX0);

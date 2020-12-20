@@ -49,6 +49,12 @@ public:
         /*Portname*/ ports port,
         /*Direction*/ pinDir dir,
         /*PullResistor*/ pullMode pull = nopull);
+    StallardOSGPIO(
+        /*Portnumber*/ uint8_t number,
+        /*Portname*/ ports port,
+        /*Direction*/ pinDir dir,
+        /*PullResistor*/ pullMode pull,
+        uint32_t alternate);
     operator int() {return state;};
     uint16_t operator=(bool state);                                            //Operator for writing on the pin
     uint16_t operator!() { return !this->state; };                             //Inverting the state

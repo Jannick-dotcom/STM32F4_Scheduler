@@ -16,7 +16,7 @@ volatile uint32_t sysTickMillisPerInt = 1;
  *
  * @param
  * @return
- */
+ *//* code */
 void StallardOS_noTask()
 {
     asm("MOV r7, #0");
@@ -336,8 +336,11 @@ void SysTick_Handler(void) //In C Language
     {
         sysTickFreq = defaultSysTickFreq;
     }
+    msCurrentTimeSinceStart += sysTickMillisPerInt;
     sysTickMillisPerInt = (uint32_t)(1000 / sysTickFreq);
     SysTick_Config(sysTickTicks); //Set the frequency of the systick interrupt
+#else
+    msCurrentTimeSinceStart++;
 #endif
 
     if (currentTask->priority > 0)
