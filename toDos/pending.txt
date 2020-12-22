@@ -1,8 +1,22 @@
 -Jannix HW libs (✓)
-    -PWM ✓ (calculate the divisors)
+    -PWM ✓
     -RS232 ✓
     -I²C ✓
     -(SPI)
     -Test the libs
 
--make the OS internal FlashOverCan Task check the messages
+Flash over Can
+	-(make the OS internal FlashOverCan Task check the messages)
+
+-Delete the unnecessary Repos
+	-BasicSoftware
+	-TaskScheduler
+
+-Floating Point Unit Exception Handling
+
+-Optimizing for Runtime
+
+-PlatformIO test feature
+    Must be connected over Serial
+    Maybe additional to HiL???
+    

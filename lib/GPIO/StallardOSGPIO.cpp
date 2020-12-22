@@ -93,13 +93,13 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
  * @param state new state, high or low
  * @return new state
  */
-uint16_t StallardOSGPIO::operator=(bool state)
+bool StallardOSGPIO::operator=(bool state)
 {
     if (this->dir == Output)
     {
         this->state = state;
         HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
-        HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+        // HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
         return state;
     }
     else

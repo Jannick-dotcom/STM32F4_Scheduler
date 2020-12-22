@@ -2,10 +2,10 @@
  * User Customization
 ********************************************/
 
-// #define contextSwitch
+#define contextSwitch
 
 #define sizeStack 300      //300 * uint32_t (Stack size for Tasks)
-#define countTasks 3
+#define countTasks 2
 #define defaultSysTickFreq 1000.0 //[Hz]
 #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
 #define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero

@@ -262,7 +262,7 @@ void SVC_Handler(void)
         break;
 
     case 5: //Start the os
-        // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+        SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
         while (SysTick_Config(sysTickTicks));
 
         NVIC_SetPriority(SysTick_IRQn, 0x00);
@@ -271,6 +271,15 @@ void SVC_Handler(void)
         NVIC_EnableIRQ(SysTick_IRQn);
         NVIC_EnableIRQ(SVCall_IRQn);
         
+        //Start the FPU (s.257 prog man)
+        // asm("LDR.W r0, =0xE000ED88");
+        // asm("LDR r1, [r0]");
+        // asm("ORR r1, r1, #(0xF << 20)");
+        // asm("STR r1, [r0]");
+        // asm("DSB");
+        // asm("ISB");
+        //FPU Started
+
         pendPendSV();
         break;
 
@@ -302,12 +311,6 @@ void SysTick_Handler(void) //In C Language
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     while (temp != taskMainStruct && temp != NULL)
     {   
-        if (temp->used && temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
-        {
-            nextTask = temp;          //set nextF to right now highest priority task
-            prioMin = temp->priority; //save prio
-        }
-
         if (temp->continueInMS < sysTickMillisPerInt)
         {
             temp->continueInMS = 0;
@@ -316,6 +319,12 @@ void SysTick_Handler(void) //In C Language
         else
         {
             temp->continueInMS -= sysTickMillisPerInt; //dekrementieren
+        }
+        
+        if (temp->used && temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        {
+            nextTask = temp;          //set nextF to right now highest priority task
+            prioMin = temp->priority; //save prio
         }
 
 #ifdef useSystickAltering
@@ -328,28 +337,20 @@ void SysTick_Handler(void) //In C Language
     }
 
 #ifdef useSystickAltering
-    if (minDelayT < 90 && minDelayT > 0)
+    if (minDelayT >= 90 || minDelayT < 1)
     {
-        sysTickFreq = 1000 / minDelayT;
+        minDelayT = 1;
     }
-    else
-    {
-        sysTickFreq = defaultSysTickFreq;
-    }
-    msCurrentTimeSinceStart += sysTickMillisPerInt;
-    sysTickMillisPerInt = (uint32_t)(1000 / sysTickFreq);
-    SysTick_Config(sysTickTicks); //Set the frequency of the systick interrupt
-#else
-    msCurrentTimeSinceStart++;
+    SysTick_Config((uint32_t)(SystemCoreClock / (1000.0 * minDelayT))); //Set the frequency of the systick interrupt
 #endif
 
     if (currentTask->priority > 0)
     {
         pendPendSV(); //If switchEnable set, set the PendSV to pending
     }
-#else
-    msCurrentTimeSinceStart++;
 #endif
+    msCurrentTimeSinceStart += sysTickMillisPerInt;
+    sysTickMillisPerInt = minDelayT;
     enable_interrupts(); //enable all interrupts
 }
 

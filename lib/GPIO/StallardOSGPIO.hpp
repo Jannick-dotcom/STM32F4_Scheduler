@@ -37,7 +37,7 @@ typedef enum pullMode
 class StallardOSGPIO
 {
 private:
-    uint8_t state;
+    bool state;
     uint32_t pin;
     ports port;
     pinDir dir;
@@ -56,16 +56,16 @@ public:
         /*PullResistor*/ pullMode pull,
         uint32_t alternate);
     operator int() {return state;};
-    uint16_t operator=(bool state);                                            //Operator for writing on the pin
-    uint16_t operator!() { return !this->state; };                             //Inverting the state
-    uint16_t operator&&(StallardOSGPIO &ref) { return this->state && ref.state; }; //Logical operator
-    uint16_t operator||(StallardOSGPIO &ref) { return this->state || ref.state; }; //Logical operator
-    uint16_t operator!=(StallardOSGPIO &ref) { return this->state != ref.state; }; //Comparison
-    uint16_t operator<(StallardOSGPIO &ref) { return this->state < ref.state; };
-    uint16_t operator>(StallardOSGPIO &ref) { return this->state > ref.state; };
-    uint16_t operator<=(StallardOSGPIO &ref) { return this->state <= ref.state; };
-    uint16_t operator>=(StallardOSGPIO &ref) { return this->state >= ref.state; };
-    uint16_t operator==(StallardOSGPIO &ref) { return this->state == ref.state; };
+    bool operator=(bool state);                                            //Operator for writing on the pin
+    bool operator!() { return !this->state; };                             //Inverting the state
+    bool operator&&(const StallardOSGPIO &ref) { return this->state && ref.state; }; //Logical operator
+    bool operator||(const StallardOSGPIO &ref) { return this->state || ref.state; }; //Logical operator
+    bool operator!=(const StallardOSGPIO &ref) { return this->state != ref.state; }; //Comparison
+    bool operator<(const StallardOSGPIO &ref) { return this->state < ref.state; };
+    bool operator>(const StallardOSGPIO &ref) { return this->state > ref.state; };
+    bool operator<=(const StallardOSGPIO &ref) { return this->state <= ref.state; };
+    bool operator>=(const StallardOSGPIO &ref) { return this->state >= ref.state; };
+    bool operator==(const StallardOSGPIO &ref) { return this->state == ref.state; };
 };
 
 #endif
