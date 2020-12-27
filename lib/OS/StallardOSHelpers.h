@@ -21,9 +21,9 @@ struct function_struct
 
   //Must have Variablen
   void (*function)();     //Auszuführende Funktion
-  uint8_t priority;       //Priorität 0 wird nicht unterbrochen außer sie wünschen es durch ein Delay
+  uint8_t priority;       //Priorität 0 wird nicht unterbrochen außer Prozess wünscht es durch ein Delay
   uint16_t id;            //ID des Tasks
-  volatile uint8_t used;           //Ist dieser TCB schon belegt?
+  volatile uint8_t used;  //Ist dieser TCB schon belegt?
 
   //nur für normalen Schedule betrieb
   float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
@@ -35,8 +35,6 @@ struct function_struct
   volatile uint32_t *Stack;         //Stack pointer
   
   volatile uint32_t continueInMS;   //Delay amount
-
-  // ~function_struct();
 };
 
 #endif

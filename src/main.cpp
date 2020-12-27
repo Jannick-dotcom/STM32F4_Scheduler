@@ -24,7 +24,7 @@ void taskNeu()
         }
         volatile uint32_t timeTaken = msCurrentTimeSinceStart - nowT;
         erg = k;
-        Tasker1.delay(1000);
+        // Tasker1.delay(1000);
     }
 }
 

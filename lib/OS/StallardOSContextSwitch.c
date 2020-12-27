@@ -161,7 +161,7 @@ void taskOnEnd(void)
  * @param
  * @return
  */
-void switchTask(void)
+static inline void switchTask(void)
 {
     if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
     if (nextTask == NULL) nextTask = taskMainStruct;
@@ -170,7 +170,9 @@ void switchTask(void)
     {
         asm("MRS r0, PSP");         //Get Process Stack Pointer
         asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
-        asm("VSTMDB r0!, {s16-s31}");
+        asm("TST lr, #0x10");
+        asm("IT EQ");
+        asm("VSTMDBEQ r0!, {s16-s31}");
         asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 
@@ -341,7 +343,7 @@ void SysTick_Handler(void) //In C Language
     {
         minDelayT = 1;
     }
-    SysTick_Config((uint32_t)(SystemCoreClock / (1000.0 * minDelayT))); //Set the frequency of the systick interrupt
+    SysTick_Config((uint32_t)(SystemCoreClock / (1000 * minDelayT))); //Set the frequency of the systick interrupt
 #endif
 
     if (currentTask->priority > 0)

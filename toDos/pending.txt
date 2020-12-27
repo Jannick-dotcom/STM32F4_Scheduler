@@ -12,7 +12,7 @@ Flash over Can
 	-BasicSoftware
 	-TaskScheduler
 
--Floating Point Unit Exception Handling
+-Floating Point Unit Exception Handling -> übertragen
 
 -Optimizing for Runtime
 
