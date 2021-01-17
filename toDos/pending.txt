@@ -1,9 +1,10 @@
--Jannix HW libs (✓)
+-Jannix HW libs (✓-Ready)
     -PWM ✓
     -RS232 ✓
     -I²C ✓
     -(SPI)
     -Test the libs
+    -ADC (maybe some error regarding the channel setting)
 
 Flash over Can
 	-(make the OS internal FlashOverCan Task check the messages)
@@ -12,7 +13,7 @@ Flash over Can
 	-BasicSoftware
 	-TaskScheduler
 
--Floating Point Unit Exception Handling -> übertragen
+-Floating Point Unit Exception Handling -> übertragen an Simao
 
 -Optimizing for Runtime
 

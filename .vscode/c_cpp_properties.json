@@ -1,10 +1,12 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
 {
     "configurations": [
         {
-            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
-        },
-        {
-            "name": "Linux",
+            "name": "PlatformIO",
             "includePath": [
                 "/home/jannick/Desktop/Rennstall/contextSwitchTest/include",
                 "/home/jannick/Desktop/Rennstall/contextSwitchTest/src",
@@ -173,14 +175,13 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50003",
+                "PLATFORMIO=50004",
                 "STM32F417xx",
                 "STM32F4xx",
                 "USE_HAL_DRIVER",
                 "F_CPU=168000000L",
                 ""
             ],
-            "intelliSenseMode": "gcc-x64",
             "compilerPath": "/home/jannick/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-gcc",
             "compilerArgs": [
                 "-mthumb",

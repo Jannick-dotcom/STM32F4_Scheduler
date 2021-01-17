@@ -13,19 +13,9 @@ extern volatile uint64_t msCurrentTimeSinceStart;
 
 void taskNeu()
 {
-    volatile double k;
-    StallardOSGPIO led1(13, PORTF, Output);
-    while (1)
-    {
-        volatile uint64_t nowT = msCurrentTimeSinceStart;
-        for (uint32_t i = 0; i < 200000; i++)
-        {
-            k = ((1.5468f / 2.5648f) * 1.201649984f) + i;
-        }
-        volatile uint32_t timeTaken = msCurrentTimeSinceStart - nowT;
-        erg = k;
-        // Tasker1.delay(1000);
-    }
+    StallardOSAnalog a0(StallardOSADC1, 2);
+    uint16_t test = a0.getValue();
+    erg = test;
 }
 
 int main()

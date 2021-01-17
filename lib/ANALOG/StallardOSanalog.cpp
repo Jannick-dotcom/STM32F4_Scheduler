@@ -47,5 +47,6 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
  */
 uint32_t StallardOSAnalog::getValue()
 {
+    HAL_ADC_Start(&hadc1);
     return HAL_ADC_GetValue(&hadc1);
 }
