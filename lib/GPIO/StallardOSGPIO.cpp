@@ -13,7 +13,7 @@ extern "C" void StallardOSGeneralFaultHandler();
  */
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
 {
-    if(number > 31) //Error check
+    if (number > 31) //Error check
     {
         StallardOSGeneralFaultHandler();
     }
@@ -55,7 +55,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
  */
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull, uint32_t alternate)
 {
-    if(number > 31) //Error check
+    if (number > 31) //Error check
     {
         StallardOSGeneralFaultHandler();
     }
@@ -111,5 +111,66 @@ bool StallardOSGPIO::operator=(bool state)
 
 bool StallardOSGPIO::read()
 {
-    return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+    if (this->dir == Input)
+        return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+    else if (this->dir == Output)
+        return this->state;
+}
+
+bool StallardOSGPIO::write(bool state)
+{
+    if (this->dir == Output)
+    {
+        HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
+        this->state = state;
+        return this->state;
+    }
+    else if (this->dir == Input)
+    {
+        GPIO_InitTypeDef GPIO_InitStruct;
+        GPIO_InitStruct.Pin = 1 << this->pin;
+        GPIO_InitStruct.Mode = this->dir;
+        GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+        GPIO_InitStruct.Pull = pullMode(state);
+
+        HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
+        return state;
+    }
+}
+
+bool StallardOSGPIO::operator!()
+{
+    return !this->read();
+} //Inverting the state
+bool StallardOSGPIO::operator&&(StallardOSGPIO &ref)
+{
+    return this->read() && ref.read();
+} //Logical operator
+bool StallardOSGPIO::operator||(StallardOSGPIO &ref)
+{
+    return this->read() || ref.read();
+} //Logical operator
+bool StallardOSGPIO::operator!=(StallardOSGPIO &ref)
+{
+    return this->read() != ref.read();
+} //Comparison
+bool StallardOSGPIO::operator<(StallardOSGPIO &ref)
+{
+    return this->read() < ref.read();
+}
+bool StallardOSGPIO::operator>(StallardOSGPIO &ref)
+{
+    return this->read() > ref.read();
+}
+bool StallardOSGPIO::operator<=(StallardOSGPIO &ref)
+{
+    return this->read() <= ref.read();
+}
+bool StallardOSGPIO::operator>=(StallardOSGPIO &ref)
+{
+    return this->read() >= ref.read();
+}
+bool StallardOSGPIO::operator==(StallardOSGPIO &ref)
+{
+    return this->read() == ref.read();
 }

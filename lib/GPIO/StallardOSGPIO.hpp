@@ -29,10 +29,9 @@ typedef enum pinDir
 typedef enum pullMode
 {
     nopull = GPIO_NOPULL,
-    pullup = GPIO_PULLUP,
-    pulldown = GPIO_PULLDOWN
+    pulldown = GPIO_PULLDOWN,
+    pullup = GPIO_PULLUP
 } pullMode;
-
 
 class StallardOSGPIO
 {
@@ -56,16 +55,17 @@ public:
         /*PullResistor*/ pullMode pull,
         uint32_t alternate);
     bool read();
-    bool operator=(bool state);                                            //Operator for writing on the pin
-    bool operator!() { return !this->state; };                             //Inverting the state
-    bool operator&&(const StallardOSGPIO &ref) { return this->state && ref.state; }; //Logical operator
-    bool operator||(const StallardOSGPIO &ref) { return this->state || ref.state; }; //Logical operator
-    bool operator!=(const StallardOSGPIO &ref) { return this->state != ref.state; }; //Comparison
-    bool operator<(const StallardOSGPIO &ref) { return this->state < ref.state; };
-    bool operator>(const StallardOSGPIO &ref) { return this->state > ref.state; };
-    bool operator<=(const StallardOSGPIO &ref) { return this->state <= ref.state; };
-    bool operator>=(const StallardOSGPIO &ref) { return this->state >= ref.state; };
-    bool operator==(const StallardOSGPIO &ref) { return this->state == ref.state; };
+    bool write(bool state);
+    bool operator=(bool state);                                                //Operator for writing on the pin
+    bool operator!();                                 //Inverting the state
+    bool operator&&(StallardOSGPIO &ref); //Logical operator
+    bool operator||(StallardOSGPIO &ref); //Logical operator
+    bool operator!=(StallardOSGPIO &ref); //Comparison
+    bool operator<(StallardOSGPIO &ref);
+    bool operator>(StallardOSGPIO &ref);
+    bool operator<=(StallardOSGPIO &ref);
+    bool operator>=(StallardOSGPIO &ref);
+    bool operator==(StallardOSGPIO &ref);
 };
 
 #endif
