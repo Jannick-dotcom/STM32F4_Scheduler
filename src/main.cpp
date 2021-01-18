@@ -14,6 +14,8 @@ extern volatile uint64_t msCurrentTimeSinceStart;
 void taskNeu()
 {
     StallardOSAnalog a0(StallardOSADC1, 2);
+    StallardOSGPIO testIn(2, PORTG, Input, pullup);
+    volatile uint8_t test2 = testIn.read();
     uint16_t test = a0.getValue();
     erg = test;
 }

@@ -55,7 +55,7 @@ public:
         /*Direction*/ pinDir dir,
         /*PullResistor*/ pullMode pull,
         uint32_t alternate);
-    operator int() {return state;};
+    bool read();
     bool operator=(bool state);                                            //Operator for writing on the pin
     bool operator!() { return !this->state; };                             //Inverting the state
     bool operator&&(const StallardOSGPIO &ref) { return this->state && ref.state; }; //Logical operator

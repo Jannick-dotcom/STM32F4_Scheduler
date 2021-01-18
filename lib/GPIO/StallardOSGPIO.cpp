@@ -108,3 +108,8 @@ bool StallardOSGPIO::operator=(bool state)
         return state;
     }
 }
+
+bool StallardOSGPIO::read()
+{
+    return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+}
