@@ -61,3 +61,33 @@ void UsageFault_Handler()
 {
     StallardOSGeneralFaultHandler();
 }
+
+// FPU Exception handler
+void FPU_ExceptionHandler(uint32_t lr, uint32_t sp)
+{
+    register uint32_t fpscr_val;
+        if(lr == 0xFFFFFFE9)
+        {
+            sp = sp + 0x60;
+        }
+        else if(lr == 0xFFFFFFED)
+        {
+        sp = __get_PSP() + 0x60 ;
+        }
+        fpscr_val = *(uint32_t*)sp;
+        { check exception flags }
+        fpscr_val &= (uint32_t)~0x8F ; // Clear all exception flags
+        *(uint32_t*)sp = fpscr_val;
+        __DMB() ;
+}
+    // FPU IRQ Handler
+    void __asm FPU_IRQHandler(void)
+    {
+        IMPORT FPU_ExceptionHandler
+        MOV R0, LR                   // move LR to R0
+        MOV R1, SP                   // Save SP to R1 to avoid any modification to
+                                     // the stack pointer from FPU_ExceptionHandler
+        VMRS R2, FPSCR               // dummy read access, to force clear
+        B FPU_ExceptionHandler
+        BX LR
+    }
