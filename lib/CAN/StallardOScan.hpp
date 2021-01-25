@@ -20,10 +20,8 @@ typedef enum CANBauds
 
 typedef struct
 {
-    CANports interface;
     uint8_t ID = 0;
     uint8_t Val = 0;
-    uint8_t isread = 1;
 } StallardOSCanMessage;
 
 class StallardOSCAN
@@ -37,7 +35,9 @@ private:
     StallardOSGPIO *CANR;
 
     // void setMessage(StallardOSCanMessage msg);
-    static bool getMessage(StallardOSCanMessage *msg, uint8_t id, CANports interface);
+    //static bool getMessage(StallardOSCanMessage *msg, uint8_t id, CANports interface);
+    
+    void init(CANports port, CANBauds baud);
 
 public:
 

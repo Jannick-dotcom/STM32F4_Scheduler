@@ -352,6 +352,7 @@ void SysTick_Handler(void) //In C Language
     }
 #endif
     msCurrentTimeSinceStart += sysTickMillisPerInt;
+    HAL_IncTick();
     sysTickMillisPerInt = minDelayT;
     enable_interrupts(); //enable all interrupts
 }

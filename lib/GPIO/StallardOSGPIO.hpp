@@ -23,7 +23,10 @@ typedef enum ports
 typedef enum pinDir
 {
     Input = GPIO_MODE_INPUT,
-    Output = GPIO_MODE_OUTPUT_PP
+    Output = GPIO_MODE_OUTPUT_PP,
+    OutputOD = GPIO_MODE_OUTPUT_OD,
+    AFOD = GPIO_MODE_AF_OD,
+    AFPP = GPIO_MODE_AF_PP
 } pinDir;
 
 typedef enum pullMode

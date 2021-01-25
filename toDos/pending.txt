@@ -4,20 +4,22 @@
     -I²C ✓
     -(SPI)
     -Test the libs
+        -CAN works! tested in loopback mode!!!!!
+        -Next up is PWM!
     -ADC (maybe some error regarding the channel setting)
 
-Flash over Can
+Flash over Can  (Pause)
 	-(make the OS internal FlashOverCan Task check the messages)
 
--Delete the unnecessary Repos
+-Delete the unnecessary Repos ✓
 	-BasicSoftware
 	-TaskScheduler
 
 -Floating Point Unit Exception Handling -> übertragen an Simao
 
--Optimizing for Runtime
+-Optimizing for Runtime ✓
 
--PlatformIO test feature
+-PlatformIO test feature (NOT PRIO)
     Must be connected over Serial
     Maybe additional to HiL???
     
