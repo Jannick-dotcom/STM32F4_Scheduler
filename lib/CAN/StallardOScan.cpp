@@ -34,8 +34,8 @@ void StallardOSCAN::init(CANports port, CANBauds baud)
         canhandle.Init.Prescaler = 10; ////////////////////////////////!!!!!!
     }
 
-    //canhandle.Init.Mode = CAN_MODE_LOOPBACK; //For Debugging -> the CAN sends message to itself
-    canhandle.Init.Mode = CAN_MODE_NORMAL; //Real CAN Networking
+    canhandle.Init.Mode = CAN_MODE_LOOPBACK; //For Debugging -> the CAN sends message to itself
+    //canhandle.Init.Mode = CAN_MODE_NORMAL; //Real CAN Networking
     canhandle.Init.SyncJumpWidth = CAN_SJW_1TQ;
     canhandle.Init.TimeSeg1 = CAN_BS1_6TQ;
     canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;

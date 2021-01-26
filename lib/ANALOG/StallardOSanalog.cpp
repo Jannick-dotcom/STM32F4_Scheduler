@@ -10,7 +10,7 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
 {
     const ADC_TypeDef *StallardOSAnalog_to_ADC_Typedef[] = {ADC1, ADC2, ADC3};
     hadc1.Instance = (ADC_TypeDef *)StallardOSAnalog_to_ADC_Typedef[number];
-    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+    hadc1.Init.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4;
     hadc1.Init.Resolution = ADC_RESOLUTION_12B;
     hadc1.Init.ScanConvMode = DISABLE;
     hadc1.Init.ContinuousConvMode = DISABLE;
@@ -31,6 +31,7 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
     sConfig.Channel = channel;
     sConfig.Rank = 1;
     sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+    sConfig.Offset = 0;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
     {
         StallardOSGeneralFaultHandler();

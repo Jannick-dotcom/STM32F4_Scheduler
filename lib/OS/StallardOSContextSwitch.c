@@ -170,9 +170,7 @@ static inline void switchTask(void)
     {
         asm("MRS r0, PSP");         //Get Process Stack Pointer
         asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
-        asm("TST lr, #0x10");
-        asm("IT EQ");
-        asm("VSTMDBEQ r0!, {s16-s31}");
+        asm("VSTMDB r0!, {s16-s31}");
         asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 
@@ -265,10 +263,10 @@ void SVC_Handler(void)
 
     case 5: //Start the os
         SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
-        while (SysTick_Config(sysTickTicks));
+        SysTick_Config(sysTickTicks);
 
         NVIC_SetPriority(SysTick_IRQn, 0x00);
-        NVIC_SetPriority(PendSV_IRQn, 0x00);
+        NVIC_SetPriority(PendSV_IRQn, 0xFF);
         NVIC_EnableIRQ(PendSV_IRQn);
         NVIC_EnableIRQ(SysTick_IRQn);
         NVIC_EnableIRQ(SVCall_IRQn);
@@ -286,8 +284,11 @@ void SVC_Handler(void)
         break;
 
     case 6: //Enter Bootloader
-        *((uint32_t *)0x2001FFF0) = 0xDEADBEEF; // End of RAM
-        NVIC_SystemReset();
+
+        // *((uint32_t *)0x2001FFF0) = 0xDEADBEEF; // End of RAM
+        // __HAL_SYSCFG_REMAPMEMORY_FLASH();
+        // NVIC_SystemReset();
+        jumpToBootloader();
         break;
 
     default:
@@ -295,6 +296,29 @@ void SVC_Handler(void)
     }
 
     enable_interrupts(); //Enable all interrupts
+}
+
+void jumpToBootloader(void) 
+{
+    void (*SysMemBootJump)(void);
+    volatile uint32_t addr = 0x1FFF0000;
+#if defined(USE_HAL_DRIVER)
+    HAL_RCC_DeInit();
+#endif /* defined(USE_HAL_DRIVER) */
+#if defined(USE_STDPERIPH_DRIVER)
+    RCC_DeInit();
+#endif /* defined(USE_STDPERIPH_DRIVER) */
+    SysTick->CTRL = 0;
+    SysTick->LOAD = 0;
+    SysTick->VAL = 0;
+    //__disable_irq();
+    SYSCFG->MEMRMP = 0x01;
+    SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
+    __set_PRIMASK(1);      // Disable interrupts
+    __set_PRIMASK(0x20001000);      // Set the main stack pointer to its default value
+    __set_MSP(0x20001000);
+    SysMemBootJump();
+    while(1);
 }
 
 /**
@@ -312,7 +336,13 @@ void SysTick_Handler(void) //In C Language
     uint32_t minDelayT = -1;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     while (temp != taskMainStruct && temp != NULL)
-    {   
+    {
+        if(temp->used == 0) //If the TCB is unused, continue with the next one
+        {
+            temp = temp->next;
+            continue;
+        }
+
         if (temp->continueInMS < sysTickMillisPerInt)
         {
             temp->continueInMS = 0;
@@ -323,7 +353,7 @@ void SysTick_Handler(void) //In C Language
             temp->continueInMS -= sysTickMillisPerInt; //dekrementieren
         }
         
-        if (temp->used && temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if (temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
             nextTask = temp;          //set nextF to right now highest priority task
             prioMin = temp->priority; //save prio
@@ -334,7 +364,7 @@ void SysTick_Handler(void) //In C Language
         {
             minDelayT = temp->continueInMS;
         }
-#endif
+#endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
 
@@ -344,16 +374,16 @@ void SysTick_Handler(void) //In C Language
         minDelayT = 1;
     }
     SysTick_Config((uint32_t)(SystemCoreClock / (1000 * minDelayT))); //Set the frequency of the systick interrupt
-#endif
+    sysTickMillisPerInt = minDelayT;
+#endif //useSystickAltering
 
     if (currentTask->priority > 0)
     {
         pendPendSV(); //If switchEnable set, set the PendSV to pending
     }
-#endif
+#endif //contextSwitch
     msCurrentTimeSinceStart += sysTickMillisPerInt;
     HAL_IncTick();
-    sysTickMillisPerInt = minDelayT;
     enable_interrupts(); //enable all interrupts
 }
 

@@ -340,6 +340,11 @@ void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
   }
 }
 
+uint64_t getRuntime()
+{
+  return msCurrentTimeSinceStart;
+}
+
 /**
  * Basic scheduling algorithm
  *

@@ -37,7 +37,7 @@ void StallardOSSerial::send(const char *dat, uint16_t bytes)
     {
         return;
     }
-    HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0);
+    HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0xFFFF);
 }
 
 /**
@@ -52,5 +52,5 @@ void StallardOSSerial::read(char *dat, uint16_t bytes)
     {
         return;
     }
-    HAL_UART_Receive(&huart, (uint8_t*)dat, bytes, 0);
+    HAL_UART_Receive(&huart, (uint8_t*)dat, bytes, 0xFFFF);
 }

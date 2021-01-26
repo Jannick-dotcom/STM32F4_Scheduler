@@ -95,18 +95,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
  */
 bool StallardOSGPIO::operator=(bool state)
 {
-    if (this->dir == Output)
-    {
-        this->state = state;
-        HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
-        // HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
-        return state;
-    }
-    else
-    {
-        this->pull = pullMode(int(state));
-        return state;
-    }
+    return this->write(state);
 }
 
 bool StallardOSGPIO::read()
@@ -141,19 +130,23 @@ bool StallardOSGPIO::write(bool state)
 bool StallardOSGPIO::operator!()
 {
     return !this->read();
-} //Inverting the state
+} 
+
 bool StallardOSGPIO::operator&&(StallardOSGPIO &ref)
 {
     return this->read() && ref.read();
-} //Logical operator
+} 
+
 bool StallardOSGPIO::operator||(StallardOSGPIO &ref)
 {
     return this->read() || ref.read();
-} //Logical operator
+} 
+
 bool StallardOSGPIO::operator!=(StallardOSGPIO &ref)
 {
-    return this->read() != ref.read();
-} //Comparison
+    return this->write(!ref.read());
+} 
+
 bool StallardOSGPIO::operator<(StallardOSGPIO &ref)
 {
     return this->read() < ref.read();

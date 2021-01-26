@@ -32,7 +32,7 @@ public:
 
     ~StallardOSpwm();   //Destructor
 
-    uint32_t operator=(uint32_t duty);  //Set new Duty cycle
+    uint16_t operator=(uint16_t duty);  //Set new Duty cycle
 };
 
 #endif

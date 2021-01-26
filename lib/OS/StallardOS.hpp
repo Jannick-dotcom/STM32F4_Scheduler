@@ -48,7 +48,7 @@ public:
   void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
 
   taskState getFunctionState(/*Funktion*/ uint16_t id);
-
+  uint64_t getRuntime();
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
   void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
   void schedule();                   //Execute in the Loop (cooperative Multitasking)
