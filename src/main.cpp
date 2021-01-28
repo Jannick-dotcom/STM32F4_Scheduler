@@ -10,6 +10,7 @@ StallardOSGPIO led21(10, PORTI, Output);
 StallardOSGPIO led31(11, PORTI, Output);
 uint8_t count = 0;
 volatile double erg;
+extern "C" void FPU_IRQHandler();
 
 void tasktest()
 {
@@ -38,6 +39,7 @@ void task2()
     for (uint16_t i = 0; i < 1000; i++)
     {
         k = 1.5468 / 2.5648 + i;
+        FPU_IRQHandler(); //Manually call the interrupt handler
     }
     erg = k;
 }
