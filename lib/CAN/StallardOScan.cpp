@@ -1,6 +1,7 @@
 #include "StallardOScan.hpp"
 
-StallardOSCanMessage STallardOS_CAN_messages[CAN_FIFO_size];
+//StallardOSCanMessage STallardOS_CAN_messages[CAN_FIFO_size];
+extern "C" volatile uint64_t msCurrentTimeSinceStart;
 
 /**
  * create a CAN instance.
@@ -42,7 +43,7 @@ void StallardOSCAN::init(CANports port, CANBauds baud)
     canhandle.Init.TimeTriggeredMode = DISABLE;
     canhandle.Init.AutoBusOff = DISABLE;
     canhandle.Init.AutoWakeUp = DISABLE;
-    canhandle.Init.AutoRetransmission = ENABLE;
+    canhandle.Init.AutoRetransmission = DISABLE;
     canhandle.Init.ReceiveFifoLocked = DISABLE;
     canhandle.Init.TransmitFifoPriority = DISABLE;
 
@@ -54,14 +55,28 @@ void StallardOSCAN::init(CANports port, CANBauds baud)
     sFilterConfig.FilterBank = 0;
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdHigh = 0x0FFF;
     sFilterConfig.FilterIdLow = 0x0000;
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;
-
+    if (HAL_CAN_ConfigFilter(&canhandle, &sFilterConfig) != HAL_OK)
+    {
+        /* Filter configuration Error */
+        StallardOSGeneralFaultHandler();
+    }
+    sFilterConfig.FilterBank = 1;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0xFFFF;
+    sFilterConfig.FilterIdLow = 0xF000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO1;
+    sFilterConfig.FilterActivation = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
     if (HAL_CAN_ConfigFilter(&canhandle, &sFilterConfig) != HAL_OK)
     {
         /* Filter configuration Error */
@@ -83,6 +98,13 @@ void StallardOSCAN::init(CANports port, CANBauds baud)
     HAL_CAN_Start(&canhandle);
 }
 
+/**
+ * crete a CAN interface.
+ *
+ * @param[in] port which CAN port to use
+ * @param[in] baud Baud rate of the CAN. Has to be same on all devices
+ * @return true if a message is received, false otherwise
+ */
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
     init(port, baud);
@@ -97,18 +119,56 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
  */
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
-    // return StallardOSCAN::getMessage(msg, id, this->interface);
-    /* Get RX message */
-
-    if (HAL_CAN_GetRxFifoFillLevel(&canhandle, CAN_RX_FIFO0) > 0)
+    auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;
+    for (auto currentFifo = 0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
     {
-        HAL_CAN_GetRxMessage(&canhandle, CAN_RX_FIFO0, &RxHeader, &msg->Val);
-        return true;
+        auto messageCount = HAL_CAN_GetRxFifoFillLevel(&canhandle, currentFifo);
+        for (auto i = 0; i < messageCount; i++) //Loop through every new message
+        {
+            for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+            {
+                if (StallardOSCanFifo[k].used == 0) //If unused
+                {
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[k].Val) == HAL_OK)
+                    {
+                        StallardOSCanFifo[k].ID = RxHeader.StdId;
+                        StallardOSCanFifo[k].used = 1;
+                        StallardOSCanFifo[k].timestamp = msCurrentTimeSinceStart;
+                    }
+                    break;  //If unused found go with next message
+                }
+                else if(k == sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 2) //FIFO full?
+                {
+                    //TODO: Find a way around the stopping of fifo filling
+                    //When fifo full delete everything or the oldest message
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[oldestMessage].Val) == HAL_OK)
+                    {
+                        StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;
+                        StallardOSCanFifo[oldestMessage].used = 1;
+                        StallardOSCanFifo[oldestMessage].timestamp = msCurrentTimeSinceStart;
+                    }
+                    break;  //If unused found go with next message
+                }
+                else
+                {
+                    if(StallardOSCanFifo[oldestMessage].timestamp > StallardOSCanFifo[k].timestamp) //When oldest message newer than this one
+                    {
+                        oldestMessage = k;  //Set this to the new oldest message
+                    }
+                }
+            }
+        }
     }
-    else if (HAL_CAN_GetRxFifoFillLevel(&canhandle, CAN_RX_FIFO1) > 0)
+    if (msg == nullptr)
+        return false;
+    for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
     {
-        HAL_CAN_GetRxMessage(&canhandle, CAN_RX_FIFO1, &RxHeader, &msg->Val);
-        return true;
+        if (StallardOSCanFifo[k].used && StallardOSCanFifo[k].ID == id)
+        {
+            *msg = StallardOSCanFifo[k];
+            StallardOSCanFifo[k].used = 0;
+            return true;
+        }
     }
     return false;
 }
@@ -120,6 +180,12 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
  */
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
-    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, &(msg->Val), (uint32_t *)CAN_TX_MAILBOX0);
+    TxHeader.StdId = msg->ID;
+    TxHeader.RTR = CAN_RTR_DATA;
+    TxHeader.IDE = CAN_ID_STD;
+
+    //TODO: Find a better way for Mailbox Full check
+    while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3); //Wait until all TX Mailboxes are free
+    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, msg->Val, (uint32_t *)CAN_TX_MAILBOX0);
     return;
 }

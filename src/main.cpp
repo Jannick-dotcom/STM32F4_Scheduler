@@ -19,19 +19,19 @@ void tasktest()
 void taskTestCAN()
 {
     StallardOSCanMessage testmessage;
-    uint8_t test = 0;
+    uint16_t test = 0;
+#ifdef contextSwitch
     while (1)
     {
-        testmessage.ID = 123;
-        testmessage.Val = test;
+#endif
+        testmessage.ID = test;
+        //testmessage.Val = ;
         testCAN.sendMessage(&testmessage);
-        testmessage.Val = 0;
-        // while(testCAN.receiveMessage(&testmessage, 123) == false)
-        // {
-        Tasker1.delay(1000);
-        // }
+        Tasker1.delay(10);
         test++;
+#ifdef contextSwitch
     }
+#endif
 }
 
 extern "C" void StallardOS_goBootloader();
@@ -44,7 +44,7 @@ void flashOverCanHandle()
         {
             //StallardOS_goBootloader();
         }
-        Tasker1.delay(100);
+        Tasker1.delay(1);
     }
 }
 
