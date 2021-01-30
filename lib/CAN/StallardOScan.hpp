@@ -22,8 +22,8 @@ typedef struct
 {
     uint8_t used = 0;
     uint64_t timestamp = -1; //TODO
-    uint16_t ID = 0;
-    uint8_t Val[4];
+    uint16_t ID = 0; //Just 11 Bit !!!!
+    uint8_t Val; //Up to 8 Bytes
 } StallardOSCanMessage;
 
 class StallardOSCAN
