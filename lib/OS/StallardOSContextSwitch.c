@@ -332,10 +332,10 @@ void SysTick_Handler(void) //In C Language
     disable_interrupts();
 #ifdef contextSwitch
     nextTask = NULL;
-    struct function_struct *temp = taskMainStruct->next;
+    struct function_struct *temp = currentTask->next;
     uint32_t minDelayT = -1;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
-    while (temp != taskMainStruct && temp != NULL)
+    while (temp != currentTask && temp != NULL)
     {
         if(temp->used == 0) //If the TCB is unused, continue with the next one
         {
