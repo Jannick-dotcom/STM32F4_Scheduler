@@ -36,15 +36,6 @@ void taskTestCAN()
 #endif
 }
 
-void floatingpointexceptionTrigger()
-{
-    float test = 0;
-    for (uint8_t i = 0; i < 20; i++)
-    {
-        test = 1.0 / float(i);
-    }
-}
-
 extern "C" void StallardOS_goBootloader();
 void flashOverCanHandle()
 {
