@@ -270,6 +270,7 @@ void SVC_Handler(void)
         NVIC_EnableIRQ(PendSV_IRQn);
         NVIC_EnableIRQ(SysTick_IRQn);
         NVIC_EnableIRQ(SVCall_IRQn);
+        NVIC_EnableIRQ(FPU_IRQn);
         
         //Start the FPU (s.257 prog man)
         // asm("LDR.W r0, =0xE000ED88");

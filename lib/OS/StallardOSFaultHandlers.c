@@ -61,3 +61,49 @@ void UsageFault_Handler()
 {
     StallardOSGeneralFaultHandler();
 }
+
+// FPU IRQ Handler
+void FPU_IRQHandler(void)
+{
+    //asm("IMPORT FPU_ExceptionHandler");
+    asm("MOV R0, LR");                  // move LR to R0
+    asm("MOV R1, SP");                  // Save SP to R1 to avoid any modification to
+                                        // the stack pointer from FPU_ExceptionHandler
+    asm("MRS r4, MSP");
+    asm("MRS r5, PSP");
+
+    asm("VMRS R2, FPSCR");              // dummy read access, to force clear
+    // register uint32_t fpscr_val;
+    
+    //if(lr == 0xFFFFFFE9)
+    //{
+        asm("CMP LR, #0xFFFFFFE9");
+        asm("ITTT EQ"); //Next 3 instructions executed if LR = 0xFFFFFFE9
+        //sp = sp + 0x60;
+        asm("MOVEQ r2, r4");
+        asm("ADDEQ r2, #0x60");
+        asm("MSREQ PSP, r2");
+    //}
+    // else if(lr == 0xFFFFFFED)
+    // {
+        asm("CMP LR, #0xFFFFFFED");
+        asm("ITTT EQ"); //Next 3 instructions executed if LR = 0xFFFFFFED
+        //sp = __get_PSP() + 0x60 ;
+        asm("MRSEQ r2, PSP");
+        asm("ADDEQ r2, #0x60");
+        asm("MSREQ PSP, r2");
+    // }
+    //fpscr_val = *(uint32_t*)sp;
+    asm("LDR r3, [r2]");
+
+    //{ check exception flags }
+    //fpscr_val &= (uint32_t)~0x8F ; // Clear all exception flags
+    asm("BIC r3, #0x8F");
+
+    //*(uint32_t*)sp = fpscr_val;
+    asm("STR r3, [r2]");
+
+    asm("DMB");
+    StallardOSGeneralFaultHandler();
+    asm("BX LR");
+}
