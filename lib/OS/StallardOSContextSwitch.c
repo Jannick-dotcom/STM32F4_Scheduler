@@ -270,6 +270,7 @@ void SVC_Handler(void)
         NVIC_EnableIRQ(PendSV_IRQn);
         NVIC_EnableIRQ(SysTick_IRQn);
         NVIC_EnableIRQ(SVCall_IRQn);
+        NVIC_EnableIRQ(FPU_IRQn);
         
         pendPendSV();
         break;

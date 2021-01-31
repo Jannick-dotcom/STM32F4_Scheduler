@@ -123,16 +123,16 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr = searchFreeFunction();
   if (function_struct_ptr == nullptr)
   {
-    function_struct_ptr = new struct function_struct; //ein neues erstellen
-    if (function_struct_ptr == nullptr)               //Wenn kein HEAP Platz mehr frei ist...
-    {
+    //function_struct_ptr = new struct function_struct; //ein neues erstellen
+    //if (function_struct_ptr == nullptr)               //Wenn kein HEAP Platz mehr frei ist...
+    //{
       return nullptr; //Aus der Funktion rausspringen
-    }
+    //}
   }
 
   if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
   {
-    first_function_struct = function_struct_ptr; //Funktion als erste setzen
+    *first_function_struct = *function_struct_ptr; //Funktion als erste setzen
     function_struct_ptr->next = function_struct_ptr;
     function_struct_ptr->prev = function_struct_ptr;
   }
@@ -316,6 +316,7 @@ void StallardOS::startOS(void)
       ;
     NVIC_SetPriority(SysTick_IRQn, 0x00);
     NVIC_EnableIRQ(SysTick_IRQn);
+    NVIC_EnableIRQ(FPU_IRQn);
 #endif
   }
 }

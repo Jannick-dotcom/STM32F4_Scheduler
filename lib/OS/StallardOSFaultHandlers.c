@@ -104,6 +104,6 @@ void FPU_IRQHandler(void)
     asm("STR r3, [r2]");
 
     asm("DMB");
-
+    StallardOSGeneralFaultHandler();
     asm("BX LR");
 }

@@ -36,19 +36,24 @@ void tasktest()
 void task2()
 {
     volatile double k;
-    for (uint16_t i = 0; i < 1000; i++)
+    volatile float l;
+    while (1)
     {
-        k = 1.5468 / 2.5648 + i;
-        FPU_IRQHandler(); //Manually call the interrupt handler
+        for (uint16_t i = 0; i < 1000; i++)
+        {
+            k = 1.5468 / 2.5648 + i;
+            l = 1.0 / 0.0;
+        }
+        erg = k;
     }
-    erg = k;
 }
 
 int main()
 {
-    Tasker1.addFunction(tasktest, 1, 1, 30);
+    // Tasker1.addFunction(tasktest, 1, 1, 30);
     Tasker1.addFunction(task2, 2, 1, 12);
     Tasker1.startOS();
+    task2();
     while (1)
     {
         Tasker1.schedule();
