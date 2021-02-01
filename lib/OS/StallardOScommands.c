@@ -1,5 +1,6 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
+#include "StallardOSconfig.h"
 
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC 0x8 // Use external clock (ST Link MCO)
@@ -147,7 +148,7 @@ void StallardOS_SetSysClock(uint8_t clockspeed)
     // }
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM = 25;             // VCO input clock = 1 MHz (8 MHz / 8)
+    RCC_OscInitStruct.PLL.PLLM = externalOszillator;             // VCO input clock = 1 MHz (8 MHz / 8)
     RCC_OscInitStruct.PLL.PLLN = clockspeed * 2;           // VCO output clock = 360 MHz (1 MHz * 360)
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2; // PLLCLK = 180 MHz (360 MHz / 2)
     RCC_OscInitStruct.PLL.PLLQ = 7;             //
@@ -167,9 +168,9 @@ void StallardOS_SetSysClock(uint8_t clockspeed)
   /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */
   RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1; // 180 MHz
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;  //  45 MHz
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;  //  90 MHz
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1; // 168 MHz
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;  //  42 MHz
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;  //  84 MHz
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     while(1);
