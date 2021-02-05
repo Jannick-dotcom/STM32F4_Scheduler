@@ -12,11 +12,7 @@
  */
 StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, uint16_t freq, uint8_t bitcount)
 {
-    this->gpio = new StallardOSGPIO(number, port, Output, nopull, GPIO_AF1_TIM1);
-    if(this->gpio == nullptr)
-    {
-        StallardOSGeneralFaultHandler();
-    }
+    this->gpio = StallardOSGPIO(number, port, Output, nopull, GPIO_AF1_TIM1); //GPIO_AF2_TIM3 GPIO_AF3_TIM8
     this->freq = freq;
     this->bitcount = bitcount;
 
@@ -27,7 +23,7 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, 
     htim.Instance = instance;
     htim.Init.Prescaler = ((SystemCoreClock / 2) / freq) - 1;
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim.Init.Period = 0;
+    htim.Init.Period = pow(2,bitcount);
     htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim.Init.RepetitionCounter = 0;
     htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -59,7 +55,7 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, 
  */
 StallardOSpwm::~StallardOSpwm()
 {
-    delete this->gpio;
+    // delete this->gpio;
 }
 
 /**

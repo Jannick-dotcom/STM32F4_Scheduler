@@ -46,6 +46,7 @@ private:
     pullMode pull;
 
 public:
+    StallardOSGPIO();
     StallardOSGPIO(
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,

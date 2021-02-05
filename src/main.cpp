@@ -1,65 +1,80 @@
 #include "StallardOS.hpp"
-StallardOS Tasker1;
-StallardOSCAN testCAN(StallardOSCAN1, CAN1M);
-StallardOSGPIO led2(14, PORTF, Output);
+StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
+StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
+
+StallardOSGPIO led1(13, PORTF, Output);
+// StallardOSGPIO led2(14, PORTF, Output);
 // StallardOSGPIO led3(15, PORTF, Output);
 // StallardOSGPIO led11(9, PORTI, Output);
 // StallardOSGPIO led21(10, PORTI, Output);
 // StallardOSGPIO led31(11, PORTI, Output);
+// StallardOSpwm fadingLED(TIM1,13, PORTF, 1000, 8);
+
+StallardOS StallardOSJanniq;
 
 void tasktest()
 {
-    while(1)
+    StallardOSpwm fadingLED(TIM1,13, PORTF, 1000, 8);
+#ifdef contextSwitch
+    while (1)
     {
-        // led31 != led31;
-        Tasker1.delay(1000);
+#endif
+        led1 = !led1;
+#ifdef contextSwitch
+        StallardOSJanniq.delay(100);
     }
+#endif
 }
 
 void taskTestCAN()
 {
     StallardOSCanMessage testmessage;
+    uint8_t data[4];
     uint16_t test = 0;
 #ifdef contextSwitch
     while (1)
     {
 #endif
         testmessage.ID = test;
-        //testmessage.Val = ;
-        testCAN.sendMessage(&testmessage);
-        // led31 != led31;
-        // Tasker1.delay(1);
+        testmessage.Val = data;
+        AD_CAN.sendMessage(&testmessage, sizeof(data));
         test++;
-        if(test > 0x7FF) test = 0;
+        if (test > 0x7FF)
+            test = 0;
 #ifdef contextSwitch
+        StallardOSJanniq.delay(1);
     }
 #endif
 }
 
-extern "C" void StallardOS_goBootloader();
 void flashOverCanHandle()
 {
     StallardOSCanMessage FOCMessage;
+#ifdef contextSwitch
     while (1)
     {
-        if (testCAN.receiveMessage(&FOCMessage, 123))
+#endif
+        if (AD_CAN.receiveMessage(&FOCMessage, 123))
         {
-            //StallardOS_goBootloader();
-            led2 != led2;
+            StallardOSJanniq.goBootloader();
         }
-        // Tasker1.delay(1);
+#ifdef contextSwitch
+        StallardOSJanniq.delay(1);
     }
+#endif
 }
 
 int main()
 {
-    // Tasker1.addFunction(tasktest, 1, 1, 30);
-    Tasker1.addFunction(flashOverCanHandle, 2, 1);
-    Tasker1.addFunction(taskTestCAN, 3, 4);
-    Tasker1.startOS();
+    StallardOSJanniq.addFunction(tasktest, 1, 1);
+    // Tasker1.addFunction(flashOverCanHandle, 2, 1);
+    // Tasker1.addFunction(taskTestCAN, 3, 4);
+    StallardOSJanniq.startOS();
     while (1)
     {
-        Tasker1.schedule();
+        #ifndef contextSwitch
+        StallardOSJanniq.schedule();
+        #endif
     }
     //Should never get here
 }

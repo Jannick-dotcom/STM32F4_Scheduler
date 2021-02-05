@@ -9,15 +9,6 @@
     -ADC (maybe some error regarding the channel setting)
 
 Flash over Can  (Pause)
-	-(make the OS internal FlashOverCan Task check the messages)
-
--Delete the unnecessary Repos ✓
-	-BasicSoftware
-	-TaskScheduler
-
--Floating Point Unit Exception Handling -> übertragen an Simao
-
--Optimizing for Runtime ✓
 
 -PlatformIO test feature (NOT PRIO)
     Must be connected over Serial

@@ -21,9 +21,9 @@ typedef enum CANBauds
 typedef struct
 {
     uint8_t used = 0;
-    uint64_t timestamp = -1; //TODO
+    uint64_t timestamp = -1; //Set Timestamp to maximum
     uint16_t ID = 0; //Just 11 Bit !!!!
-    uint8_t Val; //Up to 8 Bytes
+    uint8_t *Val; //Up to 8 Bytes
 } StallardOSCanMessage;
 
 class StallardOSCAN
@@ -33,21 +33,23 @@ private:
     CANports interface;
     CAN_TxHeaderTypeDef TxHeader;
     CAN_RxHeaderTypeDef RxHeader;
-    StallardOSGPIO *CANT;
-    StallardOSGPIO *CANR;
+    StallardOSGPIO CANT;
+    StallardOSGPIO CANR;
     
     StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
     
-    void init(CANports port, CANBauds baud);
+    // void init(CANports port, CANBauds baud);
 
 public:
 
     StallardOSCAN(
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);
+    ~StallardOSCAN();
 
+    void receiveMessage_FIFO();
     bool receiveMessage(StallardOSCanMessage *msg, uint8_t id);
-    void sendMessage(StallardOSCanMessage *msg);
+    void sendMessage(StallardOSCanMessage *msg, uint8_t size);
 };
 
 #endif

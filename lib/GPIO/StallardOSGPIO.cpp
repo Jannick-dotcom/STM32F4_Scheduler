@@ -3,6 +3,12 @@
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
 extern "C" void StallardOSGeneralFaultHandler();
 
+
+StallardOSGPIO::StallardOSGPIO()
+{
+    
+}
+
 /**
  * Create a gpio pin.
  *

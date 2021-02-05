@@ -19,7 +19,7 @@ private:
     uint32_t freq;
     uint8_t bitcount;
 
-    StallardOSGPIO *gpio;
+    StallardOSGPIO gpio;
     TIM_HandleTypeDef htim;
 
 public:

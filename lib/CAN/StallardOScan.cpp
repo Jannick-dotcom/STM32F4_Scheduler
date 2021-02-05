@@ -4,25 +4,26 @@
 extern "C" volatile uint64_t msCurrentTimeSinceStart;
 
 /**
- * create a CAN instance.
+ * crete a CAN interface.
  *
- * @param port which can port to use
- * @param baud which can baudrate to use
+ * @param[in] port which CAN port to use
+ * @param[in] baud Baud rate of the CAN. Has to be same on all devices
+ * @return true if a message is received, false otherwise
  */
-void StallardOSCAN::init(CANports port, CANBauds baud)
+StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
     CAN_FilterTypeDef sFilterConfig;
     if (port == StallardOSCAN1)
     {
-        CANR = new StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFOD, pullup, GPIO_AF9_CAN1);
-        CANT = new StallardOSGPIO(CAN1_t_pin, CAN1_t_port, AFOD, pullup, GPIO_AF9_CAN1);
+        CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFOD, pullup, GPIO_AF9_CAN1);
+        CANT = StallardOSGPIO(CAN1_t_pin, CAN1_t_port, AFOD, pullup, GPIO_AF9_CAN1);
         canhandle.Instance = CAN1;
         __CAN1_CLK_ENABLE();
     }
     else if (port == StallardOSCAN2)
     {
-        CANR = new StallardOSGPIO(CAN2_r_pin, CAN2_r_port, Output, pullup, GPIO_AF9_CAN2);
-        CANT = new StallardOSGPIO(CAN2_t_pin, CAN2_t_port, Output), pullup, GPIO_AF9_CAN2;
+        CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFOD, pullup, GPIO_AF9_CAN2);
+        CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFOD, pullup, GPIO_AF9_CAN2);
         canhandle.Instance = CAN2;
         __CAN2_CLK_ENABLE();
     }
@@ -94,30 +95,15 @@ void StallardOSCAN::init(CANports port, CANBauds baud)
     TxHeader.IDE = CAN_ID_STD;
     TxHeader.DLC = sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
     TxHeader.TransmitGlobalTime = DISABLE;
-
-    HAL_CAN_Start(&canhandle);
 }
 
-/**
- * crete a CAN interface.
- *
- * @param[in] port which CAN port to use
- * @param[in] baud Baud rate of the CAN. Has to be same on all devices
- * @return true if a message is received, false otherwise
- */
-StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
+StallardOSCAN::~StallardOSCAN()
 {
-    init(port, baud);
+    // delete this->CANR;
+    // delete this->CANT;
 }
 
-/**
- * receive a can message.
- *0
- * @param[out] msg the message container to be filled
- * @param[in] id the id of the message to receive
- * @return true if a message is received, false otherwise
- */
-bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
+void StallardOSCAN::receiveMessage_FIFO()
 {
     auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
@@ -129,7 +115,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
             {
                 if (StallardOSCanFifo[k].used == 0) //If unused
                 {
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, &StallardOSCanFifo[k].Val) == HAL_OK)
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[k].Val) == HAL_OK)
                     {
                         if(!(RxHeader.StdId & 0x400) && currentFifo == 1)
                         {
@@ -145,7 +131,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
                 {
                     //TODO: Find a way around the stopping of fifo filling
                     //When fifo full delete everything or the oldest message
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, &StallardOSCanFifo[oldestMessage].Val) == HAL_OK)
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[oldestMessage].Val) == HAL_OK)
                     {
                         StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;
                         StallardOSCanFifo[oldestMessage].used = 1;
@@ -163,6 +149,18 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
             }
         }
     }
+}
+
+
+/**
+ * receive a can message.
+ *0
+ * @param[out] msg the message container to be filled
+ * @param[in] id the id of the message to receive
+ * @return true if a message is received, false otherwise
+ */
+bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
+{
     if (msg == nullptr)
         return false;
     for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
@@ -171,6 +169,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
         {
             *msg = StallardOSCanFifo[k];
             StallardOSCanFifo[k].used = 0;
+            StallardOSCanFifo[k].timestamp = -1;
             return true;
         }
     }
@@ -182,14 +181,16 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
  *
  * @param msg message to send
  */
-void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
+void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
+    if(size > 4) return;
     TxHeader.StdId = msg->ID;
     TxHeader.RTR = CAN_RTR_DATA;
     TxHeader.IDE = CAN_ID_STD;
+    TxHeader.DLC = size;
 
     //TODO: Find a better way for Mailbox Full check
     while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3); //Wait until all TX Mailboxes are free
-    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, &msg->Val, (uint32_t *)CAN_TX_MAILBOX0);
+    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, msg->Val, (uint32_t *)CAN_TX_MAILBOX0);
     return;
 }
