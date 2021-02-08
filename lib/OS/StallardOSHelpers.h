@@ -37,6 +37,7 @@ struct function_struct
 #endif
 #ifdef contextSwitch
   //nur für KontextSwitch
+  volatile uint32_t stackUsage;
   volatile taskState State;        //Status des Tasks
   volatile uint32_t *Stack;         //Stack pointer
 #endif

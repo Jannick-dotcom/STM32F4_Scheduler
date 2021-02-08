@@ -180,6 +180,10 @@ __attribute__((always_inline)) void switchTask(void)
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 
         currentTask->State = PAUSED; //Save function state
+        if(&currentTask->vals[sizeStack] - currentTask->Stack > currentTask->stackUsage) 
+        {
+            currentTask->stackUsage = &currentTask->vals[sizeStack] - currentTask->Stack;
+        }
         currentTask = nextTask;
     }
 
