@@ -2,12 +2,11 @@
 #define SEM_H_
 
 #include <stdint.h>
-#include "StallardOS.hpp"
 #include "StallardOSHelpers.h"
 
 class StallardOSSemaphore
 {
-    uint16_t val = 0;
+    uint16_t val = 1;
 public:
     void take();
     void give();

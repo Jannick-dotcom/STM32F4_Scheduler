@@ -4,6 +4,7 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include <stdint.h>
+#include "sem.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -20,6 +21,7 @@ private:
     ADC_HandleTypeDef hadc1;
     StallardOSADC number;
     uint8_t channel;
+    StallardOSSemaphore sem;
 
 public:
     StallardOSAnalog(/*ADCNumber*/ StallardOSADC number, uint8_t channel);

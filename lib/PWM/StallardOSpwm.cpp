@@ -12,6 +12,7 @@
  */
 StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, uint16_t freq, uint8_t bitcount)
 {
+    this->sem.take();
     this->gpio = StallardOSGPIO(number, port, Output, nopull, GPIO_AF1_TIM1); //GPIO_AF2_TIM3 GPIO_AF3_TIM8
     this->freq = freq;
     this->bitcount = bitcount;
@@ -29,6 +30,7 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, 
     htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_PWM_Init(&htim) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
 
@@ -41,12 +43,15 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef* instance, uint8_t number, ports port, 
     sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
     if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
     if(HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
+    this->sem.give();
 }
 
 /**
@@ -66,6 +71,7 @@ StallardOSpwm::~StallardOSpwm()
  */
 uint16_t StallardOSpwm::operator=(uint16_t duty)
 {
+    this->sem.take();
     this->duty = duty;
     HAL_TIM_PWM_Stop(&htim, TIM_CHANNEL_1);
     TIM_OC_InitTypeDef sConfigOC;
@@ -78,15 +84,19 @@ uint16_t StallardOSpwm::operator=(uint16_t duty)
     sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
     if (HAL_TIM_PWM_Init(&htim) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
     if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
     if(HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
+    this->sem.give();
     return duty;
 }

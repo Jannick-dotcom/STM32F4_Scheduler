@@ -6,7 +6,7 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include <stdint.h>
-
+#include "sem.hpp"
 extern void StallardOSGeneralFaultHandler();
 
 class StallardOSi2c
@@ -14,6 +14,7 @@ class StallardOSi2c
 private:
     /* data */
     I2C_HandleTypeDef hi2c;
+    StallardOSSemaphore sem;
 
 public:
     StallardOSi2c(I2C_TypeDef *instance, uint32_t freq);

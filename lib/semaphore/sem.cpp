@@ -14,5 +14,5 @@ void StallardOSSemaphore::take()
     while(this->val < 1);
     this->val--;
     currentTask->waitingForSemaphore = 0;
-    currentTask->semVal = NULL;
+    currentTask->semVal = nullptr;
 }

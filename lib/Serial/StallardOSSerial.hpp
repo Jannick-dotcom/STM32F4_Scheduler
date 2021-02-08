@@ -5,6 +5,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 #include "StallardOSconfig.h"
+#include "sem.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -12,6 +13,7 @@ class StallardOSSerial
 {
 private:
     UART_HandleTypeDef huart;
+    StallardOSSemaphore sem;
 public:
     StallardOSSerial(USART_TypeDef *serPort, uint32_t baud);
     void send(const char *dat, uint16_t bytes);

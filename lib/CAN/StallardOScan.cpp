@@ -12,6 +12,7 @@ extern "C" volatile uint64_t msCurrentTimeSinceStart;
  */
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
+    this->sem.take();
     CAN_FilterTypeDef sFilterConfig;
     if (port == StallardOSCAN1)
     {
@@ -95,6 +96,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     TxHeader.IDE = CAN_ID_STD;
     TxHeader.DLC = sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
     TxHeader.TransmitGlobalTime = DISABLE;
+    this->sem.give();
 }
 
 StallardOSCAN::~StallardOSCAN()
@@ -105,6 +107,7 @@ StallardOSCAN::~StallardOSCAN()
 
 void StallardOSCAN::receiveMessage_FIFO()
 {
+    this->sem.take();
     auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
     {
@@ -149,6 +152,7 @@ void StallardOSCAN::receiveMessage_FIFO()
             }
         }
     }
+    this->sem.give();
 }
 
 
@@ -161,8 +165,12 @@ void StallardOSCAN::receiveMessage_FIFO()
  */
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
+    this->sem.take();
     if (msg == nullptr)
+    {
+        this->sem.give();
         return false;
+    }
     for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
     {
         if (StallardOSCanFifo[k].used && StallardOSCanFifo[k].ID == id)
@@ -170,9 +178,11 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
             *msg = StallardOSCanFifo[k];
             StallardOSCanFifo[k].used = 0;
             StallardOSCanFifo[k].timestamp = -1;
+            this->sem.give();
             return true;
         }
     }
+    this->sem.give();
     return false;
 }
 
@@ -183,7 +193,12 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
  */
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
-    if(size > 4) return;
+    this->sem.take();
+    if(size > 4) 
+    {
+        this->sem.give();
+        return;
+    }
     TxHeader.StdId = msg->ID;
     TxHeader.RTR = CAN_RTR_DATA;
     TxHeader.IDE = CAN_ID_STD;
@@ -192,5 +207,6 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     //TODO: Find a better way for Mailbox Full check
     while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3); //Wait until all TX Mailboxes are free
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, msg->Val, (uint32_t *)CAN_TX_MAILBOX0);
+    this->sem.give();
     return;
 }

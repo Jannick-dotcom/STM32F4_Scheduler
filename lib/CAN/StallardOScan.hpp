@@ -3,6 +3,7 @@
 
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
+#include "sem.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -35,7 +36,7 @@ private:
     CAN_RxHeaderTypeDef RxHeader;
     StallardOSGPIO CANT;
     StallardOSGPIO CANR;
-    
+    StallardOSSemaphore sem;
     StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
     
     // void init(CANports port, CANBauds baud);

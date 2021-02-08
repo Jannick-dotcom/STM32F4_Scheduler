@@ -8,6 +8,7 @@
  */
 StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
 {
+    this->sem.take();
     const ADC_TypeDef *StallardOSAnalog_to_ADC_Typedef[] = {ADC1, ADC2, ADC3};
     hadc1.Instance = (ADC_TypeDef *)StallardOSAnalog_to_ADC_Typedef[number];
     hadc1.Init.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4;
@@ -39,6 +40,7 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
 
     this->number = number;
     this->channel = channel;
+    this->sem.give();
 }
 
 /**
@@ -48,6 +50,8 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
  */
 uint32_t StallardOSAnalog::getValue()
 {
+    this->sem.take();
     HAL_ADC_Start(&hadc1);
     return HAL_ADC_GetValue(&hadc1);
+    this->sem.give();
 }

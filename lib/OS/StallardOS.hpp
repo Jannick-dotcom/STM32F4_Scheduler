@@ -6,7 +6,7 @@
 #include <system_stm32f4xx.h>
 
 #include "StallardOSHelpers.h"
-
+#include "sem.hpp"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSpwm.hpp"
 #include "StallardOSanalog.hpp"

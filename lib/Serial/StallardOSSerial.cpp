@@ -7,6 +7,7 @@
  */
 StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 {
+    this->sem.take();
     if(baud == 0)
     {
         return;
@@ -21,8 +22,10 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
     huart.Init.OverSampling = UART_OVERSAMPLING_16;
     if (HAL_UART_Init(&huart) != HAL_OK)
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
+    this->sem.give();
 }
 
 /**
@@ -33,11 +36,14 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
  */
 void StallardOSSerial::send(const char *dat, uint16_t bytes)
 {
+    this->sem.take();
     if(dat == nullptr)
     {
+        this->sem.give();
         return;
     }
     HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0xFFFF);
+    this->sem.give();
 }
 
 /**
@@ -48,9 +54,12 @@ void StallardOSSerial::send(const char *dat, uint16_t bytes)
  */
 void StallardOSSerial::read(char *dat, uint16_t bytes)
 {
+    this->sem.take();
     if(dat == nullptr)
     {
+        this->sem.give();
         return;
     }
     HAL_UART_Receive(&huart, (uint8_t*)dat, bytes, 0xFFFF);
+    this->sem.give();
 }

@@ -4,6 +4,7 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include <stdint.h>
+#include "sem.hpp"
 
 extern const GPIO_TypeDef *portsToGPIOBase[];
 
@@ -44,6 +45,7 @@ private:
     ports port;
     pinDir dir;
     pullMode pull;
+    StallardOSSemaphore sem;
 
 public:
     StallardOSGPIO();

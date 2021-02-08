@@ -3,6 +3,7 @@
 
 #include "StallardOSGPIO.hpp"
 #include "StallardOSconfig.h"
+#include "sem.hpp"
 
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
@@ -21,6 +22,7 @@ private:
 
     StallardOSGPIO gpio;
     TIM_HandleTypeDef htim;
+    StallardOSSemaphore sem;
 
 public:
     StallardOSpwm(

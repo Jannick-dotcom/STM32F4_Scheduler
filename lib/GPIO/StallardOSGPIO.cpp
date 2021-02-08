@@ -19,8 +19,10 @@ StallardOSGPIO::StallardOSGPIO()
  */
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
 {
+    this->sem.take();
     if (number > 31) //Error check
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
 
@@ -48,6 +50,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     GPIO_InitStruct.Pull = this->pull;
 
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
+    this->sem.give();
 }
 
 /**
@@ -61,8 +64,10 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
  */
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull, uint32_t alternate)
 {
+    this->sem.take();
     if (number > 31) //Error check
     {
+        this->sem.give();
         StallardOSGeneralFaultHandler();
     }
 
@@ -91,6 +96,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     GPIO_InitStruct.Alternate = alternate;
 
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
+    this->sem.give();
 }
 
 /**
@@ -106,18 +112,29 @@ bool StallardOSGPIO::operator=(bool state)
 
 bool StallardOSGPIO::read()
 {
+    this->sem.take();
     if (this->dir == Input)
+    {
+        this->sem.give();
         return HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+    }
     else if (this->dir == Output)
+    {
+        this->sem.give();
         return this->state;
+    }
+    this->sem.give();
+    return 0;
 }
 
 bool StallardOSGPIO::write(bool state)
 {
+    this->sem.take();
     if (this->dir == Output)
     {
         HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
         this->state = state;
+        this->sem.give();
         return this->state;
     }
     else if (this->dir == Input)
@@ -129,6 +146,7 @@ bool StallardOSGPIO::write(bool state)
         GPIO_InitStruct.Pull = pullMode(state);
 
         HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
+        this->sem.give();
         return state;
     }
 }
