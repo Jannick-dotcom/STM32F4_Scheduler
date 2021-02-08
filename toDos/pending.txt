@@ -1,12 +1,11 @@
--Jannix HW libs (✓-Ready)
+-Jannix HW libs (✓-Working)
+    -CAN
+    -GPIO
     -PWM ✓
     -RS232 ✓
     -I²C ✓
     -(SPI)
-    -Test the libs
-        -CAN works! tested in loopback mode!!!!!
-        -Next up is PWM!
-    -ADC (maybe some error regarding the channel setting)
+    -ADC
 
 Flash over Can  (Pause)
 

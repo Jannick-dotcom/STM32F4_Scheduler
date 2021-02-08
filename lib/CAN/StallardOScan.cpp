@@ -166,6 +166,7 @@ void StallardOSCAN::receiveMessage_FIFO()
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
     this->sem.take();
+    receiveMessage_FIFO();
     if (msg == nullptr)
     {
         this->sem.give();

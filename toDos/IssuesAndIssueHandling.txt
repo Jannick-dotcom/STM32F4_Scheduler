@@ -5,4 +5,6 @@ Code does not even reach the main
 
 StallardOSGeneralFaultHandler is executed every time
     Some Nasty shit is going on
-    
+        division by zero?
+        floating point value out of range?
+        ...
