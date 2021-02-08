@@ -345,6 +345,11 @@ void SysTick_Handler(void) //In C Language
         
         if (temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
+            if(temp->waitingForSemaphore && &temp->semVal != NULL && temp->semVal == 0) //If this task is still waiting for the semaphore
+            {
+                temp = temp->next;
+                continue;
+            }
             nextTask = temp;          //set nextF to right now highest priority task
             prioMin = temp->priority; //save prio
         }

@@ -40,6 +40,8 @@ struct function_struct
   volatile uint32_t stackUsage;
   volatile taskState State;        //Status des Tasks
   volatile uint32_t *Stack;         //Stack pointer
+  volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore
+  volatile uint16_t *semVal;
 #endif
   volatile uint32_t continueInMS;   //Delay amount
 };
