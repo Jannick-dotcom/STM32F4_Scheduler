@@ -91,42 +91,45 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     }
 
     TxHeader.StdId = 0x321; //Ids
-    TxHeader.ExtId = 0x01;
-    TxHeader.RTR = CAN_RTR_DATA;
-    TxHeader.IDE = CAN_ID_STD;
+    TxHeader.ExtId = 0x01;  //Not used
+    TxHeader.RTR = CAN_RTR_DATA;//Data Transmission
+    TxHeader.IDE = CAN_ID_STD;//Standard Identifier -> 11 bit
     TxHeader.DLC = sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
-    TxHeader.TransmitGlobalTime = DISABLE;
-    this->sem.give();
+    TxHeader.TransmitGlobalTime = DISABLE;  //No Idea what this means
+    this->sem.give();   //release Semaphore
 }
 
-StallardOSCAN::~StallardOSCAN()
+StallardOSCAN::~StallardOSCAN() //Destructor
 {
+    HAL_CAN_Stop(&canhandle);
+    HAL_CAN_DeInit(&canhandle); //Stop CAN interface
     // delete this->CANR;
     // delete this->CANT;
 }
 
 void StallardOSCAN::receiveMessage_FIFO()
 {
-    this->sem.take();
-    auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;
+    this->sem.take();   //Block Semaphore
+    auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;  //initialize the oldest Message variable
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
     {
-        auto messageCount = HAL_CAN_GetRxFifoFillLevel(&canhandle, currentFifo);
-        for (auto i = 0; i < messageCount; i++) //Loop through every new message
+        auto messageCount = HAL_CAN_GetRxFifoFillLevel(&canhandle, currentFifo);    //Read amount of messages in HW FiFo [0,1]
+        for (auto i = 0; i < messageCount; i++)                             //Loop through every new message in hardware FiFo
         {
             for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
             {
                 if (StallardOSCanFifo[k].used == 0) //If unused
                 {
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[k].Val) == HAL_OK)
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[k].Val) == HAL_OK) //Get Message
                     {
-                        if(!(RxHeader.StdId & 0x400) && currentFifo == 1)
-                        {
-                            volatile int k = 0;
-                        }
-                        StallardOSCanFifo[k].ID = RxHeader.StdId;
-                        StallardOSCanFifo[k].used = 1;
-                        StallardOSCanFifo[k].timestamp = msCurrentTimeSinceStart;
+                        //What do i do here??????
+                        // if(!(RxHeader.StdId & 0x400) && currentFifo == 1)
+                        // {
+                        //     volatile int k = 0;
+                        // }
+                        StallardOSCanFifo[k].ID = RxHeader.StdId;//Copy to SW FiFo
+                        StallardOSCanFifo[k].used = 1;              //Indicate Message is occupied
+                        StallardOSCanFifo[k].timestamp = msCurrentTimeSinceStart;   //Save timestamp
                     }
                     break;  //If unused found go with next message
                 }
@@ -134,15 +137,15 @@ void StallardOSCAN::receiveMessage_FIFO()
                 {
                     //TODO: Find a way around the stopping of fifo filling
                     //When fifo full delete everything or the oldest message
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[oldestMessage].Val) == HAL_OK)
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[oldestMessage].Val) == HAL_OK) //Get Message
                     {
-                        StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;
-                        StallardOSCanFifo[oldestMessage].used = 1;
-                        StallardOSCanFifo[oldestMessage].timestamp = msCurrentTimeSinceStart;
+                        StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;   //Delete oldest message and overwrite with new
+                        StallardOSCanFifo[oldestMessage].used = 1;              //Indicate still used
+                        StallardOSCanFifo[oldestMessage].timestamp = msCurrentTimeSinceStart;//save new Timestamp
                     }
                     break;  //If unused found go with next message
                 }
-                else
+                else    //If used and fifo not full
                 {
                     if(StallardOSCanFifo[oldestMessage].timestamp > StallardOSCanFifo[k].timestamp) //When oldest message newer than this one
                     {
@@ -152,7 +155,7 @@ void StallardOSCAN::receiveMessage_FIFO()
             }
         }
     }
-    this->sem.give();
+    this->sem.give(); //release Semaphore
 }
 
 
@@ -166,48 +169,48 @@ void StallardOSCAN::receiveMessage_FIFO()
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
     this->sem.take();
-    receiveMessage_FIFO();
-    if (msg == nullptr)
+    receiveMessage_FIFO(); //Receive the Messages from Hardware FiFo ->6 Messages total
+    if (msg == nullptr) //if provided message for storing is valid
     {
-        this->sem.give();
-        return false;
+        this->sem.give();   //Set the Semaphore free
+        return false;   //return false status
     }
     for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
     {
-        if (StallardOSCanFifo[k].used && StallardOSCanFifo[k].ID == id)
+        if (StallardOSCanFifo[k].used && StallardOSCanFifo[k].ID == id) //If ID of message in FiFo is same as we are looking for
         {
-            *msg = StallardOSCanFifo[k];
-            StallardOSCanFifo[k].used = 0;
-            StallardOSCanFifo[k].timestamp = -1;
-            this->sem.give();
-            return true;
+            *msg = StallardOSCanFifo[k];    //copy the message
+            StallardOSCanFifo[k].used = 0;  //set the FiFo message to unused
+            StallardOSCanFifo[k].timestamp = -1;    //reset timestamp
+            this->sem.give();   //release Semaphore
+            return true;    //indicate success
         }
     }
-    this->sem.give();
-    return false;
+    this->sem.give();   //release semaphore
+    return false;       //return false status
 }
 
 /**
  * send a can message.
  *
  * @param msg message to send
+ * @param size amount of Data Bytes. Maximum is 4
  */
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
-    this->sem.take();
-    if(size > 4) 
+    this->sem.take();   //Block the semaphore
+    if(msg != nullptr && size > 4)        //Check if the size and the message are valid
     {
-        this->sem.give();
+        this->sem.give();   //release semaphore
         return;
     }
-    TxHeader.StdId = msg->ID;
-    TxHeader.RTR = CAN_RTR_DATA;
-    TxHeader.IDE = CAN_ID_STD;
-    TxHeader.DLC = size;
+    TxHeader.StdId = msg->ID;   //copy the id
+    TxHeader.RTR = CAN_RTR_DATA;//indicate Data Transmission
+    TxHeader.IDE = CAN_ID_STD;  //Set Standard Identifier -> 11 bit
+    TxHeader.DLC = size;        //Set Amount of Data bytes
 
-    //TODO: Find a better way for Mailbox Full check
     while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3); //Wait until all TX Mailboxes are free
-    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, msg->Val, (uint32_t *)CAN_TX_MAILBOX0);
-    this->sem.give();
+    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
+    this->sem.give();   //release Semaphore
     return;
 }

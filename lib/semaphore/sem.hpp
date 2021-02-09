@@ -6,7 +6,7 @@
 
 class StallardOSSemaphore
 {
-    uint16_t val = 1;
+    volatile uint16_t val = 1;
 public:
     void take();
     void give();

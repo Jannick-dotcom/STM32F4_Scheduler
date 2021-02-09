@@ -1,11 +1,11 @@
 -Jannix HW libs (✓-Working)
-    -CAN
-    -GPIO
+    -CAN ✓
+    -GPIO ✓
     -PWM ✓
-    -RS232 ✓
-    -I²C ✓
+    -RS232 
+    -I²C 
     -(SPI)
-    -ADC
+    -ADC 
 
 Flash over Can  (Pause)
 
