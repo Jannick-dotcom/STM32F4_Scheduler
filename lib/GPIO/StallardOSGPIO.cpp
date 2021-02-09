@@ -99,6 +99,11 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     this->sem.give();
 }
 
+StallardOSGPIO::~StallardOSGPIO()
+{
+    HAL_GPIO_DeInit((GPIO_TypeDef *)portsToGPIOBase[this->port], this->pin);
+}
+
 /**
  * Change the pin state.
  *
