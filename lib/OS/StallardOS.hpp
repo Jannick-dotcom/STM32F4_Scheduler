@@ -15,6 +15,9 @@
 #include "StallardOSi2c.hpp"
 #include "StallardOSPID.hpp"
 
+static StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
+static StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
+
 class StallardOS
 {
 private:

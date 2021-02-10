@@ -1,6 +1,6 @@
 #include "StallardOS.hpp"
-StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
-StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
+// StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
+// StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
 
 StallardOSGPIO led1(13, PORTF, Output);
 // StallardOSGPIO led2(14, PORTF, Output);

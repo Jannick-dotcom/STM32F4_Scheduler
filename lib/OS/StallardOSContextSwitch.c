@@ -234,18 +234,18 @@ void SVC_Handler(void)
     {
     case 0: //No Task
         currentTask = NULL;
-        nextTask = NULL;
+        findNextFunction(NULL);
         pendPendSV();
         break;
 
     case 1: //Task has Ended
         currentTask = NULL;
-        nextTask = NULL;
+        findNextFunction(NULL);
         switchTask();
         break;
 
     case 2: //Delay
-        nextTask = NULL;
+        findNextFunction(NULL);
         switchTask();
         break;
 
@@ -311,19 +311,11 @@ void jumpToBootloader(void)
     while(1);
 }
 
-/**
- * Systick Handler for an Exception every x ms. Minimum is 11 Hz
- *
- * @param
- * @return
- */
-void SysTick_Handler(void) //In C Language
-{
-    disable_interrupts();
 #ifdef contextSwitch
+void findNextFunction(uint32_t *minDelayT)
+{
     nextTask = NULL;
     struct function_struct *temp = currentTask->next;
-    uint32_t minDelayT = -1;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     while (temp != currentTask && temp != NULL)
     {
@@ -353,16 +345,33 @@ void SysTick_Handler(void) //In C Language
             nextTask = temp;          //set nextF to right now highest priority task
             prioMin = temp->priority; //save prio
         }
-
 #ifdef useSystickAltering
-        if (minDelayT > temp->continueInMS)
+        if(minDelayT != NULL)
         {
-            minDelayT = temp->continueInMS;
+            if (*minDelayT > temp->continueInMS)
+            {
+                *minDelayT = temp->continueInMS;
+            }
         }
 #endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
+    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1) nextTask = currentTask;
+}
+#endif //contextSwitch
 
+/**
+ * Systick Handler for an Exception every x ms. Minimum is 11 Hz
+ *
+ * @param
+ * @return
+ */
+void SysTick_Handler(void) //In C Language
+{
+    disable_interrupts();
+#ifdef contextSwitch
+    uint32_t minDelayT = -1;
+    findNextFunction(&minDelayT);
 #ifdef useSystickAltering
     if (minDelayT >= 90 || minDelayT < 1)
     {
@@ -372,10 +381,10 @@ void SysTick_Handler(void) //In C Language
     sysTickMillisPerInt = minDelayT;
 #endif //useSystickAltering
 
-    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1) nextTask = currentTask;
+    
     if(currentTask != nextTask)
     {
-        pendPendSV(); //If switchEnable set, set the PendSV to pending
+        pendPendSV(); //If nextTask is not this task, set the PendSV to pending
     }
 
 #endif //contextSwitch
