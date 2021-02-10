@@ -107,6 +107,19 @@ StallardOSCAN::~StallardOSCAN() //Destructor
     // delete this->CANT;
 }
 
+uint16_t StallardOSCAN::getSWFiFoFillLevel()
+{
+    uint16_t fillLevel = 0;
+    for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+    {
+        if(StallardOSCanFifo[k].used)
+        {
+            fillLevel++;
+        }
+    }
+    return fillLevel;
+}
+
 void StallardOSCAN::receiveMessage_FIFO()
 {
     this->sem.take();   //Block Semaphore

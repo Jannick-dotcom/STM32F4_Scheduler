@@ -40,15 +40,14 @@ private:
     StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
     
     // void init(CANports port, CANBauds baud);
-
+    void receiveMessage_FIFO();
 public:
 
     StallardOSCAN(
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);
     ~StallardOSCAN();
-
-    void receiveMessage_FIFO();
+    uint16_t getSWFiFoFillLevel();
     bool receiveMessage(StallardOSCanMessage *msg, uint8_t id);
     void sendMessage(StallardOSCanMessage *msg, uint8_t size);
 };
