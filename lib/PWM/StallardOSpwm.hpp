@@ -3,7 +3,7 @@
 
 #include "StallardOSGPIO.hpp"
 #include "StallardOSconfig.h"
-#include "sem.hpp"
+#include "StallardOSsem.hpp"
 
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>

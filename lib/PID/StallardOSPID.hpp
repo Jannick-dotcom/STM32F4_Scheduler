@@ -1,7 +1,7 @@
 #ifndef STALLARDOSPID_H_
 #define STALLARDOSPID_H_
 
-#include "sem.hpp"
+#include "StallardOSsem.hpp"
 
 class StallardosPID
 {

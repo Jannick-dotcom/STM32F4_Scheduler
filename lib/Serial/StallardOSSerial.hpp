@@ -5,7 +5,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 #include "StallardOSconfig.h"
-#include "sem.hpp"
+#include "StallardOSsem.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 

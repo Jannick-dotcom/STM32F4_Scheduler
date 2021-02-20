@@ -3,13 +3,6 @@
 //StallardOSCanMessage STallardOS_CAN_messages[CAN_FIFO_size];
 extern "C" volatile uint64_t msCurrentTimeSinceStart;
 
-/**
- * crete a CAN interface.
- *
- * @param[in] port which CAN port to use
- * @param[in] baud Baud rate of the CAN. Has to be same on all devices
- * @return true if a message is received, false otherwise
- */
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
     this->sem.take();
@@ -171,14 +164,6 @@ void StallardOSCAN::receiveMessage_FIFO()
     this->sem.give(); //release Semaphore
 }
 
-
-/**
- * receive a can message.
- *0
- * @param[out] msg the message container to be filled
- * @param[in] id the id of the message to receive
- * @return true if a message is received, false otherwise
- */
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
     this->sem.take();
@@ -203,12 +188,6 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
     return false;       //return false status
 }
 
-/**
- * send a can message.
- *
- * @param msg message to send
- * @param size amount of Data Bytes. Maximum is 4
- */
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
     this->sem.take();   //Block the semaphore
