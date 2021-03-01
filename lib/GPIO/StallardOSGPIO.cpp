@@ -17,7 +17,7 @@ StallardOSGPIO::StallardOSGPIO()
  * @param dir    input or output
  * @param pull   internal pull-up or pull-down
  */
-StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull)
+StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool initialState, pullMode pull)
 {
     this->sem.take();
     if (number > 31) //Error check
@@ -49,6 +49,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     GPIO_InitStruct.Pull = this->pull;
 
+    HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(initialState));
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
     this->sem.give();
 }
@@ -148,7 +149,7 @@ bool StallardOSGPIO::write(bool state)
         GPIO_InitStruct.Pin = 1 << this->pin;
         GPIO_InitStruct.Mode = this->dir;
         GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-        GPIO_InitStruct.Pull = pullMode(state);
+        GPIO_InitStruct.Pull = pullMode(int(state)+1);
 
         HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
         this->sem.give();

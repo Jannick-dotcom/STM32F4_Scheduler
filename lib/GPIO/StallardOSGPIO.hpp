@@ -53,18 +53,20 @@ public:
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
         /*Direction*/ pinDir dir,
-        /*PullResistor*/ pullMode pull = nopull);
+        /*InitialState*/ bool initialState = 0,
+        /*PullResistor*/ pullMode pull = nopull
+        );
     StallardOSGPIO(
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
         /*Direction*/ pinDir dir,
         /*PullResistor*/ pullMode pull,
-        uint32_t alternate);
+        /*AlternateFunction*/ uint32_t alternate);
     ~StallardOSGPIO(); //Destructor
     bool read();
     bool write(bool state);
-    bool operator=(bool state);                                                //Operator for writing on the pin
-    bool operator!();                                 //Inverting the state
+    bool operator=(bool state);           //Operator for writing on the pin
+    bool operator!();                     //Inverting the state
     
     bool operator&&(StallardOSGPIO &ref); //Logical operator
     bool operator||(StallardOSGPIO &ref); //Logical operator
