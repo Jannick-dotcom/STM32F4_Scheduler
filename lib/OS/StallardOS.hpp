@@ -14,6 +14,7 @@
 #include "StallardOSSerial.hpp"
 #include "StallardOSi2c.hpp"
 #include "StallardOSPID.hpp"
+#include "StallardOSSPI.hpp"
 
 static StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
 static StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
