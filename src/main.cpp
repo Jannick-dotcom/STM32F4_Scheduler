@@ -54,7 +54,7 @@ void flashOverCanHandle()
     while (1)
     {
 #endif
-        if (AD_CAN.receiveMessage(&FOCMessage, 123))
+        if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
         {
             StallardOSJanniq.goBootloader();
         }

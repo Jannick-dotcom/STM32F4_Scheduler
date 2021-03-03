@@ -119,7 +119,9 @@ uint16_t StallardOSCAN::getSWFiFoFillLevel()
 
 void StallardOSCAN::receiveMessage_FIFO()
 {
+    #ifdef contextSwitch
     this->sem.take();   //Block Semaphore
+    #endif
     auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;  //initialize the oldest Message variable
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
     {
@@ -165,16 +167,22 @@ void StallardOSCAN::receiveMessage_FIFO()
             }
         }
     }
+    #ifdef contextSwitch
     this->sem.give(); //release Semaphore
+    #endif
 }
 
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
 {
+    #ifdef contextSwitch
     this->sem.take();
+    #endif
     receiveMessage_FIFO(); //Receive the Messages from Hardware FiFo ->6 Messages total
     if (msg == nullptr) //if provided message for storing is valid
     {
+        #ifdef contextSwitch
         this->sem.give();   //Set the Semaphore free
+        #endif
         return false;   //return false status
     }
     for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
@@ -184,20 +192,28 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
             *msg = StallardOSCanFifo[k];    //copy the message
             StallardOSCanFifo[k].used = 0;  //set the FiFo message to unused
             StallardOSCanFifo[k].timestamp = -1;    //reset timestamp
+            #ifdef contextSwitch
             this->sem.give();   //release Semaphore
+            #endif
             return true;    //indicate success
         }
     }
+    #ifdef contextSwitch
     this->sem.give();   //release semaphore
+    #endif
     return false;       //return false status
 }
 
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
+    #ifdef contextSwitch
     this->sem.take();   //Block the semaphore
+    #endif
     if(msg != nullptr && size > 4)        //Check if the size and the message are valid
     {
+        #ifdef contextSwitch
         this->sem.give();   //release semaphore
+        #endif
         return;
     }
     TxHeader.StdId = msg->ID;   //copy the id
@@ -207,6 +223,8 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 
     while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3); //Wait until all TX Mailboxes are free
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
+    #ifdef contextSwitch
     this->sem.give();   //release Semaphore
+    #endif
     return;
 }

@@ -1,0 +1,1 @@
+#define STOS_CAN_ID_FOC 123

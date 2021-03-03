@@ -45,7 +45,9 @@ StallardOS::StallardOS()
   TCBsCreated = 0;
   //Für Context Switch
   createTCBs();
+  #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, 0, 255);
+  #endif
 }
 
 /**

@@ -4,6 +4,7 @@
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
+#include "StallardOScan-IDs.h"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
