@@ -8,7 +8,9 @@
  */
 StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
 {
+    #ifdef contextSwitch
     this->sem.take();
+    #endif
     const ADC_TypeDef *StallardOSAnalog_to_ADC_Typedef[] = {ADC1, ADC2, ADC3};
     hadc1.Instance = (ADC_TypeDef *)StallardOSAnalog_to_ADC_Typedef[number];
     hadc1.Init.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4;
@@ -24,6 +26,9 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
     hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
     if (HAL_ADC_Init(&hadc1) != HAL_OK)
     {
+        #ifdef contextSwitch
+        this->sem.give();
+        #endif
         StallardOSGeneralFaultHandler();
     }
     /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
@@ -35,12 +40,17 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
     sConfig.Offset = 0;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
     {
+        #ifdef contextSwitch
+        this->sem.give();
+        #endif
         StallardOSGeneralFaultHandler();
     }
 
     this->number = number;
     this->channel = channel;
+    #ifdef contextSwitch
     this->sem.give();
+    #endif
 }
 
 /**
@@ -50,8 +60,12 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
  */
 uint32_t StallardOSAnalog::getValue()
 {
+    #ifdef contextSwitch
     this->sem.take();
+    #endif
     HAL_ADC_Start(&hadc1);
-    return HAL_ADC_GetValue(&hadc1);
+    #ifdef contextSwitch
     this->sem.give();
+    #endif
+    return HAL_ADC_GetValue(&hadc1);
 }

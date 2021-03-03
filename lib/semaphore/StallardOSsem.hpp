@@ -8,8 +8,10 @@ class StallardOSSemaphore
 {
     volatile uint16_t val = 1;
 public:
+#ifdef contextSwitch
     void take();
     void give();
+#endif
 };
 
 #endif

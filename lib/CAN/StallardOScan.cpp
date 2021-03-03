@@ -5,7 +5,9 @@ extern "C" volatile uint64_t msCurrentTimeSinceStart;
 
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
+    #ifdef contextSwitch
     this->sem.take();
+    #endif
     CAN_FilterTypeDef sFilterConfig;
     if (port == StallardOSCAN1)
     {
@@ -89,7 +91,9 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     TxHeader.IDE = CAN_ID_STD;//Standard Identifier -> 11 bit
     TxHeader.DLC = sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
     TxHeader.TransmitGlobalTime = DISABLE;  //No Idea what this means
+    #ifdef contextSwitch
     this->sem.give();   //release Semaphore
+    #endif
 }
 
 StallardOSCAN::~StallardOSCAN() //Destructor

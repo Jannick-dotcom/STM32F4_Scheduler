@@ -7,6 +7,9 @@
  */
 StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
 {
+    #ifdef contextSwitch
+    this->sem.take();
+    #endif
     hi2c.Instance = instance;
     hi2c.Init.ClockSpeed = freq;
     hi2c.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -20,6 +23,9 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
     {
         StallardOSGeneralFaultHandler();
     }
+    #ifdef contextSwitch
+    this->sem.give();
+    #endif
 }
 
 /**
@@ -31,14 +37,20 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
  */
 void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
+#ifdef contextSwitch
     this->sem.take();
-    if(data == nullptr)
+#endif
+    if (data == nullptr)
     {
+#ifdef contextSwitch
         this->sem.give();
+#endif
         return;
     }
     HAL_I2C_Master_Transmit(&hi2c, addr, data, bytes, 0);
+#ifdef contextSwitch
     this->sem.give();
+#endif
 }
 
 /**
@@ -51,13 +63,19 @@ void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
  */
 uint8_t StallardOSi2c::read(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
+#ifdef contextSwitch
     this->sem.take();
-    if(data == nullptr)
+#endif
+    if (data == nullptr)
     {
+#ifdef contextSwitch
         this->sem.give();
+#endif
         return 0;
     }
     HAL_I2C_Master_Receive(&hi2c, addr, data, bytes, 0);
+#ifdef contextSwitch
     this->sem.give();
+#endif
     return 1;
 }

@@ -22,7 +22,8 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
     asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
     asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
     asm("MSR PSP, r0");             //set PSP
-
+    currentTask->waitingForSemaphore = 0;
+    currentTask->semVal = 0;
     currentTask->State = RUNNING;   //Save state as running
 #endif
     enable_interrupts();

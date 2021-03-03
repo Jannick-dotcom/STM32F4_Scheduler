@@ -7,9 +7,14 @@
  */
 StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 {
+#ifdef contextSwitch
     this->sem.take();
-    if(baud == 0)
+#endif
+    if (baud == 0)
     {
+#ifdef contextSwitch
+        this->sem.give();
+#endif
         return;
     }
     huart.Instance = serPort;
@@ -22,10 +27,14 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
     huart.Init.OverSampling = UART_OVERSAMPLING_16;
     if (HAL_UART_Init(&huart) != HAL_OK)
     {
+#ifdef contextSwitch
         this->sem.give();
+#endif
         StallardOSGeneralFaultHandler();
     }
+#ifdef contextSwitch
     this->sem.give();
+#endif
 }
 
 /**
@@ -36,14 +45,20 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
  */
 void StallardOSSerial::send(const char *dat, uint16_t bytes)
 {
+#ifdef contextSwitch
     this->sem.take();
-    if(dat == nullptr)
+#endif
+    if (dat == nullptr)
     {
+#ifdef contextSwitch
         this->sem.give();
+#endif
         return;
     }
-    HAL_UART_Transmit(&huart, (uint8_t*)dat, bytes, 0xFFFF);
+    HAL_UART_Transmit(&huart, (uint8_t *)dat, bytes, 0xFFFF);
+#ifdef contextSwitch
     this->sem.give();
+#endif
 }
 
 /**
@@ -54,12 +69,18 @@ void StallardOSSerial::send(const char *dat, uint16_t bytes)
  */
 void StallardOSSerial::read(char *dat, uint16_t bytes)
 {
+#ifdef contextSwitch
     this->sem.take();
-    if(dat == nullptr)
+#endif
+    if (dat == nullptr)
     {
+#ifdef contextSwitch
         this->sem.give();
+#endif
         return;
     }
-    HAL_UART_Receive(&huart, (uint8_t*)dat, bytes, 0xFFFF);
+    HAL_UART_Receive(&huart, (uint8_t *)dat, bytes, 0xFFFF);
+#ifdef contextSwitch
     this->sem.give();
+#endif
 }
