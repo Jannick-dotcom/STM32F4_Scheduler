@@ -134,14 +134,10 @@ void StallardOSCAN::receiveMessage_FIFO()
                 {
                     if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[k].Val) == HAL_OK) //Get Message
                     {
-                        //What do i do here??????
-                        // if(!(RxHeader.StdId & 0x400) && currentFifo == 1)
-                        // {
-                        //     volatile int k = 0;
-                        // }
-                        StallardOSCanFifo[k].ID = RxHeader.StdId;//Copy to SW FiFo
+                        StallardOSCanFifo[k].ID = RxHeader.StdId;   //Copy to SW FiFo
                         StallardOSCanFifo[k].used = 1;              //Indicate Message is occupied
                         StallardOSCanFifo[k].timestamp = msCurrentTimeSinceStart;   //Save timestamp
+                        StallardOSCanFifo[k].dlc = RxHeader.DLC;
                     }
                     break;  //If unused found go with next message
                 }
@@ -154,6 +150,7 @@ void StallardOSCAN::receiveMessage_FIFO()
                         StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;   //Delete oldest message and overwrite with new
                         StallardOSCanFifo[oldestMessage].used = 1;              //Indicate still used
                         StallardOSCanFifo[oldestMessage].timestamp = msCurrentTimeSinceStart;//save new Timestamp
+                        StallardOSCanFifo[oldestMessage].dlc = RxHeader.DLC;
                     }
                     break;  //If unused found go with next message
                 }
@@ -172,7 +169,7 @@ void StallardOSCAN::receiveMessage_FIFO()
     #endif
 }
 
-bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
+bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 {
     #ifdef contextSwitch
     this->sem.take();
@@ -187,11 +184,12 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint8_t id)
     }
     for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
     {
-        if (StallardOSCanFifo[k].used && StallardOSCanFifo[k].ID == id) //If ID of message in FiFo is same as we are looking for
+        if (StallardOSCanFifo[k].used && (StallardOSCanFifo[k].ID == id || id == -1)) //If ID of message in FiFo is same as we are looking for
         {
             *msg = StallardOSCanFifo[k];    //copy the message
             StallardOSCanFifo[k].used = 0;  //set the FiFo message to unused
             StallardOSCanFifo[k].timestamp = -1;    //reset timestamp
+            StallardOSCanFifo[k].dlc = 0;
             #ifdef contextSwitch
             this->sem.give();   //release Semaphore
             #endif

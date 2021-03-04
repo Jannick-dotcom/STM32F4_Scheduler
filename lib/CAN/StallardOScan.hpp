@@ -24,6 +24,7 @@ typedef struct
 {
     uint8_t used = 0;
     uint64_t timestamp = -1; //Set Timestamp to maximum
+    uint8_t dlc;
     uint16_t ID = 0;         //Just 11 Bit !!!!
     uint8_t *Val;            //Up to 8 Bytes
 } StallardOSCanMessage;
@@ -64,13 +65,13 @@ public:
     * @param[in] id the id of the message to receive
     * @return true if a message is received, false otherwise
     */
-    bool receiveMessage(StallardOSCanMessage *msg, uint8_t id);
+    bool receiveMessage(StallardOSCanMessage *msg, uint16_t id);
 
     /**
     * send a can message.
     *
     * @param msg message to send
-    * @param size amount of Data Bytes. Maximum is 4
+    * @param size amount of Data Bytes. Maximum is 8
     */
     void sendMessage(StallardOSCanMessage *msg, uint8_t size);
 };
