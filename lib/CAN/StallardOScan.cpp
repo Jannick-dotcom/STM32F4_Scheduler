@@ -120,9 +120,6 @@ uint16_t StallardOSCAN::getSWFiFoFillLevel()
 
 void StallardOSCAN::receiveMessage_FIFO()
 {
-    #ifdef contextSwitch
-    this->sem.take();   //Block Semaphore
-    #endif
     auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1;  //initialize the oldest Message variable
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
     {
@@ -165,9 +162,6 @@ void StallardOSCAN::receiveMessage_FIFO()
             }
         }
     }
-    #ifdef contextSwitch
-    this->sem.give(); //release Semaphore
-    #endif
 }
 
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)

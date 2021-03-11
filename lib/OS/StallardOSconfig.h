@@ -1,7 +1,7 @@
 /********************************************
  * User Customization
 ********************************************/
-
+#define STOS_current_ECU_ID 2
 #define contextSwitch
 
 #define sizeStack 300      //300 * 4 Byte (Stack size for Tasks)

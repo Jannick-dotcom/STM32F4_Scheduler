@@ -1,6 +1,5 @@
 #include "StallardOS.hpp"
-// StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
-// StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
+#include "flashOverCan.hpp"
 
 StallardOSGPIO led1(13, PORTF, Output);
 // StallardOSGPIO led2(14, PORTF, Output);
@@ -14,7 +13,6 @@ StallardOS StallardOSJanniq;
 
 void tasktest()
 {
-    StallardOSpwm fadingLED(TIM1,13, PORTF, 1000, 8);
 #ifdef contextSwitch
     while (1)
     {
@@ -22,8 +20,8 @@ void tasktest()
         led1 = !led1;
 #ifdef contextSwitch
         //StallardOSJanniq.delay(500);
-        //StallardOSJanniq.yield();
-        StallardOSJanniq.getCPUload();
+        StallardOSJanniq.yield();
+        // StallardOSJanniq.getCPUload();
     }
 #endif
 }
@@ -49,28 +47,11 @@ void taskTestCAN()
 #endif
 }
 
-void flashOverCanHandle()
-{
-    StallardOSCanMessage FOCMessage;
-#ifdef contextSwitch
-    while (1)
-    {
-#endif
-        if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
-        {
-            StallardOSJanniq.goBootloader();
-        }
-#ifdef contextSwitch
-        StallardOSJanniq.delay(1);
-    }
-#endif
-}
-
 int main()
 {
     StallardOSJanniq.addFunction(tasktest, 1, 1, 2);
-    // Tasker1.addFunction(flashOverCanHandle, 2, 1);
-    // Tasker1.addFunction(taskTestCAN, 3, 4);
+    StallardOSJanniq.addFunction(flashOverCanHandle, 2, 1);
+    // StallardOSJanniq.addFunction(taskTestCAN, 3, 4);
     StallardOSJanniq.startOS();
     while (1)
     {
