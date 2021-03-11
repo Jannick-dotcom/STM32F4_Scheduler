@@ -1,7 +1,8 @@
 #include "StallardOScan.hpp"
 
 //StallardOSCanMessage STallardOS_CAN_messages[CAN_FIFO_size];
-extern "C" volatile uint64_t msCurrentTimeSinceStart;
+extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
+extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
@@ -136,7 +137,7 @@ void StallardOSCAN::receiveMessage_FIFO()
                     {
                         StallardOSCanFifo[k].ID = RxHeader.StdId;   //Copy to SW FiFo
                         StallardOSCanFifo[k].used = 1;              //Indicate Message is occupied
-                        StallardOSCanFifo[k].timestamp = msCurrentTimeSinceStart;   //Save timestamp
+                        StallardOSCanFifo[k].timestamp = usCurrentTimeSinceStart;   //Save timestamp
                         StallardOSCanFifo[k].dlc = RxHeader.DLC;
                     }
                     break;  //If unused found go with next message
@@ -149,7 +150,7 @@ void StallardOSCAN::receiveMessage_FIFO()
                     {
                         StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;   //Delete oldest message and overwrite with new
                         StallardOSCanFifo[oldestMessage].used = 1;              //Indicate still used
-                        StallardOSCanFifo[oldestMessage].timestamp = msCurrentTimeSinceStart;//save new Timestamp
+                        StallardOSCanFifo[oldestMessage].timestamp = usCurrentTimeSinceStart;//save new Timestamp
                         StallardOSCanFifo[oldestMessage].dlc = RxHeader.DLC;
                     }
                     break;  //If unused found go with next message

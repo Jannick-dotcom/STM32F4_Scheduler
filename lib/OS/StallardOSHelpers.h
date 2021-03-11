@@ -30,13 +30,19 @@ struct function_struct
   volatile uint8_t used;  //Ist dieser TCB schon belegt?
   volatile uint8_t executable;    //Funktion ausführen?
 
+  uint8_t error;  //Error in Task scheduling has happened
+
 #ifndef contextSwitch
   //nur für normalen Schedule betrieb
   float frequency;        //Soll ... mal pro Sekunde ausgeführt werden
   uint64_t lastExecTime;  //Letzter Zeitpunkt der Ausführung
 #endif
+
 #ifdef contextSwitch
   //nur für KontextSwitch
+  uint16_t refreshRate;
+  uint64_t lastYield;
+  uint64_t lastStart;
   volatile uint32_t stackUsage;
   volatile taskState State;        //Status des Tasks
   volatile uint32_t *Stack;         //Stack pointer

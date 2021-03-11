@@ -21,7 +21,9 @@ void tasktest()
 #endif
         led1 = !led1;
 #ifdef contextSwitch
-        StallardOSJanniq.delay(100);
+        //StallardOSJanniq.delay(500);
+        //StallardOSJanniq.yield();
+        StallardOSJanniq.getCPUload();
     }
 #endif
 }
@@ -66,7 +68,7 @@ void flashOverCanHandle()
 
 int main()
 {
-    StallardOSJanniq.addFunction(tasktest, 1, 1);
+    StallardOSJanniq.addFunction(tasktest, 1, 1, 2);
     // Tasker1.addFunction(flashOverCanHandle, 2, 1);
     // Tasker1.addFunction(taskTestCAN, 3, 4);
     StallardOSJanniq.startOS();

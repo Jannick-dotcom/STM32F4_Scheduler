@@ -34,6 +34,7 @@ public:
   StallardOS(); //Create a Task Scheduler
   #ifdef contextSwitch
   struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio);
+  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate);
   #else
   struct function_struct *addFunction(
       /*Funktion*/ void (*function)(),
@@ -58,13 +59,16 @@ public:
   #endif
   #ifdef contextSwitch
   taskState getFunctionState(/*Funktion*/ uint16_t id);
+  uint8_t getCPUload();
   #endif
-  uint64_t getRuntime();
+  uint64_t getRuntimeMs();
+  uint64_t getRuntimeUs(); 
   void goBootloader();
   
 
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
   void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
+  void yield();                      //RTOS sagen, dass jetzt der Code zuende ist
   #ifndef contextSwitch
   void schedule();                   //Execute in the Loop (cooperative Multitasking)
   #endif

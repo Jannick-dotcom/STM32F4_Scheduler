@@ -7,9 +7,11 @@
 extern struct function_struct *currentTask;
 extern struct function_struct *taskMainStruct;
 extern struct function_struct *nextTask;
-volatile uint64_t msCurrentTimeSinceStart = 0; //about 585 000 years of microsecond counting
+volatile uint64_t msCurrentTimeSinceStart = 0; //about 584942417 years of millisecond counting
+volatile uint64_t usCurrentTimeSinceStart = 0; //about 585 000 years of microsecond counting
 volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
 volatile uint32_t sysTickMillisPerInt = 1;
+
 volatile uint64_t taskMainTime = 0; //Experimental
 
 /**
@@ -370,27 +372,33 @@ void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
 #ifdef contextSwitch
-    uint32_t minDelayT = -1;
-    findNextFunction(&minDelayT);
-#ifdef useSystickAltering
-    if (minDelayT >= 90 || minDelayT < 1)
+    usCurrentTimeSinceStart++;
+    if(usCurrentTimeSinceStart % (defaultSysTickFreq / 1000) == 0) //Every millisecond
     {
-        minDelayT = 1;
+        msCurrentTimeSinceStart++;//sysTickMillisPerInt;
+        HAL_IncTick();
+        uint32_t minDelayT = -1;
+        if(currentTask == taskMainStruct) 
+        {
+            taskMainTime += sysTickMillisPerInt; //Auslastungsberechnung
+        }
+        findNextFunction(&minDelayT);
+        if(currentTask != nextTask)
+        {
+            pendPendSV(); //If nextTask is not this task, set the PendSV to pending
+        }
     }
-    SysTick_Config((uint32_t)(SystemCoreClock / (1000 * minDelayT))); //Set the frequency of the systick interrupt
-    sysTickMillisPerInt = minDelayT;
-#endif //useSystickAltering
-
-    
-    if(currentTask != nextTask)
-    {
-        pendPendSV(); //If nextTask is not this task, set the PendSV to pending
-    }
+// #ifdef useSystickAltering
+//     if (minDelayT >= 90 || minDelayT < 1)
+//     {
+//         minDelayT = 1;
+//     }
+//     SysTick_Config((uint32_t)(SystemCoreClock / (1000 * minDelayT))); //Set the frequency of the systick interrupt
+//     sysTickMillisPerInt = minDelayT;
+// #endif //useSystickAltering
 
 #endif //contextSwitch
-    msCurrentTimeSinceStart += sysTickMillisPerInt;
-    if(currentTask == taskMainStruct) taskMainTime += sysTickMillisPerInt;
-    HAL_IncTick();
+    
     enable_interrupts(); //enable all interrupts
 }
 

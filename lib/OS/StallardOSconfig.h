@@ -6,9 +6,9 @@
 
 #define sizeStack 300      //300 * 4 Byte (Stack size for Tasks)
 #define countTasks 10
-#define defaultSysTickFreq 1000.0 //[Hz]
+#define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 #define externalOszillator 25 //[MHz]
-//#define useSystickAltering  //Change the firing rate of Systick to maximize throughput
+// #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
 
 #define CAN1_t_pin 12
 #define CAN1_r_pin 11
