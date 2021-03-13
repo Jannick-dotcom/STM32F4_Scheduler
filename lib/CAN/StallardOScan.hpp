@@ -26,7 +26,7 @@ typedef struct
     uint64_t timestamp = -1; //Set Timestamp to maximum
     uint8_t dlc;
     uint16_t ID = 0;         //Just 11 Bit !!!!
-    uint8_t *Val;            //Up to 8 Bytes
+    uint8_t Val[8];            //Up to 8 Bytes
 } StallardOSCanMessage;
 
 class StallardOSCAN

@@ -25,8 +25,11 @@ private:
   struct function_struct taskArray[countTasks];
   struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint8_t TCBsCreated;
+
+  #ifndef contextSwitch
   //Wichtig für Overflow Handling
   uint64_t lastScheduleTime; //Die letzte Zeit an der der Scheduler ausgeführt wurde
+  #endif
 
 public:
 

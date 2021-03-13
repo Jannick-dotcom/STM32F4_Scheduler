@@ -14,7 +14,13 @@ void flashOverCanHandle()
 #endif
         if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
         {
-            if(FOCMessage.Val[0] == STOS_current_ECU_ID) StallardOSJanniq.goBootloader();
+            for (uint8_t i = 0; i < FOCMessage.dlc; i++)
+            {
+                if (FOCMessage.Val[0] == STOS_current_ECU_ID)
+                {
+                    // StallardOSJanniq.goBootloader();
+                }
+            }
         }
 #ifdef contextSwitch
         StallardOSJanniq.delay(100);

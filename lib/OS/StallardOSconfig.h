@@ -8,6 +8,7 @@
 #define countTasks 10
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 #define externalOszillator 25 //[MHz]
+
 // #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
 
 #define CAN1_t_pin 12

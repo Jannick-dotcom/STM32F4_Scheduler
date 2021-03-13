@@ -22,7 +22,7 @@ volatile uint64_t taskMainTime = 0; //Experimental
  *//* code */
 __attribute__((always_inline)) void StallardOS_noTask()
 {
-    asm("MOV r7, #0");
+    // asm("MOV R7, #0");
     asm("SVC #0");
 }
 
@@ -34,7 +34,7 @@ __attribute__((always_inline)) void StallardOS_noTask()
  */
 __attribute__((always_inline)) void StallardOS_sudo()
 {
-    asm("MOV r7, #3");
+    // asm("MOV R7, #3");
     asm("SVC #3");
 }
 
@@ -46,7 +46,7 @@ __attribute__((always_inline)) void StallardOS_sudo()
  */
 __attribute__((always_inline)) void StallardOS_unSudo()
 {
-    asm("MOV r7, #4");
+    // asm("MOV R7, #4");
     asm("SVC #4");
 }
 
@@ -58,7 +58,7 @@ __attribute__((always_inline)) void StallardOS_unSudo()
  */
 __attribute__((always_inline)) void StallardOS_start()
 {
-    asm("MOV r7, #5");
+    // asm("MOV R7, #5");
     asm("SVC #5");
 }
 
@@ -70,7 +70,7 @@ __attribute__((always_inline)) void StallardOS_start()
  */
 __attribute__((always_inline)) void StallardOS_delay()
 {
-    asm("MOV r7, #2");
+    // asm("MOV R7, #2");
     asm("SVC #2");
 }
 
@@ -82,7 +82,7 @@ __attribute__((always_inline)) void StallardOS_delay()
  */
 __attribute__((always_inline)) void StallardOS_endTask()
 {
-    asm("MOV r7, #1");
+    // asm("MOV R7, #1");
     asm("SVC #1");
 }
 
@@ -94,7 +94,7 @@ __attribute__((always_inline)) void StallardOS_endTask()
  */
 __attribute__((always_inline)) void StallardOS_goBootloader()
 {
-    asm("MOV r7, #6");
+    // asm("MOV R7, #6");
     asm("SVC #6");
 }
 
@@ -226,11 +226,19 @@ __attribute__((always_inline)) void switchTask(void)
  * @return
  */
 #ifdef contextSwitch
-void SVC_Handler(void)
+void SVC_Handler()
 {
     disable_interrupts();
     uint8_t handleMode;
-    asm("MOV %0, r7" : "=r"(handleMode));
+
+    asm("TST    LR, #4");
+    asm("ITE    EQ");
+	asm("MRSEQ	R0, MSP");
+	asm("MRSNE	R0, PSP");
+
+	asm("LDR	R0, [R0, #24]");
+	asm("LDRB	R0, [R0, #-2]");
+    asm("MOV    %0, r0" : "=r"(handleMode));
 
     switch (handleMode)
     {
@@ -330,14 +338,14 @@ void findNextFunction(uint32_t *minDelayT)
         if (temp->continueInMS < sysTickMillisPerInt)
         {
             temp->continueInMS = 0;
-            temp->executable = 1; //Wenn keine Delay Zeit mehr, task auf executable setzen
+            //temp->executable = 1; //Wenn keine Delay Zeit mehr, task auf executable setzen
         }
         else
         {
             temp->continueInMS -= sysTickMillisPerInt; //dekrementieren
         }
         
-        if (temp->executable && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if (temp->executable && temp->continueInMS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
             if(temp->waitingForSemaphore && &temp->semVal != NULL && temp->semVal == 0) //If this task is still waiting for the semaphore
             {
@@ -358,7 +366,7 @@ void findNextFunction(uint32_t *minDelayT)
 #endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
-    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1) nextTask = currentTask;
+    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1 && temp->continueInMS == 0) nextTask = currentTask;
 }
 #endif //contextSwitch
 

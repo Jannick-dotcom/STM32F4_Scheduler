@@ -71,7 +71,7 @@ void StallardOS::createTCBs()
     temp = &taskArray[i]; //new struct function_struct;
     if (temp == nullptr)  //Wenn kein HEAP Platz mehr frei ist...
     {
-      break; //Aus der Funktion rausspringen
+      return; //Aus der Funktion rausspringen
     }
 
     if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
@@ -329,7 +329,7 @@ struct function_struct *StallardOS::searchFreeFunction(void)
 void StallardOS::delay(uint32_t milliseconds)
 {
   currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-  currentTask->executable = false;
+  // currentTask->executable = false;
 
 #ifdef contextSwitch
   StallardOS_delay();
@@ -361,7 +361,7 @@ void StallardOS::yield()
     }
     currentTask->continueInMS = (1000 / currentTask->refreshRate) - (getRuntimeMs() - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate 
     currentTask->lastYield = getRuntimeMs();
-    currentTask->executable = false;
+    // currentTask->executable = false;
     #ifdef contextSwitch
     StallardOS_delay();
     #endif
@@ -413,6 +413,7 @@ void StallardOS::startOS(void)
 #ifdef contextSwitch
     NVIC_EnableIRQ(SVCall_IRQn);
     asm("MRS R0, MSP");
+    asm("SUB R0, #20");  //Reserve some space for Handlers (20*4 Byte)
     asm("MSR PSP, R0");
     asm("MOV R0, #3");
     asm("MSR CONTROL, R0");

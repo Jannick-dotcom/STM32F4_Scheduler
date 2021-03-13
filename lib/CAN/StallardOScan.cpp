@@ -141,8 +141,7 @@ void StallardOSCAN::receiveMessage_FIFO()
                 }
                 else if(k == sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 2) //FIFO full?
                 {
-                    //TODO: Find a way around the stopping of fifo filling
-                    //When fifo full delete everything or the oldest message
+                    //When fifo full delete the oldest message
                     if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, StallardOSCanFifo[oldestMessage].Val) == HAL_OK) //Get Message
                     {
                         StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;   //Delete oldest message and overwrite with new

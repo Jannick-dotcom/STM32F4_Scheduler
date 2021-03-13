@@ -29,20 +29,17 @@ void tasktest()
 void taskTestCAN()
 {
     StallardOSCanMessage testmessage;
-    uint8_t data[4];
-    uint16_t test = 0;
+    uint8_t data = STOS_current_ECU_ID;
+    
 #ifdef contextSwitch
     while (1)
     {
 #endif
-        testmessage.ID = test;
-        testmessage.Val = data;
+        testmessage.ID = STOS_CAN_ID_FOC;
+        testmessage.Val[0] = data;
         AD_CAN.sendMessage(&testmessage, sizeof(data));
-        test++;
-        if (test > 0x7FF)
-            test = 0;
 #ifdef contextSwitch
-        StallardOSJanniq.delay(1);
+        StallardOSJanniq.delay(1000);
     }
 #endif
 }
@@ -51,7 +48,7 @@ int main()
 {
     StallardOSJanniq.addFunction(tasktest, 1, 1, 2);
     StallardOSJanniq.addFunction(flashOverCanHandle, 2, 1);
-    // StallardOSJanniq.addFunction(taskTestCAN, 3, 4);
+    StallardOSJanniq.addFunction(taskTestCAN, 3, 4);
     StallardOSJanniq.startOS();
     while (1)
     {
