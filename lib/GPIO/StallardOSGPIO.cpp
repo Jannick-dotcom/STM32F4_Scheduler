@@ -181,6 +181,7 @@ bool StallardOSGPIO::write(bool state)
 #endif
         return state;
     }
+    return 0;
 }
 
 bool StallardOSGPIO::operator!()

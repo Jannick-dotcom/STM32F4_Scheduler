@@ -182,10 +182,10 @@ __attribute__((always_inline)) void switchTask(void)
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 
         currentTask->State = PAUSED; //Save function state
-        if(&currentTask->vals[sizeStack] - currentTask->Stack > currentTask->stackUsage) 
-        {
-            currentTask->stackUsage = &currentTask->vals[sizeStack] - currentTask->Stack;
-        }
+        // if(&currentTask->vals[sizeStack] - currentTask->Stack > currentTask->stackUsage) 
+        // {
+        //     currentTask->stackUsage = &currentTask->vals[sizeStack] - currentTask->Stack;
+        // }
         currentTask = nextTask;
     }
 
@@ -230,6 +230,7 @@ void SVC_Handler()
 {
     disable_interrupts();
     uint8_t handleMode;
+    uint32_t temp;
 
     asm("TST    LR, #4");
     asm("ITE    EQ");
@@ -244,18 +245,18 @@ void SVC_Handler()
     {
     case 0: //No Task
         currentTask = NULL;
-        findNextFunction(NULL);
+        //findNextFunction(NULL);
         pendPendSV();
         break;
 
     case 1: //Task has Ended
         currentTask = NULL;
-        findNextFunction(NULL);
+        //findNextFunction(NULL);
         switchTask();
         break;
 
     case 2: //Delay
-        findNextFunction(NULL);
+        findNextFunction(&temp);
         switchTask();
         break;
 
