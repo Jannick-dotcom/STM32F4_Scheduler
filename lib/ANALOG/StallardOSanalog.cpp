@@ -1,16 +1,12 @@
 #include "StallardOSanalog.hpp"
 
-/**
- * create a Analog input instance.
- *
- * @param number which ADC number to use
- * @param channel channelnumber of the adc
- */
-StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
+StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel, ports port, uint8_t pin)
 {
-    #ifdef contextSwitch
+#ifdef contextSwitch
     this->sem.take();
-    #endif
+#endif
+    gpio = StallardOSGPIO(pin,port,Analog); //initialize the gpio as analog input pin
+
     const ADC_TypeDef *StallardOSAnalog_to_ADC_Typedef[] = {ADC1, ADC2, ADC3};
     hadc1.Instance = (ADC_TypeDef *)StallardOSAnalog_to_ADC_Typedef[number];
     hadc1.Init.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4;
@@ -18,6 +14,7 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
     hadc1.Init.ScanConvMode = DISABLE;
     hadc1.Init.ContinuousConvMode = DISABLE;
     hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.NbrOfDiscConversion = 0;
     hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
     hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
     hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -26,46 +23,43 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel)
     hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
     if (HAL_ADC_Init(&hadc1) != HAL_OK)
     {
-        #ifdef contextSwitch
+#ifdef contextSwitch
         this->sem.give();
-        #endif
+#endif
         StallardOSGeneralFaultHandler();
     }
-    /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-  */
-    ADC_ChannelConfTypeDef sConfig = {0};
+    // Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+    ADC_ChannelConfTypeDef sConfig;
     sConfig.Channel = channel;
     sConfig.Rank = 1;
     sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
     sConfig.Offset = 0;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
     {
-        #ifdef contextSwitch
+#ifdef contextSwitch
         this->sem.give();
-        #endif
+#endif
         StallardOSGeneralFaultHandler();
     }
 
     this->number = number;
     this->channel = channel;
-    #ifdef contextSwitch
+#ifdef contextSwitch
     this->sem.give();
-    #endif
+#endif
 }
 
-/**
- * get a analog reading.
- *
- * @return analog value
- */
+
 uint32_t StallardOSAnalog::getValue()
 {
-    #ifdef contextSwitch
+    uint32_t retVal;
+#ifdef contextSwitch
     this->sem.take();
-    #endif
+#endif
     HAL_ADC_Start(&hadc1);
-    #ifdef contextSwitch
+    retVal = HAL_ADC_GetValue(&hadc1);
+#ifdef contextSwitch
     this->sem.give();
-    #endif
-    return HAL_ADC_GetValue(&hadc1);
+#endif
+    return retVal;
 }

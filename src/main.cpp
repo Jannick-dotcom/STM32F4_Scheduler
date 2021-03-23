@@ -13,16 +13,12 @@ StallardOS StallardOSJanniq;
 
 void tasktest()
 {
+    StallardOSAnalog testAnalog(StallardOSADC1, 1, PORTA, 1);
 #ifdef contextSwitch
     while (1)
     {
 #endif
-        led1.write(!led1.read());
-        led2 = !led2;
-        led3 = !led3;
-        led11 = !led11;
-        // led21 = !led21;
-        // led31 = !led31;
+        volatile uint32_t test = testAnalog.getValue();
 #ifdef contextSwitch
         StallardOSJanniq.delay(500);
         //StallardOSJanniq.yield();

@@ -1,5 +1,5 @@
 // AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
-
+//
 // PIO Unified Debugger
 //
 // Documentation: https://docs.platformio.org/page/plus/debugging.html
@@ -15,12 +15,12 @@
             "executable": "/home/jannick/Desktop/Rennstall/contextSwitchTest/.pio/build/nucleo_f446ze/firmware.elf",
             "projectEnvName": "nucleo_f446ze",
             "toolchainBinDir": "/home/jannick/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin",
+            "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/jannick/.platformio/platforms/ststm32/misc/svd/STM32F41x.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
                 "task": "Pre-Debug"
-            },
-            "internalConsoleOptions": "openOnSessionStart"
+            }
         },
         {
             "type": "platformio-debug",
@@ -29,8 +29,8 @@
             "executable": "/home/jannick/Desktop/Rennstall/contextSwitchTest/.pio/build/nucleo_f446ze/firmware.elf",
             "projectEnvName": "nucleo_f446ze",
             "toolchainBinDir": "/home/jannick/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin",
-            "svdPath": "/home/jannick/.platformio/platforms/ststm32/misc/svd/STM32F41x.svd",
-            "internalConsoleOptions": "openOnSessionStart"
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "/home/jannick/.platformio/platforms/ststm32/misc/svd/STM32F41x.svd"
         }
     ]
 }

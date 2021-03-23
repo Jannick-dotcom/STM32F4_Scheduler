@@ -5,6 +5,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 #include "StallardOSsem.hpp"
+#include "StallardOSGPIO.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -21,10 +22,25 @@ private:
     ADC_HandleTypeDef hadc1;
     StallardOSADC number;
     uint8_t channel;
+    StallardOSGPIO gpio;
     StallardOSSemaphore sem;
 
 public:
-    StallardOSAnalog(/*ADCNumber*/ StallardOSADC number, uint8_t channel);
+
+/**
+ * create a Analog input instance.
+ *
+ * @param number which ADC number to use
+ * @param channel channel number of the adc
+ * @param port GPIO port
+ * @param pin GPIO pin
+ */
+    StallardOSAnalog(/*ADCNumber*/ StallardOSADC number, uint8_t channel, ports port, uint8_t pin);
+    /**
+ * get a analog reading.
+ *
+ * @return analog value
+ */
     uint32_t getValue();
 };
 
