@@ -8,6 +8,7 @@ extern struct function_struct *nextTask;
 void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 {
     disable_interrupts();
+    ///TODO: Only when current task != 0
 #ifdef contextSwitch
     currentTask->Stack = currentTask->vals + sizeStack - 4; //End of Stack
     asm("MOV r4, #0");                                  //R0

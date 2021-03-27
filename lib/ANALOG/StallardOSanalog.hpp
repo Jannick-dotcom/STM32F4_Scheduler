@@ -36,7 +36,8 @@ public:
  * @param pin GPIO pin
  */
     StallardOSAnalog(/*ADCNumber*/ StallardOSADC number, uint8_t channel, ports port, uint8_t pin);
-    /**
+
+/**
  * get a analog reading.
  *
  * @return analog value

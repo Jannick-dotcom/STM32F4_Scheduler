@@ -1,12 +1,12 @@
 #include "StallardOS.hpp"
 #include "flashOverCan.hpp"
 
-StallardOSGPIO led1(13, PORTF, Output,1);
-StallardOSGPIO led2(14, PORTF, Output,1);
-StallardOSGPIO led3(15, PORTF, Output,1);
-StallardOSGPIO led11(9, PORTI, Output,1);
-StallardOSGPIO led21(10, PORTI, Output,1);
-StallardOSGPIO led31(11, PORTI, Output,1);
+// StallardOSGPIO led1(13, PORTF, Output,1);
+// StallardOSGPIO led2(14, PORTF, Output,1);
+// StallardOSGPIO led3(15, PORTF, Output,1);
+// StallardOSGPIO led11(9, PORTI, Output,1);
+// StallardOSGPIO led21(10, PORTI, Output,1);
+// StallardOSGPIO led31(11, PORTI, Output,1);
 // StallardOSpwm fadingLED(TIM1,13, PORTF, 1000, 8);
 
 StallardOS StallardOSJanniq;
@@ -20,9 +20,9 @@ void tasktest()
 #endif
         volatile uint32_t test = testAnalog.getValue();
 #ifdef contextSwitch
-        StallardOSJanniq.delay(500);
-        //StallardOSJanniq.yield();
-        // StallardOSJanniq.getCPUload();
+        // StallardOSJanniq.delay(500);
+        StallardOSJanniq.yield();
+        //StallardOSJanniq.getCPUload();
     }
 #endif
 }
