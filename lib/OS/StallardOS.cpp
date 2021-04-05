@@ -349,22 +349,22 @@ void StallardOS::delay(uint32_t milliseconds)
  */
 void StallardOS::yield()
 {
-  if(currentTask->refreshRate != 0)
+  if (currentTask->refreshRate != 0)
   {
-    if(currentTask->lastYield + (1000 / currentTask->refreshRate) > getRuntimeMs()) //If task takes longer than expected
+    if (currentTask->lastYield + (1000 / currentTask->refreshRate) > getRuntimeMs()) //If task takes longer than expected
     {
       currentTask->error++;
     }
-    else if(currentTask->error > 0) //if not and errors happened
+    else if (currentTask->error > 0) //if not and errors happened
     {
       currentTask->error--;
     }
-    currentTask->continueInMS = (1000 / currentTask->refreshRate) - (getRuntimeMs() - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate 
+    currentTask->continueInMS = (1000 / currentTask->refreshRate) - (getRuntimeMs() - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
     currentTask->lastYield = getRuntimeMs();
-    // currentTask->executable = false;
-    #ifdef contextSwitch
+// currentTask->executable = false;
+#ifdef contextSwitch
     StallardOS_delay();
-    #endif
+#endif
     currentTask->lastStart = getRuntimeMs();
   }
 }
@@ -390,7 +390,7 @@ taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 }
 
 uint8_t StallardOS::getCPUload()
-{ 
+{
   float val;
   val = (1.0 - float(taskMainTime) / float(getRuntimeMs())) * 100.0;
   return val;
@@ -404,8 +404,6 @@ uint8_t StallardOS::getCPUload()
  */
 void StallardOS::startOS(void)
 {
-  StallardOS_SetSysClock(168);
-  SystemCoreClockUpdate();
   enable_interrupts();
   if (first_function_struct != nullptr)
   {
@@ -413,7 +411,7 @@ void StallardOS::startOS(void)
 #ifdef contextSwitch
     NVIC_EnableIRQ(SVCall_IRQn);
     asm("MRS R0, MSP");
-    asm("SUB R0, #20");  //Reserve some space for Handlers (20*4 Byte)
+    asm("SUB R0, #20"); //Reserve some space for Handlers (20*4 Byte)
     asm("MSR PSP, R0");
     asm("MOV R0, #3");
     asm("MSR CONTROL, R0");

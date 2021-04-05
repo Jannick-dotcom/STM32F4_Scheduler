@@ -17,11 +17,11 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, uint8_t number, ports port, 
 #endif
     this->gpio = StallardOSGPIO(number, port, AFPP, nopull, GPIO_AF1_TIM1); //GPIO_AF2_TIM3 GPIO_AF3_TIM8
     this->freq = freq;
-    this->bitcount = bitcount;
+    this->bitcount = bitcount; //TODO: Make it variable!
     __HAL_RCC_TIM1_CLK_ENABLE();
     TIM_OC_InitTypeDef sConfigOC;
     htim.Instance = instance;
-    htim.Init.Prescaler = ((SystemCoreClock / 2) / freq) - 1;
+    htim.Init.Prescaler = (SystemCoreClock / freq) / pow(2, bitcount);
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim.Init.Period = pow(2, bitcount) - 1;
     htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -98,20 +98,23 @@ uint16_t StallardOSpwm::operator=(uint16_t duty)
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
     sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-    {
-#ifdef contextSwitch
-        this->sem.give();
-#endif
-        StallardOSGeneralFaultHandler();
-    }
-    if (HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
-    {
-#ifdef contextSwitch
-        this->sem.give();
-#endif
-        StallardOSGeneralFaultHandler();
-    }
+    
+    __HAL_TIM_SET_COMPARE(&htim, TIM_CHANNEL_1, duty);
+
+//     if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+//     {
+// #ifdef contextSwitch
+//         this->sem.give();
+// #endif
+//         StallardOSGeneralFaultHandler();
+//     }
+//     if (HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
+//     {
+// #ifdef contextSwitch
+//         this->sem.give();
+// #endif
+//         StallardOSGeneralFaultHandler();
+//     }
 #ifdef contextSwitch
     this->sem.give();
 #endif

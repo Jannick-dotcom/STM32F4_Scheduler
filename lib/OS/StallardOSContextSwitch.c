@@ -276,8 +276,9 @@ void SVC_Handler()
 
     case 5: //Start the os
         SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+        StallardOS_SetSysClock(168);
         SysTick_Config(sysTickTicks);
-
+        SystemCoreClockUpdate();
         NVIC_SetPriority(SysTick_IRQn, 0x00);
         NVIC_SetPriority(PendSV_IRQn, 0xFF);
         NVIC_EnableIRQ(PendSV_IRQn);

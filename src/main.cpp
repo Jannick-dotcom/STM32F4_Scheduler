@@ -7,18 +7,19 @@
 // StallardOSGPIO led11(9, PORTI, Output,1);
 // StallardOSGPIO led21(10, PORTI, Output,1);
 // StallardOSGPIO led31(11, PORTI, Output,1);
-// StallardOSpwm fadingLED(TIM1,13, PORTF, 1000, 8);
+StallardOSpwm fadingLED(TIM1,13, PORTF, 1000, 8);
 
 StallardOS StallardOSJanniq;
 
 void tasktest()
 {
-    StallardOSAnalog testAnalog(StallardOSADC1, 1, PORTA, 1);
+    // StallardOSAnalog testAnalog(StallardOSADC1, 1, PORTA, 1);
 #ifdef contextSwitch
     while (1)
     {
 #endif
-        volatile uint32_t test = testAnalog.getValue();
+        // volatile uint32_t test = testAnalog.getValue();
+        // led1 = !led1;
 #ifdef contextSwitch
         // StallardOSJanniq.delay(500);
         StallardOSJanniq.yield();
