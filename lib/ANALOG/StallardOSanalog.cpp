@@ -1,14 +1,14 @@
 #include "StallardOSanalog.hpp"
 
-StallardOSAnalog::StallardOSAnalog(StallardOSADC number, uint8_t channel, ports port, uint8_t pin)
+StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel channel, ports port, uint8_t pin)
 {
 #ifdef contextSwitch
     this->sem.take();
 #endif
     gpio = StallardOSGPIO(pin,port,Analog); //initialize the gpio as analog input pin
     __HAL_RCC_ADC1_CLK_ENABLE();
-    __HAL_RCC_ADC1_CLK_ENABLE();
-    __HAL_RCC_ADC1_CLK_ENABLE();
+    __HAL_RCC_ADC2_CLK_ENABLE();
+    __HAL_RCC_ADC3_CLK_ENABLE();
     const ADC_TypeDef *StallardOSAnalog_to_ADC_Typedef[] = {ADC1, ADC2, ADC3};
     hadc1.Instance = (ADC_TypeDef *)StallardOSAnalog_to_ADC_Typedef[number];
     hadc1.Init.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4;
