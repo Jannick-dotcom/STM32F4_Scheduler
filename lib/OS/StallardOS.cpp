@@ -259,6 +259,19 @@ void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
   }
 }
 
+void StallardOS::switchPrivilegeLevel(bool status)
+{
+  if(status == false)
+  {
+    asm("SVC #4");
+  }
+  else
+  {
+    asm("SVC #3");
+  }
+  
+}
+
 /**
  * Search a task in the list
  *

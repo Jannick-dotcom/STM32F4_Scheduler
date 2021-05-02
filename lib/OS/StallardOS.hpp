@@ -10,12 +10,13 @@
 #include "StallardOSGPIO.hpp"
 #include "StallardOSpwm.hpp"
 #include "StallardOSanalog.hpp"
+#include "StallardOSExtAnalog.hpp"
 #include "StallardOScan.hpp"
 #include "StallardOSSerial.hpp"
 #include "StallardOSi2c.hpp"
 #include "StallardOSPID.hpp"
 #include "StallardOSSPI.hpp"
-#include "StallardOSDAC.hpp"
+// #include "StallardOSDAC.hpp"
 
 static StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
 static StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
@@ -58,6 +59,7 @@ private:
 
 public:
   void setFunctionPriority(/*Funktion*/ uint16_t id, /*New Priority*/ uint8_t prio);
+  void switchPrivilegeLevel(bool status);
   #ifndef contextSwitch
   void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
   #endif
