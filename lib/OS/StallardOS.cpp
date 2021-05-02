@@ -33,6 +33,30 @@ void taskMain(void)
   }
 }
 
+void flashOverCanHandle()
+{
+    StallardOSCanMessage FOCMessage;
+    const uint16_t STOS_CAN_ID_FOC = 123;
+#ifdef contextSwitch
+    while (1)
+    {
+#endif
+        if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
+        {
+            for (uint8_t i = 0; i < FOCMessage.dlc; i++)
+            {
+                if (FOCMessage.Val[i] == STOS_current_ECU_ID)
+                {
+                    // StallardOSJanniq.goBootloader();
+                }
+            }
+        }
+#ifdef contextSwitch
+        StallardOS::delay(100);
+    }
+#endif
+}
+
 /**
  * Create StallardOS RTOS.
  *
@@ -48,7 +72,8 @@ StallardOS::StallardOS()
   //Für Context Switch
   createTCBs();
 #ifdef contextSwitch
-  taskMainStruct = addFunction(taskMain, 0, 255);
+  taskMainStruct = addFunction(taskMain, -1, 255);
+  addFunction(flashOverCanHandle, -2, 3);
 #endif
 }
 

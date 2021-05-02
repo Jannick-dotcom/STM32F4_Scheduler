@@ -70,10 +70,11 @@ public:
   uint64_t getRuntimeMs();
   uint64_t getRuntimeUs(); 
   void goBootloader();
+  // static void flashOverCanHandle();
   
 
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
-  void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
+  static void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
   void yield();                      //RTOS sagen, dass jetzt der Code zuende ist
   #ifndef contextSwitch
   void schedule();                   //Execute in the Loop (cooperative Multitasking)
