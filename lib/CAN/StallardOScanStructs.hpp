@@ -144,7 +144,7 @@ struct STOS_CAN_DAT_States_Temp_Press{
 	uint8_t mappos;
 	uint8_t mil_b;
 	uint8_t oillamp_b;
-	uint8_t oillamp_b;
+	// uint8_t oillamp_b;
 	uint8_t pamb;
 	uint8_t pcrank;
 	uint8_t pfuel;

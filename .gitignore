@@ -2,3 +2,5 @@
 .vscode/
 src/
 toDos/
+workspace.code-workspace
+platformio.ini
