@@ -3,9 +3,7 @@
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
 extern "C" void StallardOSGeneralFaultHandler();
 
-StallardOSGPIO::StallardOSGPIO()
-{
-}
+StallardOSGPIO::StallardOSGPIO() {}
 
 /**
  * Create a gpio pin.
@@ -72,7 +70,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
 #ifdef contextSwitch
     this->sem.take();
 #endif
-    if (number > 31) //Error check
+    if (number > 31 || alternate == uint32_t(-1)) //Error check
     {
 #ifdef contextSwitch
         this->sem.give();
