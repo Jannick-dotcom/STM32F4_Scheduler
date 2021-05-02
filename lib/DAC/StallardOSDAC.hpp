@@ -7,17 +7,23 @@
 
 extern "C" void StallardOSGeneralFaultHandler();
 
+typedef enum StallardOSDACChannel
+{
+    channel1 = DAC_CHANNEL_1,
+    channel2 = DAC_CHANNEL_2
+} StallardOSDACChannel;
+
 class StallardOSDAC
 {
 private:
     StallardOSSemaphore sem;
     DAC_HandleTypeDef handle;
     DAC_ChannelConfTypeDef chanconf;
-    uint32_t channel;
+    StallardOSDACChannel channel;
     StallardOSGPIO gpio;
 
 public:
-    StallardOSDAC();
+    StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number);
     void setValue(uint16_t value); //12 Bit
 };
 

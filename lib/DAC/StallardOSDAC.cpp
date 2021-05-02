@@ -1,19 +1,20 @@
 #include "StallardOSDAC.hpp"
 
-StallardOSDAC::StallardOSDAC()
+StallardOSDAC::StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number)
 {
-    handle.Instance = DAC1;
-    // handle.Instance = DAC2;
-    chanconf.DAC_Trigger = DAC_TRIGGER_SOFTWARE;
-    chanconf.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
-    HAL_DAC_ConfigChannel(&handle, &chanconf, channel);
+    this->channel = channel;
+    handle.Instance = dac;
+    gpio = StallardOSGPIO(number, port, Analog);
+    chanconf.DAC_Trigger = DAC_TRIGGER_NONE;
+    chanconf.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
     HAL_DAC_Init(&handle);
-    HAL_DAC_SetValue(&handle, DAC_CHANNEL_1, DAC_ALIGN_12B_R, 2048);
-    HAL_DAC_Start(&handle, DAC_CHANNEL_1);
+    HAL_DAC_ConfigChannel(&handle, &chanconf, channel);
+    HAL_DAC_Start(&handle, channel);
+    HAL_DAC_SetValue(&handle, channel, DAC_ALIGN_12B_R, 255);
 }
 
 void StallardOSDAC::setValue(uint16_t value)
 {
-    HAL_DAC_SetValue(&handle, DAC_CHANNEL_1, DAC_ALIGN_12B_R, 2048);
-    HAL_DAC_Start(&handle, DAC_CHANNEL_1);
+    HAL_DAC_SetValue(&handle, channel, DAC_ALIGN_12B_R, value);
+    // HAL_DAC_Start(&handle, DAC_CHANNEL_1);
 }
