@@ -1,11 +1,11 @@
 #include "StallardOSanalog.hpp"
 
-StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel channel, ports port, uint8_t pin)
+StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel channel, ports port, uint8_t pin) : gpio(pin,port,Analog)
 {
 #ifdef contextSwitch
     this->sem.take();
 #endif
-    gpio = StallardOSGPIO(pin,port,Analog); //initialize the gpio as analog input pin
+    // gpio = StallardOSGPIO(pin,port,Analog); //initialize the gpio as analog input pin
     __HAL_RCC_ADC1_CLK_ENABLE();
     __HAL_RCC_ADC2_CLK_ENABLE();
     __HAL_RCC_ADC3_CLK_ENABLE();
