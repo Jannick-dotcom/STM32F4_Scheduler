@@ -1,24 +1,102 @@
 #include "StallardOSpwm.hpp"
 #include <math.h>
 
+uint8_t mapToAlternateFunction(TIM_TypeDef *instance)
+{
+    if (instance == TIM1)
+    {
+        __HAL_RCC_TIM1_CLK_ENABLE();
+        return Tim1;
+    }
+    else if (instance == TIM2)
+    {
+        __HAL_RCC_TIM2_CLK_ENABLE();
+        return Tim2;
+    }
+    else if (instance == TIM3)
+    {
+        __HAL_RCC_TIM3_CLK_ENABLE();
+        return Tim3;
+    }
+    else if (instance == TIM4)
+    {
+        __HAL_RCC_TIM4_CLK_ENABLE();
+        return Tim4;
+    }
+    else if (instance == TIM5)
+    {
+        __HAL_RCC_TIM5_CLK_ENABLE();
+        return Tim5;
+    }
+    // else if (instance == TIM6)
+    // {
+    //     __HAL_RCC_TIM6_CLK_ENABLE();
+    //     return Tim6;
+    // }
+    // else if (instance == TIM7)
+    // {
+    //     __HAL_RCC_TIM7_CLK_ENABLE();
+    //     return Tim7;
+    // }
+    else if (instance == TIM8)
+    {
+        __HAL_RCC_TIM8_CLK_ENABLE();
+        return Tim8;
+    }
+    else if (instance == TIM9)
+    {
+        __HAL_RCC_TIM9_CLK_ENABLE();
+        return Tim9;
+    }
+    else if (instance == TIM10)
+    {
+        __HAL_RCC_TIM10_CLK_ENABLE();
+        return Tim10;
+    }
+    else if (instance == TIM11)
+    {
+        __HAL_RCC_TIM11_CLK_ENABLE();
+        return Tim11;
+    }
+    else if (instance == TIM12)
+    {
+        __HAL_RCC_TIM12_CLK_ENABLE();
+        return Tim12;
+    }
+    else if (instance == TIM13)
+    {
+        __HAL_RCC_TIM13_CLK_ENABLE();
+        return Tim13;
+    }
+    else if (instance == TIM14)
+    {
+        __HAL_RCC_TIM14_CLK_ENABLE();
+        return Tim14;
+    }
+    else
+        return -1;
+}
+
 /**
  * create a pwm instance.
  *
  * @param instance which timer to use
+ * @param channel Timer channel to use
  * @param number number of the pin on the port
  * @param port gpio port
  * @param freq frequency of the pwm
  * @param bitcount number of bits for the pwm
  */
-StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, uint8_t number, ports port, uint16_t freq, uint8_t bitcount)
+StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, uint8_t channel, uint8_t number, ports port, uint16_t freq, uint8_t bitcount) : 
+    gpio(number, port, AFPP, nopull, mapToAlternateFunction(instance))
 {
 #ifdef contextSwitch
     this->sem.take();
 #endif
-    this->gpio = StallardOSGPIO(number, port, AFPP, nopull, GPIO_AF1_TIM1); //GPIO_AF2_TIM3 GPIO_AF3_TIM8
+    // this->gpio = StallardOSGPIO(number, port, AFPP, nopull, mapToAlternateFunction(instance));
     this->freq = freq;
-    this->bitcount = bitcount; //TODO: Make it variable!
-    __HAL_RCC_TIM1_CLK_ENABLE();
+    this->channel = channel;
+    this->bitcount = bitcount;
     TIM_OC_InitTypeDef sConfigOC;
     htim.Instance = instance;
     htim.Init.Prescaler = (SystemCoreClock / freq) / pow(2, bitcount);
@@ -49,14 +127,14 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, uint8_t number, ports port, 
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
     sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+    if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, this->channel) != HAL_OK)
     {
 #ifdef contextSwitch
         this->sem.give();
 #endif
         StallardOSGeneralFaultHandler();
     }
-    if (HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
+    if (HAL_TIM_PWM_Start(&htim, this->channel) != HAL_OK)
     {
 #ifdef contextSwitch
         this->sem.give();
@@ -69,18 +147,9 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, uint8_t number, ports port, 
 }
 
 /**
- * delete a pwm instance.
- *
- */
-StallardOSpwm::~StallardOSpwm()
-{
-    // delete this->gpio;
-}
-
-/**
  * create a pwm instance.
  *
- * @param duty which timer to use
+ * @param duty duty cycle of the pwm signal
  * @return duty cycle set
  */
 uint16_t StallardOSpwm::operator=(uint16_t duty)
@@ -89,32 +158,7 @@ uint16_t StallardOSpwm::operator=(uint16_t duty)
     this->sem.take();
 #endif
     this->duty = duty;
-    // HAL_TIM_PWM_Stop(&htim, TIM_CHANNEL_1);
-    TIM_OC_InitTypeDef sConfigOC;
-    sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = duty;
-    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-    sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    
-    __HAL_TIM_SET_COMPARE(&htim, TIM_CHANNEL_1, duty);
-
-//     if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-//     {
-// #ifdef contextSwitch
-//         this->sem.give();
-// #endif
-//         StallardOSGeneralFaultHandler();
-//     }
-//     if (HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
-//     {
-// #ifdef contextSwitch
-//         this->sem.give();
-// #endif
-//         StallardOSGeneralFaultHandler();
-//     }
+    __HAL_TIM_SET_COMPARE(&htim, this->channel, duty);
 #ifdef contextSwitch
     this->sem.give();
 #endif
