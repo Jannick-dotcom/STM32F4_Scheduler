@@ -23,4 +23,8 @@
 
 #define CAN_FIFO_size 200    //[Messages] should be enough for 1 second of storing
 
+// #define CAN_debug
+
+#define extADCSpiPort SPI2
+
 /////////////////////////////////////////////

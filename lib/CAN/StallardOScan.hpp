@@ -4,7 +4,8 @@
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
-#include "StallardOScan-IDs.h"
+#include "StallardOScanIDs.h"
+#include "StallardOScanStructs.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -27,7 +28,7 @@ typedef struct
     uint8_t dlc;
     uint16_t ID = 0;         //Just 11 Bit !!!!
     uint8_t Val[8];            //Up to 8 Bytes
-} StallardOSCanMessage; //TODO:Overloading from 1 to 8 Byte
+} StallardOSCanMessage;
 
 class StallardOSCAN
 {
