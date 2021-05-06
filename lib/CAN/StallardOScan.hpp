@@ -1,34 +1,16 @@
 #ifndef StallardOSCAN_h
 #define StallardOSCAN_h
-
+// #include <typeinfo>
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
+
 #include "StallardOScanIDs.h"
+#include "StallardOScanTypes.hpp"
 #include "StallardOScanStructs.hpp"
 
+
 extern "C" void StallardOSGeneralFaultHandler();
-
-typedef enum CANports
-{
-    StallardOSCAN1 = 0,
-    StallardOSCAN2
-} CANports;
-
-typedef enum CANBauds
-{
-    CAN500k = 0,
-    CAN1M = 1
-} CANBauds;
-
-typedef struct
-{
-    uint8_t used = 0;
-    uint64_t timestamp = -1; //Set Timestamp to maximum
-    uint8_t dlc;
-    uint16_t ID = 0;         //Just 11 Bit !!!!
-    uint8_t Val[8];            //Up to 8 Bytes
-} StallardOSCanMessage;
 
 class StallardOSCAN
 {
@@ -41,9 +23,12 @@ private:
     StallardOSGPIO CANR;
     StallardOSSemaphore sem;
     StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
+    AD_CAN_STRUCT adCan;
+    MS_CAN_STRUCT msCAN;
 
     // void init(CANports port, CANBauds baud);
     void receiveMessage_FIFO();
+    bool translateToStruct(StallardOSCanMessage *msg);
 
 public:
     /**
@@ -75,6 +60,9 @@ public:
     * @param size amount of Data Bytes. Maximum is 8
     */
     void sendMessage(StallardOSCanMessage *msg, uint8_t size);
+
+    void sendMessage(StallardOSCanMessage *msg);
+
 };
 
 #endif

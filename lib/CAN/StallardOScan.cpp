@@ -93,7 +93,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     TxHeader.ExtId = 0x01;  //Not used
     TxHeader.RTR = CAN_RTR_DATA;//Data Transmission
     TxHeader.IDE = CAN_ID_STD;//Standard Identifier -> 11 bit
-    TxHeader.DLC = sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
+    TxHeader.DLC = 8;//sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
     TxHeader.TransmitGlobalTime = DISABLE;  //No Idea what this means
     #ifdef contextSwitch
     this->sem.give();   //release Semaphore
@@ -111,7 +111,8 @@ StallardOSCAN::~StallardOSCAN() //Destructor
 uint16_t StallardOSCAN::getSWFiFoFillLevel()
 {
     uint16_t fillLevel = 0;
-    for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+    auto k = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage);
+    for (k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
     {
         if(StallardOSCanFifo[k].used)
         {
@@ -127,9 +128,10 @@ void StallardOSCAN::receiveMessage_FIFO()
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++) //Loop through the two hardware fifos
     {
         auto messageCount = HAL_CAN_GetRxFifoFillLevel(&canhandle, currentFifo);    //Read amount of messages in HW FiFo [0,1]
-        for (auto i = 0; i < messageCount; i++)                             //Loop through every new message in hardware FiFo
+        for (auto i = uint32_t(0); i < messageCount; i++)                             //Loop through every new message in hardware FiFo
         {
-            for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+            auto k = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage);
+            for (k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
             {
                 if (StallardOSCanFifo[k].used == 0) //If unused
                 {
@@ -179,9 +181,10 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
         #endif
         return false;   //return false status
     }
-    for (auto k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+    auto k = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage);
+    for (k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
     {
-        if (StallardOSCanFifo[k].used && (StallardOSCanFifo[k].ID == id || id == -1)) //If ID of message in FiFo is same as we are looking for
+        if (StallardOSCanFifo[k].used && (StallardOSCanFifo[k].ID == id || id == uint16_t(-1))) //If ID of message in FiFo is same as we are looking for
         {
             *msg = StallardOSCanFifo[k];    //copy the message
             StallardOSCanFifo[k].used = 0;  //set the FiFo message to unused
@@ -223,3 +226,13 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     #endif
     return;
 }
+
+void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
+{
+    if(msg->ID != 0) sendMessage(msg, msg->dlc);
+}
+
+// bool StallardOSCAN::translateToStruct(StallardOSCanMessage *msgin,  *msgOut)
+// {
+//     return true;
+// }

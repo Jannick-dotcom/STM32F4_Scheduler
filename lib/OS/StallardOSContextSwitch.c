@@ -142,6 +142,78 @@ __attribute__((always_inline)) void StallardOS_SysTick_Config(uint32_t ticks)
     SysTick_Config(ticks);
 }
 
+void jumpToBootloader(void) 
+{
+    void (*SysMemBootJump)(void);
+    volatile uint32_t addr = 0x1FFF0000;
+#if defined(USE_HAL_DRIVER)
+    HAL_RCC_DeInit();
+#endif /* defined(USE_HAL_DRIVER) */
+#if defined(USE_STDPERIPH_DRIVER)
+    RCC_DeInit();
+#endif /* defined(USE_STDPERIPH_DRIVER) */
+    SysTick->CTRL = 0;
+    SysTick->LOAD = 0;
+    SysTick->VAL = 0;
+    //__disable_irq();
+    SYSCFG->MEMRMP = 0x01;
+    SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
+    __set_PRIMASK(1);      // Disable interrupts
+    __set_PRIMASK(0x20001000);      // Set the main stack pointer to its default value
+    __set_MSP(0x20001000);
+    SysMemBootJump();
+    while(1);
+}
+
+#ifdef contextSwitch
+void findNextFunction(uint32_t *minDelayT)
+{
+    nextTask = NULL;
+    struct function_struct *temp = currentTask->next;
+    uint8_t prioMin = -1;                         //Use only tasks with prio < 255
+    while (temp != currentTask && temp != NULL)
+    {
+        if(temp->used == 0) //If the TCB is unused, continue with the next one
+        {
+            temp = temp->next;
+            continue;
+        }
+
+        if (temp->continueInMS < sysTickMillisPerInt)
+        {
+            temp->continueInMS = 0;
+        }
+        else
+        {
+            temp->continueInMS -= sysTickMillisPerInt; //dekrementieren
+        }
+        
+        if (temp->executable && temp->continueInMS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        {
+            if(temp->waitingForSemaphore && &temp->semVal != NULL && temp->semVal == 0) //If this task is still waiting for the semaphore
+            {
+                temp = temp->next;
+                continue;
+            }
+            nextTask = temp;          //set nextF to right now highest priority task
+            prioMin = temp->priority; //save prio
+        }
+#ifdef useSystickAltering
+        if(minDelayT != NULL)
+        {
+            if (*minDelayT > temp->continueInMS)
+            {
+                *minDelayT = temp->continueInMS;
+            }
+        }
+#endif //useSystickAltering
+        temp = temp->next; //Nächsten Task
+    }
+    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1 && temp->continueInMS == 0) nextTask = currentTask;
+}
+#endif //contextSwitch
+
+
 /**
  * If a Task Returns, this function gets executed and calls the remove function of this task.
  *
@@ -302,76 +374,6 @@ void SVC_Handler()
 }
 #endif
 
-void jumpToBootloader(void) 
-{
-    void (*SysMemBootJump)(void);
-    volatile uint32_t addr = 0x1FFF0000;
-#if defined(USE_HAL_DRIVER)
-    HAL_RCC_DeInit();
-#endif /* defined(USE_HAL_DRIVER) */
-#if defined(USE_STDPERIPH_DRIVER)
-    RCC_DeInit();
-#endif /* defined(USE_STDPERIPH_DRIVER) */
-    SysTick->CTRL = 0;
-    SysTick->LOAD = 0;
-    SysTick->VAL = 0;
-    //__disable_irq();
-    SYSCFG->MEMRMP = 0x01;
-    SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
-    __set_PRIMASK(1);      // Disable interrupts
-    __set_PRIMASK(0x20001000);      // Set the main stack pointer to its default value
-    __set_MSP(0x20001000);
-    SysMemBootJump();
-    while(1);
-}
-
-#ifdef contextSwitch
-void findNextFunction(uint32_t *minDelayT)
-{
-    nextTask = NULL;
-    struct function_struct *temp = currentTask->next;
-    uint8_t prioMin = -1;                         //Use only tasks with prio < 255
-    while (temp != currentTask && temp != NULL)
-    {
-        if(temp->used == 0) //If the TCB is unused, continue with the next one
-        {
-            temp = temp->next;
-            continue;
-        }
-
-        if (temp->continueInMS < sysTickMillisPerInt)
-        {
-            temp->continueInMS = 0;
-        }
-        else
-        {
-            temp->continueInMS -= sysTickMillisPerInt; //dekrementieren
-        }
-        
-        if (temp->executable && temp->continueInMS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
-        {
-            if(temp->waitingForSemaphore && &temp->semVal != NULL && temp->semVal == 0) //If this task is still waiting for the semaphore
-            {
-                temp = temp->next;
-                continue;
-            }
-            nextTask = temp;          //set nextF to right now highest priority task
-            prioMin = temp->priority; //save prio
-        }
-#ifdef useSystickAltering
-        if(minDelayT != NULL)
-        {
-            if (*minDelayT > temp->continueInMS)
-            {
-                *minDelayT = temp->continueInMS;
-            }
-        }
-#endif //useSystickAltering
-        temp = temp->next; //Nächsten Task
-    }
-    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1 && temp->continueInMS == 0) nextTask = currentTask;
-}
-#endif //contextSwitch
 
 /**
  * Systick Handler for an Exception every x ms. Minimum is 11 Hz

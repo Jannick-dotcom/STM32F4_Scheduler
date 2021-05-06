@@ -2,6 +2,6 @@
 .vscode/
 src/
 toDos/
-workspace.code-workspace
-platformio.ini
-.csv
+*.code-workspace
+*.ini
+*.csv
