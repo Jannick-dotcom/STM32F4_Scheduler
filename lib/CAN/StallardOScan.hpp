@@ -1,6 +1,6 @@
 #ifndef StallardOSCAN_h
 #define StallardOSCAN_h
-// #include <typeinfo>
+#include <typeinfo>
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
@@ -11,6 +11,7 @@
 
 
 extern "C" void StallardOSGeneralFaultHandler();
+// template <typename message>
 
 class StallardOSCAN
 {
@@ -23,12 +24,12 @@ private:
     StallardOSGPIO CANR;
     StallardOSSemaphore sem;
     StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
-    AD_CAN_STRUCT adCan;
-    MS_CAN_STRUCT msCAN;
+
+    static bool can1used;
+    static bool can2used;
 
     // void init(CANports port, CANBauds baud);
     void receiveMessage_FIFO();
-    bool translateToStruct(StallardOSCanMessage *msg);
 
 public:
     /**
@@ -41,7 +42,17 @@ public:
     StallardOSCAN(
         /*Portname*/ CANports port,
         /*CANPortnumber*/ CANBauds baud);
+    
+    /**
+     *  Destroy a CAN interface
+     */
     ~StallardOSCAN();
+
+    /**
+    * check the usage of the Software FiFo
+    *
+    * @return amount of Messages in the FiFo
+    */
     uint16_t getSWFiFoFillLevel();
 
     /**
@@ -52,6 +63,15 @@ public:
     * @return true if a message is received, false otherwise
     */
     bool receiveMessage(StallardOSCanMessage *msg, uint16_t id);
+    
+    template <typename message>
+    /**
+    * receive a can message.
+    *
+    * @param[in,out] msg the message container to be filled
+    * @return true if a message is received, false otherwise
+    */
+    bool receiveMessage(message *msg);
 
     /**
     * send a can message.
@@ -61,6 +81,11 @@ public:
     */
     void sendMessage(StallardOSCanMessage *msg, uint8_t size);
 
+    /**
+    * send a can message.
+    *
+    * @param msg message to send, should be a struct from StallardOScanStructs.h !
+    */
     void sendMessage(StallardOSCanMessage *msg);
 
 };

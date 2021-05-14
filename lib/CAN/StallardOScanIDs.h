@@ -55,7 +55,7 @@
 #define STOS_CAN_ID_Steering_Whl_Angle 0x172
 #define STOS_CAN_ID_SWCU_ECU_Temp 0x244
 #define STOS_CAN_ID_SWCU_Oh_Shit 0x175
-#define STOS_CAN_ID_SWCU_Switches 0x100
+#define STOS_CAN_ID_SWCU_Switches 0x099
 #define STOS_CAN_ID_Test_FCU_A 0x177
 #define STOS_CAN_ID_Test_FCU_B 0x178
 #define STOS_CAN_ID_Water_Oil_Status_Control 0x246

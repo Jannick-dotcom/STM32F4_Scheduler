@@ -4,25 +4,30 @@
 extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 
+bool StallardOSCAN::can1used = false;
+bool StallardOSCAN::can2used = false;
+
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
     #ifdef contextSwitch
     this->sem.take();
     #endif
     CAN_FilterTypeDef sFilterConfig;
-    if (port == StallardOSCAN1)
+    if (port == StallardOSCAN1 && can1used == false)
     {
         CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFOD, pullup, GPIO_AF9_CAN1);
         CANT = StallardOSGPIO(CAN1_t_pin, CAN1_t_port, AFOD, pullup, GPIO_AF9_CAN1);
         canhandle.Instance = CAN1;
         __CAN1_CLK_ENABLE();
+        can1used = true;
     }
-    else if (port == StallardOSCAN2)
+    else if (port == StallardOSCAN2 && can2used == false)
     {
         CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFOD, pullup, GPIO_AF9_CAN2);
         CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFOD, pullup, GPIO_AF9_CAN2);
         canhandle.Instance = CAN2;
         __CAN2_CLK_ENABLE();
+        can2used = true;
     }
     if (baud == CANBauds::CAN1M)
     {
@@ -104,8 +109,6 @@ StallardOSCAN::~StallardOSCAN() //Destructor
 {
     HAL_CAN_Stop(&canhandle);
     HAL_CAN_DeInit(&canhandle); //Stop CAN interface
-    // delete this->CANR;
-    // delete this->CANT;
 }
 
 uint16_t StallardOSCAN::getSWFiFoFillLevel()
@@ -229,10 +232,18 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
-    if(msg->ID != 0) sendMessage(msg, msg->dlc);
+    if(msg->ID != 0 && msg->dlc != 0) sendMessage(msg, msg->dlc);
 }
 
-// bool StallardOSCAN::translateToStruct(StallardOSCanMessage *msgin,  *msgOut)
-// {
-//     return true;
-// }
+template <typename message>
+bool StallardOSCAN::receiveMessage(message *msg)
+{
+    StallardOSCanMessage temp;
+        if(receiveMessage(&temp, msg->ID))
+        {
+            *(msg->Val) = *(temp.Val);
+            msg->unbuild();
+            return true;
+        }
+        return false;
+}

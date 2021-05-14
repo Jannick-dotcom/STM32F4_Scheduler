@@ -15,18 +15,18 @@ typedef enum CANBauds
 
 struct StallardOSCanMessage
 {
-// private:
-//     virtual void nothing(){};
+private:
+    virtual void nothing(){};
 public:
     uint8_t used = 0;
     uint64_t timestamp = -1; //Set Timestamp to maximum
     uint8_t dlc = 0;
-    uint16_t ID = 0;         //Just 11 Bit !!!!
+    uint16_t ID;         //Just 11 Bit !!!!
     uint8_t Val[8];            //Up to 8 Bytes
 };
 
 template <typename valueTemplate>
-struct CAN_Signal //: private StallardOSCanMessage
+struct CAN_Signal
 {
 public:
     valueTemplate value;
@@ -41,7 +41,6 @@ public:
     uint64_t build()
     {
         return value << startbit;
-        // return (value<<startbit)|((1<<startbit)-1);
     }
     CAN_Signal operator=(valueTemplate val)
     {
