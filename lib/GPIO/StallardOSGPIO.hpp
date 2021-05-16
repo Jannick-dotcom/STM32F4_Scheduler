@@ -67,16 +67,25 @@ public:
     bool read();
     bool write(bool state);
     bool operator=(bool state);           //Operator for writing on the pin
-    bool operator!();                     //Inverting the state
+    // bool operator!();                     //Inverting the state
     
     bool operator&&(StallardOSGPIO &ref); //Logical operator
     bool operator||(StallardOSGPIO &ref); //Logical operator
     bool operator!=(StallardOSGPIO &ref); //Comparison
-    bool operator<(StallardOSGPIO &ref);
-    bool operator>(StallardOSGPIO &ref);
-    bool operator<=(StallardOSGPIO &ref);
-    bool operator>=(StallardOSGPIO &ref);
+    // bool operator<(StallardOSGPIO &ref);
+    // bool operator>(StallardOSGPIO &ref);
+    // bool operator<=(StallardOSGPIO &ref);
+    // bool operator>=(StallardOSGPIO &ref);
     bool operator==(StallardOSGPIO &ref);
+
+    bool operator&&(bool ref); //Logical operator
+    bool operator||(bool ref); //Logical operator
+    bool operator!=(bool ref); //Comparison
+    // bool operator<(bool ref);
+    // bool operator>(bool ref);
+    // bool operator<=(bool ref);
+    // bool operator>=(bool ref);
+    bool operator==(bool ref);
 };
 
 #endif
