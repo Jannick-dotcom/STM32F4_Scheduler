@@ -16,6 +16,7 @@ class StallardOSExtAnalog
 private:
     StallardOSSPI spihandle;
     uint8_t channel;
+    uint8_t adcNumber;
     
     StallardOSGPIO cs;
     StallardOSGPIO drdy;
@@ -30,8 +31,7 @@ public:
 /**
  * create a Analog input instance.
  *
- * @param inst which SPI to use
- * @param baud SPI baud rate
+ * @param adcNumber which adc to use
  * @param channel Number of channel
  */
     StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber);
