@@ -72,8 +72,9 @@ StallardOS::StallardOS()
   //Für Context Switch
   createTCBs();
 #ifdef contextSwitch
-  taskMainStruct = addFunction(taskMain, -1, 255);
-  addFunction(flashOverCanHandle, -2, 3);
+  taskMainStruct = addFunction(taskMain, -2, 255);
+  if(taskMainStruct == nullptr) while(1);
+  addFunction(flashOverCanHandle, -3, 3);
 #endif
 }
 
@@ -133,6 +134,18 @@ void StallardOS::createTCBs()
   }
 }
 
+#ifdef contextSwitch
+/**
+ * Add a new Task to execute list.
+ *
+ * @param function Task to execute.
+ * @param id unique id of the task.
+ * @param prio priority of the task, lower means higher.
+ * @param refreshRate frequency of execution.
+ * @return pointer to the created tcb.
+ */
+struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)
+#else
 /**
  * Add a new Task to execute list.
  *
@@ -143,13 +156,10 @@ void StallardOS::createTCBs()
  * @param Execcount amount of executes of this task, no value is endless.
  * @return pointer to the created tcb.
  */
-#ifdef contextSwitch
-struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio)
-#else
 struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t exec_freq, uint16_t Execcount)
 #endif
 {
-  if (function == nullptr || searchFunction(id) != nullptr) //Make sure the parameters are correct
+  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000) //Make sure the parameters are correct
   {
     return nullptr;
   }
@@ -159,61 +169,6 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
     return nullptr;
   }
 #endif
-
-  struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
-
-  function_struct_ptr = searchFreeFunction();
-  if (function_struct_ptr == nullptr)
-  {
-    //function_struct_ptr = new struct function_struct; //ein neues erstellen
-    //if (function_struct_ptr == nullptr)               //Wenn kein HEAP Platz mehr frei ist...
-    //{
-    return nullptr; //Aus der Funktion rausspringen
-    //}
-  }
-
-  if (first_function_struct == nullptr) //Wenn schon funktionen hinzugefügt wurden
-  {
-    return nullptr;
-  }
-
-  //alle Werte übertragen
-  function_struct_ptr->function = function;
-  function_struct_ptr->executable = true;
-  function_struct_ptr->priority = prio;
-  function_struct_ptr->id = id;
-  function_struct_ptr->error = 0;
-
-#ifdef contextSwitch
-  function_struct_ptr->refreshRate = 0;
-  function_struct_ptr->lastYield = 0;
-  function_struct_ptr->State = NEW;                                       //New Task
-  function_struct_ptr->Stack = function_struct_ptr->vals + sizeStack - 4; //End of Stack
-#else
-  function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
-  function_struct_ptr->frequency = exec_freq;
-#endif
-  function_struct_ptr->used = true;
-  function_struct_ptr->continueInMS = 0;
-  return function_struct_ptr;
-}
-
-#ifdef contextSwitch
-/**
- * Add a new Task to execute list.
- *
- * @param function Task to execute.
- * @param id unique id of the task.
- * @param prio priority of the task, lower means higher.
- * @param refreshRate How often the Task should walk through per second.
- * @return pointer to the created tcb.
- */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)
-{
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000) //Make sure the parameters are correct
-  {
-    return nullptr;
-  }
 
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
 
@@ -252,7 +207,6 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->continueInMS = 0;
   return function_struct_ptr;
 }
-#endif
 
 /**
  * Here we en/disable a Task from the List.

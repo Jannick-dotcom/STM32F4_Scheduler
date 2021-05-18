@@ -8,24 +8,35 @@ extern struct function_struct *nextTask;
 void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 {
     disable_interrupts();
-    ///TODO: Only when current task != 0
 #ifdef contextSwitch
-    currentTask->Stack = currentTask->vals + sizeStack - 4; //End of Stack
-    asm("MOV r4, #0");                                  //R0
-    asm("MOV r5, #1");                                  //R1
-    asm("MOV r6, #2");                                  //R2
-    asm("MOV r7, #3");                                  //R3
-    asm("MOV r8, #12");                                 //R12
-    asm("MOV r9, %0" : : "r"(taskMainStruct->function));//LR
-    asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier));   //PC
-    asm("MOV r11, #0x01000000");                        //XPSR
+    if (taskMainStruct != 0)
+    {
+        if (currentTask == 0)
+            currentTask = taskMainStruct;
+        currentTask->Stack = currentTask->vals + sizeStack - 4; //End of Stack
+        // asm("MOV r3, #2");                                  //CONTROL
+        asm("MOV r4, #0");  //R0
+        asm("MOV r5, #1");  //R1
+        asm("MOV r6, #2");  //R2
+        asm("MOV r7, #3");  //R3
+        asm("MOV r8, #12"); //R12
+        asm("MOV r9, %0"
+            :
+            : "r"(taskMainStruct->function)); //LR
+        asm("MOV r10, %0"
+            :
+            : "r"((uint32_t)currentTask->function & functionModifier)); //PC
+        asm("MOV r11, #0x01000000");                                    //XPSR
 
-    asm("MOV r0, %0" : : "r"(currentTask->Stack));  //get saved Stack pointer
-    asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
-    asm("MSR PSP, r0");             //set PSP
-    currentTask->waitingForSemaphore = 0;
-    currentTask->semVal = 0;
-    currentTask->State = RUNNING;   //Save state as running
+        asm("MOV r0, %0"
+            :
+            : "r"(currentTask->Stack)); //get saved Stack pointer
+        asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
+        asm("MSR PSP, r0");             //set PSP
+        currentTask->waitingForSemaphore = 0;
+        currentTask->semVal = 0;
+        currentTask->State = RUNNING; //Save state as running
+    }
 #endif
     enable_interrupts();
 }
@@ -58,12 +69,12 @@ void UsageFault_Handler()
 // FPU IRQ Handler
 void FPU_IRQHandler(void)
 {
-    asm("MOV R0, LR");                  // move LR to R0
-    asm("MOV R1, SP");                  // Save SP to R1 to avoid any modification to the stack pointer from FPU_ExceptionHandler
+    asm("MOV R0, LR"); // move LR to R0
+    asm("MOV R1, SP"); // Save SP to R1 to avoid any modification to the stack pointer from FPU_ExceptionHandler
     asm("MRS r4, MSP");
     asm("MRS r5, PSP");
 
-    asm("VMRS R2, FPSCR");              // dummy read access, to force clear
+    asm("VMRS R2, FPSCR"); // dummy read access, to force clear
     asm("CMP LR, #0xFFFFFFE9");
 
     asm("ITTT EQ"); //Next 3 instructions executed if LR = 0xFFFFFFE9

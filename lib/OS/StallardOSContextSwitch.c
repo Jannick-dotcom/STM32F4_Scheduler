@@ -248,8 +248,8 @@ __attribute__((always_inline)) void switchTask(void)
     if ((currentTask->State == RUNNING)) //Hier Task anhalten
     {
         asm("MRS r0, PSP");         //Get Process Stack Pointer
-        asm("MRS r3, CONTROL");
-        asm("STMDB r0!, {r3-r11}"); //Save additional not yet saved registers
+        // asm("MRS r3, CONTROL");
+        asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
         asm("VSTMDB r0!, {s16-s31}");
         asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
@@ -284,9 +284,9 @@ __attribute__((always_inline)) void switchTask(void)
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack)); //get saved Stack pointer
         asm("VLDMIA r0!, {s16-s31}");
-        asm("LDMIA r0!, {r3-r11}");   //load registers from memory
+        asm("LDMIA r0!, {r4-r11}");   //load registers from memory
         asm("MSR PSP, r0");           //set PSP
-        asm("MSR CONTROL, r3");
+        // asm("MSR CONTROL, r3");
         currentTask->State = RUNNING; //Save state as running
         nextTask = NULL;
     }

@@ -38,8 +38,7 @@ public:
   //Constructor
   StallardOS(); //Create a Task Scheduler
   #ifdef contextSwitch
-  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio);
-  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate);
+  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
   #else
   struct function_struct *addFunction(
       /*Funktion*/ void (*function)(),
