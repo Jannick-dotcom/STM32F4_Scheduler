@@ -5,7 +5,6 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
-#include "StallardOSHelpers.h"
 #include "StallardOSsem.hpp"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSpwm.hpp"
@@ -17,6 +16,8 @@
 #include "StallardOSPID.hpp"
 #include "StallardOSSPI.hpp"
 // #include "StallardOSDAC.hpp"
+
+#include "StallardOSHelpers.h"
 
 static StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
 static StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
@@ -68,7 +69,7 @@ public:
   #endif
   uint64_t getRuntimeMs();
   uint64_t getRuntimeUs(); 
-  void goBootloader();
+  static void goBootloader();
   // static void flashOverCanHandle();
   
 

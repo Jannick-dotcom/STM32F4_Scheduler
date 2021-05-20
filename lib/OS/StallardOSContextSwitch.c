@@ -20,7 +20,7 @@ volatile uint64_t taskMainTime = 0; //Experimental
  * @param
  * @return
  *//* code */
-__attribute__((always_inline)) void StallardOS_noTask()
+__attribute__((always_inline)) inline void StallardOS_noTask()
 {
     // asm("MOV R7, #0");
     asm("SVC #0");
@@ -32,7 +32,7 @@ __attribute__((always_inline)) void StallardOS_noTask()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_sudo()
+__attribute__((always_inline)) inline void StallardOS_sudo()
 {
     // asm("MOV R7, #3");
     asm("SVC #3");
@@ -44,7 +44,7 @@ __attribute__((always_inline)) void StallardOS_sudo()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_unSudo()
+__attribute__((always_inline)) inline void StallardOS_unSudo()
 {
     // asm("MOV R7, #4");
     asm("SVC #4");
@@ -56,7 +56,7 @@ __attribute__((always_inline)) void StallardOS_unSudo()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_start()
+__attribute__((always_inline)) inline void StallardOS_start()
 {
     // asm("MOV R7, #5");
     asm("SVC #5");
@@ -68,7 +68,7 @@ __attribute__((always_inline)) void StallardOS_start()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_delay()
+__attribute__((always_inline)) inline void StallardOS_delay()
 {
     // asm("MOV R7, #2");
     asm("SVC #2");
@@ -80,7 +80,7 @@ __attribute__((always_inline)) void StallardOS_delay()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_endTask()
+__attribute__((always_inline)) inline void StallardOS_endTask()
 {
     // asm("MOV R7, #1");
     asm("SVC #1");
@@ -92,7 +92,7 @@ __attribute__((always_inline)) void StallardOS_endTask()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_goBootloader()
+__attribute__((always_inline)) inline void StallardOS_goBootloader()
 {
     // asm("MOV R7, #6");
     asm("SVC #6");
@@ -104,7 +104,7 @@ __attribute__((always_inline)) void StallardOS_goBootloader()
  * @param
  * @return
  */
-__attribute__((always_inline)) void enable_interrupts()
+__attribute__((always_inline)) inline void enable_interrupts()
 {
     asm("CPSIE I"); //Instruction for enabling interrupts
 }
@@ -115,7 +115,7 @@ __attribute__((always_inline)) void enable_interrupts()
  * @param
  * @return
  */
-__attribute__((always_inline)) void disable_interrupts() 
+__attribute__((always_inline)) inline void disable_interrupts() 
 {
     asm("CPSID I"); //Instruction for disabling interrupts
 }
@@ -126,7 +126,7 @@ __attribute__((always_inline)) void disable_interrupts()
  * @param
  * @return
  */
-__attribute__((always_inline)) void pendPendSV()
+__attribute__((always_inline)) inline void pendPendSV()
 {
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
@@ -137,7 +137,7 @@ __attribute__((always_inline)) void pendPendSV()
  * @param
  * @return
  */
-__attribute__((always_inline)) void StallardOS_SysTick_Config(uint32_t ticks)
+__attribute__((always_inline)) inline void StallardOS_SysTick_Config(uint32_t ticks)
 {
     SysTick_Config(ticks);
 }
@@ -166,12 +166,16 @@ void jumpToBootloader(void)
 }
 
 #ifdef contextSwitch
-void findNextFunction(uint32_t *minDelayT)
+void findNextFunction()
 {
     nextTask = NULL;
-    struct function_struct *temp = currentTask->next;
+    struct function_struct *temp = currentTask;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
-    while (temp != currentTask && temp != NULL)
+    if(temp == NULL)
+    {
+        return;
+    }
+    do
     {
         if(temp->used == 0) //If the TCB is unused, continue with the next one
         {
@@ -179,7 +183,7 @@ void findNextFunction(uint32_t *minDelayT)
             continue;
         }
 
-        if (temp->continueInMS < sysTickMillisPerInt)
+        if (temp->continueInMS <= sysTickMillisPerInt)
         {
             temp->continueInMS = 0;
         }
@@ -209,7 +213,8 @@ void findNextFunction(uint32_t *minDelayT)
 #endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
-    if((nextTask == taskMainStruct || nextTask == NULL) && currentTask->executable == 1 && temp->continueInMS == 0) nextTask = currentTask;
+    while (temp != currentTask);
+    if(nextTask->continueInMS > 0) nextTask = NULL;    
 }
 #endif //contextSwitch
 
@@ -240,7 +245,7 @@ void taskOnEnd(void)
  * @return
  */
 #ifdef contextSwitch
-__attribute__((always_inline)) void switchTask(void)
+__attribute__((always_inline)) inline void switchTask(void)
 {
     if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
     if (nextTask == NULL) nextTask = taskMainStruct;
@@ -304,7 +309,6 @@ void SVC_Handler()
 {
     disable_interrupts();
     uint8_t handleMode;
-    uint32_t temp;
 
     asm("TST    LR, #4");
     asm("ITE    EQ");
@@ -319,18 +323,16 @@ void SVC_Handler()
     {
     case 0: //No Task
         currentTask = NULL;
-        //findNextFunction(NULL);
         pendPendSV();
         break;
 
     case 1: //Task has Ended
         currentTask = NULL;
-        //findNextFunction(NULL);
         switchTask();
         break;
 
     case 2: //Delay
-        findNextFunction(&temp);
+        nextTask = NULL;
         switchTask();
         break;
 
@@ -352,7 +354,6 @@ void SVC_Handler()
         SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
         StallardOS_SetSysClock(168);
         SysTick_Config(sysTickTicks);
-        SystemCoreClockUpdate();
         NVIC_SetPriority(SysTick_IRQn, 0x00);
         NVIC_SetPriority(PendSV_IRQn, 0xFF);
         NVIC_EnableIRQ(PendSV_IRQn);
@@ -369,7 +370,6 @@ void SVC_Handler()
     default:
         break;
     }
-
     enable_interrupts(); //Enable all interrupts
 }
 #endif
@@ -384,34 +384,24 @@ void SVC_Handler()
 void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
-#ifdef contextSwitch
+
     usCurrentTimeSinceStart++;
-    if(usCurrentTimeSinceStart % (defaultSysTickFreq / 1000) == 0) //Every millisecond
+    if(usCurrentTimeSinceStart % (sysTickFreq / 1000) == 0) //Every millisecond
     {
         msCurrentTimeSinceStart++;//sysTickMillisPerInt;
         HAL_IncTick();
-        uint32_t minDelayT = -1;
+#ifdef contextSwitch
         if(currentTask == taskMainStruct) 
         {
             taskMainTime += sysTickMillisPerInt; //Auslastungsberechnung
         }
-        findNextFunction(&minDelayT);
+        findNextFunction();
         if(currentTask != nextTask)
         {
             pendPendSV(); //If nextTask is not this task, set the PendSV to pending
         }
-    }
-#ifdef useSystickAltering
-    if (minDelayT >= 90 || minDelayT < 1)
-    {
-        minDelayT = 1;
-    }
-    SysTick_Config((uint32_t)(SystemCoreClock / (1000 * minDelayT))); //Set the frequency of the systick interrupt
-    sysTickMillisPerInt = minDelayT;
-#endif //useSystickAltering
-
 #endif //contextSwitch
-    
+    }
     enable_interrupts(); //enable all interrupts
 }
 
@@ -426,7 +416,6 @@ void PendSV_Handler()
 {
     disable_interrupts();
     switchTask();
-    //asm("MOV LR, #0xFFFFFFFD");                             //Set the LR to 0xFFFFFFFD to signal Process mode with psp
     enable_interrupts(); //Enable all interrupts
 }
 #endif

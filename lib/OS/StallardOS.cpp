@@ -1,5 +1,15 @@
 #include "StallardOS.hpp"
 
+extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
+extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
+extern "C" volatile uint64_t taskMainTime;
+
+//Kontext Switch
+struct function_struct *currentTask = nullptr;
+struct function_struct *nextTask = nullptr;
+struct function_struct *taskMainStruct = nullptr;
+
+extern "C" void StallardOS_SetSysClock(uint8_t clockspeed);
 extern "C" void StallardOS_start();
 extern "C" void StallardOS_delay();
 extern "C" void StallardOS_noTask();
@@ -10,15 +20,6 @@ extern "C" void StallardOS_endTask();
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
-extern "C" void StallardOS_SetSysClock(uint8_t);
-extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
-extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
-extern "C" volatile uint64_t taskMainTime;
-
-//Kontext Switch
-struct function_struct *currentTask = nullptr;
-struct function_struct *nextTask = nullptr;
-struct function_struct *taskMainStruct = nullptr;
 
 /**
  * Waste Time if all tasks are in delay.
@@ -41,18 +42,18 @@ void flashOverCanHandle()
     while (1)
     {
 #endif
-        if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
-        {
-            for (uint8_t i = 0; i < FOCMessage.dlc; i++)
-            {
-                if (FOCMessage.Val[i] == STOS_current_ECU_ID)
-                {
-                    // StallardOSJanniq.goBootloader();
-                }
-            }
-        }
+      if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
+      {
+          for (uint8_t i = 0; i < FOCMessage.dlc; i++)
+          {
+              if (FOCMessage.Val == STOS_current_ECU_ID)
+              {
+                // StallardOS::goBootloader();
+              }
+          }
+      }
 #ifdef contextSwitch
-        StallardOS::delay(100);
+      StallardOS::delay(100);
     }
 #endif
 }
@@ -74,7 +75,7 @@ StallardOS::StallardOS()
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
-  addFunction(flashOverCanHandle, -3, 3);
+  // addFunction(flashOverCanHandle, -3, 3);
 #endif
 }
 
@@ -204,6 +205,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->frequency = exec_freq;
 #endif
   function_struct_ptr->used = true;
+  function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->continueInMS = 0;
   return function_struct_ptr;
 }
@@ -320,7 +322,7 @@ struct function_struct *StallardOS::searchFreeFunction(void)
  */
 void StallardOS::delay(uint32_t milliseconds)
 {
-  currentTask->continueInMS = milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+  currentTask->continueInMS += milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
   // currentTask->executable = false;
 
 #ifdef contextSwitch
@@ -403,7 +405,7 @@ void StallardOS::startOS(void)
 #ifdef contextSwitch
     NVIC_EnableIRQ(SVCall_IRQn);
     asm("MRS R0, MSP");
-    asm("SUB R0, #20"); //Reserve some space for Handlers (20*4 Byte)
+    asm("SUB R0, #100"); //Reserve some space for Handlers (100*4 Byte)
     asm("MSR PSP, R0");
     asm("MOV R0, #3");
     asm("MSR CONTROL, R0");

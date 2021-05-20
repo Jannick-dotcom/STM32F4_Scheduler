@@ -7,6 +7,24 @@
 #define functionModifier (uint32_t)0xFFFFFFFE     //Use the function pointer with lowest bit zero
 #define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void StallardOS_SetSysClock(uint8_t clockspeed);
+void StallardOS_start();
+void StallardOS_delay();
+void StallardOS_noTask();
+void StallardOS_sudo();
+void StallardOS_unSudo();
+void StallardOS_delay();
+void StallardOS_endTask();
+void StallardOS_goBootloader();
+void enable_interrupts();
+void disable_interrupts();
+#ifdef __cplusplus
+}
+#endif
+
 typedef enum {
   NEW,
   RUNNING,

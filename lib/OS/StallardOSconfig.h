@@ -4,7 +4,7 @@
 #define STOS_current_ECU_ID 2
 #define contextSwitch
 
-#define sizeStack 300      //300 * 4 Byte (Stack size for Tasks)
+#define sizeStack 500      //300 * 4 Byte (Stack size for Tasks)
 #define countTasks 10
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 #define externalOszillator 25 //[MHz]

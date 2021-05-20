@@ -1,6 +1,7 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include "StallardOSconfig.h"
+#include "StallardOSHelpers.h"
 
 // // clock source is selected with CLOCK_SOURCE in json config
 // #define USE_PLL_HSE_EXTC 0x8 // Use external clock (ST Link MCO)
