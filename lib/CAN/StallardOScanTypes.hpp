@@ -22,7 +22,7 @@ public:
     uint64_t timestamp = -1; //Set Timestamp to maximum
     uint8_t dlc = 0;
     uint16_t ID;         //Just 11 Bit !!!!
-    uint8_t Val[8];            //Up to 8 Bytes
+    uint64_t Val;            //Up to 8 Bytes
 };
 
 template <typename valueTemplate>
@@ -30,17 +30,26 @@ struct CAN_Signal
 {
 public:
     valueTemplate value;
-    uint8_t countOfBits;
-    uint16_t startbit;
-    CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start)
+    const uint8_t countOfBits;
+    const uint16_t startbit;
+    CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start) : countOfBits(bitcount), startbit(start)
     {
         value = val;
-        countOfBits = bitcount;
-        startbit = start;
+        // countOfBits = bitcount;
+        // startbit = start;
     }
     uint64_t build()
     {
-        return value << startbit;
+        return (value & prepareMask()) << startbit;
+    }
+    uint64_t prepareMask()
+    {
+        uint8_t mask = 0;
+        for(uint8_t i = 0; i < countOfBits; i++)
+        {
+            mask = (mask << 1) | 1;
+        }
+        return mask;
     }
     CAN_Signal operator=(valueTemplate val)
     {

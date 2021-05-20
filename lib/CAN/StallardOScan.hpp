@@ -1,6 +1,6 @@
 #ifndef StallardOSCAN_h
 #define StallardOSCAN_h
-#include <typeinfo>
+// #include <typeinfo>
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
@@ -11,7 +11,6 @@
 
 
 extern "C" void StallardOSGeneralFaultHandler();
-// template <typename message>
 
 class StallardOSCAN
 {
@@ -64,14 +63,20 @@ public:
     */
     bool receiveMessage(StallardOSCanMessage *msg, uint16_t id);
     
-    template <typename message>
     /**
     * receive a can message.
     *
     * @param[in,out] msg the message container to be filled
     * @return true if a message is received, false otherwise
     */
-    bool receiveMessage(message *msg);
+    bool receiveMessage(StallardOSCanMessage *msg)
+    {
+        if (receiveMessage(msg, msg->ID))
+        {
+            return true;
+        }
+        return false;
+    }
 
     /**
     * send a can message.
