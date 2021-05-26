@@ -6,72 +6,72 @@ uint8_t mapToAlternateFunction(TIM_TypeDef *instance)
     if (instance == TIM1)
     {
         __HAL_RCC_TIM1_CLK_ENABLE();
-        return Tim1;
+        return STOS_Tim1;
     }
     else if (instance == TIM2)
     {
         __HAL_RCC_TIM2_CLK_ENABLE();
-        return Tim2;
+        return STOS_Tim2;
     }
     else if (instance == TIM3)
     {
         __HAL_RCC_TIM3_CLK_ENABLE();
-        return Tim3;
+        return STOS_Tim3;
     }
     else if (instance == TIM4)
     {
         __HAL_RCC_TIM4_CLK_ENABLE();
-        return Tim4;
+        return STOS_Tim4;
     }
     else if (instance == TIM5)
     {
         __HAL_RCC_TIM5_CLK_ENABLE();
-        return Tim5;
+        return STOS_Tim5;
     }
     // else if (instance == TIM6)
     // {
     //     __HAL_RCC_TIM6_CLK_ENABLE();
-    //     return Tim6;
+    //     return STOS_Tim6;
     // }
     // else if (instance == TIM7)
     // {
     //     __HAL_RCC_TIM7_CLK_ENABLE();
-    //     return Tim7;
+    //     return STOS_Tim7;
     // }
     else if (instance == TIM8)
     {
         __HAL_RCC_TIM8_CLK_ENABLE();
-        return Tim8;
+        return STOS_Tim8;
     }
     else if (instance == TIM9)
     {
         __HAL_RCC_TIM9_CLK_ENABLE();
-        return Tim9;
+        return STOS_Tim9;
     }
     else if (instance == TIM10)
     {
         __HAL_RCC_TIM10_CLK_ENABLE();
-        return Tim10;
+        return STOS_Tim10;
     }
     else if (instance == TIM11)
     {
         __HAL_RCC_TIM11_CLK_ENABLE();
-        return Tim11;
+        return STOS_Tim11;
     }
     else if (instance == TIM12)
     {
         __HAL_RCC_TIM12_CLK_ENABLE();
-        return Tim12;
+        return STOS_Tim12;
     }
     else if (instance == TIM13)
     {
         __HAL_RCC_TIM13_CLK_ENABLE();
-        return Tim13;
+        return STOS_Tim13;
     }
     else if (instance == TIM14)
     {
         __HAL_RCC_TIM14_CLK_ENABLE();
-        return Tim14;
+        return STOS_Tim14;
     }
     else
         return -1;
@@ -87,7 +87,7 @@ uint8_t mapToAlternateFunction(TIM_TypeDef *instance)
  * @param freq frequency of the pwm
  * @param bitcount number of bits for the pwm
  */
-StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, uint8_t channel, uint8_t number, ports port, uint16_t freq, uint8_t bitcount) : 
+StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t number, ports port, uint16_t freq, uint8_t bitcount) : 
     gpio(number, port, AFPP, nopull, mapToAlternateFunction(instance))
 {
 #ifdef contextSwitch

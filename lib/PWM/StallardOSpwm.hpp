@@ -11,22 +11,30 @@
 
 extern "C" void StallardOSGeneralFaultHandler();
 
+typedef enum PWMChannel
+{
+    ch1 = TIM_CHANNEL_1,
+    ch2 = TIM_CHANNEL_2,
+    ch3 = TIM_CHANNEL_3,
+    ch4 = TIM_CHANNEL_4
+}PWMChannel;
+
 typedef enum PWMalternateFunctions
 {
-    Tim1 = GPIO_AF1_TIM1,
-    Tim2 = GPIO_AF1_TIM2,
-    Tim3 = GPIO_AF2_TIM3,
-    Tim4 = GPIO_AF2_TIM4,
-    Tim5 = GPIO_AF2_TIM5,
-    //Tim6 = NULL,
-    //Tim7 = NULL,
-    Tim8 = GPIO_AF3_TIM8,
-    Tim9 = GPIO_AF3_TIM9,
-    Tim10 = GPIO_AF3_TIM10,
-    Tim11 = GPIO_AF3_TIM11,
-    Tim12 = GPIO_AF9_TIM12,
-    Tim13 = GPIO_AF9_TIM13,
-    Tim14 = GPIO_AF9_TIM14
+    STOS_Tim1 = GPIO_AF1_TIM1,
+    STOS_Tim2 = GPIO_AF1_TIM2,
+    STOS_Tim3 = GPIO_AF2_TIM3,
+    STOS_Tim4 = GPIO_AF2_TIM4,
+    STOS_Tim5 = GPIO_AF2_TIM5,
+    //STOS_Tim6 = NULL,
+    //STOS_Tim7 = NULL,
+    STOS_Tim8 = GPIO_AF3_TIM8,
+    STOS_Tim9 = GPIO_AF3_TIM9,
+    STOS_Tim10 = GPIO_AF3_TIM10,
+    STOS_Tim11 = GPIO_AF3_TIM11,
+    STOS_Tim12 = GPIO_AF9_TIM12,
+    STOS_Tim13 = GPIO_AF9_TIM13,
+    STOS_Tim14 = GPIO_AF9_TIM14
 } PWMalternateFunctions;
 
 class StallardOSpwm
