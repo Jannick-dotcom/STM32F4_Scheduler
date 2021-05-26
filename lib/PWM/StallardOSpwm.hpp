@@ -13,10 +13,10 @@ extern "C" void StallardOSGeneralFaultHandler();
 
 typedef enum PWMChannel
 {
-    ch1 = TIM_CHANNEL_1,
-    ch2 = TIM_CHANNEL_2,
-    ch3 = TIM_CHANNEL_3,
-    ch4 = TIM_CHANNEL_4
+    PWMch1 = TIM_CHANNEL_1,
+    PWMch2 = TIM_CHANNEL_2, 
+    PWMch3 = TIM_CHANNEL_3,
+    PWMch4 = TIM_CHANNEL_4
 }PWMChannel;
 
 typedef enum PWMalternateFunctions
@@ -54,7 +54,7 @@ private:
 public:
     StallardOSpwm(
         /*Timer to be used*/ TIM_TypeDef *instance,
-        /*Timer Channel*/ uint8_t channel,
+        /*Timer Channel*/ PWMChannel channel,
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
         /*Frequency*/ uint16_t freq,
