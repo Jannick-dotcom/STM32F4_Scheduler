@@ -4,8 +4,8 @@
 #define STOS_current_ECU_ID 2
 #define contextSwitch
 
-#define sizeStack 500      //300 * 4 Byte (Stack size for Tasks)
-#define countTasks 10
+#define sizeStack 512      //300 * 4 Byte (Stack size for Tasks)
+#define countTasks 3
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 #define externalOszillator 25 //[MHz]
 
@@ -26,5 +26,9 @@
 #define CAN_debug
 
 #define extADCSpiPort SPI2
+#define SPI_GPIO_PORT PORTB
+#define SPI_GPIO_PIN_MOSI 15
+#define SPI_GPIO_PIN_MISO 14
+#define SPI_GPIO_PIN_SCK 10 
 
 /////////////////////////////////////////////
