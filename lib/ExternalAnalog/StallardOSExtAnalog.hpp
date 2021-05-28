@@ -21,7 +21,7 @@ private:
     StallardOSGPIO cs;
     StallardOSGPIO drdy;
 
-    static StallardOSSemaphore sem;
+    StallardOSSemaphore sem;
     uint8_t registerRead(uint8_t address);
     void registerWrite(uint8_t address, uint8_t value);
     uint16_t channelRead();

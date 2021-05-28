@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
+#include "StallardOSGPIO.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -14,6 +15,9 @@ class StallardOSSPI
 private:
     StallardOSSemaphore sem;
     SPI_HandleTypeDef handle;
+    StallardOSGPIO mosi;
+    StallardOSGPIO miso;
+    StallardOSGPIO sclk;
 
 public:
     StallardOSSPI(SPI_TypeDef *inst, uint32_t baud);

@@ -67,8 +67,8 @@ uint16_t StallardOSExtAnalog::channelRead()
 uint16_t StallardOSExtAnalog::getValue()
 {
     uint16_t buf;
-    this->sem.take();
+    sem.take();
     buf = channelRead();
-    this->sem.give();
+    sem.give();
     return buf;
 }

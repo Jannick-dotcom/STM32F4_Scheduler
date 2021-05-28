@@ -1,10 +1,14 @@
 #include "StallardOSSPI.hpp"
 
-StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, uint32_t baud)
+StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, uint32_t baud, ports port, uint8_t number)
 {
     #ifdef contextSwitch
     this->sem.take();
     #endif
+
+    this->miso = StallardOSGPIO(SPI_GPIO_PIN_MISO, SPI_GPIO_PORT, Input, nopull, GPIO_AF5_SPI2);
+    this->mosi = StallardOSGPIO(SPI_GPIO_PIN_MISO, SPI_GPIO_PORT, Input, nopull, GPIO_AF5_SPI2);
+    this->sclk = StallardOSGPIO(SPI_GPIO_PIN_SCK, SPI_GPIO_PORT, Input, nopull, GPIO_AF5_SPI2);
     handle.Instance = inst;
     handle.Init.Mode = SPI_MODE_MASTER; //SPI_MODE_SLAVE
     handle.Init.Direction = SPI_DIRECTION_2LINES; //SPI_DIRECTION_1LINE, SPI_DIRECTION_2LINES_RXONLY
