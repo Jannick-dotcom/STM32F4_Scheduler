@@ -10,6 +10,11 @@
 
 extern "C" void StallardOSGeneralFaultHandler();
 
+typedef enum SPIBauds
+{
+    Normal = SPI_BAUDRATEPRESCALER_256
+} SPIBauds;
+
 class StallardOSSPI
 {
 private:
@@ -20,7 +25,7 @@ private:
     StallardOSGPIO sclk;
 
 public:
-    StallardOSSPI(SPI_TypeDef *inst, uint32_t baud);
+    StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud);
     void send(uint8_t *data, uint16_t size);
     void receive(uint8_t *data, uint16_t size, uint16_t timeout);
 };
