@@ -1,6 +1,6 @@
 #include "StallardOSGPIO.hpp"
 
-#ifdef STM32f417ig
+#ifdef STM32F417xx
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
 #else
 const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH};
@@ -46,7 +46,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
     __GPIOF_CLK_ENABLE();
     __GPIOG_CLK_ENABLE();
     __GPIOH_CLK_ENABLE();
-    #ifdef STM32f417xx
+    #ifdef STM32F417xx
     __GPIOI_CLK_ENABLE();
     #endif
 
@@ -100,7 +100,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     __GPIOF_CLK_ENABLE();
     __GPIOG_CLK_ENABLE();
     __GPIOH_CLK_ENABLE();
-    #ifdef STM32f417xx
+    #ifdef STM32F417xx
     __GPIOI_CLK_ENABLE();
     #endif
     
@@ -191,10 +191,10 @@ bool StallardOSGPIO::write(bool state)
     return 0;
 }
 
-// bool StallardOSGPIO::operator!()
-// {
-//     return !this->read();
-// }
+bool StallardOSGPIO::operator!()
+{
+    return !this->read();
+}
 
 bool StallardOSGPIO::operator&&(StallardOSGPIO &ref)
 {
