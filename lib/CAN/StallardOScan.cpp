@@ -38,11 +38,11 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     }
     if (baud == CANBauds::CAN1M)
     {
-        canhandle.Init.Prescaler = 21;
+        canhandle.Init.Prescaler = 3; //3?
     }
     else if (baud == CANBauds::CAN500k)
     {
-        canhandle.Init.Prescaler = 42;
+        canhandle.Init.Prescaler = 6; //6?
     }
 
 #ifdef CAN_debug
@@ -157,7 +157,7 @@ void StallardOSCAN::receiveMessage_FIFO()
             {
                 if (StallardOSCanFifo[k].used == 0) //If unused
                 {
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, (uint8_t*)&StallardOSCanFifo[k].Val) == HAL_OK) //Get Message
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, (uint8_t *)&StallardOSCanFifo[k].Val) == HAL_OK) //Get Message
                     {
                         StallardOSCanFifo[k].ID = RxHeader.StdId;                 //Copy to SW FiFo
                         StallardOSCanFifo[k].used = 1;                            //Indicate Message is occupied
@@ -169,7 +169,7 @@ void StallardOSCAN::receiveMessage_FIFO()
                 else if (k == sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 2) //FIFO full?
                 {
                     //When fifo full delete the oldest message
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, (uint8_t*)&StallardOSCanFifo[oldestMessage].Val) == HAL_OK) //Get Message
+                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, (uint8_t *)&StallardOSCanFifo[oldestMessage].Val) == HAL_OK) //Get Message
                     {
                         StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;                 //Delete oldest message and overwrite with new
                         StallardOSCanFifo[oldestMessage].used = 1;                            //Indicate still used
@@ -242,8 +242,8 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     TxHeader.DLC = size;         //Set Amount of Data bytes
 
     while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3)
-        ;                                                                               //Wait until all TX Mailboxes are free
-    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t*)&msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
+        ;                                                                                           //Wait until all TX Mailboxes are free
+    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
 #endif
