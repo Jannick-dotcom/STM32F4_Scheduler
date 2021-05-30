@@ -17,6 +17,12 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 #endif
         return;
     }
+    __HAL_RCC_USART1_CLK_ENABLE();
+    __HAL_RCC_USART2_CLK_ENABLE();
+    __HAL_RCC_USART3_CLK_ENABLE();
+    __HAL_RCC_USART6_CLK_ENABLE();
+    __HAL_RCC_UART4_CLK_ENABLE();
+    __HAL_RCC_UART5_CLK_ENABLE();
     huart.Instance = serPort;
     huart.Init.BaudRate = baud;
     huart.Init.WordLength = UART_WORDLENGTH_8B;
