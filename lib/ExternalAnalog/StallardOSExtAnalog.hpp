@@ -20,6 +20,7 @@ private:
     
     StallardOSGPIO cs;
     StallardOSGPIO drdy;
+    StallardOSGPIO reset;
 
     StallardOSSemaphore sem;
     uint8_t registerRead(uint8_t address);

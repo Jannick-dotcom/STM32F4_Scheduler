@@ -1,13 +1,14 @@
 #include "StallardOSExtAnalog.hpp"
 
 StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber) : 
-spihandle(extADCSpiPort, 0)
-// cs(3,PORTB, Input),
-// drdy(3,PORTB,Input)
+spihandle(extADCSpiPort, Normal),
+cs(4+adcNumber,PORTB, Output, true),
+drdy(6+adcNumber,PORTB,Input)
 {
     if(adcNumber > 2 || channel > 15) return;
-    cs = StallardOSGPIO(4+adcNumber,PORTB, Output, true);
-    drdy = StallardOSGPIO(6+adcNumber, PORTB, Input);
+    // cs = StallardOSGPIO(4+adcNumber,PORTB, Output, true);
+    // drdy = StallardOSGPIO(6+adcNumber, PORTB, Input);
+    reset = StallardOSGPIO(2+adcNumber, PORTD, Output);
     this->channel = channel;
     this->adcNumber = adcNumber;
 
