@@ -10,6 +10,9 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
     #ifdef contextSwitch
     this->sem.take();
     #endif
+    __HAL_RCC_I2C1_CLK_ENABLE();
+    __HAL_RCC_I2C2_CLK_ENABLE();
+    __HAL_RCC_I2C3_CLK_ENABLE();
     hi2c.Instance = instance;
     hi2c.Init.ClockSpeed = freq;
     hi2c.Init.DutyCycle = I2C_DUTYCYCLE_2;
