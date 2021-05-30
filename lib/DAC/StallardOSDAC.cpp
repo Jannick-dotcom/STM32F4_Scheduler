@@ -2,6 +2,7 @@
 
 StallardOSDAC::StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number)
 {
+    __HAL_RCC_DAC_CLK_ENABLE();
     this->channel = channel;
     handle.Instance = dac;
     gpio = StallardOSGPIO(number, port, Analog);
