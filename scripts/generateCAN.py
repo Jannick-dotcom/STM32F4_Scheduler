@@ -1,4 +1,9 @@
 import math
+import os
+import pandas as pd
+
+read_file = pd.read_excel (r'CAN_System_Design_2021/210226_CAN_Masterlist_V10_JMa.xlsx')
+read_file.to_csv (r'CAN_System_Design_2021/Masterlist.csv', index = None, header=True)
 
 infile = open("CAN_System_Design_2021/Masterlist.csv", "r") #the excel exported as csv with the Information
 outfileDefs = open("lib/CAN/StallardOScanIDs.h", "w") #the output for IDs
@@ -15,7 +20,9 @@ bitcountInMsg = ""
 strFunc = ""
 signamesInMessage = "" #variable for printing in the build function
 
-# messagesClass = "class STOS_CAN_Messages {\n"
+# uint8_t temp = ADCAN_AE_Fan_Telemetry_1.countOfBits + ADCAN_AE_Fan_Telemetry_2.countOfBits;
+# 		temp = (temp + 8 - (temp % 8)) / 8;
+# 		_size = dlc = temp;
 
 for x in infileArray: #Go through every line
     if(x > ""): #if there is something in the line
@@ -46,18 +53,27 @@ for x in infileArray: #Go through every line
                 outfileDefs.write("#define STOS_CAN_ID_" + msgname + " " + id + "\n") #write a new define for the id
                 
                 if(prevMSGName != ""): #if this is not the first message name?
+                    outfileStructs.write("\tuint64_t jk_pow(uint8_t exp)\n\t{\n\t\treturn (2 << exp);\n\t}\n")
                     outfileStructs.write(strFunc + "\t}\n")
+
+                    outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
+                    outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
+                    outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
+                    outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
+
+                    outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
+                    #outfileStructs.write("\tuint16_t _size")# = dlc = ((" + bitcountInMsg + ") / 8) + 1;\n") #ToDo: most of the time not true
                     
-                    outfileStructs.write("\tvoid build() {\n\t\t*Val = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
-                    outfileStructs.write("\tuint16_t _size = dlc = " + bitcountInMsg + ";\n")
                     outfileStructs.write("};\n\n")
+                    
                     bitcountInMsg = ""
 
                 strFunc = "\tvoid unbuild()\n\t{\n"
 
                 outfileStructs.write("struct STOS_CAN_PDU_" + msgname + " : public StallardOSCanMessage \n{\npublic:\n") #write the first struct
-                outfileStructs.write("\tSTOS_CAN_PDU_" + msgname + "() {\n\t\tID = _id;\n\t}\n")
+
                 outfileStructs.write("\tstatic const uint16_t _id = " + id + ";\n")
+                outfileStructs.write("\tuint16_t _size;\n")
                 
                 # messagesClass += "\tSTOS_CAN_PDU_" + msgname + " elem" + id + ";\n"
 
@@ -65,14 +81,14 @@ for x in infileArray: #Go through every line
                 signamesInMessage = ""
 
             if(prevSigName != signame): #if new signal
-                strFunc += "\t\t" + signame + ".value = *Val & ~(uint64_t(pow(2, " + signame + ".startbit)-1)) & (uint64_t(pow(2, " + signame + ".countOfBits)-1) << " + signame + ".startbit);\n"
+                strFunc += "\t\t" + signame + ".value = (Val & ~(jk_pow(" + signame + ".startbit)-1) & ((jk_pow(" + signame + ".countOfBits)-1) << " + signame + ".startbit)) >> " + signame +".startbit;\n"
                 if(signamesInMessage != ""):
                     signamesInMessage = signamesInMessage + " | "
                 signamesInMessage = signamesInMessage + signame + ".build()"
 
                 if(bitcountInMsg != ""):
                     bitcountInMsg = bitcountInMsg + " + "
-                bitcountInMsg = bitcountInMsg + "sizeof(" + str(signame) + ".value)"
+                bitcountInMsg = bitcountInMsg + str(signame) + ".countOfBits"
 
                 outfileStructs.write("\tCAN_Signal<")
                 if(signed == "Unsigned"):      #is unsigned?
@@ -85,9 +101,18 @@ for x in infileArray: #Go through every line
 
 # messagesClass += "\tvoid *pointerToCorrectOne;\n};\n"
 
+outfileStructs.write("\tuint64_t jk_pow(uint8_t exp)\n\t{\n\t\treturn (2 << exp);\n\t}\n")
 outfileStructs.write(strFunc + "\t}\n")
-outfileStructs.write("\tvoid build() {\n\t\t*Val = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
-outfileStructs.write("\tuint16_t _size = " + bitcountInMsg + ";\n}; \n\n") #write the closing stuff
+
+outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
+outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
+outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
+outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
+
+outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
+
+# outfileStructs.write("\tuint16_t _size = " + bitcountInMsg + ";\n}; \n\n") #write the closing stuff
+outfileStructs.write(";\n}; \n\n")
 
 # outfileStructs.write(messagesClass)
 
@@ -96,3 +121,5 @@ outfileStructs.write("#endif")
 infile.close() #close the files
 outfileDefs.close()
 outfileStructs.close()
+
+os.remove('CAN_System_Design_2021/Masterlist.csv')
