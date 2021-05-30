@@ -169,7 +169,7 @@ void jumpToBootloader(void)
 void findNextFunction()
 {
     nextTask = NULL;
-    struct function_struct *temp = currentTask;
+    struct function_struct *temp = currentTask->next;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     if(temp == NULL)
     {

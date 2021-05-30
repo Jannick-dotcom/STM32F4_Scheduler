@@ -19,8 +19,8 @@
 
 #include "StallardOSHelpers.h"
 
-static StallardOSCAN AD_CAN(StallardOSCAN1, CAN1M);
-static StallardOSCAN Engine_CAN(StallardOSCAN2, CAN500k);
+static StallardOSCAN AD_CAN(StallardOSCAN2, CAN1M);
+static StallardOSCAN MS4_CAN(StallardOSCAN1, CAN500k);
 
 class StallardOS
 {
@@ -35,7 +35,6 @@ private:
   #endif
 
 public:
-
   //Constructor
   StallardOS(); //Create a Task Scheduler
   #ifdef contextSwitch
