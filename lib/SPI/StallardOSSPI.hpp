@@ -25,7 +25,7 @@ private:
     StallardOSGPIO sclk;
 
 public:
-    StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud);
+    StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck);
     void send(uint8_t *data, uint16_t size);
     void receive(uint8_t *data, uint16_t size, uint16_t timeout);
 };

@@ -8,6 +8,7 @@
 #include "StallardOSsem.hpp"
 #include "StallardOSSPI.hpp"
 #include "StallardOSGPIO.hpp"
+#include "StallardOSClass.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -23,6 +24,8 @@ private:
     StallardOSGPIO reset;
 
     StallardOSSemaphore sem;
+
+public:
     uint8_t registerRead(uint8_t address);
     void registerWrite(uint8_t address, uint8_t value);
     uint16_t channelRead();
