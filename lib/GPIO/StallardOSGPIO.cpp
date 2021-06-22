@@ -36,7 +36,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
     this->dir = dir;
     this->pull = pull;
 
-    this->state = 0;
+    this->state = initialState;
 
     __GPIOA_CLK_ENABLE();
     __GPIOB_CLK_ENABLE();

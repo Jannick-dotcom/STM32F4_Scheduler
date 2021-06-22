@@ -21,6 +21,17 @@ typedef enum ports
     PORTI
 } ports;
 
+struct gpio
+{
+    gpio(ports po, uint8_t pi)
+    {
+        port = po;
+        pin = pi;
+    }
+    ports port;
+    uint8_t pin;
+};
+
 typedef enum pinDir
 {
     Analog = GPIO_MODE_ANALOG,
