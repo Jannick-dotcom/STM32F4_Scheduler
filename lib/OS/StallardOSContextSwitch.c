@@ -253,8 +253,8 @@ __attribute__((always_inline)) inline void switchTask(void)
     if ((currentTask->State == RUNNING)) //Hier Task anhalten
     {
         asm("MRS r0, PSP");         //Get Process Stack Pointer
-        // asm("MRS r3, CONTROL");
-        asm("STMDB r0!, {r4-r11}"); //Save additional not yet saved registers
+        asm("MRS r3, CONTROL");
+        asm("STMDB r0!, {r3-r11}"); //Save additional not yet saved registers
         asm("VSTMDB r0!, {s16-s31}");
         asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
@@ -269,6 +269,7 @@ __attribute__((always_inline)) inline void switchTask(void)
 
     if (currentTask->State == NEW) //New Task
     {
+        asm("MOV r3, #3");  //CONTROL
         asm("MOV r4, #0");  //R0
         asm("MOV r5, #1");  //R1
         asm("MOV r6, #2");  //R2
@@ -279,7 +280,7 @@ __attribute__((always_inline)) inline void switchTask(void)
         asm("MOV r11, #0x01000000");                                    //XPSR
 
         asm("MOV r0, %0"  : : "r"(currentTask->Stack)); //get saved Stack pointer
-        asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for R0-R3, R12, LR, PC, XPSR
+        asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
         asm("MSR PSP, r0");             //set PSP
 
         currentTask->State = RUNNING; //Save state as running
@@ -289,9 +290,9 @@ __attribute__((always_inline)) inline void switchTask(void)
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack)); //get saved Stack pointer
         asm("VLDMIA r0!, {s16-s31}");
-        asm("LDMIA r0!, {r4-r11}");   //load registers from memory
+        asm("LDMIA r0!, {r3-r11}");   //load registers from memory
         asm("MSR PSP, r0");           //set PSP
-        // asm("MSR CONTROL, r3");
+        asm("MSR CONTROL, r3");
         currentTask->State = RUNNING; //Save state as running
         nextTask = NULL;
     }
@@ -388,17 +389,20 @@ void SysTick_Handler(void) //In C Language
     usCurrentTimeSinceStart++;
     if(usCurrentTimeSinceStart % (sysTickFreq / 1000) == 0) //Every millisecond
     {
-        msCurrentTimeSinceStart++;//sysTickMillisPerInt;
+        msCurrentTimeSinceStart++;
         HAL_IncTick();
 #ifdef contextSwitch
-        if(currentTask == taskMainStruct) 
+        if(currentTask != NULL)
         {
-            taskMainTime += sysTickMillisPerInt; //Auslastungsberechnung
-        }
-        findNextFunction();
-        if(currentTask != nextTask)
-        {
-            pendPendSV(); //If nextTask is not this task, set the PendSV to pending
+            if(currentTask == taskMainStruct && taskMainStruct != NULL) 
+            {
+                taskMainTime += sysTickMillisPerInt; //Auslastungsberechnung
+            }
+            findNextFunction();
+            if(currentTask != nextTask && currentTask != NULL)
+            {
+                pendPendSV(); //If nextTask is not this task, set the PendSV to pending
+            }
         }
 #endif //contextSwitch
     }

@@ -75,6 +75,9 @@ StallardOS::StallardOS()
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
+  SysTick_Config(sysTickTicks);
+  NVIC_EnableIRQ(SysTick_IRQn);
+  
   // addFunction(flashOverCanHandle, -3, 3);
 #endif
 }
@@ -322,15 +325,18 @@ struct function_struct *StallardOS::searchFreeFunction(void)
  */
 void StallardOS::delay(uint32_t milliseconds)
 {
+  if(currentTask == nullptr) //wenn im bootup
+  {
+    uint64_t continueTimeStamp = msCurrentTimeSinceStart + (milliseconds * 1000);
+    while (msCurrentTimeSinceStart < continueTimeStamp);
+  }
   currentTask->continueInMS += milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-  // currentTask->executable = false;
 
 #ifdef contextSwitch
   StallardOS_delay();
 #else
   uint64_t continueTimeStamp = msCurrentTimeSinceStart + (milliseconds * 1000);
-  while (msCurrentTimeSinceStart < continueTimeStamp)
-    ;
+  while (msCurrentTimeSinceStart < continueTimeStamp);
 #endif
 }
 
