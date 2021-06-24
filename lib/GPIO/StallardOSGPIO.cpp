@@ -165,7 +165,7 @@ bool StallardOSGPIO::write(bool state)
 #ifdef contextSwitch
     this->sem.take();
 #endif
-    if (this->dir == Output)
+    if (this->dir == Output || this->dir == OutputOD)
     {
         HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
         this->state = state;
