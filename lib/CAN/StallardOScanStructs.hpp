@@ -2,6 +2,7 @@
 #define StallardOScanStructs_hpp
 #include "stdint.h"
 #include "StallardOScanTypes.hpp"
+#include <math.h>
 
 struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage 
 {
@@ -38,6 +39,7 @@ public:
 		ID = _id;
 		uint8_t temp = activate_blip.countOfBits + activate_cut.countOfBits + blip_state.countOfBits + cut_level_gcu.countOfBits + engaged_gear.countOfBits + gearpot.countOfBits + shift_state.countOfBits + state_cut.countOfBits + target_engine_speed.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -71,6 +73,7 @@ public:
 		ID = _id;
 		uint8_t temp = speedABSfl.countOfBits + speedABSfr.countOfBits + speedABSrl.countOfBits + speedABSrr.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -106,6 +109,7 @@ public:
 		ID = _id;
 		uint8_t temp = ax1_Bremse60ABS.countOfBits + ay1_Bremse60ABS.countOfBits + blsABS.countOfBits + p_HzABS.countOfBits + switchstateABS.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -147,6 +151,7 @@ public:
 		ID = _id;
 		uint8_t temp = ti_1.countOfBits + ti_2.countOfBits + ti_3.countOfBits + ti_4.countOfBits + ti_5.countOfBits + ti_6.countOfBits + ti_7.countOfBits + ti_8.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -186,6 +191,7 @@ public:
 		ID = _id;
 		uint8_t temp = injang.countOfBits + injoff.countOfBits + lamctrl_2k.countOfBits + lamctrl_k.countOfBits + tibase.countOfBits + tibatt_o.countOfBits + timap.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -227,6 +233,7 @@ public:
 		ID = _id;
 		uint8_t temp = ign_1.countOfBits + ign_2.countOfBits + ign_3.countOfBits + ign_4.countOfBits + ign_5.countOfBits + ign_6.countOfBits + ign_7.countOfBits + ign_8.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -264,6 +271,7 @@ public:
 		ID = _id;
 		uint8_t temp = ath.countOfBits + dath.countOfBits + ignbase.countOfBits + ignmap.countOfBits + rev.countOfBits + tdwell.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -305,6 +313,7 @@ public:
 		ID = _id;
 		uint8_t temp = lam.countOfBits + lam_2.countOfBits + lami.countOfBits + lami_2.countOfBits + lammap.countOfBits + lammap_2.countOfBits + lamp.countOfBits + lamp_2.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -340,6 +349,7 @@ public:
 		ID = _id;
 		uint8_t temp = speed.countOfBits + speedfl.countOfBits + speedfr.countOfBits + speedrl.countOfBits + speedrr.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -373,6 +383,7 @@ public:
 		ID = _id;
 		uint8_t temp = lapdist.countOfBits + laptime.countOfBits + laptimediff.countOfBits + laptimefast.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -414,6 +425,7 @@ public:
 		ID = _id;
 		uint8_t temp = accx.countOfBits + accy.countOfBits + accz.countOfBits + ddugear.countOfBits + gcstate.countOfBits + gear.countOfBits + gearcut_u.countOfBits + gearratio.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -451,6 +463,7 @@ public:
 		ID = _id;
 		uint8_t temp = slipsp.countOfBits + slra.countOfBits + tcpfac.countOfBits + tcsw.countOfBits + vdraxle.countOfBits + vref.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -490,6 +503,7 @@ public:
 		ID = _id;
 		uint8_t temp = aps.countOfBits + batt_u.countOfBits + camshaftpos.countOfBits + etb.countOfBits + etb_sp.countOfBits + lap_c.countOfBits + p1.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -609,6 +623,7 @@ public:
 		ID = _id;
 		uint8_t temp = battlow_b.countOfBits + etbsys_e.countOfBits + fuellap.countOfBits + fueltank.countOfBits + gearcut_b.countOfBits + idle_b.countOfBits + ignoff_b.countOfBits + injcut_b.countOfBits + injcutin_b.countOfBits + injenrich_b.countOfBits + injstartphase_b.countOfBits + knockadaptenable_b.countOfBits + knockenable_b.countOfBits + lamctrl_2b.countOfBits + lamctrl_b.countOfBits + lap_b.countOfBits + laptrig_b.countOfBits + mappos.countOfBits + mil_b.countOfBits + oillamp_b.countOfBits + pamb.countOfBits + pcrank.countOfBits + pfuel.countOfBits + phsok_b.countOfBits + phsokset_b.countOfBits + poil.countOfBits + pwat.countOfBits + rev_b.countOfBits + revlimit_b.countOfBits + rowcounter_0x77A.countOfBits + shled1_b.countOfBits + shled2_b.countOfBits + shled3_b.countOfBits + shled4_b.countOfBits + shled5_b.countOfBits + speedlimit_b.countOfBits + speedlimitreq_b.countOfBits + startend_b.countOfBits + tair.countOfBits + tc_b.countOfBits + tex.countOfBits + tex_2.countOfBits + tfuel.countOfBits + tlam.countOfBits + tlam_2.countOfBits + tmot.countOfBits + toil.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -646,6 +661,7 @@ public:
 		ID = _id;
 		uint8_t temp = p22_2m_pwg_m.countOfBits + p22_m.countOfBits + p22_sp.countOfBits + pwg_sp.countOfBits + wgdc_2_wgdchold.countOfBits + wgdc_wgdcvent.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -677,6 +693,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Accel_1_X.countOfBits + ADCAN_SP_Accel_1_Y.countOfBits + ADCAN_SP_Accel_1_Z.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -708,6 +725,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Accel_2_X.countOfBits + ADCAN_SP_Accel_2_Y.countOfBits + ADCAN_SP_Accel_2_Z.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -737,6 +755,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_AE_Fan_L_PWM.countOfBits + ADCAN_AE_Fan_R_PWM.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -766,6 +785,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_AE_Fan_Telemetry_1.countOfBits + ADCAN_AE_Fan_Telemetry_2.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -793,6 +813,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_AE_Warnings.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -820,6 +841,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_PT_Airbox_Pos.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -849,6 +871,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_ARH_1_Homing.countOfBits + ADCAN_SP_ARH_2_Homing.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -878,6 +901,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_ARH_1_PWM.countOfBits + ADCAN_SP_ARH_2_PWM.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -909,6 +933,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_Battery_48V_Temp_1.countOfBits + ADCAN_EL_Battery_48V_Temp_2.countOfBits + ADCAN_EL_Battery_48V_Temp_3.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -938,6 +963,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Brake_Disc_Temp_FL.countOfBits + ADCAN_SP_Brake_Disc_Temp_FR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -967,6 +993,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Brake_Disc_Temp_RL.countOfBits + ADCAN_SP_Brake_Disc_Temp_RR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -998,6 +1025,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Brake_Pressure_Front.countOfBits + ADCAN_SP_Brake_Pressure_Rear.countOfBits + ADCAN_SP_Brake_Bias.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1039,6 +1067,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_Current_Sensor_1.countOfBits + ADCAN_EL_Current_Sensor_2.countOfBits + ADCAN_EL_Current_Sensor_3.countOfBits + ADCAN_EL_Current_Sensor_4.countOfBits + ADCAN_EL_Current_Sensor_5.countOfBits + ADCAN_EL_Current_Sensor_6.countOfBits + ADCAN_EL_Current_Sensor_7.countOfBits + ADCAN_EL_Current_Sensor_8.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1070,6 +1099,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_Battery_24V_Temp.countOfBits + ADCAN_EL_ECU_Temp_FCU_1.countOfBits + ADCAN_EL_ECU_Temp_FCU_2.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1103,6 +1133,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_ARB_Switch.countOfBits + ADCAN_SP_LaunchC_Activated.countOfBits + ADCAN_SP_LaunchC_Switch.countOfBits + ADCAN_SP_RAS_Switch.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1142,6 +1173,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_FDS_Friction_LC.countOfBits + ADCAN_SP_FDS_Slip_mue_max.countOfBits + ADCAN_SP_FDS_Swim_VDE.countOfBits + ADCAN_SP_FDS_Velo_VDE.countOfBits + ADCAN_SP_FDS_Wheel_Slip_RL.countOfBits + ADCAN_SP_FDS_Wheel_Slip_RR.countOfBits + ADCAN_SP_FDS_Yaw_VDE.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1183,6 +1215,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_FDS_Slip_Angle_FL.countOfBits + ADCAN_SP_FDS_Slip_Angle_FR.countOfBits + ADCAN_SP_FDS_Slip_Angle_RL.countOfBits + ADCAN_SP_FDS_Slip_Angle_RR.countOfBits + ADCAN_SP_FDS_Whl_Load_FL.countOfBits + ADCAN_SP_FDS_Whl_Load_FR.countOfBits + ADCAN_SP_FDS_Whl_Load_RL.countOfBits + ADCAN_SP_FDS_Whl_Load_RR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1212,6 +1245,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_FoC_1.countOfBits + ADCAN_EL_FoC_2.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1239,6 +1273,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_CH_Frame_Pressure.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1270,6 +1305,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Gyro_1_X.countOfBits + ADCAN_SP_Gyro_1_Y.countOfBits + ADCAN_SP_Gyro_1_Z.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1301,6 +1337,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Gyro_2_X.countOfBits + ADCAN_SP_Gyro_2_Y.countOfBits + ADCAN_SP_Gyro_2_Z.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1330,6 +1367,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Niveau_FL_Niveau.countOfBits + ADCAN_SP_Niveau_FR_Niveau.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1367,6 +1405,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Niveau_FL_Error.countOfBits + ADCAN_SP_Niveau_FL_Function.countOfBits + ADCAN_SP_Niveau_FL_on_off.countOfBits + ADCAN_SP_Niveau_FR_Error.countOfBits + ADCAN_SP_Niveau_FR_Function.countOfBits + ADCAN_SP_Niveau_FR_on_off.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1394,6 +1433,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Niveau_R_Niveau.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1423,6 +1463,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Niveau_R_Error.countOfBits + ADCAN_SP_Niveau_R_Function.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1450,6 +1491,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_PT_Oil_Pressure.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1481,6 +1523,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_PT_Oil_Level.countOfBits + ADCAN_PT_Oil_Level_RS232.countOfBits + ADCAN_PT_Oil_Temp.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1514,6 +1557,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_ECU_Temp_PDU_1.countOfBits + ADCAN_EL_ECU_Temp_PDU_2.countOfBits + ADCAN_EL_ECU_Temp_PDU_3.countOfBits + ADCAN_EL_ECU_Temp_PDU_4.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1603,6 +1647,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_CH_Mainhoop_Diag_L_1.countOfBits + ADCAN_CH_Mainhoop_Diag_R_1.countOfBits + ADCAN_EL_BOTS_Diag_1.countOfBits + ADCAN_EL_BSPD_Shutdown_Out.countOfBits + ADCAN_EL_Cockpit_Diag_1.countOfBits + ADCAN_EL_Crash_Diag.countOfBits + ADCAN_EL_Fuse_Status_1.countOfBits + ADCAN_EL_Fuse_Status_10.countOfBits + ADCAN_EL_Fuse_Status_11.countOfBits + ADCAN_EL_Fuse_Status_12.countOfBits + ADCAN_EL_Fuse_Status_13.countOfBits + ADCAN_EL_Fuse_Status_14.countOfBits + ADCAN_EL_Fuse_Status_15.countOfBits + ADCAN_EL_Fuse_Status_16.countOfBits + ADCAN_EL_Fuse_Status_17.countOfBits + ADCAN_EL_Fuse_Status_18.countOfBits + ADCAN_EL_Fuse_Status_19.countOfBits + ADCAN_EL_Fuse_Status_2.countOfBits + ADCAN_EL_Fuse_Status_3.countOfBits + ADCAN_EL_Fuse_Status_4.countOfBits + ADCAN_EL_Fuse_Status_5.countOfBits + ADCAN_EL_Fuse_Status_6.countOfBits + ADCAN_EL_Fuse_Status_7.countOfBits + ADCAN_EL_Fuse_Status_8.countOfBits + ADCAN_EL_Fuse_Status_9.countOfBits + ADCAN_EL_Relais_Status_1.countOfBits + ADCAN_EL_Relais_Status_2.countOfBits + ADCAN_EL_Shutdown_Cockpit.countOfBits + ADCAN_PT_Fuel_Pump_Signal.countOfBits + ADCAN_PT_Reserve_Signal_L.countOfBits + ADCAN_PT_Reserve_Signal_R.countOfBits + ADCAN_PT_Water_Pump_Signal.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1634,6 +1679,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_AE_Pitot_1.countOfBits + ADCAN_AE_Pitot_2.countOfBits + ADCAN_AE_Pitot_3.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1663,6 +1709,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_RAS_PWM_L.countOfBits + ADCAN_SP_RAS_PWM_R.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1694,6 +1741,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_RAS_Angle.countOfBits + ADCAN_SP_RAS_Homing_L.countOfBits + ADCAN_SP_RAS_Homing_R.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1723,6 +1771,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_ECU_Temp_RCU_1.countOfBits + ADCAN_EL_ECU_Temp_RCU_2.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1756,6 +1805,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_ZZ_Test_RCU_1.countOfBits + ADCAN_ZZ_Test_RCU_2.countOfBits + ADCAN_ZZ_Test_RCU_3.countOfBits + ADCAN_ZZ_Test_RCU_4.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1789,6 +1839,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_ZZ_Test_RCU_5.countOfBits + ADCAN_ZZ_Test_RCU_6.countOfBits + ADCAN_ZZ_Test_RCU_7.countOfBits + ADCAN_ZZ_Test_RCU_8.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1818,6 +1869,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_ZZ_Test_RCU_10.countOfBits + ADCAN_ZZ_Test_RCU_9.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1847,6 +1899,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Rocker_FL.countOfBits + ADCAN_SP_Rocker_FR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1876,6 +1929,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Rocker_RL.countOfBits + ADCAN_SP_Rocker_RR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1913,6 +1967,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_PT_Gearshift_DigIn.countOfBits + ADCAN_PT_Gearshift_LaunchC.countOfBits + ADCAN_PT_Shift_Force_Sensor.countOfBits + ADCAN_SP_Clutch_DigIn.countOfBits + ADCAN_SP_Clutch_LaunchC.countOfBits + ADCAN_PT_Shift_Force_on_off.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1940,6 +1995,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Steering_Wheel_Angle.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1967,6 +2023,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_ECU_Temp_SWCU.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -1998,6 +2055,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_EL_INCR_1.countOfBits + ADCAN_EL_INCR_2.countOfBits + ADCAN_EL_Oh_Shit.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -2035,6 +2093,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_AE_Switch_1.countOfBits + ADCAN_EL_Radio_Switch.countOfBits + ADCAN_PT_Shift_Down.countOfBits + ADCAN_PT_Shift_Up.countOfBits + ADCAN_SP_ARH_switch_1.countOfBits + ADCAN_SP_Clutch_Signal.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -2066,6 +2125,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_ZZ_Test_FCU_1.countOfBits + ADCAN_ZZ_Test_FCU_2.countOfBits + ADCAN_ZZ_Test_FCU_3.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -2097,6 +2157,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_ZZ_Test_FCU_4.countOfBits + ADCAN_ZZ_Test_FCU_5.countOfBits + ADCAN_ZZ_Test_FCU_6.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -2134,6 +2195,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_PT_Oil_Fan_Percent.countOfBits + ADCAN_PT_Oil_PWM.countOfBits + ADCAN_PT_Water_1_PWM.countOfBits + ADCAN_PT_Water_2_PWM.countOfBits + ADCAN_PT_Water_Fan_1_Percent.countOfBits + ADCAN_PT_Water_Fan_2_Percent.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -2163,6 +2225,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Wheel_Speed_FL.countOfBits + ADCAN_SP_Wheel_Speed_FR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
@@ -2192,6 +2255,7 @@ public:
 		ID = _id;
 		uint8_t temp = ADCAN_SP_Wheel_Speed_RL.countOfBits + ADCAN_SP_Wheel_Speed_RR.countOfBits;
 		temp = (temp + 8 - (temp % 8)) / 8;
+		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {

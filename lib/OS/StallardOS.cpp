@@ -75,7 +75,7 @@ StallardOS::StallardOS()
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
-  SysTick_Config(sysTickTicks);
+  SysTick_Config((uint32_t)(168000000 / sysTickFreq));
   NVIC_EnableIRQ(SysTick_IRQn);
   
   // addFunction(flashOverCanHandle, -3, 3);
