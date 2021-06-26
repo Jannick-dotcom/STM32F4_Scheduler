@@ -165,7 +165,7 @@ void StallardOS_SetSysClock(uint8_t clockspeed)
   RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1; // 168 MHz
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;  //  42 MHz
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;  //  84 MHz
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;  //  84 MHz
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {

@@ -15,17 +15,18 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     CAN_FilterTypeDef sFilterConfig;
     if (port == StallardOSCAN1 && can1used == false)
     {
-        CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFOD, pullup, GPIO_AF9_CAN1);
-        CANT = StallardOSGPIO(CAN1_t_pin, CAN1_t_port, AFOD, pullup, GPIO_AF9_CAN1);
+        CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFPP, nopull, GPIO_AF9_CAN1);
+        CANT = StallardOSGPIO(CAN1_t_pin, CAN1_t_port, AFPP, nopull, GPIO_AF9_CAN1);
         canhandle.Instance = CAN1;
         __CAN1_CLK_ENABLE();
         can1used = true;
     }
     else if (port == StallardOSCAN2 && can2used == false)
     {
-        CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFOD, pullup, GPIO_AF9_CAN2);
-        CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFOD, pullup, GPIO_AF9_CAN2);
+        CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFPP, nopull, GPIO_AF9_CAN2);
+        CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFPP, nopull, GPIO_AF9_CAN2);
         canhandle.Instance = CAN2;
+        // __CAN1_CLK_ENABLE();
         __CAN2_CLK_ENABLE();
         can2used = true;
     }
@@ -67,8 +68,15 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 #endif
         StallardOSGeneralFaultHandler();
     }
-
-    sFilterConfig.FilterBank = 0;
+    
+    if(port == StallardOSCAN1)
+    {
+        sFilterConfig.FilterBank = 0;
+    }
+    else if(port == StallardOSCAN2)
+    {
+        sFilterConfig.FilterBank = 14;
+    }
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
     sFilterConfig.FilterIdHigh = 0x0000 << 5; //When MSB low let it pass
@@ -86,7 +94,14 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         /* Filter configuration Error */
         StallardOSGeneralFaultHandler();
     }
-    sFilterConfig.FilterBank = 1;
+    if(port == StallardOSCAN1)
+    {
+        sFilterConfig.FilterBank = 1;
+    }
+    else if(port == StallardOSCAN2)
+    {
+        sFilterConfig.FilterBank = 15;
+    }
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
     sFilterConfig.FilterIdHigh = 0x0400 << 5; //When MSB high let it pass
