@@ -36,17 +36,15 @@ void taskMain(void)
 
 void flashOverCanHandle()
 {
-    StallardOSCanMessage FOCMessage;
-    const uint16_t STOS_CAN_ID_FOC = 123;
+  STOS_CAN_PDU_Flash_Over_Can FOCMessage;
 #ifdef contextSwitch
     while (1)
     {
 #endif
-      if (AD_CAN.receiveMessage(&FOCMessage, STOS_CAN_ID_FOC))
+    if (MS4_CAN.receiveMessage(&FOCMessage))
       {
-          for (uint8_t i = 0; i < FOCMessage.dlc; i++)
-          {
-              if (FOCMessage.Val == STOS_current_ECU_ID)
+      FOCMessage.unbuild();
+        if (FOCMessage.ADCAN_EL_FoC_1.value == STOS_current_ECU_ID)
               {
                 // StallardOS::goBootloader();
               }
@@ -56,7 +54,6 @@ void flashOverCanHandle()
       StallardOS::delay(100);
     }
 #endif
-}
 
 /**
  * Create StallardOS RTOS.

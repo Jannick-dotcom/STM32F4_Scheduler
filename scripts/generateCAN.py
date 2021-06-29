@@ -1,8 +1,9 @@
 import math
 import os
 import pandas as pd
+import glob
 
-read_file = pd.read_excel (r'CAN_System_Design_2021/210226_CAN_Masterlist_V10_JMa.xlsx')
+read_file = pd.read_excel (glob.glob('CAN_System_Design_2021/*.xlsx')[0])
 read_file.to_csv (r'CAN_System_Design_2021/Masterlist.csv', index = None, header=True)
 
 infile = open("CAN_System_Design_2021/Masterlist.csv", "r") #the excel exported as csv with the Information
@@ -11,18 +12,18 @@ outfileStructs = open("lib/CAN/StallardOScanStructs.hpp", "w") #the output for s
 
 outfileStructs.write("#ifndef StallardOScanStructs_hpp\n#define StallardOScanStructs_hpp\n")
 outfileStructs.write('#include "stdint.h"\n#include "StallardOScanTypes.hpp"\n#include <math.h>\n\n') #include the integer types to the struct file
+outfileStructs.write("uint64_t jk_pow(uint8_t exp)\n{\n\treturn (1 << exp);\n}\n\n")
 
 infileText = infile.read(-1) #read all stuff from the csv
 infileArray = infileText.split("\n") #split the text into an array containing the lines
 prevMSGName = "" #variable for saving the previous Message name
 prevSigName = ""
 bitcountInMsg = ""
+bitcountWholeMessage = 0
 strFunc = ""
 signamesInMessage = "" #variable for printing in the build function
 
-# uint8_t temp = ADCAN_AE_Fan_Telemetry_1.countOfBits + ADCAN_AE_Fan_Telemetry_2.countOfBits;
-# 		temp = (temp + 8 - (temp % 8)) / 8;
-# 		_size = dlc = temp;
+# messagesClass = ""
 
 for x in infileArray: #Go through every line
     if(x > ""): #if there is something in the line
@@ -51,14 +52,18 @@ for x in infileArray: #Go through every line
 
             if(prevMSGName != msgname): #New Message?
                 outfileDefs.write("#define STOS_CAN_ID_" + msgname + " " + id + "\n") #write a new define for the id
-                
+                if(bitcountWholeMessage > 64):
+                    print("Something is wrong with size of PDU:" + prevMSGName)
+                bitcountWholeMessage = 0
+
                 if(prevMSGName != ""): #if this is not the first message name?
-                    outfileStructs.write("\tuint64_t jk_pow(uint8_t exp)\n\t{\n\t\treturn (2 << exp);\n\t}\n")
+                    
                     outfileStructs.write(strFunc + "\t}\n")
 
                     outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
                     outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
                     outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
+                    outfileStructs.write("\t\tif(temp > 8) temp = 8;\n")
                     outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
 
                     outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
@@ -81,7 +86,12 @@ for x in infileArray: #Go through every line
                 signamesInMessage = ""
 
             if(prevSigName != signame): #if new signal
-                strFunc += "\t\t" + signame + ".value = (Val & ~(jk_pow(" + signame + ".startbit)-1) & ((jk_pow(" + signame + ".countOfBits)-1) << " + signame + ".startbit)) >> " + signame +".startbit;\n"
+
+                bitcountWholeMessage += bitcountIn
+                if(int(startingAtBit) + bitcountIn > 64):
+                    print("Something is wrong with size of PDU:" + msgname)
+
+                strFunc += "\t\t" + signame + ".value = ((Val & (~(jk_pow(" + signame + ".startbit)-1))) & ((uint64_t)(jk_pow(" + signame + ".countOfBits)-1) << (uint64_t)" + signame + ".startbit)) >> (uint64_t)" + signame +".startbit;\n"
                 if(signamesInMessage != ""):
                     signamesInMessage = signamesInMessage + " | "
                 signamesInMessage = signamesInMessage + signame + ".build()"
@@ -97,16 +107,17 @@ for x in infileArray: #Go through every line
                 outfileStructs.write(signame + " = {" + initVal + ", " + str(bitcountIn) + ", " + startingAtBit + "};//init,bitcount,startbit \n") #write a signal
                 prevSigName = signame
             else:
-                print("Someting is wrong with " + signame + "!!!\n")
+                print("Something is wrong with Signals of PDU:" + msgname + "!!!\n")
 
-# messagesClass += "\tvoid *pointerToCorrectOne;\n};\n"
+# messagesClass += "};\n"
 
-outfileStructs.write("\tuint64_t jk_pow(uint8_t exp)\n\t{\n\t\treturn (2 << exp);\n\t}\n")
+# outfileStructs.write("\tuint64_t jk_pow(uint8_t exp)\n\t{\n\t\treturn (1 << exp);\n\t}\n")
 outfileStructs.write(strFunc + "\t}\n")
 
 outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
 outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
 outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
+outfileStructs.write("\t\tif(temp > 8) temp = 8;\n")
 outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
 
 outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")

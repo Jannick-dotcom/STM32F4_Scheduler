@@ -29,7 +29,7 @@ template <typename valueTemplate>
 struct CAN_Signal
 {
 public:
-    valueTemplate value;
+    volatile valueTemplate value;
     const uint8_t countOfBits;
     const uint16_t startbit;
     CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start) : countOfBits(bitcount), startbit(start)
@@ -40,16 +40,7 @@ public:
     }
     uint64_t build()
     {
-        return (value & prepareMask()) << startbit;
-    }
-    uint64_t prepareMask()
-    {
-        uint8_t mask = 0;
-        for(uint8_t i = 0; i < countOfBits; i++)
-        {
-            mask = (mask << 1) | 1;
-        }
-        return mask;
+        return (uint64_t)((uint64_t)value & (((uint64_t)1 << (uint64_t)countOfBits) - 1)) << (uint64_t)startbit;
     }
     CAN_Signal operator=(valueTemplate val)
     {

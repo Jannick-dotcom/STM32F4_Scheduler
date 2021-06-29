@@ -244,7 +244,7 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 #ifdef contextSwitch
     this->sem.take(); //Block the semaphore
 #endif
-    if (msg == nullptr || size > 8) //Check if the size and the message are valid
+    if (msg == nullptr || size > 8 || size == 0) //Check if the size and the message are valid
     {
 #ifdef contextSwitch
         this->sem.give(); //release semaphore
@@ -267,6 +267,5 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 
 void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
-    if (msg->ID != 0 && msg->dlc != 0)
         sendMessage(msg, msg->dlc);
 }
