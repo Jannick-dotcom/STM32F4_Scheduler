@@ -25,7 +25,7 @@ public:
       /*Funktion*/ void (*function)(),
       /*ID of task*/ uint16_t id,                  //The ID must be different for different tasks
       /*Prioritaet*/ uint8_t prio,                 //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
-      /*Executions per sec*/ uint16_t exec_freq,  //Must be bigger than 0 ! //not used by context switch
+      /*Executions per sec*/ uint16_t refreshRate,  //Must be bigger than 0 ! //not used by context switch
       /*Number of execs*/ uint16_t Execcount = 0); //not used by context switch
   #endif
   void changeFunctionEnabled(
@@ -39,7 +39,7 @@ private:
 
 public:
   void setFunctionPriority(/*Funktion*/ uint16_t id, /*New Priority*/ uint8_t prio);
-  void switchPrivilegeLevel(bool status);
+  // void switchPrivilegeLevel(bool status);
   #ifndef contextSwitch
   void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
   #endif

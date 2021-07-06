@@ -72,7 +72,7 @@ struct function_struct
   volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore
   volatile uint16_t *semVal;
 #endif
-  volatile uint32_t continueInMS; //Delay amount
+  volatile uint32_t continueInUS; //Delay amount
 };
 
 #endif

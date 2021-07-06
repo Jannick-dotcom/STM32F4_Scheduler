@@ -29,31 +29,12 @@ extern "C" void disable_interrupts();
  */
 void taskMain(void)
 {
+  #ifdef contextSwitch
   while (1)
   {
   }
+  #endif
 }
-
-void flashOverCanHandle()
-{
-  STOS_CAN_PDU_Flash_Over_Can FOCMessage;
-#ifdef contextSwitch
-    while (1)
-    {
-#endif
-    if (MS4_CAN.receiveMessage(&FOCMessage))
-      {
-      FOCMessage.unbuild();
-        if (FOCMessage.ADCAN_EL_FoC_1.value == STOS_current_ECU_ID)
-              {
-                // StallardOS::goBootloader();
-              }
-          }
-      }
-#ifdef contextSwitch
-      StallardOS::delay(100);
-    }
-#endif
 
 /**
  * Create StallardOS RTOS.
@@ -72,10 +53,11 @@ StallardOS::StallardOS()
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
-  SysTick_Config((uint32_t)(168000000 / sysTickFreq));
   NVIC_EnableIRQ(SysTick_IRQn);
+  SysTick_Config((uint32_t)(SystemCoreClock / sysTickFreq));
+#else
+  first_function_struct = taskMainStruct = addFunction(taskMain, -2, 255, 1);
   
-  // addFunction(flashOverCanHandle, -3, 3);
 #endif
 }
 
@@ -129,7 +111,7 @@ void StallardOS::createTCBs()
     temp->executable = true;
 #endif
     temp->used = false;
-    temp->continueInMS = 0;
+    temp->continueInUS = 0;
 
     TCBsCreated++;
   }
@@ -142,7 +124,7 @@ void StallardOS::createTCBs()
  * @param function Task to execute.
  * @param id unique id of the task.
  * @param prio priority of the task, lower means higher.
- * @param refreshRate frequency of execution.
+ * @param refreshRate frequency of execution. <= 1000 !
  * @return pointer to the created tcb.
  */
 struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)
@@ -153,11 +135,11 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
  * @param function Task to execute.
  * @param id unique id of the task.
  * @param prio priority of the task, lower means higher.
- * @param exec_freq frequency of execution through the normal scheduler.
+ * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @param Execcount amount of executes of this task, no value is endless.
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t exec_freq, uint16_t Execcount)
+struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate, uint16_t Execcount)
 #endif
 {
   if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000) //Make sure the parameters are correct
@@ -165,7 +147,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
     return nullptr;
   }
 #ifndef contextSwitch
-  if (exec_freq == 0)
+  if (refreshRate == 0)
   {
     return nullptr;
   }
@@ -200,13 +182,14 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->State = NEW;                                       //New Task
   function_struct_ptr->Stack = function_struct_ptr->vals + sizeStack - 4; //End of Stack
+  function_struct_ptr->waitingForSemaphore = 0;
 #else
   function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
-  function_struct_ptr->frequency = exec_freq;
+  function_struct_ptr->frequency = refreshRate;
 #endif
   function_struct_ptr->used = true;
-  function_struct_ptr->waitingForSemaphore = 0;
-  function_struct_ptr->continueInMS = 0;
+  
+  function_struct_ptr->continueInUS = 0;
   return function_struct_ptr;
 }
 
@@ -238,19 +221,6 @@ void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
   {
     temp->priority = prio; //Die Priorität ändern
   }
-}
-
-void StallardOS::switchPrivilegeLevel(bool status)
-{
-  if(status == false)
-  {
-    asm("SVC #4");
-  }
-  else
-  {
-    asm("SVC #3");
-  }
-  
 }
 
 /**
@@ -324,17 +294,14 @@ void StallardOS::delay(uint32_t milliseconds)
 {
   if(currentTask == nullptr) //wenn im bootup
   {
-    uint64_t continueTimeStamp = msCurrentTimeSinceStart + (milliseconds * 1000);
-    while (msCurrentTimeSinceStart < continueTimeStamp);
+    uint64_t continueTimeStamp = usCurrentTimeSinceStart + (milliseconds * 1000);
+    while (usCurrentTimeSinceStart < continueTimeStamp);
   }
-  currentTask->continueInMS += milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-
-#ifdef contextSwitch
-  StallardOS_delay();
-#else
-  uint64_t continueTimeStamp = msCurrentTimeSinceStart + (milliseconds * 1000);
-  while (msCurrentTimeSinceStart < continueTimeStamp);
-#endif
+  else
+  {
+    currentTask->continueInUS += milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+    StallardOS_delay();
+  }
 }
 
 /**
@@ -344,27 +311,22 @@ void StallardOS::delay(uint32_t milliseconds)
  * @param id unique id of the task.
  * @param prio new priority, lower means higher
  */
+#ifdef contextSwitch
 void StallardOS::yield()
 {
+  currentTask->lastYield = usCurrentTimeSinceStart;
   if (currentTask->refreshRate != 0)
   {
-    if (currentTask->lastYield + (1000 / currentTask->refreshRate) > getRuntimeMs()) //If task takes longer than expected
-    {
-      currentTask->error++;
-    }
-    else if (currentTask->error > 0) //if not and errors happened
-    {
-      currentTask->error--;
-    }
-    currentTask->continueInMS = (1000 / currentTask->refreshRate) - (getRuntimeMs() - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-    currentTask->lastYield = getRuntimeMs();
-// currentTask->executable = false;
-#ifdef contextSwitch
+    currentTask->continueInUS = (1000000 / currentTask->refreshRate) - (usCurrentTimeSinceStart - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
+    if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
+      currentTask->continueInUS = 0;
+
     StallardOS_delay();
-#endif
-    currentTask->lastStart = getRuntimeMs();
+
+    currentTask->lastStart = usCurrentTimeSinceStart;
   }
 }
+#endif
 
 /**
  * Check the state of a task
@@ -408,7 +370,7 @@ void StallardOS::startOS(void)
 #ifdef contextSwitch
     NVIC_EnableIRQ(SVCall_IRQn);
     asm("MRS R0, MSP");
-    asm("SUB R0, #100"); //Reserve some space for Handlers (100*4 Byte)
+    asm("SUB R0, #200"); //Reserve some space for Handlers (200*4 Byte)
     asm("MSR PSP, R0");
     asm("MOV R0, #3");
     asm("MSR CONTROL, R0");
@@ -448,7 +410,7 @@ void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
 
 uint64_t StallardOS::getRuntimeMs()
 {
-  return msCurrentTimeSinceStart;
+  return usCurrentTimeSinceStart / 1000;
 }
 
 uint64_t StallardOS::getRuntimeUs()
@@ -470,7 +432,7 @@ void StallardOS::schedule()
 {
   // uint16_t endOfList = 0;                     //Merker für das traversieren der Liste
   function_struct *function_struct_ptr;       //Pointer auf Structs zu den Funktionen mit dem ich arbeite
-  lastScheduleTime = msCurrentTimeSinceStart; //Jetzige Schedule Zeit speichern
+  lastScheduleTime = usCurrentTimeSinceStart; //Jetzige Schedule Zeit speichern
 
   function_struct_ptr = first_function_struct->next;
   // endOfList = 0;
@@ -481,9 +443,9 @@ void StallardOS::schedule()
       function_struct_ptr = function_struct_ptr->next;
       continue;
     }
-    if ((function_struct_ptr->lastExecTime + (1000.0 / function_struct_ptr->frequency)) < msCurrentTimeSinceStart && function_struct_ptr->priority < 255)
+    if ((function_struct_ptr->lastExecTime + (1000.0 / function_struct_ptr->frequency)) < usCurrentTimeSinceStart && function_struct_ptr->priority < 255)
     {
-      function_struct_ptr->lastExecTime = msCurrentTimeSinceStart;
+      function_struct_ptr->lastExecTime = usCurrentTimeSinceStart;
       (*function_struct_ptr->function)();
       break;
     }
