@@ -1,10 +1,14 @@
 /********************************************
  * User Customization
 ********************************************/
-#define STOS_current_ECU_ID 2
+#define STOS_current_ECU_ID 1 //FCU
+// #define STOS_current_ECU_ID 2 //RCU
+// #define STOS_current_ECU_ID 3 //PDU
+// #define STOS_current_ECU_ID 4 //SWCU
+
 #define contextSwitch
 
-#define sizeStack 2000      //300 * 4 Byte (Stack size for Tasks)
+#define sizeStack 1000      //300 * 4 Byte (Stack size for Tasks)
 #define countTasks 4
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 #define externalOszillator 25 //[MHz]

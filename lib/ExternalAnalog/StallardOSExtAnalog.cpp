@@ -99,8 +99,12 @@ uint16_t StallardOSExtAnalog::channelRead()
 uint16_t StallardOSExtAnalog::getValue()
 {
     uint16_t buf;
+    #ifdef contextSwitch
     sem.take();
+    #endif
     buf = channelRead();
+    #ifdef contextSwitch
     sem.give();
+    #endif
     return buf;
 }

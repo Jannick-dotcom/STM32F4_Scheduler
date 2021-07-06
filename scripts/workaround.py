@@ -7,7 +7,16 @@ env.Append(
     LINKFLAGS=[
         "-mthumb", 
         "-mcpu=cortex-m4", 
+        "-mfloat-abi=hard",
         "-mfpu=fpv4-sp-d16", 
-        "-mfloat-abi=hard"
+        "-fsingle-precision-constant"
     ]
+)
+
+env.AddPostAction(
+    "$BUILD_DIR/${PROGNAME}.elf",
+    env.VerboseAction(" ".join([
+        "$OBJCOPY", "-O", "ihex", "-R", ".eeprom",
+        "$BUILD_DIR/${PROGNAME}.elf", "$BUILD_DIR/${PROGNAME}.hex"
+    ]), "Building $BUILD_DIR/${PROGNAME}.hex")
 )

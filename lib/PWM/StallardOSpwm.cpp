@@ -99,7 +99,14 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
     this->bitcount = bitcount;
     TIM_OC_InitTypeDef sConfigOC;
     htim.Instance = instance;
-    htim.Init.Prescaler = (SystemCoreClock / freq) / pow(2, bitcount);
+    if(instance == TIM1 || instance == TIM8 || instance == TIM9 || instance == TIM10 || instance == TIM11)
+    {
+        htim.Init.Prescaler = (168000000 / (freq)) / pow(2, bitcount);
+    }
+    else
+    {
+        htim.Init.Prescaler = (168000000 / (4*freq)) / pow(2, bitcount);
+    }
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim.Init.Period = pow(2, bitcount) - 1;
     htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

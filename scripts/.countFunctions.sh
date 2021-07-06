@@ -20,11 +20,11 @@ for ((i=1; i<=$CNTLNS; i++)) do
         CNT=$((CNT+1))
     fi
 done
-CNT=$((CNT+1))
+CNT=$((CNT+2))
 
 echo "Count of processes:  $CNT"
 PATHTODAT=$(find -name StallardOSconfig.h)
-echo $PATHTODAT
+# echo $PATHTODAT
 LINE=$(grep -n "#define countTasks" $PATHTODAT | cut -d ":" -f1)
 
 sed -i $LINE'd' $PATHTODAT
