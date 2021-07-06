@@ -14,26 +14,26 @@ struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x100;
 	uint16_t _size;
-	CAN_Signal<int8_t> activate_blip = {0, 1, 60};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> activate_cut = {0, 1, 61};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> blip_state = {0, 4, 28};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> cut_level_gcu = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> engaged_gear = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> gearpot = {0, 10, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> shift_state = {0, 4, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> state_cut = {0, 4, 56};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> target_engine_speed = {0, 14, 32};//init,bitcount,startbit 
+	CAN_Signal<int8_t> activate_blip = {0, 1, 60, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> activate_cut = {0, 1, 61, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> blip_state = {0, 4, 28, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> cut_level_gcu = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> engaged_gear = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> gearpot = {0, 10, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> shift_state = {0, 4, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> state_cut = {0, 4, 56, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> target_engine_speed = {0, 14, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		activate_blip.value = ((Val & (~(jk_pow(activate_blip.startbit)-1))) & ((uint64_t)(jk_pow(activate_blip.countOfBits)-1) << (uint64_t)activate_blip.startbit)) >> (uint64_t)activate_blip.startbit;
-		activate_cut.value = ((Val & (~(jk_pow(activate_cut.startbit)-1))) & ((uint64_t)(jk_pow(activate_cut.countOfBits)-1) << (uint64_t)activate_cut.startbit)) >> (uint64_t)activate_cut.startbit;
-		blip_state.value = ((Val & (~(jk_pow(blip_state.startbit)-1))) & ((uint64_t)(jk_pow(blip_state.countOfBits)-1) << (uint64_t)blip_state.startbit)) >> (uint64_t)blip_state.startbit;
-		cut_level_gcu.value = ((Val & (~(jk_pow(cut_level_gcu.startbit)-1))) & ((uint64_t)(jk_pow(cut_level_gcu.countOfBits)-1) << (uint64_t)cut_level_gcu.startbit)) >> (uint64_t)cut_level_gcu.startbit;
-		engaged_gear.value = ((Val & (~(jk_pow(engaged_gear.startbit)-1))) & ((uint64_t)(jk_pow(engaged_gear.countOfBits)-1) << (uint64_t)engaged_gear.startbit)) >> (uint64_t)engaged_gear.startbit;
-		gearpot.value = ((Val & (~(jk_pow(gearpot.startbit)-1))) & ((uint64_t)(jk_pow(gearpot.countOfBits)-1) << (uint64_t)gearpot.startbit)) >> (uint64_t)gearpot.startbit;
-		shift_state.value = ((Val & (~(jk_pow(shift_state.startbit)-1))) & ((uint64_t)(jk_pow(shift_state.countOfBits)-1) << (uint64_t)shift_state.startbit)) >> (uint64_t)shift_state.startbit;
-		state_cut.value = ((Val & (~(jk_pow(state_cut.startbit)-1))) & ((uint64_t)(jk_pow(state_cut.countOfBits)-1) << (uint64_t)state_cut.startbit)) >> (uint64_t)state_cut.startbit;
-		target_engine_speed.value = ((Val & (~(jk_pow(target_engine_speed.startbit)-1))) & ((uint64_t)(jk_pow(target_engine_speed.countOfBits)-1) << (uint64_t)target_engine_speed.startbit)) >> (uint64_t)target_engine_speed.startbit;
+		activate_blip.unbuild(Val);
+		activate_cut.unbuild(Val);
+		blip_state.unbuild(Val);
+		cut_level_gcu.unbuild(Val);
+		engaged_gear.unbuild(Val);
+		gearpot.unbuild(Val);
+		shift_state.unbuild(Val);
+		state_cut.unbuild(Val);
+		target_engine_speed.unbuild(Val);
 	}
 	STOS_CAN_PDU_AGS1_gearbox_control_unit() 
 	{
@@ -54,16 +54,16 @@ struct STOS_CAN_PDU_ABS_wheelspeeds : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x24A;
 	uint16_t _size;
-	CAN_Signal<uint16_t> speedABSfl = {0, 16, 0};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> speedABSfr = {0, 16, 16};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> speedABSrl = {0, 16, 32};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> speedABSrr = {0, 16, 48};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> speedABSfl = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> speedABSfr = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> speedABSrl = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> speedABSrr = {0, 16, 48, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		speedABSfl.value = ((Val & (~(jk_pow(speedABSfl.startbit)-1))) & ((uint64_t)(jk_pow(speedABSfl.countOfBits)-1) << (uint64_t)speedABSfl.startbit)) >> (uint64_t)speedABSfl.startbit;
-		speedABSfr.value = ((Val & (~(jk_pow(speedABSfr.startbit)-1))) & ((uint64_t)(jk_pow(speedABSfr.countOfBits)-1) << (uint64_t)speedABSfr.startbit)) >> (uint64_t)speedABSfr.startbit;
-		speedABSrl.value = ((Val & (~(jk_pow(speedABSrl.startbit)-1))) & ((uint64_t)(jk_pow(speedABSrl.countOfBits)-1) << (uint64_t)speedABSrl.startbit)) >> (uint64_t)speedABSrl.startbit;
-		speedABSrr.value = ((Val & (~(jk_pow(speedABSrr.startbit)-1))) & ((uint64_t)(jk_pow(speedABSrr.countOfBits)-1) << (uint64_t)speedABSrr.startbit)) >> (uint64_t)speedABSrr.startbit;
+		speedABSfl.unbuild(Val);
+		speedABSfr.unbuild(Val);
+		speedABSrl.unbuild(Val);
+		speedABSrr.unbuild(Val);
 	}
 	STOS_CAN_PDU_ABS_wheelspeeds() 
 	{
@@ -84,18 +84,18 @@ struct STOS_CAN_PDU_ABS_switch_state_slip_and_speed : public StallardOSCanMessag
 public:
 	static const uint16_t _id = 0x5C0;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ax1_Bremse60ABS = {0, 16, 32};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ay1_Bremse60ABS = {0, 16, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> blsABS = {0, 1, 24};//init,bitcount,startbit 
-	CAN_Signal<int16_t> p_HzABS = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> switchstateABS = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ax1_Bremse60ABS = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ay1_Bremse60ABS = {0, 16, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> blsABS = {0, 1, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int16_t> p_HzABS = {0, 16, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> switchstateABS = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ax1_Bremse60ABS.value = ((Val & (~(jk_pow(ax1_Bremse60ABS.startbit)-1))) & ((uint64_t)(jk_pow(ax1_Bremse60ABS.countOfBits)-1) << (uint64_t)ax1_Bremse60ABS.startbit)) >> (uint64_t)ax1_Bremse60ABS.startbit;
-		ay1_Bremse60ABS.value = ((Val & (~(jk_pow(ay1_Bremse60ABS.startbit)-1))) & ((uint64_t)(jk_pow(ay1_Bremse60ABS.countOfBits)-1) << (uint64_t)ay1_Bremse60ABS.startbit)) >> (uint64_t)ay1_Bremse60ABS.startbit;
-		blsABS.value = ((Val & (~(jk_pow(blsABS.startbit)-1))) & ((uint64_t)(jk_pow(blsABS.countOfBits)-1) << (uint64_t)blsABS.startbit)) >> (uint64_t)blsABS.startbit;
-		p_HzABS.value = ((Val & (~(jk_pow(p_HzABS.startbit)-1))) & ((uint64_t)(jk_pow(p_HzABS.countOfBits)-1) << (uint64_t)p_HzABS.startbit)) >> (uint64_t)p_HzABS.startbit;
-		switchstateABS.value = ((Val & (~(jk_pow(switchstateABS.startbit)-1))) & ((uint64_t)(jk_pow(switchstateABS.countOfBits)-1) << (uint64_t)switchstateABS.startbit)) >> (uint64_t)switchstateABS.startbit;
+		ax1_Bremse60ABS.unbuild(Val);
+		ay1_Bremse60ABS.unbuild(Val);
+		blsABS.unbuild(Val);
+		p_HzABS.unbuild(Val);
+		switchstateABS.unbuild(Val);
 	}
 	STOS_CAN_PDU_ABS_switch_state_slip_and_speed() 
 	{
@@ -116,24 +116,24 @@ struct STOS_CAN_PDU_Injection_1 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x770;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ti_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_3 = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_4 = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_5 = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_6 = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_7 = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ti_8 = {0, 8, 56};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ti_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_3 = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_4 = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_5 = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_6 = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_7 = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ti_8 = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ti_1.value = ((Val & (~(jk_pow(ti_1.startbit)-1))) & ((uint64_t)(jk_pow(ti_1.countOfBits)-1) << (uint64_t)ti_1.startbit)) >> (uint64_t)ti_1.startbit;
-		ti_2.value = ((Val & (~(jk_pow(ti_2.startbit)-1))) & ((uint64_t)(jk_pow(ti_2.countOfBits)-1) << (uint64_t)ti_2.startbit)) >> (uint64_t)ti_2.startbit;
-		ti_3.value = ((Val & (~(jk_pow(ti_3.startbit)-1))) & ((uint64_t)(jk_pow(ti_3.countOfBits)-1) << (uint64_t)ti_3.startbit)) >> (uint64_t)ti_3.startbit;
-		ti_4.value = ((Val & (~(jk_pow(ti_4.startbit)-1))) & ((uint64_t)(jk_pow(ti_4.countOfBits)-1) << (uint64_t)ti_4.startbit)) >> (uint64_t)ti_4.startbit;
-		ti_5.value = ((Val & (~(jk_pow(ti_5.startbit)-1))) & ((uint64_t)(jk_pow(ti_5.countOfBits)-1) << (uint64_t)ti_5.startbit)) >> (uint64_t)ti_5.startbit;
-		ti_6.value = ((Val & (~(jk_pow(ti_6.startbit)-1))) & ((uint64_t)(jk_pow(ti_6.countOfBits)-1) << (uint64_t)ti_6.startbit)) >> (uint64_t)ti_6.startbit;
-		ti_7.value = ((Val & (~(jk_pow(ti_7.startbit)-1))) & ((uint64_t)(jk_pow(ti_7.countOfBits)-1) << (uint64_t)ti_7.startbit)) >> (uint64_t)ti_7.startbit;
-		ti_8.value = ((Val & (~(jk_pow(ti_8.startbit)-1))) & ((uint64_t)(jk_pow(ti_8.countOfBits)-1) << (uint64_t)ti_8.startbit)) >> (uint64_t)ti_8.startbit;
+		ti_1.unbuild(Val);
+		ti_2.unbuild(Val);
+		ti_3.unbuild(Val);
+		ti_4.unbuild(Val);
+		ti_5.unbuild(Val);
+		ti_6.unbuild(Val);
+		ti_7.unbuild(Val);
+		ti_8.unbuild(Val);
 	}
 	STOS_CAN_PDU_Injection_1() 
 	{
@@ -154,22 +154,22 @@ struct STOS_CAN_PDU_Injection_2 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x771;
 	uint16_t _size;
-	CAN_Signal<uint8_t> injang = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> injoff = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lamctrl_2k = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lamctrl_k = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tibase = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tibatt_o = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> timap = {0, 8, 16};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> injang = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> injoff = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lamctrl_2k = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lamctrl_k = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tibase = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tibatt_o = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> timap = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		injang.value = ((Val & (~(jk_pow(injang.startbit)-1))) & ((uint64_t)(jk_pow(injang.countOfBits)-1) << (uint64_t)injang.startbit)) >> (uint64_t)injang.startbit;
-		injoff.value = ((Val & (~(jk_pow(injoff.startbit)-1))) & ((uint64_t)(jk_pow(injoff.countOfBits)-1) << (uint64_t)injoff.startbit)) >> (uint64_t)injoff.startbit;
-		lamctrl_2k.value = ((Val & (~(jk_pow(lamctrl_2k.startbit)-1))) & ((uint64_t)(jk_pow(lamctrl_2k.countOfBits)-1) << (uint64_t)lamctrl_2k.startbit)) >> (uint64_t)lamctrl_2k.startbit;
-		lamctrl_k.value = ((Val & (~(jk_pow(lamctrl_k.startbit)-1))) & ((uint64_t)(jk_pow(lamctrl_k.countOfBits)-1) << (uint64_t)lamctrl_k.startbit)) >> (uint64_t)lamctrl_k.startbit;
-		tibase.value = ((Val & (~(jk_pow(tibase.startbit)-1))) & ((uint64_t)(jk_pow(tibase.countOfBits)-1) << (uint64_t)tibase.startbit)) >> (uint64_t)tibase.startbit;
-		tibatt_o.value = ((Val & (~(jk_pow(tibatt_o.startbit)-1))) & ((uint64_t)(jk_pow(tibatt_o.countOfBits)-1) << (uint64_t)tibatt_o.startbit)) >> (uint64_t)tibatt_o.startbit;
-		timap.value = ((Val & (~(jk_pow(timap.startbit)-1))) & ((uint64_t)(jk_pow(timap.countOfBits)-1) << (uint64_t)timap.startbit)) >> (uint64_t)timap.startbit;
+		injang.unbuild(Val);
+		injoff.unbuild(Val);
+		lamctrl_2k.unbuild(Val);
+		lamctrl_k.unbuild(Val);
+		tibase.unbuild(Val);
+		tibatt_o.unbuild(Val);
+		timap.unbuild(Val);
 	}
 	STOS_CAN_PDU_Injection_2() 
 	{
@@ -190,24 +190,24 @@ struct STOS_CAN_PDU_Ignition : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x772;
 	uint16_t _size;
-	CAN_Signal<int8_t> ign_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_3 = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_4 = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_5 = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_6 = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_7 = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ign_8 = {0, 8, 56};//init,bitcount,startbit 
+	CAN_Signal<int8_t> ign_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_3 = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_4 = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_5 = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_6 = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_7 = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ign_8 = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ign_1.value = ((Val & (~(jk_pow(ign_1.startbit)-1))) & ((uint64_t)(jk_pow(ign_1.countOfBits)-1) << (uint64_t)ign_1.startbit)) >> (uint64_t)ign_1.startbit;
-		ign_2.value = ((Val & (~(jk_pow(ign_2.startbit)-1))) & ((uint64_t)(jk_pow(ign_2.countOfBits)-1) << (uint64_t)ign_2.startbit)) >> (uint64_t)ign_2.startbit;
-		ign_3.value = ((Val & (~(jk_pow(ign_3.startbit)-1))) & ((uint64_t)(jk_pow(ign_3.countOfBits)-1) << (uint64_t)ign_3.startbit)) >> (uint64_t)ign_3.startbit;
-		ign_4.value = ((Val & (~(jk_pow(ign_4.startbit)-1))) & ((uint64_t)(jk_pow(ign_4.countOfBits)-1) << (uint64_t)ign_4.startbit)) >> (uint64_t)ign_4.startbit;
-		ign_5.value = ((Val & (~(jk_pow(ign_5.startbit)-1))) & ((uint64_t)(jk_pow(ign_5.countOfBits)-1) << (uint64_t)ign_5.startbit)) >> (uint64_t)ign_5.startbit;
-		ign_6.value = ((Val & (~(jk_pow(ign_6.startbit)-1))) & ((uint64_t)(jk_pow(ign_6.countOfBits)-1) << (uint64_t)ign_6.startbit)) >> (uint64_t)ign_6.startbit;
-		ign_7.value = ((Val & (~(jk_pow(ign_7.startbit)-1))) & ((uint64_t)(jk_pow(ign_7.countOfBits)-1) << (uint64_t)ign_7.startbit)) >> (uint64_t)ign_7.startbit;
-		ign_8.value = ((Val & (~(jk_pow(ign_8.startbit)-1))) & ((uint64_t)(jk_pow(ign_8.countOfBits)-1) << (uint64_t)ign_8.startbit)) >> (uint64_t)ign_8.startbit;
+		ign_1.unbuild(Val);
+		ign_2.unbuild(Val);
+		ign_3.unbuild(Val);
+		ign_4.unbuild(Val);
+		ign_5.unbuild(Val);
+		ign_6.unbuild(Val);
+		ign_7.unbuild(Val);
+		ign_8.unbuild(Val);
 	}
 	STOS_CAN_PDU_Ignition() 
 	{
@@ -228,20 +228,20 @@ struct STOS_CAN_PDU_Ignition_Rev_Ath : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x773;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ath = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<int8_t> dath = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ignbase = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<int8_t> ignmap = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> rev = {0, 16, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tdwell = {0, 8, 16};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ath = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> dath = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ignbase = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> ignmap = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> rev = {0, 16, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tdwell = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ath.value = ((Val & (~(jk_pow(ath.startbit)-1))) & ((uint64_t)(jk_pow(ath.countOfBits)-1) << (uint64_t)ath.startbit)) >> (uint64_t)ath.startbit;
-		dath.value = ((Val & (~(jk_pow(dath.startbit)-1))) & ((uint64_t)(jk_pow(dath.countOfBits)-1) << (uint64_t)dath.startbit)) >> (uint64_t)dath.startbit;
-		ignbase.value = ((Val & (~(jk_pow(ignbase.startbit)-1))) & ((uint64_t)(jk_pow(ignbase.countOfBits)-1) << (uint64_t)ignbase.startbit)) >> (uint64_t)ignbase.startbit;
-		ignmap.value = ((Val & (~(jk_pow(ignmap.startbit)-1))) & ((uint64_t)(jk_pow(ignmap.countOfBits)-1) << (uint64_t)ignmap.startbit)) >> (uint64_t)ignmap.startbit;
-		rev.value = ((Val & (~(jk_pow(rev.startbit)-1))) & ((uint64_t)(jk_pow(rev.countOfBits)-1) << (uint64_t)rev.startbit)) >> (uint64_t)rev.startbit;
-		tdwell.value = ((Val & (~(jk_pow(tdwell.startbit)-1))) & ((uint64_t)(jk_pow(tdwell.countOfBits)-1) << (uint64_t)tdwell.startbit)) >> (uint64_t)tdwell.startbit;
+		ath.unbuild(Val);
+		dath.unbuild(Val);
+		ignbase.unbuild(Val);
+		ignmap.unbuild(Val);
+		rev.unbuild(Val);
+		tdwell.unbuild(Val);
 	}
 	STOS_CAN_PDU_Ignition_Rev_Ath() 
 	{
@@ -262,24 +262,24 @@ struct STOS_CAN_PDU_Lambda : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x774;
 	uint16_t _size;
-	CAN_Signal<uint8_t> lam = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lam_2 = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<int8_t> lami = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<int8_t> lami_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lammap = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lammap_2 = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<int8_t> lamp = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<int8_t> lamp_2 = {0, 8, 24};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> lam = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lam_2 = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> lami = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> lami_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lammap = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lammap_2 = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> lamp = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> lamp_2 = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		lam.value = ((Val & (~(jk_pow(lam.startbit)-1))) & ((uint64_t)(jk_pow(lam.countOfBits)-1) << (uint64_t)lam.startbit)) >> (uint64_t)lam.startbit;
-		lam_2.value = ((Val & (~(jk_pow(lam_2.startbit)-1))) & ((uint64_t)(jk_pow(lam_2.countOfBits)-1) << (uint64_t)lam_2.startbit)) >> (uint64_t)lam_2.startbit;
-		lami.value = ((Val & (~(jk_pow(lami.startbit)-1))) & ((uint64_t)(jk_pow(lami.countOfBits)-1) << (uint64_t)lami.startbit)) >> (uint64_t)lami.startbit;
-		lami_2.value = ((Val & (~(jk_pow(lami_2.startbit)-1))) & ((uint64_t)(jk_pow(lami_2.countOfBits)-1) << (uint64_t)lami_2.startbit)) >> (uint64_t)lami_2.startbit;
-		lammap.value = ((Val & (~(jk_pow(lammap.startbit)-1))) & ((uint64_t)(jk_pow(lammap.countOfBits)-1) << (uint64_t)lammap.startbit)) >> (uint64_t)lammap.startbit;
-		lammap_2.value = ((Val & (~(jk_pow(lammap_2.startbit)-1))) & ((uint64_t)(jk_pow(lammap_2.countOfBits)-1) << (uint64_t)lammap_2.startbit)) >> (uint64_t)lammap_2.startbit;
-		lamp.value = ((Val & (~(jk_pow(lamp.startbit)-1))) & ((uint64_t)(jk_pow(lamp.countOfBits)-1) << (uint64_t)lamp.startbit)) >> (uint64_t)lamp.startbit;
-		lamp_2.value = ((Val & (~(jk_pow(lamp_2.startbit)-1))) & ((uint64_t)(jk_pow(lamp_2.countOfBits)-1) << (uint64_t)lamp_2.startbit)) >> (uint64_t)lamp_2.startbit;
+		lam.unbuild(Val);
+		lam_2.unbuild(Val);
+		lami.unbuild(Val);
+		lami_2.unbuild(Val);
+		lammap.unbuild(Val);
+		lammap_2.unbuild(Val);
+		lamp.unbuild(Val);
+		lamp_2.unbuild(Val);
 	}
 	STOS_CAN_PDU_Lambda() 
 	{
@@ -300,18 +300,18 @@ struct STOS_CAN_PDU_Speed : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x775;
 	uint16_t _size;
-	CAN_Signal<uint16_t> speed = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> speedfl = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> speedfr = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> speedrl = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> speedrr = {0, 8, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> speed = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> speedfl = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> speedfr = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> speedrl = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> speedrr = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		speed.value = ((Val & (~(jk_pow(speed.startbit)-1))) & ((uint64_t)(jk_pow(speed.countOfBits)-1) << (uint64_t)speed.startbit)) >> (uint64_t)speed.startbit;
-		speedfl.value = ((Val & (~(jk_pow(speedfl.startbit)-1))) & ((uint64_t)(jk_pow(speedfl.countOfBits)-1) << (uint64_t)speedfl.startbit)) >> (uint64_t)speedfl.startbit;
-		speedfr.value = ((Val & (~(jk_pow(speedfr.startbit)-1))) & ((uint64_t)(jk_pow(speedfr.countOfBits)-1) << (uint64_t)speedfr.startbit)) >> (uint64_t)speedfr.startbit;
-		speedrl.value = ((Val & (~(jk_pow(speedrl.startbit)-1))) & ((uint64_t)(jk_pow(speedrl.countOfBits)-1) << (uint64_t)speedrl.startbit)) >> (uint64_t)speedrl.startbit;
-		speedrr.value = ((Val & (~(jk_pow(speedrr.startbit)-1))) & ((uint64_t)(jk_pow(speedrr.countOfBits)-1) << (uint64_t)speedrr.startbit)) >> (uint64_t)speedrr.startbit;
+		speed.unbuild(Val);
+		speedfl.unbuild(Val);
+		speedfr.unbuild(Val);
+		speedrl.unbuild(Val);
+		speedrr.unbuild(Val);
 	}
 	STOS_CAN_PDU_Speed() 
 	{
@@ -332,16 +332,16 @@ struct STOS_CAN_PDU_Lapfunc : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x776;
 	uint16_t _size;
-	CAN_Signal<uint16_t> lapdist = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> laptime = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> laptimediff = {0, 16, 40};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> laptimefast = {0, 16, 56};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> lapdist = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> laptime = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> laptimediff = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> laptimefast = {0, 16, 48, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		lapdist.value = ((Val & (~(jk_pow(lapdist.startbit)-1))) & ((uint64_t)(jk_pow(lapdist.countOfBits)-1) << (uint64_t)lapdist.startbit)) >> (uint64_t)lapdist.startbit;
-		laptime.value = ((Val & (~(jk_pow(laptime.startbit)-1))) & ((uint64_t)(jk_pow(laptime.countOfBits)-1) << (uint64_t)laptime.startbit)) >> (uint64_t)laptime.startbit;
-		laptimediff.value = ((Val & (~(jk_pow(laptimediff.startbit)-1))) & ((uint64_t)(jk_pow(laptimediff.countOfBits)-1) << (uint64_t)laptimediff.startbit)) >> (uint64_t)laptimediff.startbit;
-		laptimefast.value = ((Val & (~(jk_pow(laptimefast.startbit)-1))) & ((uint64_t)(jk_pow(laptimefast.countOfBits)-1) << (uint64_t)laptimefast.startbit)) >> (uint64_t)laptimefast.startbit;
+		lapdist.unbuild(Val);
+		laptime.unbuild(Val);
+		laptimediff.unbuild(Val);
+		laptimefast.unbuild(Val);
 	}
 	STOS_CAN_PDU_Lapfunc() 
 	{
@@ -362,24 +362,24 @@ struct STOS_CAN_PDU_Gear_Dashboard_Acceleration : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x777;
 	uint16_t _size;
-	CAN_Signal<int8_t> accx = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<int8_t> accy = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<int8_t> accz = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ddugear = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> gcstate = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> gear = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> gearcut_u = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> gearratio = {0, 8, 16};//init,bitcount,startbit 
+	CAN_Signal<int8_t> accx = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> accy = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> accz = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ddugear = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> gcstate = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> gear = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> gearcut_u = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> gearratio = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		accx.value = ((Val & (~(jk_pow(accx.startbit)-1))) & ((uint64_t)(jk_pow(accx.countOfBits)-1) << (uint64_t)accx.startbit)) >> (uint64_t)accx.startbit;
-		accy.value = ((Val & (~(jk_pow(accy.startbit)-1))) & ((uint64_t)(jk_pow(accy.countOfBits)-1) << (uint64_t)accy.startbit)) >> (uint64_t)accy.startbit;
-		accz.value = ((Val & (~(jk_pow(accz.startbit)-1))) & ((uint64_t)(jk_pow(accz.countOfBits)-1) << (uint64_t)accz.startbit)) >> (uint64_t)accz.startbit;
-		ddugear.value = ((Val & (~(jk_pow(ddugear.startbit)-1))) & ((uint64_t)(jk_pow(ddugear.countOfBits)-1) << (uint64_t)ddugear.startbit)) >> (uint64_t)ddugear.startbit;
-		gcstate.value = ((Val & (~(jk_pow(gcstate.startbit)-1))) & ((uint64_t)(jk_pow(gcstate.countOfBits)-1) << (uint64_t)gcstate.startbit)) >> (uint64_t)gcstate.startbit;
-		gear.value = ((Val & (~(jk_pow(gear.startbit)-1))) & ((uint64_t)(jk_pow(gear.countOfBits)-1) << (uint64_t)gear.startbit)) >> (uint64_t)gear.startbit;
-		gearcut_u.value = ((Val & (~(jk_pow(gearcut_u.startbit)-1))) & ((uint64_t)(jk_pow(gearcut_u.countOfBits)-1) << (uint64_t)gearcut_u.startbit)) >> (uint64_t)gearcut_u.startbit;
-		gearratio.value = ((Val & (~(jk_pow(gearratio.startbit)-1))) & ((uint64_t)(jk_pow(gearratio.countOfBits)-1) << (uint64_t)gearratio.startbit)) >> (uint64_t)gearratio.startbit;
+		accx.unbuild(Val);
+		accy.unbuild(Val);
+		accz.unbuild(Val);
+		ddugear.unbuild(Val);
+		gcstate.unbuild(Val);
+		gear.unbuild(Val);
+		gearcut_u.unbuild(Val);
+		gearratio.unbuild(Val);
 	}
 	STOS_CAN_PDU_Gear_Dashboard_Acceleration() 
 	{
@@ -400,20 +400,20 @@ struct STOS_CAN_PDU_Traction_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x778;
 	uint16_t _size;
-	CAN_Signal<uint8_t> slipsp = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> slra = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<int8_t> tcpfac = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tcsw = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> vdraxle = {0, 16, 40};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> vref = {0, 16, 56};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> slipsp = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> slra = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int8_t> tcpfac = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tcsw = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> vdraxle = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> vref = {0, 16, 48, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		slipsp.value = ((Val & (~(jk_pow(slipsp.startbit)-1))) & ((uint64_t)(jk_pow(slipsp.countOfBits)-1) << (uint64_t)slipsp.startbit)) >> (uint64_t)slipsp.startbit;
-		slra.value = ((Val & (~(jk_pow(slra.startbit)-1))) & ((uint64_t)(jk_pow(slra.countOfBits)-1) << (uint64_t)slra.startbit)) >> (uint64_t)slra.startbit;
-		tcpfac.value = ((Val & (~(jk_pow(tcpfac.startbit)-1))) & ((uint64_t)(jk_pow(tcpfac.countOfBits)-1) << (uint64_t)tcpfac.startbit)) >> (uint64_t)tcpfac.startbit;
-		tcsw.value = ((Val & (~(jk_pow(tcsw.startbit)-1))) & ((uint64_t)(jk_pow(tcsw.countOfBits)-1) << (uint64_t)tcsw.startbit)) >> (uint64_t)tcsw.startbit;
-		vdraxle.value = ((Val & (~(jk_pow(vdraxle.startbit)-1))) & ((uint64_t)(jk_pow(vdraxle.countOfBits)-1) << (uint64_t)vdraxle.startbit)) >> (uint64_t)vdraxle.startbit;
-		vref.value = ((Val & (~(jk_pow(vref.startbit)-1))) & ((uint64_t)(jk_pow(vref.countOfBits)-1) << (uint64_t)vref.startbit)) >> (uint64_t)vref.startbit;
+		slipsp.unbuild(Val);
+		slra.unbuild(Val);
+		tcpfac.unbuild(Val);
+		tcsw.unbuild(Val);
+		vdraxle.unbuild(Val);
+		vref.unbuild(Val);
 	}
 	STOS_CAN_PDU_Traction_Control() 
 	{
@@ -434,22 +434,22 @@ struct STOS_CAN_PDU_Electronic_Throttle_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x779;
 	uint16_t _size;
-	CAN_Signal<uint8_t> aps = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> batt_u = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> camshaftpos = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> etb = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> etb_sp = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lap_c = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> p1 = {0, 16, 32};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> aps = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> batt_u = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> camshaftpos = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> etb = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> etb_sp = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lap_c = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> p1 = {0, 16, 24, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		aps.value = ((Val & (~(jk_pow(aps.startbit)-1))) & ((uint64_t)(jk_pow(aps.countOfBits)-1) << (uint64_t)aps.startbit)) >> (uint64_t)aps.startbit;
-		batt_u.value = ((Val & (~(jk_pow(batt_u.startbit)-1))) & ((uint64_t)(jk_pow(batt_u.countOfBits)-1) << (uint64_t)batt_u.startbit)) >> (uint64_t)batt_u.startbit;
-		camshaftpos.value = ((Val & (~(jk_pow(camshaftpos.startbit)-1))) & ((uint64_t)(jk_pow(camshaftpos.countOfBits)-1) << (uint64_t)camshaftpos.startbit)) >> (uint64_t)camshaftpos.startbit;
-		etb.value = ((Val & (~(jk_pow(etb.startbit)-1))) & ((uint64_t)(jk_pow(etb.countOfBits)-1) << (uint64_t)etb.startbit)) >> (uint64_t)etb.startbit;
-		etb_sp.value = ((Val & (~(jk_pow(etb_sp.startbit)-1))) & ((uint64_t)(jk_pow(etb_sp.countOfBits)-1) << (uint64_t)etb_sp.startbit)) >> (uint64_t)etb_sp.startbit;
-		lap_c.value = ((Val & (~(jk_pow(lap_c.startbit)-1))) & ((uint64_t)(jk_pow(lap_c.countOfBits)-1) << (uint64_t)lap_c.startbit)) >> (uint64_t)lap_c.startbit;
-		p1.value = ((Val & (~(jk_pow(p1.startbit)-1))) & ((uint64_t)(jk_pow(p1.countOfBits)-1) << (uint64_t)p1.startbit)) >> (uint64_t)p1.startbit;
+		aps.unbuild(Val);
+		batt_u.unbuild(Val);
+		camshaftpos.unbuild(Val);
+		etb.unbuild(Val);
+		etb_sp.unbuild(Val);
+		lap_c.unbuild(Val);
+		p1.unbuild(Val);
 	}
 	STOS_CAN_PDU_Electronic_Throttle_Control() 
 	{
@@ -470,102 +470,124 @@ struct STOS_CAN_PDU_States_Temp_Press : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x77A;
 	uint16_t _size;
-	CAN_Signal<uint8_t> battlow_b = {0, 1, 61};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> etbsys_e = {0, 1, 25};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> fuellap = {0, 16, 40};//init,bitcount,startbit 
-	CAN_Signal<int16_t> fueltank = {0, 16, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> gearcut_b = {0, 1, 9};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> idle_b = {0, 1, 23};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ignoff_b = {0, 1, 31};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> injcut_b = {0, 1, 15};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> injcutin_b = {0, 1, 14};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> injenrich_b = {0, 1, 13};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> injstartphase_b = {0, 1, 12};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> knockadaptenable_b = {0, 1, 27};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> knockenable_b = {0, 1, 26};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lamctrl_2b = {0, 1, 10};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lamctrl_b = {0, 1, 11};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> lap_b = {0, 1, 22};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> laptrig_b = {0, 1, 21};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> mappos = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> mil_b = {0, 1, 20};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> oillamp_b = {0, 1, 19};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> pamb = {0, 16, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> pcrank = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> pfuel = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> phsok_b = {0, 1, 18};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> phsokset_b = {0, 1, 17};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> poil = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> pwat = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> rev_b = {0, 1, 30};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> revlimit_b = {0, 1, 29};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> rowcounter_0x77A = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> shled1_b = {0, 1, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> shled2_b = {0, 1, 57};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> shled3_b = {0, 1, 58};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> shled4_b = {0, 1, 59};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> shled5_b = {0, 1, 60};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> speedlimit_b = {0, 1, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> speedlimitreq_b = {0, 1, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> startend_b = {0, 1, 28};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tair = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tc_b = {0, 1, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tex = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tex_2 = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tfuel = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tlam = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tlam_2 = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> tmot = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> toil = {0, 8, 40};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> battlow_b = {0, 1, 61, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> etbsys_e = {0, 1, 25, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> fuellap = {0, 16, 32, 0x3};//init,bitcount,startbit,rowcount 
+	CAN_Signal<int16_t> fueltank = {0, 16, 48, 0x3};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> gearcut_b = {0, 1, 9, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> idle_b = {0, 1, 23, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ignoff_b = {0, 1, 31, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> injcut_b = {0, 1, 15, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> injcutin_b = {0, 1, 14, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> injenrich_b = {0, 1, 13, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> injstartphase_b = {0, 1, 12, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> knockadaptenable_b = {0, 1, 27, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> knockenable_b = {0, 1, 26, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lamctrl_2b = {0, 1, 10, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lamctrl_b = {0, 1, 11, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> lap_b = {0, 1, 22, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> laptrig_b = {0, 1, 21, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> mappos = {0, 8, 48, 0x2};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> mil_b = {0, 1, 20, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> oillamp_b = {0, 1, 19, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> pamb = {0, 16, 32, 0x2};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> pcrank = {0, 8, 32, 0x1};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> pfuel = {0, 8, 56, 0x1};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> phsok_b = {0, 1, 18, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> phsokset_b = {0, 1, 17, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> poil = {0, 8, 40, 0x1};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> pwat = {0, 8, 48, 0x1};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> rev_b = {0, 1, 30, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> revlimit_b = {0, 1, 29, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> rowcounter_0x77A = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> shled1_b = {0, 1, 56, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> shled2_b = {0, 1, 57, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> shled3_b = {0, 1, 58, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> shled4_b = {0, 1, 59, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> shled5_b = {0, 1, 60, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> speedlimit_b = {0, 1, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> speedlimitreq_b = {0, 1, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> startend_b = {0, 1, 28, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tair = {0, 8, 56, 0x2};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tc_b = {0, 1, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tex = {0, 8, 40, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tex_2 = {0, 8, 48, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tfuel = {0, 8, 32, 0x4};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tlam = {0, 8, 48, 0x4};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tlam_2 = {0, 8, 56, 0x4};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> tmot = {0, 8, 32, 0x5};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> toil = {0, 8, 40, 0x4};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		battlow_b.value = ((Val & (~(jk_pow(battlow_b.startbit)-1))) & ((uint64_t)(jk_pow(battlow_b.countOfBits)-1) << (uint64_t)battlow_b.startbit)) >> (uint64_t)battlow_b.startbit;
-		etbsys_e.value = ((Val & (~(jk_pow(etbsys_e.startbit)-1))) & ((uint64_t)(jk_pow(etbsys_e.countOfBits)-1) << (uint64_t)etbsys_e.startbit)) >> (uint64_t)etbsys_e.startbit;
-		fuellap.value = ((Val & (~(jk_pow(fuellap.startbit)-1))) & ((uint64_t)(jk_pow(fuellap.countOfBits)-1) << (uint64_t)fuellap.startbit)) >> (uint64_t)fuellap.startbit;
-		fueltank.value = ((Val & (~(jk_pow(fueltank.startbit)-1))) & ((uint64_t)(jk_pow(fueltank.countOfBits)-1) << (uint64_t)fueltank.startbit)) >> (uint64_t)fueltank.startbit;
-		gearcut_b.value = ((Val & (~(jk_pow(gearcut_b.startbit)-1))) & ((uint64_t)(jk_pow(gearcut_b.countOfBits)-1) << (uint64_t)gearcut_b.startbit)) >> (uint64_t)gearcut_b.startbit;
-		idle_b.value = ((Val & (~(jk_pow(idle_b.startbit)-1))) & ((uint64_t)(jk_pow(idle_b.countOfBits)-1) << (uint64_t)idle_b.startbit)) >> (uint64_t)idle_b.startbit;
-		ignoff_b.value = ((Val & (~(jk_pow(ignoff_b.startbit)-1))) & ((uint64_t)(jk_pow(ignoff_b.countOfBits)-1) << (uint64_t)ignoff_b.startbit)) >> (uint64_t)ignoff_b.startbit;
-		injcut_b.value = ((Val & (~(jk_pow(injcut_b.startbit)-1))) & ((uint64_t)(jk_pow(injcut_b.countOfBits)-1) << (uint64_t)injcut_b.startbit)) >> (uint64_t)injcut_b.startbit;
-		injcutin_b.value = ((Val & (~(jk_pow(injcutin_b.startbit)-1))) & ((uint64_t)(jk_pow(injcutin_b.countOfBits)-1) << (uint64_t)injcutin_b.startbit)) >> (uint64_t)injcutin_b.startbit;
-		injenrich_b.value = ((Val & (~(jk_pow(injenrich_b.startbit)-1))) & ((uint64_t)(jk_pow(injenrich_b.countOfBits)-1) << (uint64_t)injenrich_b.startbit)) >> (uint64_t)injenrich_b.startbit;
-		injstartphase_b.value = ((Val & (~(jk_pow(injstartphase_b.startbit)-1))) & ((uint64_t)(jk_pow(injstartphase_b.countOfBits)-1) << (uint64_t)injstartphase_b.startbit)) >> (uint64_t)injstartphase_b.startbit;
-		knockadaptenable_b.value = ((Val & (~(jk_pow(knockadaptenable_b.startbit)-1))) & ((uint64_t)(jk_pow(knockadaptenable_b.countOfBits)-1) << (uint64_t)knockadaptenable_b.startbit)) >> (uint64_t)knockadaptenable_b.startbit;
-		knockenable_b.value = ((Val & (~(jk_pow(knockenable_b.startbit)-1))) & ((uint64_t)(jk_pow(knockenable_b.countOfBits)-1) << (uint64_t)knockenable_b.startbit)) >> (uint64_t)knockenable_b.startbit;
-		lamctrl_2b.value = ((Val & (~(jk_pow(lamctrl_2b.startbit)-1))) & ((uint64_t)(jk_pow(lamctrl_2b.countOfBits)-1) << (uint64_t)lamctrl_2b.startbit)) >> (uint64_t)lamctrl_2b.startbit;
-		lamctrl_b.value = ((Val & (~(jk_pow(lamctrl_b.startbit)-1))) & ((uint64_t)(jk_pow(lamctrl_b.countOfBits)-1) << (uint64_t)lamctrl_b.startbit)) >> (uint64_t)lamctrl_b.startbit;
-		lap_b.value = ((Val & (~(jk_pow(lap_b.startbit)-1))) & ((uint64_t)(jk_pow(lap_b.countOfBits)-1) << (uint64_t)lap_b.startbit)) >> (uint64_t)lap_b.startbit;
-		laptrig_b.value = ((Val & (~(jk_pow(laptrig_b.startbit)-1))) & ((uint64_t)(jk_pow(laptrig_b.countOfBits)-1) << (uint64_t)laptrig_b.startbit)) >> (uint64_t)laptrig_b.startbit;
-		mappos.value = ((Val & (~(jk_pow(mappos.startbit)-1))) & ((uint64_t)(jk_pow(mappos.countOfBits)-1) << (uint64_t)mappos.startbit)) >> (uint64_t)mappos.startbit;
-		mil_b.value = ((Val & (~(jk_pow(mil_b.startbit)-1))) & ((uint64_t)(jk_pow(mil_b.countOfBits)-1) << (uint64_t)mil_b.startbit)) >> (uint64_t)mil_b.startbit;
-		oillamp_b.value = ((Val & (~(jk_pow(oillamp_b.startbit)-1))) & ((uint64_t)(jk_pow(oillamp_b.countOfBits)-1) << (uint64_t)oillamp_b.startbit)) >> (uint64_t)oillamp_b.startbit;
-		pamb.value = ((Val & (~(jk_pow(pamb.startbit)-1))) & ((uint64_t)(jk_pow(pamb.countOfBits)-1) << (uint64_t)pamb.startbit)) >> (uint64_t)pamb.startbit;
-		pcrank.value = ((Val & (~(jk_pow(pcrank.startbit)-1))) & ((uint64_t)(jk_pow(pcrank.countOfBits)-1) << (uint64_t)pcrank.startbit)) >> (uint64_t)pcrank.startbit;
-		pfuel.value = ((Val & (~(jk_pow(pfuel.startbit)-1))) & ((uint64_t)(jk_pow(pfuel.countOfBits)-1) << (uint64_t)pfuel.startbit)) >> (uint64_t)pfuel.startbit;
-		phsok_b.value = ((Val & (~(jk_pow(phsok_b.startbit)-1))) & ((uint64_t)(jk_pow(phsok_b.countOfBits)-1) << (uint64_t)phsok_b.startbit)) >> (uint64_t)phsok_b.startbit;
-		phsokset_b.value = ((Val & (~(jk_pow(phsokset_b.startbit)-1))) & ((uint64_t)(jk_pow(phsokset_b.countOfBits)-1) << (uint64_t)phsokset_b.startbit)) >> (uint64_t)phsokset_b.startbit;
-		poil.value = ((Val & (~(jk_pow(poil.startbit)-1))) & ((uint64_t)(jk_pow(poil.countOfBits)-1) << (uint64_t)poil.startbit)) >> (uint64_t)poil.startbit;
-		pwat.value = ((Val & (~(jk_pow(pwat.startbit)-1))) & ((uint64_t)(jk_pow(pwat.countOfBits)-1) << (uint64_t)pwat.startbit)) >> (uint64_t)pwat.startbit;
-		rev_b.value = ((Val & (~(jk_pow(rev_b.startbit)-1))) & ((uint64_t)(jk_pow(rev_b.countOfBits)-1) << (uint64_t)rev_b.startbit)) >> (uint64_t)rev_b.startbit;
-		revlimit_b.value = ((Val & (~(jk_pow(revlimit_b.startbit)-1))) & ((uint64_t)(jk_pow(revlimit_b.countOfBits)-1) << (uint64_t)revlimit_b.startbit)) >> (uint64_t)revlimit_b.startbit;
-		rowcounter_0x77A.value = ((Val & (~(jk_pow(rowcounter_0x77A.startbit)-1))) & ((uint64_t)(jk_pow(rowcounter_0x77A.countOfBits)-1) << (uint64_t)rowcounter_0x77A.startbit)) >> (uint64_t)rowcounter_0x77A.startbit;
-		shled1_b.value = ((Val & (~(jk_pow(shled1_b.startbit)-1))) & ((uint64_t)(jk_pow(shled1_b.countOfBits)-1) << (uint64_t)shled1_b.startbit)) >> (uint64_t)shled1_b.startbit;
-		shled2_b.value = ((Val & (~(jk_pow(shled2_b.startbit)-1))) & ((uint64_t)(jk_pow(shled2_b.countOfBits)-1) << (uint64_t)shled2_b.startbit)) >> (uint64_t)shled2_b.startbit;
-		shled3_b.value = ((Val & (~(jk_pow(shled3_b.startbit)-1))) & ((uint64_t)(jk_pow(shled3_b.countOfBits)-1) << (uint64_t)shled3_b.startbit)) >> (uint64_t)shled3_b.startbit;
-		shled4_b.value = ((Val & (~(jk_pow(shled4_b.startbit)-1))) & ((uint64_t)(jk_pow(shled4_b.countOfBits)-1) << (uint64_t)shled4_b.startbit)) >> (uint64_t)shled4_b.startbit;
-		shled5_b.value = ((Val & (~(jk_pow(shled5_b.startbit)-1))) & ((uint64_t)(jk_pow(shled5_b.countOfBits)-1) << (uint64_t)shled5_b.startbit)) >> (uint64_t)shled5_b.startbit;
-		speedlimit_b.value = ((Val & (~(jk_pow(speedlimit_b.startbit)-1))) & ((uint64_t)(jk_pow(speedlimit_b.countOfBits)-1) << (uint64_t)speedlimit_b.startbit)) >> (uint64_t)speedlimit_b.startbit;
-		speedlimitreq_b.value = ((Val & (~(jk_pow(speedlimitreq_b.startbit)-1))) & ((uint64_t)(jk_pow(speedlimitreq_b.countOfBits)-1) << (uint64_t)speedlimitreq_b.startbit)) >> (uint64_t)speedlimitreq_b.startbit;
-		startend_b.value = ((Val & (~(jk_pow(startend_b.startbit)-1))) & ((uint64_t)(jk_pow(startend_b.countOfBits)-1) << (uint64_t)startend_b.startbit)) >> (uint64_t)startend_b.startbit;
-		tair.value = ((Val & (~(jk_pow(tair.startbit)-1))) & ((uint64_t)(jk_pow(tair.countOfBits)-1) << (uint64_t)tair.startbit)) >> (uint64_t)tair.startbit;
-		tc_b.value = ((Val & (~(jk_pow(tc_b.startbit)-1))) & ((uint64_t)(jk_pow(tc_b.countOfBits)-1) << (uint64_t)tc_b.startbit)) >> (uint64_t)tc_b.startbit;
-		tex.value = ((Val & (~(jk_pow(tex.startbit)-1))) & ((uint64_t)(jk_pow(tex.countOfBits)-1) << (uint64_t)tex.startbit)) >> (uint64_t)tex.startbit;
-		tex_2.value = ((Val & (~(jk_pow(tex_2.startbit)-1))) & ((uint64_t)(jk_pow(tex_2.countOfBits)-1) << (uint64_t)tex_2.startbit)) >> (uint64_t)tex_2.startbit;
-		tfuel.value = ((Val & (~(jk_pow(tfuel.startbit)-1))) & ((uint64_t)(jk_pow(tfuel.countOfBits)-1) << (uint64_t)tfuel.startbit)) >> (uint64_t)tfuel.startbit;
-		tlam.value = ((Val & (~(jk_pow(tlam.startbit)-1))) & ((uint64_t)(jk_pow(tlam.countOfBits)-1) << (uint64_t)tlam.startbit)) >> (uint64_t)tlam.startbit;
-		tlam_2.value = ((Val & (~(jk_pow(tlam_2.startbit)-1))) & ((uint64_t)(jk_pow(tlam_2.countOfBits)-1) << (uint64_t)tlam_2.startbit)) >> (uint64_t)tlam_2.startbit;
-		tmot.value = ((Val & (~(jk_pow(tmot.startbit)-1))) & ((uint64_t)(jk_pow(tmot.countOfBits)-1) << (uint64_t)tmot.startbit)) >> (uint64_t)tmot.startbit;
-		toil.value = ((Val & (~(jk_pow(toil.startbit)-1))) & ((uint64_t)(jk_pow(toil.countOfBits)-1) << (uint64_t)toil.startbit)) >> (uint64_t)toil.startbit;
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			battlow_b.unbuild(Val);
+		etbsys_e.unbuild(Val);
+		if((Val & 0xFF) == 0x3) //If the rowcounter points to this row 
+			fuellap.unbuild(Val);
+		if((Val & 0xFF) == 0x3) //If the rowcounter points to this row 
+			fueltank.unbuild(Val);
+		gearcut_b.unbuild(Val);
+		idle_b.unbuild(Val);
+		ignoff_b.unbuild(Val);
+		injcut_b.unbuild(Val);
+		injcutin_b.unbuild(Val);
+		injenrich_b.unbuild(Val);
+		injstartphase_b.unbuild(Val);
+		knockadaptenable_b.unbuild(Val);
+		knockenable_b.unbuild(Val);
+		lamctrl_2b.unbuild(Val);
+		lamctrl_b.unbuild(Val);
+		lap_b.unbuild(Val);
+		laptrig_b.unbuild(Val);
+		if((Val & 0xFF) == 0x2) //If the rowcounter points to this row 
+			mappos.unbuild(Val);
+		mil_b.unbuild(Val);
+		oillamp_b.unbuild(Val);
+		if((Val & 0xFF) == 0x2) //If the rowcounter points to this row 
+			pamb.unbuild(Val);
+		if((Val & 0xFF) == 0x1) //If the rowcounter points to this row 
+			pcrank.unbuild(Val);
+		if((Val & 0xFF) == 0x1) //If the rowcounter points to this row 
+			pfuel.unbuild(Val);
+		phsok_b.unbuild(Val);
+		phsokset_b.unbuild(Val);
+		if((Val & 0xFF) == 0x1) //If the rowcounter points to this row 
+			poil.unbuild(Val);
+		if((Val & 0xFF) == 0x1) //If the rowcounter points to this row 
+			pwat.unbuild(Val);
+		rev_b.unbuild(Val);
+		revlimit_b.unbuild(Val);
+		rowcounter_0x77A.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			shled1_b.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			shled2_b.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			shled3_b.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			shled4_b.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			shled5_b.unbuild(Val);
+		speedlimit_b.unbuild(Val);
+		speedlimitreq_b.unbuild(Val);
+		startend_b.unbuild(Val);
+		if((Val & 0xFF) == 0x2) //If the rowcounter points to this row 
+			tair.unbuild(Val);
+		tc_b.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			tex.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			tex_2.unbuild(Val);
+		if((Val & 0xFF) == 0x4) //If the rowcounter points to this row 
+			tfuel.unbuild(Val);
+		if((Val & 0xFF) == 0x4) //If the rowcounter points to this row 
+			tlam.unbuild(Val);
+		if((Val & 0xFF) == 0x4) //If the rowcounter points to this row 
+			tlam_2.unbuild(Val);
+		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
+			tmot.unbuild(Val);
+		if((Val & 0xFF) == 0x4) //If the rowcounter points to this row 
+			toil.unbuild(Val);
 	}
 	STOS_CAN_PDU_States_Temp_Press() 
 	{
@@ -586,20 +608,20 @@ struct STOS_CAN_PDU_Boost_Pressures_Wastegate : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x77C;
 	uint16_t _size;
-	CAN_Signal<uint16_t> p22_2m_pwg_m = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> p22_m = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> p22_sp = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> pwg_sp = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> wgdc_2_wgdchold = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> wgdc_wgdcvent = {0, 8, 48};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> p22_2m_pwg_m = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> p22_m = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> p22_sp = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> pwg_sp = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> wgdc_2_wgdchold = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> wgdc_wgdcvent = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		p22_2m_pwg_m.value = ((Val & (~(jk_pow(p22_2m_pwg_m.startbit)-1))) & ((uint64_t)(jk_pow(p22_2m_pwg_m.countOfBits)-1) << (uint64_t)p22_2m_pwg_m.startbit)) >> (uint64_t)p22_2m_pwg_m.startbit;
-		p22_m.value = ((Val & (~(jk_pow(p22_m.startbit)-1))) & ((uint64_t)(jk_pow(p22_m.countOfBits)-1) << (uint64_t)p22_m.startbit)) >> (uint64_t)p22_m.startbit;
-		p22_sp.value = ((Val & (~(jk_pow(p22_sp.startbit)-1))) & ((uint64_t)(jk_pow(p22_sp.countOfBits)-1) << (uint64_t)p22_sp.startbit)) >> (uint64_t)p22_sp.startbit;
-		pwg_sp.value = ((Val & (~(jk_pow(pwg_sp.startbit)-1))) & ((uint64_t)(jk_pow(pwg_sp.countOfBits)-1) << (uint64_t)pwg_sp.startbit)) >> (uint64_t)pwg_sp.startbit;
-		wgdc_2_wgdchold.value = ((Val & (~(jk_pow(wgdc_2_wgdchold.startbit)-1))) & ((uint64_t)(jk_pow(wgdc_2_wgdchold.countOfBits)-1) << (uint64_t)wgdc_2_wgdchold.startbit)) >> (uint64_t)wgdc_2_wgdchold.startbit;
-		wgdc_wgdcvent.value = ((Val & (~(jk_pow(wgdc_wgdcvent.startbit)-1))) & ((uint64_t)(jk_pow(wgdc_wgdcvent.countOfBits)-1) << (uint64_t)wgdc_wgdcvent.startbit)) >> (uint64_t)wgdc_wgdcvent.startbit;
+		p22_2m_pwg_m.unbuild(Val);
+		p22_m.unbuild(Val);
+		p22_sp.unbuild(Val);
+		pwg_sp.unbuild(Val);
+		wgdc_2_wgdchold.unbuild(Val);
+		wgdc_wgdcvent.unbuild(Val);
 	}
 	STOS_CAN_PDU_Boost_Pressures_Wastegate() 
 	{
@@ -620,14 +642,14 @@ struct STOS_CAN_PDU_Acceleration_1 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x150;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_X = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Y = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Z = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_X = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Y = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Z = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Accel_1_X.value = ((Val & (~(jk_pow(ADCAN_SP_Accel_1_X.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Accel_1_X.countOfBits)-1) << (uint64_t)ADCAN_SP_Accel_1_X.startbit)) >> (uint64_t)ADCAN_SP_Accel_1_X.startbit;
-		ADCAN_SP_Accel_1_Y.value = ((Val & (~(jk_pow(ADCAN_SP_Accel_1_Y.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Accel_1_Y.countOfBits)-1) << (uint64_t)ADCAN_SP_Accel_1_Y.startbit)) >> (uint64_t)ADCAN_SP_Accel_1_Y.startbit;
-		ADCAN_SP_Accel_1_Z.value = ((Val & (~(jk_pow(ADCAN_SP_Accel_1_Z.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Accel_1_Z.countOfBits)-1) << (uint64_t)ADCAN_SP_Accel_1_Z.startbit)) >> (uint64_t)ADCAN_SP_Accel_1_Z.startbit;
+		ADCAN_SP_Accel_1_X.unbuild(Val);
+		ADCAN_SP_Accel_1_Y.unbuild(Val);
+		ADCAN_SP_Accel_1_Z.unbuild(Val);
 	}
 	STOS_CAN_PDU_Acceleration_1() 
 	{
@@ -648,14 +670,14 @@ struct STOS_CAN_PDU_Acceleration_2 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x151;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_X = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Y = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Z = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_X = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Y = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Z = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Accel_2_X.value = ((Val & (~(jk_pow(ADCAN_SP_Accel_2_X.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Accel_2_X.countOfBits)-1) << (uint64_t)ADCAN_SP_Accel_2_X.startbit)) >> (uint64_t)ADCAN_SP_Accel_2_X.startbit;
-		ADCAN_SP_Accel_2_Y.value = ((Val & (~(jk_pow(ADCAN_SP_Accel_2_Y.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Accel_2_Y.countOfBits)-1) << (uint64_t)ADCAN_SP_Accel_2_Y.startbit)) >> (uint64_t)ADCAN_SP_Accel_2_Y.startbit;
-		ADCAN_SP_Accel_2_Z.value = ((Val & (~(jk_pow(ADCAN_SP_Accel_2_Z.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Accel_2_Z.countOfBits)-1) << (uint64_t)ADCAN_SP_Accel_2_Z.startbit)) >> (uint64_t)ADCAN_SP_Accel_2_Z.startbit;
+		ADCAN_SP_Accel_2_X.unbuild(Val);
+		ADCAN_SP_Accel_2_Y.unbuild(Val);
+		ADCAN_SP_Accel_2_Z.unbuild(Val);
 	}
 	STOS_CAN_PDU_Acceleration_2() 
 	{
@@ -676,12 +698,12 @@ struct STOS_CAN_PDU_Aero_Fan_PWM : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x157;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_AE_Fan_L_PWM = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_AE_Fan_R_PWM = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_AE_Fan_L_PWM = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_AE_Fan_R_PWM = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_AE_Fan_L_PWM.value = ((Val & (~(jk_pow(ADCAN_AE_Fan_L_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Fan_L_PWM.countOfBits)-1) << (uint64_t)ADCAN_AE_Fan_L_PWM.startbit)) >> (uint64_t)ADCAN_AE_Fan_L_PWM.startbit;
-		ADCAN_AE_Fan_R_PWM.value = ((Val & (~(jk_pow(ADCAN_AE_Fan_R_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Fan_R_PWM.countOfBits)-1) << (uint64_t)ADCAN_AE_Fan_R_PWM.startbit)) >> (uint64_t)ADCAN_AE_Fan_R_PWM.startbit;
+		ADCAN_AE_Fan_L_PWM.unbuild(Val);
+		ADCAN_AE_Fan_R_PWM.unbuild(Val);
 	}
 	STOS_CAN_PDU_Aero_Fan_PWM() 
 	{
@@ -702,12 +724,12 @@ struct STOS_CAN_PDU_Aero_Fan_Telemetry : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x158;
 	uint16_t _size;
-	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_1 = {0, 32, 24};//init,bitcount,startbit 
-	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_2 = {0, 32, 56};//init,bitcount,startbit 
+	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_1 = {0, 32, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_2 = {0, 32, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_AE_Fan_Telemetry_1.value = ((Val & (~(jk_pow(ADCAN_AE_Fan_Telemetry_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Fan_Telemetry_1.countOfBits)-1) << (uint64_t)ADCAN_AE_Fan_Telemetry_1.startbit)) >> (uint64_t)ADCAN_AE_Fan_Telemetry_1.startbit;
-		ADCAN_AE_Fan_Telemetry_2.value = ((Val & (~(jk_pow(ADCAN_AE_Fan_Telemetry_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Fan_Telemetry_2.countOfBits)-1) << (uint64_t)ADCAN_AE_Fan_Telemetry_2.startbit)) >> (uint64_t)ADCAN_AE_Fan_Telemetry_2.startbit;
+		ADCAN_AE_Fan_Telemetry_1.unbuild(Val);
+		ADCAN_AE_Fan_Telemetry_2.unbuild(Val);
 	}
 	STOS_CAN_PDU_Aero_Fan_Telemetry() 
 	{
@@ -728,10 +750,10 @@ struct STOS_CAN_PDU_Aero_Fan_Warnings : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x105;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_AE_Warnings = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_AE_Warnings = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_AE_Warnings.value = ((Val & (~(jk_pow(ADCAN_AE_Warnings.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Warnings.countOfBits)-1) << (uint64_t)ADCAN_AE_Warnings.startbit)) >> (uint64_t)ADCAN_AE_Warnings.startbit;
+		ADCAN_AE_Warnings.unbuild(Val);
 	}
 	STOS_CAN_PDU_Aero_Fan_Warnings() 
 	{
@@ -752,10 +774,10 @@ struct STOS_CAN_PDU_Airbox_Position : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x200;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Airbox_Pos = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_PT_Airbox_Pos = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_PT_Airbox_Pos.value = ((Val & (~(jk_pow(ADCAN_PT_Airbox_Pos.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Airbox_Pos.countOfBits)-1) << (uint64_t)ADCAN_PT_Airbox_Pos.startbit)) >> (uint64_t)ADCAN_PT_Airbox_Pos.startbit;
+		ADCAN_PT_Airbox_Pos.unbuild(Val);
 	}
 	STOS_CAN_PDU_Airbox_Position() 
 	{
@@ -776,12 +798,12 @@ struct STOS_CAN_PDU_ARH_Homing : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x201;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_Homing = {0, 1, 7};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_Homing = {0, 1, 6};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_Homing = {0, 1, 7, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_Homing = {0, 1, 6, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_ARH_1_Homing.value = ((Val & (~(jk_pow(ADCAN_SP_ARH_1_Homing.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_ARH_1_Homing.countOfBits)-1) << (uint64_t)ADCAN_SP_ARH_1_Homing.startbit)) >> (uint64_t)ADCAN_SP_ARH_1_Homing.startbit;
-		ADCAN_SP_ARH_2_Homing.value = ((Val & (~(jk_pow(ADCAN_SP_ARH_2_Homing.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_ARH_2_Homing.countOfBits)-1) << (uint64_t)ADCAN_SP_ARH_2_Homing.startbit)) >> (uint64_t)ADCAN_SP_ARH_2_Homing.startbit;
+		ADCAN_SP_ARH_1_Homing.unbuild(Val);
+		ADCAN_SP_ARH_2_Homing.unbuild(Val);
 	}
 	STOS_CAN_PDU_ARH_Homing() 
 	{
@@ -802,12 +824,12 @@ struct STOS_CAN_PDU_ARH_PWM : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x160;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_PWM = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_PWM = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_PWM = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_PWM = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_ARH_1_PWM.value = ((Val & (~(jk_pow(ADCAN_SP_ARH_1_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_ARH_1_PWM.countOfBits)-1) << (uint64_t)ADCAN_SP_ARH_1_PWM.startbit)) >> (uint64_t)ADCAN_SP_ARH_1_PWM.startbit;
-		ADCAN_SP_ARH_2_PWM.value = ((Val & (~(jk_pow(ADCAN_SP_ARH_2_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_ARH_2_PWM.countOfBits)-1) << (uint64_t)ADCAN_SP_ARH_2_PWM.startbit)) >> (uint64_t)ADCAN_SP_ARH_2_PWM.startbit;
+		ADCAN_SP_ARH_1_PWM.unbuild(Val);
+		ADCAN_SP_ARH_2_PWM.unbuild(Val);
 	}
 	STOS_CAN_PDU_ARH_PWM() 
 	{
@@ -828,14 +850,14 @@ struct STOS_CAN_PDU_Battery_Temp_48V : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x203;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_3 = {0, 8, 16};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_3 = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_Battery_48V_Temp_1.value = ((Val & (~(jk_pow(ADCAN_EL_Battery_48V_Temp_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Battery_48V_Temp_1.countOfBits)-1) << (uint64_t)ADCAN_EL_Battery_48V_Temp_1.startbit)) >> (uint64_t)ADCAN_EL_Battery_48V_Temp_1.startbit;
-		ADCAN_EL_Battery_48V_Temp_2.value = ((Val & (~(jk_pow(ADCAN_EL_Battery_48V_Temp_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Battery_48V_Temp_2.countOfBits)-1) << (uint64_t)ADCAN_EL_Battery_48V_Temp_2.startbit)) >> (uint64_t)ADCAN_EL_Battery_48V_Temp_2.startbit;
-		ADCAN_EL_Battery_48V_Temp_3.value = ((Val & (~(jk_pow(ADCAN_EL_Battery_48V_Temp_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Battery_48V_Temp_3.countOfBits)-1) << (uint64_t)ADCAN_EL_Battery_48V_Temp_3.startbit)) >> (uint64_t)ADCAN_EL_Battery_48V_Temp_3.startbit;
+		ADCAN_EL_Battery_48V_Temp_1.unbuild(Val);
+		ADCAN_EL_Battery_48V_Temp_2.unbuild(Val);
+		ADCAN_EL_Battery_48V_Temp_3.unbuild(Val);
 	}
 	STOS_CAN_PDU_Battery_Temp_48V() 
 	{
@@ -856,12 +878,12 @@ struct STOS_CAN_PDU_Brake_Disc_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x205;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FL = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FR = {0, 16, 24};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FL = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FR = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Brake_Disc_Temp_FL.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Disc_Temp_FL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Disc_Temp_FL.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Disc_Temp_FL.startbit)) >> (uint64_t)ADCAN_SP_Brake_Disc_Temp_FL.startbit;
-		ADCAN_SP_Brake_Disc_Temp_FR.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Disc_Temp_FR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Disc_Temp_FR.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Disc_Temp_FR.startbit)) >> (uint64_t)ADCAN_SP_Brake_Disc_Temp_FR.startbit;
+		ADCAN_SP_Brake_Disc_Temp_FL.unbuild(Val);
+		ADCAN_SP_Brake_Disc_Temp_FR.unbuild(Val);
 	}
 	STOS_CAN_PDU_Brake_Disc_F() 
 	{
@@ -882,12 +904,12 @@ struct STOS_CAN_PDU_Brake_Disc_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x206;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RL = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RR = {0, 16, 24};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RL = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RR = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Brake_Disc_Temp_RL.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Disc_Temp_RL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Disc_Temp_RL.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Disc_Temp_RL.startbit)) >> (uint64_t)ADCAN_SP_Brake_Disc_Temp_RL.startbit;
-		ADCAN_SP_Brake_Disc_Temp_RR.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Disc_Temp_RR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Disc_Temp_RR.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Disc_Temp_RR.startbit)) >> (uint64_t)ADCAN_SP_Brake_Disc_Temp_RR.startbit;
+		ADCAN_SP_Brake_Disc_Temp_RL.unbuild(Val);
+		ADCAN_SP_Brake_Disc_Temp_RR.unbuild(Val);
 	}
 	STOS_CAN_PDU_Brake_Disc_R() 
 	{
@@ -908,14 +930,14 @@ struct STOS_CAN_PDU_Brake_Pressure : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x155;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Front = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Rear = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Brake_Bias = {0, 8, 32};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Front = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Rear = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Brake_Bias = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Brake_Pressure_Front.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Pressure_Front.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Pressure_Front.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Pressure_Front.startbit)) >> (uint64_t)ADCAN_SP_Brake_Pressure_Front.startbit;
-		ADCAN_SP_Brake_Pressure_Rear.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Pressure_Rear.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Pressure_Rear.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Pressure_Rear.startbit)) >> (uint64_t)ADCAN_SP_Brake_Pressure_Rear.startbit;
-		ADCAN_SP_Brake_Bias.value = ((Val & (~(jk_pow(ADCAN_SP_Brake_Bias.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Brake_Bias.countOfBits)-1) << (uint64_t)ADCAN_SP_Brake_Bias.startbit)) >> (uint64_t)ADCAN_SP_Brake_Bias.startbit;
+		ADCAN_SP_Brake_Pressure_Front.unbuild(Val);
+		ADCAN_SP_Brake_Pressure_Rear.unbuild(Val);
+		ADCAN_SP_Brake_Bias.unbuild(Val);
 	}
 	STOS_CAN_PDU_Brake_Pressure() 
 	{
@@ -936,24 +958,24 @@ struct STOS_CAN_PDU_Current_Sensors : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x208;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_3 = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_4 = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_5 = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_6 = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_7 = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_8 = {0, 8, 56};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_3 = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_4 = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_5 = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_6 = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_7 = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_8 = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_Current_Sensor_1.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_1.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_1.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_1.startbit;
-		ADCAN_EL_Current_Sensor_2.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_2.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_2.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_2.startbit;
-		ADCAN_EL_Current_Sensor_3.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_3.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_3.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_3.startbit;
-		ADCAN_EL_Current_Sensor_4.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_4.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_4.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_4.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_4.startbit;
-		ADCAN_EL_Current_Sensor_5.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_5.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_5.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_5.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_5.startbit;
-		ADCAN_EL_Current_Sensor_6.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_6.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_6.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_6.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_6.startbit;
-		ADCAN_EL_Current_Sensor_7.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_7.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_7.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_7.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_7.startbit;
-		ADCAN_EL_Current_Sensor_8.value = ((Val & (~(jk_pow(ADCAN_EL_Current_Sensor_8.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Current_Sensor_8.countOfBits)-1) << (uint64_t)ADCAN_EL_Current_Sensor_8.startbit)) >> (uint64_t)ADCAN_EL_Current_Sensor_8.startbit;
+		ADCAN_EL_Current_Sensor_1.unbuild(Val);
+		ADCAN_EL_Current_Sensor_2.unbuild(Val);
+		ADCAN_EL_Current_Sensor_3.unbuild(Val);
+		ADCAN_EL_Current_Sensor_4.unbuild(Val);
+		ADCAN_EL_Current_Sensor_5.unbuild(Val);
+		ADCAN_EL_Current_Sensor_6.unbuild(Val);
+		ADCAN_EL_Current_Sensor_7.unbuild(Val);
+		ADCAN_EL_Current_Sensor_8.unbuild(Val);
 	}
 	STOS_CAN_PDU_Current_Sensors() 
 	{
@@ -974,14 +996,14 @@ struct STOS_CAN_PDU_FCU_ECU_Bat_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x210;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_24V_Temp = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_1 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_2 = {0, 8, 16};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_24V_Temp = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_1 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_2 = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_Battery_24V_Temp.value = ((Val & (~(jk_pow(ADCAN_EL_Battery_24V_Temp.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Battery_24V_Temp.countOfBits)-1) << (uint64_t)ADCAN_EL_Battery_24V_Temp.startbit)) >> (uint64_t)ADCAN_EL_Battery_24V_Temp.startbit;
-		ADCAN_EL_ECU_Temp_FCU_1.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_FCU_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_FCU_1.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_FCU_1.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_FCU_1.startbit;
-		ADCAN_EL_ECU_Temp_FCU_2.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_FCU_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_FCU_2.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_FCU_2.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_FCU_2.startbit;
+		ADCAN_EL_Battery_24V_Temp.unbuild(Val);
+		ADCAN_EL_ECU_Temp_FCU_1.unbuild(Val);
+		ADCAN_EL_ECU_Temp_FCU_2.unbuild(Val);
 	}
 	STOS_CAN_PDU_FCU_ECU_Bat_Temp() 
 	{
@@ -1002,16 +1024,16 @@ struct STOS_CAN_PDU_FCU_Switches : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x212;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_ARB_Switch = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Activated = {0, 1, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Switch = {0, 8, 31};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Switch = {0, 8, 16};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_ARB_Switch = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Activated = {0, 1, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Switch = {0, 8, 31, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Switch = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_ARB_Switch.value = ((Val & (~(jk_pow(ADCAN_SP_ARB_Switch.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_ARB_Switch.countOfBits)-1) << (uint64_t)ADCAN_SP_ARB_Switch.startbit)) >> (uint64_t)ADCAN_SP_ARB_Switch.startbit;
-		ADCAN_SP_LaunchC_Activated.value = ((Val & (~(jk_pow(ADCAN_SP_LaunchC_Activated.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_LaunchC_Activated.countOfBits)-1) << (uint64_t)ADCAN_SP_LaunchC_Activated.startbit)) >> (uint64_t)ADCAN_SP_LaunchC_Activated.startbit;
-		ADCAN_SP_LaunchC_Switch.value = ((Val & (~(jk_pow(ADCAN_SP_LaunchC_Switch.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_LaunchC_Switch.countOfBits)-1) << (uint64_t)ADCAN_SP_LaunchC_Switch.startbit)) >> (uint64_t)ADCAN_SP_LaunchC_Switch.startbit;
-		ADCAN_SP_RAS_Switch.value = ((Val & (~(jk_pow(ADCAN_SP_RAS_Switch.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_RAS_Switch.countOfBits)-1) << (uint64_t)ADCAN_SP_RAS_Switch.startbit)) >> (uint64_t)ADCAN_SP_RAS_Switch.startbit;
+		ADCAN_SP_ARB_Switch.unbuild(Val);
+		ADCAN_SP_LaunchC_Activated.unbuild(Val);
+		ADCAN_SP_LaunchC_Switch.unbuild(Val);
+		ADCAN_SP_RAS_Switch.unbuild(Val);
 	}
 	STOS_CAN_PDU_FCU_Switches() 
 	{
@@ -1032,22 +1054,22 @@ struct STOS_CAN_PDU_FDS_Parameters : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x215;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Friction_LC = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_mue_max = {0, 8, 56};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Swim_VDE = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_FDS_Velo_VDE = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RL = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RR = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Yaw_VDE = {0, 8, 32};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Friction_LC = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_mue_max = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Swim_VDE = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_FDS_Velo_VDE = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RL = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RR = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Yaw_VDE = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_FDS_Friction_LC.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Friction_LC.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Friction_LC.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Friction_LC.startbit)) >> (uint64_t)ADCAN_SP_FDS_Friction_LC.startbit;
-		ADCAN_SP_FDS_Slip_mue_max.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Slip_mue_max.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Slip_mue_max.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Slip_mue_max.startbit)) >> (uint64_t)ADCAN_SP_FDS_Slip_mue_max.startbit;
-		ADCAN_SP_FDS_Swim_VDE.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Swim_VDE.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Swim_VDE.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Swim_VDE.startbit)) >> (uint64_t)ADCAN_SP_FDS_Swim_VDE.startbit;
-		ADCAN_SP_FDS_Velo_VDE.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Velo_VDE.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Velo_VDE.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Velo_VDE.startbit)) >> (uint64_t)ADCAN_SP_FDS_Velo_VDE.startbit;
-		ADCAN_SP_FDS_Wheel_Slip_RL.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Wheel_Slip_RL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Wheel_Slip_RL.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Wheel_Slip_RL.startbit)) >> (uint64_t)ADCAN_SP_FDS_Wheel_Slip_RL.startbit;
-		ADCAN_SP_FDS_Wheel_Slip_RR.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Wheel_Slip_RR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Wheel_Slip_RR.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Wheel_Slip_RR.startbit)) >> (uint64_t)ADCAN_SP_FDS_Wheel_Slip_RR.startbit;
-		ADCAN_SP_FDS_Yaw_VDE.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Yaw_VDE.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Yaw_VDE.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Yaw_VDE.startbit)) >> (uint64_t)ADCAN_SP_FDS_Yaw_VDE.startbit;
+		ADCAN_SP_FDS_Friction_LC.unbuild(Val);
+		ADCAN_SP_FDS_Slip_mue_max.unbuild(Val);
+		ADCAN_SP_FDS_Swim_VDE.unbuild(Val);
+		ADCAN_SP_FDS_Velo_VDE.unbuild(Val);
+		ADCAN_SP_FDS_Wheel_Slip_RL.unbuild(Val);
+		ADCAN_SP_FDS_Wheel_Slip_RR.unbuild(Val);
+		ADCAN_SP_FDS_Yaw_VDE.unbuild(Val);
 	}
 	STOS_CAN_PDU_FDS_Parameters() 
 	{
@@ -1068,24 +1090,24 @@ struct STOS_CAN_PDU_FDS_Wheel_Signals : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x216;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FL = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FR = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RL = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RR = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FL = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FR = {0, 8, 40};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RL = {0, 8, 48};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RR = {0, 8, 56};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FL = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FR = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RL = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RR = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FL = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FR = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RL = {0, 8, 48, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RR = {0, 8, 56, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_FDS_Slip_Angle_FL.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Slip_Angle_FL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Slip_Angle_FL.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Slip_Angle_FL.startbit)) >> (uint64_t)ADCAN_SP_FDS_Slip_Angle_FL.startbit;
-		ADCAN_SP_FDS_Slip_Angle_FR.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Slip_Angle_FR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Slip_Angle_FR.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Slip_Angle_FR.startbit)) >> (uint64_t)ADCAN_SP_FDS_Slip_Angle_FR.startbit;
-		ADCAN_SP_FDS_Slip_Angle_RL.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Slip_Angle_RL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Slip_Angle_RL.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Slip_Angle_RL.startbit)) >> (uint64_t)ADCAN_SP_FDS_Slip_Angle_RL.startbit;
-		ADCAN_SP_FDS_Slip_Angle_RR.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Slip_Angle_RR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Slip_Angle_RR.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Slip_Angle_RR.startbit)) >> (uint64_t)ADCAN_SP_FDS_Slip_Angle_RR.startbit;
-		ADCAN_SP_FDS_Whl_Load_FL.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Whl_Load_FL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Whl_Load_FL.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Whl_Load_FL.startbit)) >> (uint64_t)ADCAN_SP_FDS_Whl_Load_FL.startbit;
-		ADCAN_SP_FDS_Whl_Load_FR.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Whl_Load_FR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Whl_Load_FR.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Whl_Load_FR.startbit)) >> (uint64_t)ADCAN_SP_FDS_Whl_Load_FR.startbit;
-		ADCAN_SP_FDS_Whl_Load_RL.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Whl_Load_RL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Whl_Load_RL.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Whl_Load_RL.startbit)) >> (uint64_t)ADCAN_SP_FDS_Whl_Load_RL.startbit;
-		ADCAN_SP_FDS_Whl_Load_RR.value = ((Val & (~(jk_pow(ADCAN_SP_FDS_Whl_Load_RR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_FDS_Whl_Load_RR.countOfBits)-1) << (uint64_t)ADCAN_SP_FDS_Whl_Load_RR.startbit)) >> (uint64_t)ADCAN_SP_FDS_Whl_Load_RR.startbit;
+		ADCAN_SP_FDS_Slip_Angle_FL.unbuild(Val);
+		ADCAN_SP_FDS_Slip_Angle_FR.unbuild(Val);
+		ADCAN_SP_FDS_Slip_Angle_RL.unbuild(Val);
+		ADCAN_SP_FDS_Slip_Angle_RR.unbuild(Val);
+		ADCAN_SP_FDS_Whl_Load_FL.unbuild(Val);
+		ADCAN_SP_FDS_Whl_Load_FR.unbuild(Val);
+		ADCAN_SP_FDS_Whl_Load_RL.unbuild(Val);
+		ADCAN_SP_FDS_Whl_Load_RR.unbuild(Val);
 	}
 	STOS_CAN_PDU_FDS_Wheel_Signals() 
 	{
@@ -1106,12 +1128,12 @@ struct STOS_CAN_PDU_Flash_Over_Can : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x222;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_FoC_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_FoC_2 = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_FoC_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_FoC_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_FoC_1.value = ((Val & (~(jk_pow(ADCAN_EL_FoC_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_FoC_1.countOfBits)-1) << (uint64_t)ADCAN_EL_FoC_1.startbit)) >> (uint64_t)ADCAN_EL_FoC_1.startbit;
-		ADCAN_EL_FoC_2.value = ((Val & (~(jk_pow(ADCAN_EL_FoC_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_FoC_2.countOfBits)-1) << (uint64_t)ADCAN_EL_FoC_2.startbit)) >> (uint64_t)ADCAN_EL_FoC_2.startbit;
+		ADCAN_EL_FoC_1.unbuild(Val);
+		ADCAN_EL_FoC_2.unbuild(Val);
 	}
 	STOS_CAN_PDU_Flash_Over_Can() 
 	{
@@ -1132,10 +1154,10 @@ struct STOS_CAN_PDU_Frame_Pressure : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x218;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_CH_Frame_Pressure = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_CH_Frame_Pressure = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_CH_Frame_Pressure.value = ((Val & (~(jk_pow(ADCAN_CH_Frame_Pressure.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_CH_Frame_Pressure.countOfBits)-1) << (uint64_t)ADCAN_CH_Frame_Pressure.startbit)) >> (uint64_t)ADCAN_CH_Frame_Pressure.startbit;
+		ADCAN_CH_Frame_Pressure.unbuild(Val);
 	}
 	STOS_CAN_PDU_Frame_Pressure() 
 	{
@@ -1156,14 +1178,14 @@ struct STOS_CAN_PDU_Gyroscope_1 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x152;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_X = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Y = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Z = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_X = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Y = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Z = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Gyro_1_X.value = ((Val & (~(jk_pow(ADCAN_SP_Gyro_1_X.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Gyro_1_X.countOfBits)-1) << (uint64_t)ADCAN_SP_Gyro_1_X.startbit)) >> (uint64_t)ADCAN_SP_Gyro_1_X.startbit;
-		ADCAN_SP_Gyro_1_Y.value = ((Val & (~(jk_pow(ADCAN_SP_Gyro_1_Y.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Gyro_1_Y.countOfBits)-1) << (uint64_t)ADCAN_SP_Gyro_1_Y.startbit)) >> (uint64_t)ADCAN_SP_Gyro_1_Y.startbit;
-		ADCAN_SP_Gyro_1_Z.value = ((Val & (~(jk_pow(ADCAN_SP_Gyro_1_Z.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Gyro_1_Z.countOfBits)-1) << (uint64_t)ADCAN_SP_Gyro_1_Z.startbit)) >> (uint64_t)ADCAN_SP_Gyro_1_Z.startbit;
+		ADCAN_SP_Gyro_1_X.unbuild(Val);
+		ADCAN_SP_Gyro_1_Y.unbuild(Val);
+		ADCAN_SP_Gyro_1_Z.unbuild(Val);
 	}
 	STOS_CAN_PDU_Gyroscope_1() 
 	{
@@ -1184,14 +1206,14 @@ struct STOS_CAN_PDU_Gyroscope_2 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x153;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_X = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Y = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Z = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_X = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Y = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Z = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Gyro_2_X.value = ((Val & (~(jk_pow(ADCAN_SP_Gyro_2_X.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Gyro_2_X.countOfBits)-1) << (uint64_t)ADCAN_SP_Gyro_2_X.startbit)) >> (uint64_t)ADCAN_SP_Gyro_2_X.startbit;
-		ADCAN_SP_Gyro_2_Y.value = ((Val & (~(jk_pow(ADCAN_SP_Gyro_2_Y.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Gyro_2_Y.countOfBits)-1) << (uint64_t)ADCAN_SP_Gyro_2_Y.startbit)) >> (uint64_t)ADCAN_SP_Gyro_2_Y.startbit;
-		ADCAN_SP_Gyro_2_Z.value = ((Val & (~(jk_pow(ADCAN_SP_Gyro_2_Z.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Gyro_2_Z.countOfBits)-1) << (uint64_t)ADCAN_SP_Gyro_2_Z.startbit)) >> (uint64_t)ADCAN_SP_Gyro_2_Z.startbit;
+		ADCAN_SP_Gyro_2_X.unbuild(Val);
+		ADCAN_SP_Gyro_2_Y.unbuild(Val);
+		ADCAN_SP_Gyro_2_Z.unbuild(Val);
 	}
 	STOS_CAN_PDU_Gyroscope_2() 
 	{
@@ -1212,12 +1234,12 @@ struct STOS_CAN_PDU_Niveau_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x111;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Niveau = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Niveau = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Niveau = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Niveau = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Niveau_FL_Niveau.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FL_Niveau.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FL_Niveau.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FL_Niveau.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FL_Niveau.startbit;
-		ADCAN_SP_Niveau_FR_Niveau.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FR_Niveau.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FR_Niveau.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FR_Niveau.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FR_Niveau.startbit;
+		ADCAN_SP_Niveau_FL_Niveau.unbuild(Val);
+		ADCAN_SP_Niveau_FR_Niveau.unbuild(Val);
 	}
 	STOS_CAN_PDU_Niveau_F() 
 	{
@@ -1238,20 +1260,20 @@ struct STOS_CAN_PDU_Niveau_Front_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x219;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Error = {0, 1, 23};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Function = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_on_off = {0, 1, 22};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Error = {0, 1, 18};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Function = {0, 8, 21};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_on_off = {0, 1, 20};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Error = {0, 1, 23, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Function = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_on_off = {0, 1, 22, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Error = {0, 1, 18, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Function = {0, 8, 21, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_on_off = {0, 1, 20, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Niveau_FL_Error.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FL_Error.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FL_Error.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FL_Error.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FL_Error.startbit;
-		ADCAN_SP_Niveau_FL_Function.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FL_Function.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FL_Function.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FL_Function.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FL_Function.startbit;
-		ADCAN_SP_Niveau_FL_on_off.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FL_on_off.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FL_on_off.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FL_on_off.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FL_on_off.startbit;
-		ADCAN_SP_Niveau_FR_Error.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FR_Error.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FR_Error.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FR_Error.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FR_Error.startbit;
-		ADCAN_SP_Niveau_FR_Function.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FR_Function.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FR_Function.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FR_Function.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FR_Function.startbit;
-		ADCAN_SP_Niveau_FR_on_off.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_FR_on_off.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_FR_on_off.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_FR_on_off.startbit)) >> (uint64_t)ADCAN_SP_Niveau_FR_on_off.startbit;
+		ADCAN_SP_Niveau_FL_Error.unbuild(Val);
+		ADCAN_SP_Niveau_FL_Function.unbuild(Val);
+		ADCAN_SP_Niveau_FL_on_off.unbuild(Val);
+		ADCAN_SP_Niveau_FR_Error.unbuild(Val);
+		ADCAN_SP_Niveau_FR_Function.unbuild(Val);
+		ADCAN_SP_Niveau_FR_on_off.unbuild(Val);
 	}
 	STOS_CAN_PDU_Niveau_Front_Status() 
 	{
@@ -1272,10 +1294,10 @@ struct STOS_CAN_PDU_Niveau_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x110;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Niveau = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Niveau = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Niveau_R_Niveau.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_R_Niveau.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_R_Niveau.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_R_Niveau.startbit)) >> (uint64_t)ADCAN_SP_Niveau_R_Niveau.startbit;
+		ADCAN_SP_Niveau_R_Niveau.unbuild(Val);
 	}
 	STOS_CAN_PDU_Niveau_R() 
 	{
@@ -1296,12 +1318,12 @@ struct STOS_CAN_PDU_Niveau_Rear_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x220;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Error = {0, 1, 15};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Function = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Error = {0, 1, 15, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Function = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Niveau_R_Error.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_R_Error.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_R_Error.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_R_Error.startbit)) >> (uint64_t)ADCAN_SP_Niveau_R_Error.startbit;
-		ADCAN_SP_Niveau_R_Function.value = ((Val & (~(jk_pow(ADCAN_SP_Niveau_R_Function.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Niveau_R_Function.countOfBits)-1) << (uint64_t)ADCAN_SP_Niveau_R_Function.startbit)) >> (uint64_t)ADCAN_SP_Niveau_R_Function.startbit;
+		ADCAN_SP_Niveau_R_Error.unbuild(Val);
+		ADCAN_SP_Niveau_R_Function.unbuild(Val);
 	}
 	STOS_CAN_PDU_Niveau_Rear_Status() 
 	{
@@ -1322,10 +1344,10 @@ struct STOS_CAN_PDU_Oil_Pressure : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x163;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Pressure = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Pressure = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_PT_Oil_Pressure.value = ((Val & (~(jk_pow(ADCAN_PT_Oil_Pressure.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Oil_Pressure.countOfBits)-1) << (uint64_t)ADCAN_PT_Oil_Pressure.startbit)) >> (uint64_t)ADCAN_PT_Oil_Pressure.startbit;
+		ADCAN_PT_Oil_Pressure.unbuild(Val);
 	}
 	STOS_CAN_PDU_Oil_Pressure() 
 	{
@@ -1346,14 +1368,14 @@ struct STOS_CAN_PDU_Oil_Pressure_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x224;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level_RS232 = {0, 1, 23};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Temp = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level_RS232 = {0, 1, 23, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Temp = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_PT_Oil_Level.value = ((Val & (~(jk_pow(ADCAN_PT_Oil_Level.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Oil_Level.countOfBits)-1) << (uint64_t)ADCAN_PT_Oil_Level.startbit)) >> (uint64_t)ADCAN_PT_Oil_Level.startbit;
-		ADCAN_PT_Oil_Level_RS232.value = ((Val & (~(jk_pow(ADCAN_PT_Oil_Level_RS232.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Oil_Level_RS232.countOfBits)-1) << (uint64_t)ADCAN_PT_Oil_Level_RS232.startbit)) >> (uint64_t)ADCAN_PT_Oil_Level_RS232.startbit;
-		ADCAN_PT_Oil_Temp.value = ((Val & (~(jk_pow(ADCAN_PT_Oil_Temp.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Oil_Temp.countOfBits)-1) << (uint64_t)ADCAN_PT_Oil_Temp.startbit)) >> (uint64_t)ADCAN_PT_Oil_Temp.startbit;
+		ADCAN_PT_Oil_Level.unbuild(Val);
+		ADCAN_PT_Oil_Level_RS232.unbuild(Val);
+		ADCAN_PT_Oil_Temp.unbuild(Val);
 	}
 	STOS_CAN_PDU_Oil_Pressure_Status() 
 	{
@@ -1374,16 +1396,16 @@ struct STOS_CAN_PDU_PDU_ECU_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x230;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_3 = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_4 = {0, 8, 24};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_3 = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_4 = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_ECU_Temp_PDU_1.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_PDU_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_PDU_1.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_PDU_1.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_PDU_1.startbit;
-		ADCAN_EL_ECU_Temp_PDU_2.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_PDU_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_PDU_2.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_PDU_2.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_PDU_2.startbit;
-		ADCAN_EL_ECU_Temp_PDU_3.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_PDU_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_PDU_3.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_PDU_3.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_PDU_3.startbit;
-		ADCAN_EL_ECU_Temp_PDU_4.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_PDU_4.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_PDU_4.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_PDU_4.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_PDU_4.startbit;
+		ADCAN_EL_ECU_Temp_PDU_1.unbuild(Val);
+		ADCAN_EL_ECU_Temp_PDU_2.unbuild(Val);
+		ADCAN_EL_ECU_Temp_PDU_3.unbuild(Val);
+		ADCAN_EL_ECU_Temp_PDU_4.unbuild(Val);
 	}
 	STOS_CAN_PDU_PDU_ECU_Temp() 
 	{
@@ -1404,72 +1426,72 @@ struct STOS_CAN_PDU_PDU_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x226;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_L_1 = {0, 1, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_R_1 = {0, 1, 1};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_BOTS_Diag_1 = {0, 1, 2};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_BSPD_Shutdown_Out = {0, 1, 3};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Cockpit_Diag_1 = {0, 1, 4};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Crash_Diag = {0, 1, 5};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_1 = {0, 1, 6};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_10 = {0, 1, 7};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_11 = {0, 1, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_12 = {0, 1, 9};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_13 = {0, 1, 10};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_14 = {0, 1, 11};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_15 = {0, 1, 12};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_16 = {0, 1, 13};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_17 = {0, 1, 14};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_18 = {0, 1, 15};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_19 = {0, 1, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_2 = {0, 1, 17};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_3 = {0, 1, 18};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_4 = {0, 1, 19};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_5 = {0, 1, 20};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_6 = {0, 1, 21};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_7 = {0, 1, 22};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_8 = {0, 1, 23};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_9 = {0, 1, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_1 = {0, 1, 25};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_2 = {0, 1, 26};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Shutdown_Cockpit = {0, 1, 27};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Fuel_Pump_Signal = {0, 1, 28};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_L = {0, 1, 29};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_R = {0, 1, 30};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_Pump_Signal = {0, 1, 31};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_L_1 = {0, 1, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_R_1 = {0, 1, 1, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_BOTS_Diag_1 = {0, 1, 2, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_BSPD_Shutdown_Out = {0, 1, 3, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Cockpit_Diag_1 = {0, 1, 4, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Crash_Diag = {0, 1, 5, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_1 = {0, 1, 6, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_10 = {0, 1, 7, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_11 = {0, 1, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_12 = {0, 1, 9, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_13 = {0, 1, 10, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_14 = {0, 1, 11, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_15 = {0, 1, 12, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_16 = {0, 1, 13, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_17 = {0, 1, 14, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_18 = {0, 1, 15, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_19 = {0, 1, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_2 = {0, 1, 17, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_3 = {0, 1, 18, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_4 = {0, 1, 19, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_5 = {0, 1, 20, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_6 = {0, 1, 21, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_7 = {0, 1, 22, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_8 = {0, 1, 23, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_9 = {0, 1, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_1 = {0, 1, 25, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_2 = {0, 1, 26, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Shutdown_Cockpit = {0, 1, 27, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Fuel_Pump_Signal = {0, 1, 28, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_L = {0, 1, 29, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_R = {0, 1, 30, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Pump_Signal = {0, 1, 31, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_CH_Mainhoop_Diag_L_1.value = ((Val & (~(jk_pow(ADCAN_CH_Mainhoop_Diag_L_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_CH_Mainhoop_Diag_L_1.countOfBits)-1) << (uint64_t)ADCAN_CH_Mainhoop_Diag_L_1.startbit)) >> (uint64_t)ADCAN_CH_Mainhoop_Diag_L_1.startbit;
-		ADCAN_CH_Mainhoop_Diag_R_1.value = ((Val & (~(jk_pow(ADCAN_CH_Mainhoop_Diag_R_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_CH_Mainhoop_Diag_R_1.countOfBits)-1) << (uint64_t)ADCAN_CH_Mainhoop_Diag_R_1.startbit)) >> (uint64_t)ADCAN_CH_Mainhoop_Diag_R_1.startbit;
-		ADCAN_EL_BOTS_Diag_1.value = ((Val & (~(jk_pow(ADCAN_EL_BOTS_Diag_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_BOTS_Diag_1.countOfBits)-1) << (uint64_t)ADCAN_EL_BOTS_Diag_1.startbit)) >> (uint64_t)ADCAN_EL_BOTS_Diag_1.startbit;
-		ADCAN_EL_BSPD_Shutdown_Out.value = ((Val & (~(jk_pow(ADCAN_EL_BSPD_Shutdown_Out.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_BSPD_Shutdown_Out.countOfBits)-1) << (uint64_t)ADCAN_EL_BSPD_Shutdown_Out.startbit)) >> (uint64_t)ADCAN_EL_BSPD_Shutdown_Out.startbit;
-		ADCAN_EL_Cockpit_Diag_1.value = ((Val & (~(jk_pow(ADCAN_EL_Cockpit_Diag_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Cockpit_Diag_1.countOfBits)-1) << (uint64_t)ADCAN_EL_Cockpit_Diag_1.startbit)) >> (uint64_t)ADCAN_EL_Cockpit_Diag_1.startbit;
-		ADCAN_EL_Crash_Diag.value = ((Val & (~(jk_pow(ADCAN_EL_Crash_Diag.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Crash_Diag.countOfBits)-1) << (uint64_t)ADCAN_EL_Crash_Diag.startbit)) >> (uint64_t)ADCAN_EL_Crash_Diag.startbit;
-		ADCAN_EL_Fuse_Status_1.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_1.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_1.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_1.startbit;
-		ADCAN_EL_Fuse_Status_10.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_10.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_10.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_10.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_10.startbit;
-		ADCAN_EL_Fuse_Status_11.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_11.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_11.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_11.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_11.startbit;
-		ADCAN_EL_Fuse_Status_12.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_12.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_12.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_12.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_12.startbit;
-		ADCAN_EL_Fuse_Status_13.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_13.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_13.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_13.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_13.startbit;
-		ADCAN_EL_Fuse_Status_14.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_14.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_14.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_14.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_14.startbit;
-		ADCAN_EL_Fuse_Status_15.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_15.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_15.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_15.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_15.startbit;
-		ADCAN_EL_Fuse_Status_16.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_16.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_16.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_16.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_16.startbit;
-		ADCAN_EL_Fuse_Status_17.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_17.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_17.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_17.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_17.startbit;
-		ADCAN_EL_Fuse_Status_18.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_18.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_18.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_18.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_18.startbit;
-		ADCAN_EL_Fuse_Status_19.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_19.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_19.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_19.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_19.startbit;
-		ADCAN_EL_Fuse_Status_2.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_2.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_2.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_2.startbit;
-		ADCAN_EL_Fuse_Status_3.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_3.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_3.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_3.startbit;
-		ADCAN_EL_Fuse_Status_4.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_4.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_4.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_4.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_4.startbit;
-		ADCAN_EL_Fuse_Status_5.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_5.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_5.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_5.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_5.startbit;
-		ADCAN_EL_Fuse_Status_6.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_6.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_6.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_6.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_6.startbit;
-		ADCAN_EL_Fuse_Status_7.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_7.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_7.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_7.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_7.startbit;
-		ADCAN_EL_Fuse_Status_8.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_8.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_8.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_8.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_8.startbit;
-		ADCAN_EL_Fuse_Status_9.value = ((Val & (~(jk_pow(ADCAN_EL_Fuse_Status_9.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Fuse_Status_9.countOfBits)-1) << (uint64_t)ADCAN_EL_Fuse_Status_9.startbit)) >> (uint64_t)ADCAN_EL_Fuse_Status_9.startbit;
-		ADCAN_EL_Relais_Status_1.value = ((Val & (~(jk_pow(ADCAN_EL_Relais_Status_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Relais_Status_1.countOfBits)-1) << (uint64_t)ADCAN_EL_Relais_Status_1.startbit)) >> (uint64_t)ADCAN_EL_Relais_Status_1.startbit;
-		ADCAN_EL_Relais_Status_2.value = ((Val & (~(jk_pow(ADCAN_EL_Relais_Status_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Relais_Status_2.countOfBits)-1) << (uint64_t)ADCAN_EL_Relais_Status_2.startbit)) >> (uint64_t)ADCAN_EL_Relais_Status_2.startbit;
-		ADCAN_EL_Shutdown_Cockpit.value = ((Val & (~(jk_pow(ADCAN_EL_Shutdown_Cockpit.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Shutdown_Cockpit.countOfBits)-1) << (uint64_t)ADCAN_EL_Shutdown_Cockpit.startbit)) >> (uint64_t)ADCAN_EL_Shutdown_Cockpit.startbit;
-		ADCAN_PT_Fuel_Pump_Signal.value = ((Val & (~(jk_pow(ADCAN_PT_Fuel_Pump_Signal.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Fuel_Pump_Signal.countOfBits)-1) << (uint64_t)ADCAN_PT_Fuel_Pump_Signal.startbit)) >> (uint64_t)ADCAN_PT_Fuel_Pump_Signal.startbit;
-		ADCAN_PT_Reserve_Signal_L.value = ((Val & (~(jk_pow(ADCAN_PT_Reserve_Signal_L.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Reserve_Signal_L.countOfBits)-1) << (uint64_t)ADCAN_PT_Reserve_Signal_L.startbit)) >> (uint64_t)ADCAN_PT_Reserve_Signal_L.startbit;
-		ADCAN_PT_Reserve_Signal_R.value = ((Val & (~(jk_pow(ADCAN_PT_Reserve_Signal_R.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Reserve_Signal_R.countOfBits)-1) << (uint64_t)ADCAN_PT_Reserve_Signal_R.startbit)) >> (uint64_t)ADCAN_PT_Reserve_Signal_R.startbit;
-		ADCAN_PT_Water_Pump_Signal.value = ((Val & (~(jk_pow(ADCAN_PT_Water_Pump_Signal.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Water_Pump_Signal.countOfBits)-1) << (uint64_t)ADCAN_PT_Water_Pump_Signal.startbit)) >> (uint64_t)ADCAN_PT_Water_Pump_Signal.startbit;
+		ADCAN_CH_Mainhoop_Diag_L_1.unbuild(Val);
+		ADCAN_CH_Mainhoop_Diag_R_1.unbuild(Val);
+		ADCAN_EL_BOTS_Diag_1.unbuild(Val);
+		ADCAN_EL_BSPD_Shutdown_Out.unbuild(Val);
+		ADCAN_EL_Cockpit_Diag_1.unbuild(Val);
+		ADCAN_EL_Crash_Diag.unbuild(Val);
+		ADCAN_EL_Fuse_Status_1.unbuild(Val);
+		ADCAN_EL_Fuse_Status_10.unbuild(Val);
+		ADCAN_EL_Fuse_Status_11.unbuild(Val);
+		ADCAN_EL_Fuse_Status_12.unbuild(Val);
+		ADCAN_EL_Fuse_Status_13.unbuild(Val);
+		ADCAN_EL_Fuse_Status_14.unbuild(Val);
+		ADCAN_EL_Fuse_Status_15.unbuild(Val);
+		ADCAN_EL_Fuse_Status_16.unbuild(Val);
+		ADCAN_EL_Fuse_Status_17.unbuild(Val);
+		ADCAN_EL_Fuse_Status_18.unbuild(Val);
+		ADCAN_EL_Fuse_Status_19.unbuild(Val);
+		ADCAN_EL_Fuse_Status_2.unbuild(Val);
+		ADCAN_EL_Fuse_Status_3.unbuild(Val);
+		ADCAN_EL_Fuse_Status_4.unbuild(Val);
+		ADCAN_EL_Fuse_Status_5.unbuild(Val);
+		ADCAN_EL_Fuse_Status_6.unbuild(Val);
+		ADCAN_EL_Fuse_Status_7.unbuild(Val);
+		ADCAN_EL_Fuse_Status_8.unbuild(Val);
+		ADCAN_EL_Fuse_Status_9.unbuild(Val);
+		ADCAN_EL_Relais_Status_1.unbuild(Val);
+		ADCAN_EL_Relais_Status_2.unbuild(Val);
+		ADCAN_EL_Shutdown_Cockpit.unbuild(Val);
+		ADCAN_PT_Fuel_Pump_Signal.unbuild(Val);
+		ADCAN_PT_Reserve_Signal_L.unbuild(Val);
+		ADCAN_PT_Reserve_Signal_R.unbuild(Val);
+		ADCAN_PT_Water_Pump_Signal.unbuild(Val);
 	}
 	STOS_CAN_PDU_PDU_Status() 
 	{
@@ -1490,14 +1512,14 @@ struct STOS_CAN_PDU_Pitot : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x232;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_AE_Pitot_1 = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_AE_Pitot_2 = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_AE_Pitot_3 = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_AE_Pitot_1 = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_AE_Pitot_2 = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_AE_Pitot_3 = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_AE_Pitot_1.value = ((Val & (~(jk_pow(ADCAN_AE_Pitot_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Pitot_1.countOfBits)-1) << (uint64_t)ADCAN_AE_Pitot_1.startbit)) >> (uint64_t)ADCAN_AE_Pitot_1.startbit;
-		ADCAN_AE_Pitot_2.value = ((Val & (~(jk_pow(ADCAN_AE_Pitot_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Pitot_2.countOfBits)-1) << (uint64_t)ADCAN_AE_Pitot_2.startbit)) >> (uint64_t)ADCAN_AE_Pitot_2.startbit;
-		ADCAN_AE_Pitot_3.value = ((Val & (~(jk_pow(ADCAN_AE_Pitot_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Pitot_3.countOfBits)-1) << (uint64_t)ADCAN_AE_Pitot_3.startbit)) >> (uint64_t)ADCAN_AE_Pitot_3.startbit;
+		ADCAN_AE_Pitot_1.unbuild(Val);
+		ADCAN_AE_Pitot_2.unbuild(Val);
+		ADCAN_AE_Pitot_3.unbuild(Val);
 	}
 	STOS_CAN_PDU_Pitot() 
 	{
@@ -1518,12 +1540,12 @@ struct STOS_CAN_PDU_RAS_PWM : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x161;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_L = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_R = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_L = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_R = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_RAS_PWM_L.value = ((Val & (~(jk_pow(ADCAN_SP_RAS_PWM_L.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_RAS_PWM_L.countOfBits)-1) << (uint64_t)ADCAN_SP_RAS_PWM_L.startbit)) >> (uint64_t)ADCAN_SP_RAS_PWM_L.startbit;
-		ADCAN_SP_RAS_PWM_R.value = ((Val & (~(jk_pow(ADCAN_SP_RAS_PWM_R.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_RAS_PWM_R.countOfBits)-1) << (uint64_t)ADCAN_SP_RAS_PWM_R.startbit)) >> (uint64_t)ADCAN_SP_RAS_PWM_R.startbit;
+		ADCAN_SP_RAS_PWM_L.unbuild(Val);
+		ADCAN_SP_RAS_PWM_R.unbuild(Val);
 	}
 	STOS_CAN_PDU_RAS_PWM() 
 	{
@@ -1544,14 +1566,14 @@ struct STOS_CAN_PDU_RAS_Status_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x234;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Angle = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_L = {0, 1, 15};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_R = {0, 1, 14};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Angle = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_L = {0, 1, 15, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_R = {0, 1, 14, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_RAS_Angle.value = ((Val & (~(jk_pow(ADCAN_SP_RAS_Angle.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_RAS_Angle.countOfBits)-1) << (uint64_t)ADCAN_SP_RAS_Angle.startbit)) >> (uint64_t)ADCAN_SP_RAS_Angle.startbit;
-		ADCAN_SP_RAS_Homing_L.value = ((Val & (~(jk_pow(ADCAN_SP_RAS_Homing_L.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_RAS_Homing_L.countOfBits)-1) << (uint64_t)ADCAN_SP_RAS_Homing_L.startbit)) >> (uint64_t)ADCAN_SP_RAS_Homing_L.startbit;
-		ADCAN_SP_RAS_Homing_R.value = ((Val & (~(jk_pow(ADCAN_SP_RAS_Homing_R.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_RAS_Homing_R.countOfBits)-1) << (uint64_t)ADCAN_SP_RAS_Homing_R.startbit)) >> (uint64_t)ADCAN_SP_RAS_Homing_R.startbit;
+		ADCAN_SP_RAS_Angle.unbuild(Val);
+		ADCAN_SP_RAS_Homing_L.unbuild(Val);
+		ADCAN_SP_RAS_Homing_R.unbuild(Val);
 	}
 	STOS_CAN_PDU_RAS_Status_Control() 
 	{
@@ -1572,12 +1594,12 @@ struct STOS_CAN_PDU_RCU_ECU_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x236;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_2 = {0, 8, 8};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_ECU_Temp_RCU_1.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_RCU_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_RCU_1.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_RCU_1.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_RCU_1.startbit;
-		ADCAN_EL_ECU_Temp_RCU_2.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_RCU_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_RCU_2.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_RCU_2.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_RCU_2.startbit;
+		ADCAN_EL_ECU_Temp_RCU_1.unbuild(Val);
+		ADCAN_EL_ECU_Temp_RCU_2.unbuild(Val);
 	}
 	STOS_CAN_PDU_RCU_ECU_Temp() 
 	{
@@ -1598,16 +1620,16 @@ struct STOS_CAN_PDU_RCU_Test_A : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x165;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_1 = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_2 = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_3 = {0, 16, 40};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_4 = {0, 16, 56};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_1 = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_2 = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_3 = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_4 = {0, 16, 48, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_ZZ_Test_RCU_1.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_1.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_1.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_1.startbit;
-		ADCAN_ZZ_Test_RCU_2.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_2.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_2.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_2.startbit;
-		ADCAN_ZZ_Test_RCU_3.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_3.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_3.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_3.startbit;
-		ADCAN_ZZ_Test_RCU_4.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_4.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_4.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_4.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_4.startbit;
+		ADCAN_ZZ_Test_RCU_1.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_2.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_3.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_4.unbuild(Val);
 	}
 	STOS_CAN_PDU_RCU_Test_A() 
 	{
@@ -1628,16 +1650,16 @@ struct STOS_CAN_PDU_RCU_Test_B : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x166;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_5 = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_6 = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_7 = {0, 16, 40};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_8 = {0, 16, 56};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_5 = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_6 = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_7 = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_8 = {0, 16, 48, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_ZZ_Test_RCU_5.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_5.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_5.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_5.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_5.startbit;
-		ADCAN_ZZ_Test_RCU_6.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_6.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_6.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_6.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_6.startbit;
-		ADCAN_ZZ_Test_RCU_7.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_7.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_7.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_7.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_7.startbit;
-		ADCAN_ZZ_Test_RCU_8.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_8.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_8.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_8.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_8.startbit;
+		ADCAN_ZZ_Test_RCU_5.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_6.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_7.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_8.unbuild(Val);
 	}
 	STOS_CAN_PDU_RCU_Test_B() 
 	{
@@ -1658,12 +1680,12 @@ struct STOS_CAN_PDU_RCU_Test_C : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x167;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_10 = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_9 = {0, 16, 8};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_10 = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_9 = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_ZZ_Test_RCU_10.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_10.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_10.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_10.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_10.startbit;
-		ADCAN_ZZ_Test_RCU_9.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_RCU_9.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_RCU_9.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_RCU_9.startbit)) >> (uint64_t)ADCAN_ZZ_Test_RCU_9.startbit;
+		ADCAN_ZZ_Test_RCU_10.unbuild(Val);
+		ADCAN_ZZ_Test_RCU_9.unbuild(Val);
 	}
 	STOS_CAN_PDU_RCU_Test_C() 
 	{
@@ -1684,12 +1706,12 @@ struct STOS_CAN_PDU_Rocker_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x238;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FL = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FR = {0, 16, 24};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FL = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FR = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Rocker_FL.value = ((Val & (~(jk_pow(ADCAN_SP_Rocker_FL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Rocker_FL.countOfBits)-1) << (uint64_t)ADCAN_SP_Rocker_FL.startbit)) >> (uint64_t)ADCAN_SP_Rocker_FL.startbit;
-		ADCAN_SP_Rocker_FR.value = ((Val & (~(jk_pow(ADCAN_SP_Rocker_FR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Rocker_FR.countOfBits)-1) << (uint64_t)ADCAN_SP_Rocker_FR.startbit)) >> (uint64_t)ADCAN_SP_Rocker_FR.startbit;
+		ADCAN_SP_Rocker_FL.unbuild(Val);
+		ADCAN_SP_Rocker_FR.unbuild(Val);
 	}
 	STOS_CAN_PDU_Rocker_F() 
 	{
@@ -1710,12 +1732,12 @@ struct STOS_CAN_PDU_Rocker_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x239;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RL = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RR = {0, 16, 24};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RL = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RR = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Rocker_RL.value = ((Val & (~(jk_pow(ADCAN_SP_Rocker_RL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Rocker_RL.countOfBits)-1) << (uint64_t)ADCAN_SP_Rocker_RL.startbit)) >> (uint64_t)ADCAN_SP_Rocker_RL.startbit;
-		ADCAN_SP_Rocker_RR.value = ((Val & (~(jk_pow(ADCAN_SP_Rocker_RR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Rocker_RR.countOfBits)-1) << (uint64_t)ADCAN_SP_Rocker_RR.startbit)) >> (uint64_t)ADCAN_SP_Rocker_RR.startbit;
+		ADCAN_SP_Rocker_RL.unbuild(Val);
+		ADCAN_SP_Rocker_RR.unbuild(Val);
 	}
 	STOS_CAN_PDU_Rocker_R() 
 	{
@@ -1736,20 +1758,20 @@ struct STOS_CAN_PDU_Shift_Clutch : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x170;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_DigIn = {0, 1, 21};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_LaunchC = {0, 1, 20};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_PT_Shift_Force_Sensor = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Clutch_DigIn = {0, 1, 23};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Clutch_LaunchC = {0, 1, 22};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Shift_Force_on_off = {0, 1, 19};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_DigIn = {0, 1, 21, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_LaunchC = {0, 1, 20, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_PT_Shift_Force_Sensor = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Clutch_DigIn = {0, 1, 23, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Clutch_LaunchC = {0, 1, 22, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Shift_Force_on_off = {0, 1, 19, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_PT_Gearshift_DigIn.value = ((Val & (~(jk_pow(ADCAN_PT_Gearshift_DigIn.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Gearshift_DigIn.countOfBits)-1) << (uint64_t)ADCAN_PT_Gearshift_DigIn.startbit)) >> (uint64_t)ADCAN_PT_Gearshift_DigIn.startbit;
-		ADCAN_PT_Gearshift_LaunchC.value = ((Val & (~(jk_pow(ADCAN_PT_Gearshift_LaunchC.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Gearshift_LaunchC.countOfBits)-1) << (uint64_t)ADCAN_PT_Gearshift_LaunchC.startbit)) >> (uint64_t)ADCAN_PT_Gearshift_LaunchC.startbit;
-		ADCAN_PT_Shift_Force_Sensor.value = ((Val & (~(jk_pow(ADCAN_PT_Shift_Force_Sensor.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Shift_Force_Sensor.countOfBits)-1) << (uint64_t)ADCAN_PT_Shift_Force_Sensor.startbit)) >> (uint64_t)ADCAN_PT_Shift_Force_Sensor.startbit;
-		ADCAN_SP_Clutch_DigIn.value = ((Val & (~(jk_pow(ADCAN_SP_Clutch_DigIn.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Clutch_DigIn.countOfBits)-1) << (uint64_t)ADCAN_SP_Clutch_DigIn.startbit)) >> (uint64_t)ADCAN_SP_Clutch_DigIn.startbit;
-		ADCAN_SP_Clutch_LaunchC.value = ((Val & (~(jk_pow(ADCAN_SP_Clutch_LaunchC.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Clutch_LaunchC.countOfBits)-1) << (uint64_t)ADCAN_SP_Clutch_LaunchC.startbit)) >> (uint64_t)ADCAN_SP_Clutch_LaunchC.startbit;
-		ADCAN_PT_Shift_Force_on_off.value = ((Val & (~(jk_pow(ADCAN_PT_Shift_Force_on_off.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Shift_Force_on_off.countOfBits)-1) << (uint64_t)ADCAN_PT_Shift_Force_on_off.startbit)) >> (uint64_t)ADCAN_PT_Shift_Force_on_off.startbit;
+		ADCAN_PT_Gearshift_DigIn.unbuild(Val);
+		ADCAN_PT_Gearshift_LaunchC.unbuild(Val);
+		ADCAN_PT_Shift_Force_Sensor.unbuild(Val);
+		ADCAN_SP_Clutch_DigIn.unbuild(Val);
+		ADCAN_SP_Clutch_LaunchC.unbuild(Val);
+		ADCAN_PT_Shift_Force_on_off.unbuild(Val);
 	}
 	STOS_CAN_PDU_Shift_Clutch() 
 	{
@@ -1770,10 +1792,10 @@ struct STOS_CAN_PDU_Steering_Whl_Angle : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x172;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Steering_Wheel_Angle = {0, 16, 8};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Steering_Wheel_Angle = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Steering_Wheel_Angle.value = ((Val & (~(jk_pow(ADCAN_SP_Steering_Wheel_Angle.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Steering_Wheel_Angle.countOfBits)-1) << (uint64_t)ADCAN_SP_Steering_Wheel_Angle.startbit)) >> (uint64_t)ADCAN_SP_Steering_Wheel_Angle.startbit;
+		ADCAN_SP_Steering_Wheel_Angle.unbuild(Val);
 	}
 	STOS_CAN_PDU_Steering_Whl_Angle() 
 	{
@@ -1794,10 +1816,10 @@ struct STOS_CAN_PDU_SWCU_ECU_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x244;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_SWCU = {0, 8, 0};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_SWCU = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_ECU_Temp_SWCU.value = ((Val & (~(jk_pow(ADCAN_EL_ECU_Temp_SWCU.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_ECU_Temp_SWCU.countOfBits)-1) << (uint64_t)ADCAN_EL_ECU_Temp_SWCU.startbit)) >> (uint64_t)ADCAN_EL_ECU_Temp_SWCU.startbit;
+		ADCAN_EL_ECU_Temp_SWCU.unbuild(Val);
 	}
 	STOS_CAN_PDU_SWCU_ECU_Temp() 
 	{
@@ -1818,14 +1840,14 @@ struct STOS_CAN_PDU_SWCU_Oh_Shit : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x175;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_INCR_1 = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_INCR_2 = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Oh_Shit = {0, 1, 23};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_EL_INCR_1 = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_INCR_2 = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Oh_Shit = {0, 1, 23, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_EL_INCR_1.value = ((Val & (~(jk_pow(ADCAN_EL_INCR_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_INCR_1.countOfBits)-1) << (uint64_t)ADCAN_EL_INCR_1.startbit)) >> (uint64_t)ADCAN_EL_INCR_1.startbit;
-		ADCAN_EL_INCR_2.value = ((Val & (~(jk_pow(ADCAN_EL_INCR_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_INCR_2.countOfBits)-1) << (uint64_t)ADCAN_EL_INCR_2.startbit)) >> (uint64_t)ADCAN_EL_INCR_2.startbit;
-		ADCAN_EL_Oh_Shit.value = ((Val & (~(jk_pow(ADCAN_EL_Oh_Shit.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Oh_Shit.countOfBits)-1) << (uint64_t)ADCAN_EL_Oh_Shit.startbit)) >> (uint64_t)ADCAN_EL_Oh_Shit.startbit;
+		ADCAN_EL_INCR_1.unbuild(Val);
+		ADCAN_EL_INCR_2.unbuild(Val);
+		ADCAN_EL_Oh_Shit.unbuild(Val);
 	}
 	STOS_CAN_PDU_SWCU_Oh_Shit() 
 	{
@@ -1846,20 +1868,20 @@ struct STOS_CAN_PDU_SWCU_Switches : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x099;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_AE_Switch_1 = {0, 1, 2};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_EL_Radio_Switch = {0, 1, 3};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Shift_Down = {0, 1, 4};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Shift_Up = {0, 1, 5};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_switch_1 = {0, 1, 6};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_SP_Clutch_Signal = {0, 1, 7};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_AE_Switch_1 = {0, 1, 2, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_EL_Radio_Switch = {0, 1, 3, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Shift_Down = {0, 1, 4, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Shift_Up = {0, 1, 5, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_switch_1 = {0, 1, 6, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_SP_Clutch_Signal = {0, 1, 7, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_AE_Switch_1.value = ((Val & (~(jk_pow(ADCAN_AE_Switch_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_AE_Switch_1.countOfBits)-1) << (uint64_t)ADCAN_AE_Switch_1.startbit)) >> (uint64_t)ADCAN_AE_Switch_1.startbit;
-		ADCAN_EL_Radio_Switch.value = ((Val & (~(jk_pow(ADCAN_EL_Radio_Switch.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_EL_Radio_Switch.countOfBits)-1) << (uint64_t)ADCAN_EL_Radio_Switch.startbit)) >> (uint64_t)ADCAN_EL_Radio_Switch.startbit;
-		ADCAN_PT_Shift_Down.value = ((Val & (~(jk_pow(ADCAN_PT_Shift_Down.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Shift_Down.countOfBits)-1) << (uint64_t)ADCAN_PT_Shift_Down.startbit)) >> (uint64_t)ADCAN_PT_Shift_Down.startbit;
-		ADCAN_PT_Shift_Up.value = ((Val & (~(jk_pow(ADCAN_PT_Shift_Up.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Shift_Up.countOfBits)-1) << (uint64_t)ADCAN_PT_Shift_Up.startbit)) >> (uint64_t)ADCAN_PT_Shift_Up.startbit;
-		ADCAN_SP_ARH_switch_1.value = ((Val & (~(jk_pow(ADCAN_SP_ARH_switch_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_ARH_switch_1.countOfBits)-1) << (uint64_t)ADCAN_SP_ARH_switch_1.startbit)) >> (uint64_t)ADCAN_SP_ARH_switch_1.startbit;
-		ADCAN_SP_Clutch_Signal.value = ((Val & (~(jk_pow(ADCAN_SP_Clutch_Signal.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Clutch_Signal.countOfBits)-1) << (uint64_t)ADCAN_SP_Clutch_Signal.startbit)) >> (uint64_t)ADCAN_SP_Clutch_Signal.startbit;
+		ADCAN_AE_Switch_1.unbuild(Val);
+		ADCAN_EL_Radio_Switch.unbuild(Val);
+		ADCAN_PT_Shift_Down.unbuild(Val);
+		ADCAN_PT_Shift_Up.unbuild(Val);
+		ADCAN_SP_ARH_switch_1.unbuild(Val);
+		ADCAN_SP_Clutch_Signal.unbuild(Val);
 	}
 	STOS_CAN_PDU_SWCU_Switches() 
 	{
@@ -1880,14 +1902,14 @@ struct STOS_CAN_PDU_Test_FCU_A : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x177;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_1 = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_2 = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_3 = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_1 = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_2 = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_3 = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_ZZ_Test_FCU_1.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_FCU_1.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_FCU_1.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_FCU_1.startbit)) >> (uint64_t)ADCAN_ZZ_Test_FCU_1.startbit;
-		ADCAN_ZZ_Test_FCU_2.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_FCU_2.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_FCU_2.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_FCU_2.startbit)) >> (uint64_t)ADCAN_ZZ_Test_FCU_2.startbit;
-		ADCAN_ZZ_Test_FCU_3.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_FCU_3.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_FCU_3.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_FCU_3.startbit)) >> (uint64_t)ADCAN_ZZ_Test_FCU_3.startbit;
+		ADCAN_ZZ_Test_FCU_1.unbuild(Val);
+		ADCAN_ZZ_Test_FCU_2.unbuild(Val);
+		ADCAN_ZZ_Test_FCU_3.unbuild(Val);
 	}
 	STOS_CAN_PDU_Test_FCU_A() 
 	{
@@ -1908,14 +1930,14 @@ struct STOS_CAN_PDU_Test_FCU_B : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x178;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_4 = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_5 = {0, 16, 24};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_6 = {0, 16, 40};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_4 = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_5 = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_6 = {0, 16, 32, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_ZZ_Test_FCU_4.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_FCU_4.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_FCU_4.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_FCU_4.startbit)) >> (uint64_t)ADCAN_ZZ_Test_FCU_4.startbit;
-		ADCAN_ZZ_Test_FCU_5.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_FCU_5.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_FCU_5.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_FCU_5.startbit)) >> (uint64_t)ADCAN_ZZ_Test_FCU_5.startbit;
-		ADCAN_ZZ_Test_FCU_6.value = ((Val & (~(jk_pow(ADCAN_ZZ_Test_FCU_6.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_ZZ_Test_FCU_6.countOfBits)-1) << (uint64_t)ADCAN_ZZ_Test_FCU_6.startbit)) >> (uint64_t)ADCAN_ZZ_Test_FCU_6.startbit;
+		ADCAN_ZZ_Test_FCU_4.unbuild(Val);
+		ADCAN_ZZ_Test_FCU_5.unbuild(Val);
+		ADCAN_ZZ_Test_FCU_6.unbuild(Val);
 	}
 	STOS_CAN_PDU_Test_FCU_B() 
 	{
@@ -1936,20 +1958,20 @@ struct STOS_CAN_PDU_Water_Oil_Status_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x246;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Fan_Percent = {0, 8, 0};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_PWM = {0, 8, 8};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_1_PWM = {0, 8, 16};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_2_PWM = {0, 8, 24};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_1_Percent = {0, 8, 32};//init,bitcount,startbit 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_2_Percent = {0, 8, 40};//init,bitcount,startbit 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Fan_Percent = {0, 8, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_PWM = {0, 8, 8, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_1_PWM = {0, 8, 16, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_2_PWM = {0, 8, 24, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_1_Percent = {0, 8, 32, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_2_Percent = {0, 8, 40, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_PT_Oil_Fan_Percent.value = ((Val & (~(jk_pow(ADCAN_PT_Oil_Fan_Percent.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Oil_Fan_Percent.countOfBits)-1) << (uint64_t)ADCAN_PT_Oil_Fan_Percent.startbit)) >> (uint64_t)ADCAN_PT_Oil_Fan_Percent.startbit;
-		ADCAN_PT_Oil_PWM.value = ((Val & (~(jk_pow(ADCAN_PT_Oil_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Oil_PWM.countOfBits)-1) << (uint64_t)ADCAN_PT_Oil_PWM.startbit)) >> (uint64_t)ADCAN_PT_Oil_PWM.startbit;
-		ADCAN_PT_Water_1_PWM.value = ((Val & (~(jk_pow(ADCAN_PT_Water_1_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Water_1_PWM.countOfBits)-1) << (uint64_t)ADCAN_PT_Water_1_PWM.startbit)) >> (uint64_t)ADCAN_PT_Water_1_PWM.startbit;
-		ADCAN_PT_Water_2_PWM.value = ((Val & (~(jk_pow(ADCAN_PT_Water_2_PWM.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Water_2_PWM.countOfBits)-1) << (uint64_t)ADCAN_PT_Water_2_PWM.startbit)) >> (uint64_t)ADCAN_PT_Water_2_PWM.startbit;
-		ADCAN_PT_Water_Fan_1_Percent.value = ((Val & (~(jk_pow(ADCAN_PT_Water_Fan_1_Percent.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Water_Fan_1_Percent.countOfBits)-1) << (uint64_t)ADCAN_PT_Water_Fan_1_Percent.startbit)) >> (uint64_t)ADCAN_PT_Water_Fan_1_Percent.startbit;
-		ADCAN_PT_Water_Fan_2_Percent.value = ((Val & (~(jk_pow(ADCAN_PT_Water_Fan_2_Percent.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_PT_Water_Fan_2_Percent.countOfBits)-1) << (uint64_t)ADCAN_PT_Water_Fan_2_Percent.startbit)) >> (uint64_t)ADCAN_PT_Water_Fan_2_Percent.startbit;
+		ADCAN_PT_Oil_Fan_Percent.unbuild(Val);
+		ADCAN_PT_Oil_PWM.unbuild(Val);
+		ADCAN_PT_Water_1_PWM.unbuild(Val);
+		ADCAN_PT_Water_2_PWM.unbuild(Val);
+		ADCAN_PT_Water_Fan_1_Percent.unbuild(Val);
+		ADCAN_PT_Water_Fan_2_Percent.unbuild(Val);
 	}
 	STOS_CAN_PDU_Water_Oil_Status_Control() 
 	{
@@ -1970,12 +1992,12 @@ struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x180;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FL = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FR = {0, 16, 24};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FL = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FR = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Wheel_Speed_FL.value = ((Val & (~(jk_pow(ADCAN_SP_Wheel_Speed_FL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Wheel_Speed_FL.countOfBits)-1) << (uint64_t)ADCAN_SP_Wheel_Speed_FL.startbit)) >> (uint64_t)ADCAN_SP_Wheel_Speed_FL.startbit;
-		ADCAN_SP_Wheel_Speed_FR.value = ((Val & (~(jk_pow(ADCAN_SP_Wheel_Speed_FR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Wheel_Speed_FR.countOfBits)-1) << (uint64_t)ADCAN_SP_Wheel_Speed_FR.startbit)) >> (uint64_t)ADCAN_SP_Wheel_Speed_FR.startbit;
+		ADCAN_SP_Wheel_Speed_FL.unbuild(Val);
+		ADCAN_SP_Wheel_Speed_FR.unbuild(Val);
 	}
 	STOS_CAN_PDU_Whl_Speed_F() 
 	{
@@ -1996,12 +2018,12 @@ struct STOS_CAN_PDU_Whl_Speed_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x181;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RL = {0, 16, 8};//init,bitcount,startbit 
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RR = {0, 16, 24};//init,bitcount,startbit 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RL = {0, 16, 0, 0};//init,bitcount,startbit,rowcount 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RR = {0, 16, 16, 0};//init,bitcount,startbit,rowcount 
 	void unbuild()
 	{
-		ADCAN_SP_Wheel_Speed_RL.value = ((Val & (~(jk_pow(ADCAN_SP_Wheel_Speed_RL.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Wheel_Speed_RL.countOfBits)-1) << (uint64_t)ADCAN_SP_Wheel_Speed_RL.startbit)) >> (uint64_t)ADCAN_SP_Wheel_Speed_RL.startbit;
-		ADCAN_SP_Wheel_Speed_RR.value = ((Val & (~(jk_pow(ADCAN_SP_Wheel_Speed_RR.startbit)-1))) & ((uint64_t)(jk_pow(ADCAN_SP_Wheel_Speed_RR.countOfBits)-1) << (uint64_t)ADCAN_SP_Wheel_Speed_RR.startbit)) >> (uint64_t)ADCAN_SP_Wheel_Speed_RR.startbit;
+		ADCAN_SP_Wheel_Speed_RL.unbuild(Val);
+		ADCAN_SP_Wheel_Speed_RR.unbuild(Val);
 	}
 	STOS_CAN_PDU_Whl_Speed_R() 
 	{
