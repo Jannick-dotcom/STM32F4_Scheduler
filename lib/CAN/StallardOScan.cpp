@@ -26,7 +26,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFPP, nopull, GPIO_AF9_CAN2);
         CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFPP, nopull, GPIO_AF9_CAN2);
         canhandle.Instance = CAN2;
-        // __CAN1_CLK_ENABLE();
+        __CAN1_CLK_ENABLE();
         __CAN2_CLK_ENABLE();
         can2used = true;
     }
@@ -40,10 +40,14 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     if (baud == CANBauds::CAN1M)
     {
         canhandle.Init.Prescaler = 3; //3?
+        canhandle.Init.TimeSeg1 = CAN_BS1_4TQ; //Sample Point 87.5%
+        canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;
     }
     else if (baud == CANBauds::CAN500k)
     {
         canhandle.Init.Prescaler = 6; //6?
+        canhandle.Init.TimeSeg1 = CAN_BS1_4TQ; //Sample Point 87.5%
+        canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;
     }
 
 #ifdef CAN_debug
@@ -52,12 +56,10 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     canhandle.Init.Mode = CAN_MODE_NORMAL; //Real CAN Networking
 #endif
     canhandle.Init.SyncJumpWidth = CAN_SJW_1TQ;
-    canhandle.Init.TimeSeg1 = CAN_BS1_6TQ; //Sample Point 87.5%
-    canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;
     canhandle.Init.TimeTriggeredMode = DISABLE;
     canhandle.Init.AutoBusOff = DISABLE;
     canhandle.Init.AutoWakeUp = DISABLE;
-    canhandle.Init.AutoRetransmission = DISABLE;
+    canhandle.Init.AutoRetransmission = ENABLE;
     canhandle.Init.ReceiveFifoLocked = DISABLE;
     canhandle.Init.TransmitFifoPriority = DISABLE;
 
@@ -256,8 +258,8 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     TxHeader.IDE = CAN_ID_STD;   //Set Standard Identifier -> 11 bit
     TxHeader.DLC = size;         //Set Amount of Data bytes
 
-    while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 3)
-        ;                                                                                           //Wait until all TX Mailboxes are free
+    if (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 1)
+        HAL_CAN_AbortTxRequest(&canhandle,-1);                                                                                           //Wait until all TX Mailboxes are free
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
