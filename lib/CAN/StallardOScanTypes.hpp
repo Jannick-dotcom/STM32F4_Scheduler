@@ -49,13 +49,13 @@ public:
         value = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
         if(isMotorola && countOfBits > 8)
         {
-            uint8_t *arr = &value;
+            uint8_t *arr = (uint8_t*)&value;
             valueTemplate temp = 0;
             for(uint8_t i = countOfBits/8; i > 0; i--)
             {
                 temp |= arr[i-1] << (i * 8);
             }
-            value = temp
+            value = temp;
         }
     }
     CAN_Signal operator=(valueTemplate val)
