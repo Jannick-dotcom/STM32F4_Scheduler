@@ -50,10 +50,10 @@ public:
         if(isMotorola && countOfBits > 8)
         {
             uint8_t *arr = (uint8_t*)&value;
-            valueTemplate temp = 0;
+            uint64_t temp = 0;
             for(uint8_t i = countOfBits/8; i > 0; i--)
             {
-                temp |= arr[i-1] << (i * 8);
+                temp |= (uint64_t)arr[i-1] << (((countOfBits/8)-i) * 8);
             }
             value = temp;
         }
