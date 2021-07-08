@@ -33,7 +33,8 @@ public:
     const uint8_t countOfBits;
     const uint16_t startbit;
     const uint8_t rowcount;
-    CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start, uint8_t row) : countOfBits(bitcount), startbit(start), rowcount(row)
+    const uint8_t isMotorola;
+    CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start, uint8_t row, uint8_t isMoto) : countOfBits(bitcount), startbit(start), rowcount(row), isMotorola(isMoto)
     {
         value = val;
         // countOfBits = bitcount;
@@ -46,6 +47,16 @@ public:
     void unbuild(const uint64_t Val)
     {
         value = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
+        if(isMotorola && countOfBits > 8)
+        {
+            uint8_t *arr = &value;
+            valueTemplate temp = 0;
+            for(uint8_t i = countOfBits/8; i > 0; i--)
+            {
+                temp |= arr[i-1] << (i * 8);
+            }
+            value = temp
+        }
     }
     CAN_Signal operator=(valueTemplate val)
     {
