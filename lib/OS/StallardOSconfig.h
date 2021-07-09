@@ -9,9 +9,9 @@
 #define contextSwitch
 
 #define sizeStack 1000      //300 * 4 Byte (Stack size for Tasks)
-#define countTasks 4
+#define countTasks 3
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
-#define externalOszillator 25 //[MHz]
+#define externalOszillator 8 //[MHz]
 
 // #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
 

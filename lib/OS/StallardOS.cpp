@@ -1,6 +1,6 @@
 #include "StallardOS.hpp"
 
-extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
+// extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 extern "C" volatile uint64_t taskMainTime;
 
@@ -44,6 +44,7 @@ void taskMain(void)
  */
 StallardOS::StallardOS()
 {
+  // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
   //Basiswerte Initialisieren
   first_function_struct = nullptr;
   currentTask = nullptr;

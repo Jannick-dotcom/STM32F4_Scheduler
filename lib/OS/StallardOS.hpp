@@ -18,7 +18,7 @@
 #include "StallardOSSPI.hpp"
 #include "StallardOSDAC.hpp"
 
-static StallardOSCAN MS4_CAN(StallardOSCAN1, CAN1M);
-static StallardOSCAN AD_CAN(StallardOSCAN2, CAN500k);
+static StallardOSCAN MS4_CAN(StallardOSCAN2, CAN1M);
+static StallardOSCAN AD_CAN(StallardOSCAN1, CAN500k);
 
 #endif //StallardOS_h

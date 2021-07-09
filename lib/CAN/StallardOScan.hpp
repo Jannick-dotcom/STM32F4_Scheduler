@@ -22,7 +22,7 @@ private:
     StallardOSGPIO CANT;
     StallardOSGPIO CANR;
     StallardOSSemaphore sem;
-    StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
+    static StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
 
     static bool can1used;
     static bool can2used;

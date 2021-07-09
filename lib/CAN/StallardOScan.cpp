@@ -1,7 +1,5 @@
 #include "StallardOScan.hpp"
 
-//StallardOSCanMessage STallardOS_CAN_messages[CAN_FIFO_size];
-extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 
 bool StallardOSCAN::can1used = false;

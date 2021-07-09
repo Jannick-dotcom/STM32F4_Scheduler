@@ -101,14 +101,14 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
     htim.Instance = instance;
     if(instance == TIM1 || instance == TIM8 || instance == TIM9 || instance == TIM10 || instance == TIM11)
     {
-        htim.Init.Prescaler = (168000000 / (freq)) / pow(2, bitcount);
+        htim.Init.Prescaler = (168000000 / (freq)) / ((uint32_t)1 << bitcount);
     }
     else
     {
-        htim.Init.Prescaler = (168000000 / (4*freq)) / pow(2, bitcount);
+        htim.Init.Prescaler = (168000000 / (4*freq)) / ((uint32_t)1 << bitcount);
     }
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim.Init.Period = pow(2, bitcount) - 1;
+    htim.Init.Period = ((uint32_t)1 << bitcount) - 1;
     htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim.Init.RepetitionCounter = 0;
     htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
