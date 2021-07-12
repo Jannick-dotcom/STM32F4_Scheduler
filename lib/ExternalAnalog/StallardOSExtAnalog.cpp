@@ -2,13 +2,14 @@
 
 StallardOSSPI StallardOSExtAnalog::spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10));
 uint8_t StallardOSExtAnalog::adcInitialized = 0;
+StallardOSSemaphore StallardOSExtAnalog::sem;
+extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 
-StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber) : cs(4 + adcNumber, PORTB, Output, true)
+StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber)
 {
     if (adcNumber > 2 || channel > 15 || adcNumber == 0)
         return;
-    // cs = StallardOSGPIO(4+adcNumber,PORTB, Output, true);
-    // drdy = StallardOSGPIO(6+adcNumber, PORTB, Input);
+    cs = StallardOSGPIO(4+adcNumber,PORTB, Output, true);
     reset = StallardOSGPIO(5 - adcNumber, PORTD, Output, true);
     drdy = StallardOSGPIO(6 + adcNumber, PORTB, Input);
     this->channel = channel;
@@ -17,26 +18,27 @@ StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber) : c
     //Setup of the ADC, without channel setting
     if((adcInitialized & adcNumber) != 0)
         return;
-    registerWrite(0x00, 0b00010010); //Page 34f //CONFIG0
-    // volatile uint8_t test = registerRead(0x00);
+    registerWrite(0x00, 0b00000010); //Page 34f //CONFIG0
+    volatile uint8_t test = registerRead(0x00);
     registerWrite(0x01, 0b00000010); //Page 36  //CONFIG1
-    for(uint8_t i = 0; i < 16; i++) //Fix start pin
-    {
-        channelRead();
-    }
-    adcInitialized |= adcNumber;
-    // test = registerRead(0x01);
-    // registerWrite(0x02, 0);
-    // test = registerRead(0x02);
-    // registerWrite(0x03,0);
-    // test = registerRead(0x03);
-    // registerWrite(0x04, 0);
-    // test = registerRead(0x04);
-    // registerWrite(0x05, 0);
-    // test = registerRead(0x05);
-    // registerWrite(0x06, 0);
-    // test = registerRead(0x06);
+    
+    test = registerRead(0x01);
+    registerWrite(0x02, 0);
+    test = registerRead(0x02);
+    registerWrite(0x03,0);
+    test = registerRead(0x03);
+    registerWrite(0x04, 0);
+    test = registerRead(0x04);
+    registerWrite(0x05, 0);
+    test = registerRead(0x05);
+    registerWrite(0x06, 0);
+    test = registerRead(0x06);
 
+    // for(uint8_t i = 0; i < 16; i++) //Fix start pin
+    // {
+    //     channelRead();
+    // }
+    adcInitialized |= adcNumber;
 }
 
 void StallardOSExtAnalog::registerWrite(uint8_t address, uint8_t value)
@@ -61,7 +63,7 @@ uint8_t StallardOSExtAnalog::registerRead(uint8_t address)
     data = (0b0100 << 4) | (address & 0x0F); //'010' -> register Read, '0' -> write singular register, register address
     cs = 0;
     spihandle.send(&data, sizeof(data));
-    spihandle.receive(&data, sizeof(data), -1);
+    spihandle.receive(&data, sizeof(data), HAL_MAX_DELAY);
     cs = 1;
     return data;
 }
@@ -92,12 +94,18 @@ uint16_t StallardOSExtAnalog::channelRead()
     cs = 0;
     spihandle.send(&dataout, sizeof(dataout)); //Send pulse convert command
     cs = 1;
-    while (drdy == true)
-        ; //Wait for conversion to be finished
+    uint64_t timestart = usCurrentTimeSinceStart;
+    while (drdy == true) //Wait for the drdy pin or timeout
+    {
+        if(usCurrentTimeSinceStart - timestart > 100000)
+        {
+            return 0; //No reading error!!!!
+        }
+    }
     cs = 0;
     dataout = 0b00110000; //direct read command
     spihandle.send(&dataout, sizeof(dataout));
-    spihandle.receive(datain, sizeof(datain), -1); //Receive a 2 byte Analog Value
+    spihandle.receive(datain, sizeof(datain), HAL_MAX_DELAY); //Receive a 2 byte Analog Value
     cs = 1;
     registerWrite(0x04, 0);
     registerWrite(0x05, 0);

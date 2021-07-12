@@ -44,7 +44,7 @@ void taskMain(void)
  */
 StallardOS::StallardOS()
 {
-  // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+  SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
   //Basiswerte Initialisieren
   first_function_struct = nullptr;
   currentTask = nullptr;
@@ -300,7 +300,7 @@ void StallardOS::delay(uint32_t milliseconds)
   }
   else
   {
-    currentTask->continueInUS += milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+    currentTask->continueInUS += (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     StallardOS_delay();
   }
 }

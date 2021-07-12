@@ -23,7 +23,7 @@ private:
     StallardOSGPIO drdy;
     StallardOSGPIO reset;
 
-    StallardOSSemaphore sem;
+    static StallardOSSemaphore sem;
     static uint8_t adcInitialized;
 
 public:
