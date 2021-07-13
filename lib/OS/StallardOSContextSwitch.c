@@ -255,7 +255,7 @@ __attribute__((always_inline)) inline void switchTask(void)
         asm("MRS r0, PSP");         //Get Process Stack Pointer
         // asm("MRS r3, CONTROL");
         asm("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
-        asm("VSTMDB r0!, {s16-s31}");
+        // asm("VSTMDB r0!, {s16-s31}");
         // asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 
@@ -274,13 +274,14 @@ __attribute__((always_inline)) inline void switchTask(void)
         // asm("MOV r6, #2");  //R2
         // asm("MOV r7, #3");  //R3
         // asm("MOV r8, #12"); //R12
-        asm("MOV r9, %0"  : : "r"((uint32_t)taskOnEnd)); //LR
+        // asm("MOV r9, %0"  : : "r"((uint32_t)taskOnEnd)); //LR
+        asm("MOV r9, #0"); //LR (Temporär)
         asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier)); //PC
         asm("MOV r11, #0x01000000");                                    //XPSR
-        asm("MOV r14, #0xFFFFFFFD");                                    //Default return value
+        // asm("MOV r14, #0xFFFFFFFD");                                    //Default return value
 
         asm("MOV r0, %0"  : : "r"(currentTask->Stack)); //get saved Stack pointer
-        asm("STMDB r0!, {r4-r11, r14}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
+        asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
         asm("MSR PSP, r0");             //set PSP
 
         currentTask->State = RUNNING; //Save state as running
@@ -289,7 +290,7 @@ __attribute__((always_inline)) inline void switchTask(void)
     if (currentTask->State == PAUSED) //Hier Task fortsetzen
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack)); //get saved Stack pointer
-        asm("VLDMIA r0!, {s16-s31}");
+        // asm("VLDMIA r0!, {s16-s31}");
         asm("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
         asm("MSR PSP, r0");           //set PSP
         
@@ -306,7 +307,7 @@ __attribute__((always_inline)) inline void switchTask(void)
  * @return
  */
 #ifdef contextSwitch
-__attribute__((naked)) void SVC_Handler()
+void SVC_Handler()
 {
     // disable_interrupts();
     uint8_t handleMode;
@@ -324,20 +325,23 @@ __attribute__((naked)) void SVC_Handler()
     {
     case 0: //No Task
         currentTask = NULL;
-        switchTask();
-        asm("bx r14");
+        // switchTask();
+        // asm("bx r14");
+        pendPendSV();
         break;
 
     case 1: //Task has Ended
         currentTask = NULL;
-        switchTask();
-        asm("bx r14");
+        // switchTask();
+        // asm("bx r14");
+        pendPendSV();
         break;
 
     case 2: //Delay
         nextTask = NULL;
-        switchTask();
-        asm("bx r14");
+        // switchTask();
+        // asm("bx r14");
+        pendPendSV();
         break;
 
     case 3: //Switch to privileged mode
@@ -355,8 +359,8 @@ __attribute__((naked)) void SVC_Handler()
         break;
 
     case 5: //Start the os
-        SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
-        StallardOS_SetSysClock(168);
+        // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+        // StallardOS_SetSysClock(168);
         SysTick_Config(sysTickTicks);
         NVIC_SetPriority(SysTick_IRQn, 0x00);
         NVIC_SetPriority(PendSV_IRQn, 0xFF);
@@ -369,8 +373,9 @@ __attribute__((naked)) void SVC_Handler()
         NVIC_EnableIRQ(BusFault_IRQn);
         NVIC_EnableIRQ(MemoryManagement_IRQn);
         NVIC_EnableIRQ(NonMaskableInt_IRQn);
-        switchTask();
-        asm("bx r14");
+        // switchTask();
+        // asm("bx r14");
+        pendPendSV();
         break;
 
     case 6: //Enter Bootloader
@@ -398,7 +403,7 @@ void SysTick_Handler(void) //In C Language
     usCurrentTimeSinceStart += 10;
     if(usCurrentTimeSinceStart % (sysTickFreq / 1000) == 0) //Every millisecond
     {
-        // HAL_IncTick();
+        HAL_IncTick();
 #ifdef contextSwitch
         if(currentTask != NULL)
         {
@@ -424,11 +429,11 @@ void SysTick_Handler(void) //In C Language
  * @return
  */
 #ifdef contextSwitch
-__attribute__((naked)) void PendSV_Handler()
+void PendSV_Handler()
 {
     disable_interrupts();
     switchTask();
     enable_interrupts(); //Enable all interrupts
-    asm("bx r14");
+    // asm("bx r14");
 }
 #endif

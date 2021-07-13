@@ -53,7 +53,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.Pin = 1 << this->pin;
     GPIO_InitStruct.Mode = this->dir;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Pull = this->pull;
 
     HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(initialState));
@@ -107,7 +107,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.Pin = 1 << this->pin;
     GPIO_InitStruct.Mode = this->dir;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Pull = this->pull;
     GPIO_InitStruct.Alternate = alternate;
 

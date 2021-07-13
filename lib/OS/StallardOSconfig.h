@@ -8,7 +8,7 @@
 
 #define contextSwitch
 
-#define sizeStack 1000      //300 * 4 Byte (Stack size for Tasks)
+#define sizeStack 500      //300 * 4 Byte (Stack size for Tasks)
 #define countTasks 3
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 #define externalOszillator 8 //[MHz]
@@ -27,7 +27,7 @@
 
 #define CAN_FIFO_size 200    //[Messages] should be enough for 1 second of storing
 
-//#define CAN_debug
+// #define CAN_debug
 
 #define extADCSpiPort SPI2
 #define SPI_GPIO_PORT PORTB

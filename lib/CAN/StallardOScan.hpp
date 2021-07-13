@@ -22,7 +22,7 @@ private:
     StallardOSGPIO CANT;
     StallardOSGPIO CANR;
     StallardOSSemaphore sem;
-    static StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
+    StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
 
     static bool can1used;
     static bool can2used;
@@ -84,14 +84,14 @@ public:
     * @param msg message to send
     * @param size amount of Data Bytes. Maximum is 8
     */
-    void sendMessage(StallardOSCanMessage *msg, uint8_t size);
+    int sendMessage(StallardOSCanMessage *msg, uint8_t size);
 
     /**
     * send a can message.
     *
     * @param msg message to send, should be a struct from StallardOScanStructs.h !
     */
-    void sendMessage(StallardOSCanMessage *msg);
+    int sendMessage(StallardOSCanMessage *msg);
 
 };
 

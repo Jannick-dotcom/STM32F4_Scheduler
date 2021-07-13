@@ -44,13 +44,14 @@ void taskMain(void)
  */
 StallardOS::StallardOS()
 {
-  SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+  // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
   //Basiswerte Initialisieren
   first_function_struct = nullptr;
   currentTask = nullptr;
   TCBsCreated = 0;
   //Für Context Switch
   createTCBs();
+  StallardOS_SetSysClock(168);
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);

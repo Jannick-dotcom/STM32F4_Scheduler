@@ -57,7 +57,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     canhandle.Init.TimeTriggeredMode = DISABLE;
     canhandle.Init.AutoBusOff = DISABLE;
     canhandle.Init.AutoWakeUp = DISABLE;
-    canhandle.Init.AutoRetransmission = ENABLE;
+    canhandle.Init.AutoRetransmission = DISABLE;
     canhandle.Init.ReceiveFifoLocked = DISABLE;
     canhandle.Init.TransmitFifoPriority = DISABLE;
 
@@ -128,12 +128,6 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         StallardOSGeneralFaultHandler();
     }
 
-    TxHeader.StdId = 0x321;                //Ids
-    TxHeader.ExtId = 0x01;                 //Not used
-    TxHeader.RTR = CAN_RTR_DATA;           //Data Transmission
-    TxHeader.IDE = CAN_ID_STD;             //Standard Identifier -> 11 bit
-    TxHeader.DLC = 8;                      //sizeof(StallardOSCanMessage::Val); //Bytezahl die zu senden ist
-    TxHeader.TransmitGlobalTime = DISABLE; //No Idea what this means
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
 #endif
@@ -239,7 +233,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
     return false; //return false status
 }
 
-void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
+int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
 #ifdef contextSwitch
     this->sem.take(); //Block the semaphore
@@ -249,7 +243,7 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 #ifdef contextSwitch
         this->sem.give(); //release semaphore
 #endif
-        return;
+        return -1;
     }
     TxHeader.StdId = msg->ID;    //copy the id
     TxHeader.RTR = CAN_RTR_DATA; //indicate Data Transmission
@@ -262,10 +256,10 @@ void StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
 #endif
-    return;
+    return HAL_CAN_GetError(&canhandle);
 }
 
-void StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
+int StallardOSCAN::sendMessage(StallardOSCanMessage *msg)
 {
-        sendMessage(msg, msg->dlc);
+    return sendMessage(msg, msg->dlc);
 }

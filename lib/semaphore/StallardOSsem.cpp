@@ -4,6 +4,11 @@ extern struct function_struct *currentTask;
 
 #ifdef contextSwitch
 
+StallardOSSemaphore::StallardOSSemaphore()
+{
+    this->val = 1;
+}
+
 void StallardOSSemaphore::give()
 {
     this->val++;

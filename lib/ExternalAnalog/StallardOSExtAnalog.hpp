@@ -15,7 +15,7 @@ extern "C" void StallardOSGeneralFaultHandler();
 class StallardOSExtAnalog
 {
 private:
-    static StallardOSSPI spihandle;
+    StallardOSSPI spihandle;
     uint8_t channel;
     uint8_t adcNumber;
     
@@ -23,12 +23,12 @@ private:
     StallardOSGPIO drdy;
     StallardOSGPIO reset;
 
-    static StallardOSSemaphore sem;
+    StallardOSSemaphore sem;
     static uint8_t adcInitialized;
 
-public:
     uint8_t registerRead(uint8_t address);
     void registerWrite(uint8_t address, uint8_t value);
+public:
     uint16_t channelRead();
 
 public:
