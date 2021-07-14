@@ -255,7 +255,9 @@ __attribute__((always_inline)) inline void switchTask(void)
         asm("MRS r0, PSP");         //Get Process Stack Pointer
         // asm("MRS r3, CONTROL");
         asm("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
-        // asm("VSTMDB r0!, {s16-s31}");
+        #ifdef useFPU
+        asm("VSTMDB r0!, {s16-s31}");
+        #endif
         // asm("MSR PSP, r0"); //Set Modified Stack pointer
         asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
 
@@ -278,19 +280,22 @@ __attribute__((always_inline)) inline void switchTask(void)
         asm("MOV r9, #0"); //LR (Temporär)
         asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier)); //PC
         asm("MOV r11, #0x01000000");                                    //XPSR
-        // asm("MOV r14, #0xFFFFFFFD");                                    //Default return value
+        asm("MOV r14, #0xFFFFFFFD");                                    //Default return value
 
         asm("MOV r0, %0"  : : "r"(currentTask->Stack)); //get saved Stack pointer
         asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
         asm("MSR PSP, r0");             //set PSP
 
         currentTask->State = RUNNING; //Save state as running
+        currentTask->lastStart = usCurrentTimeSinceStart;
     }
 
     if (currentTask->State == PAUSED) //Hier Task fortsetzen
     {
         asm("MOV r0, %0" : : "r"(currentTask->Stack)); //get saved Stack pointer
-        // asm("VLDMIA r0!, {s16-s31}");
+        #ifdef useFPU
+        asm("VLDMIA r0!, {s16-s31}");
+        #endif
         asm("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
         asm("MSR PSP, r0");           //set PSP
         
@@ -359,7 +364,9 @@ void SVC_Handler()
         break;
 
     case 5: //Start the os
-        // SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+        SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+        asm("DSB");
+        asm("ISB");
         // StallardOS_SetSysClock(168);
         SysTick_Config(sysTickTicks);
         NVIC_SetPriority(SysTick_IRQn, 0x00);

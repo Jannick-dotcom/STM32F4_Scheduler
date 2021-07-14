@@ -19,7 +19,6 @@ reset(5 - adcNumber, PORTD, Output, false) //If not in initializer list, Can1 is
     //Setup of the ADC, without channel setting
     if((adcInitialized & adcNumber) != 0)
         return;
-    StallardOS::delay(100);
     reset = 1;
     StallardOS::delay(100);
     registerWrite(0x00, 0b00110000); //Page 34f //CONFIG0

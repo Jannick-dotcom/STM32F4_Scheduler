@@ -41,6 +41,12 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 
 void HardFault_Handler()
 {
+    asm("TST    LR, #4");//firstly, find the PC
+    asm("ITE    EQ");
+	asm("MRSEQ	R0, MSP");
+	asm("MRSNE	R0, PSP");
+
+	asm("LDR	R0, [R0, #24]"); //PC is in R0
     if (taskMainStruct != 0)
     {
         if (currentTask == 0)
