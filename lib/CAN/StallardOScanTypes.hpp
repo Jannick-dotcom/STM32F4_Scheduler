@@ -28,21 +28,32 @@ public:
 template <typename valueTemplate>
 struct CAN_Signal
 {
-public:
-    volatile valueTemplate value;
     const uint8_t countOfBits;
     const uint16_t startbit;
     const uint8_t rowcount;
     const uint8_t isMotorola;
-    CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start, uint8_t row, uint8_t isMoto) : countOfBits(bitcount), startbit(start), rowcount(row), isMotorola(isMoto)
+    const float factor;
+    const float offset;
+public:
+    volatile valueTemplate rawValue;
+    volatile float physValue;
+    
+    CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start, uint8_t row, uint8_t isMoto, float factor, float offset) : 
+    countOfBits(bitcount), 
+    startbit(start), 
+    rowcount(row), 
+    isMotorola(isMoto),
+    factor(factor),
+    offset(offset)
     {
-        value = val;
+        rawValue = val;
         // countOfBits = bitcount;
         // startbit = start;
     }
     uint64_t build()
     {
-        uint64_t val = (uint64_t)((uint64_t)value & (((uint64_t)1 << (uint64_t)countOfBits) - 1)) << (uint64_t)startbit;
+        uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1)) << (uint64_t)startbit;
+        val = val * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
             uint8_t *arr = (uint8_t*)&val;
@@ -56,21 +67,22 @@ public:
     }
     void unbuild(const uint64_t Val)
     {
-        value = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
+        rawValue = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
+        rawValue = rawValue * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
-            uint8_t *arr = (uint8_t*)&value;
+            uint8_t *arr = (uint8_t*)&rawValue;
             uint64_t temp = 0;
             for(uint8_t i = countOfBits/8; i > 0; i--)
             {
                 temp |= (uint64_t)arr[i-1] << (((countOfBits/8)-i) * 8);
             }
-            value = temp;
+            rawValue = temp;
         }
     }
     CAN_Signal operator=(valueTemplate val)
     {
-        value = val;
+        rawValue = val;
         return *this;
     }
 };
