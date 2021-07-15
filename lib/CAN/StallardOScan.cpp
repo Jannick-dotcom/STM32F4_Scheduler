@@ -57,7 +57,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     canhandle.Init.TimeTriggeredMode = DISABLE;
     canhandle.Init.AutoBusOff = DISABLE;
     canhandle.Init.AutoWakeUp = DISABLE;
-    canhandle.Init.AutoRetransmission = DISABLE;
+    canhandle.Init.AutoRetransmission = ENABLE;
     canhandle.Init.ReceiveFifoLocked = DISABLE;
     canhandle.Init.TransmitFifoPriority = DISABLE;
 

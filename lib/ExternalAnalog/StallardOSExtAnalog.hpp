@@ -19,9 +19,13 @@ private:
     uint8_t channel;
     uint8_t adcNumber;
     
-    StallardOSGPIO cs;
-    StallardOSGPIO drdy;
-    StallardOSGPIO reset;
+    static StallardOSGPIO cs1;
+    static StallardOSGPIO drdy1;
+    static StallardOSGPIO reset1;
+
+    static StallardOSGPIO cs2;
+    static StallardOSGPIO drdy2;
+    static StallardOSGPIO reset2;
 
     StallardOSSemaphore sem;
     static uint8_t adcInitialized;
