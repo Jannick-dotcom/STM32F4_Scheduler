@@ -25,11 +25,12 @@ private:
 
     StallardOSSemaphore sem;
     static uint8_t adcInitialized;
+    int16_t offset;
 
     uint8_t registerRead(uint8_t address);
     void registerWrite(uint8_t address, uint8_t value);
+    uint16_t channelRead(uint8_t channel);
 public:
-    uint16_t channelRead();
 
 public:
 
@@ -46,7 +47,7 @@ public:
  *
  * @return analog value
  */
-    uint16_t getValue();
+    int16_t getValue();
 };
 
 #endif

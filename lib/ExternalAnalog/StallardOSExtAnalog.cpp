@@ -21,19 +21,19 @@ reset(5 - adcNumber, PORTD, Output, false) //If not in initializer list, Can1 is
         return;
     reset = 1;
     StallardOS::delay(100);
-    registerWrite(0x00, 0b00110000); //Page 34f //CONFIG0
+    registerWrite(0x00, 0b00000000); //Page 34f //CONFIG0
     registerWrite(0x01, 0b00000011); //Page 36  //CONFIG1
 
-    volatile uint16_t test;
-    for(uint8_t i = 0; i < 10; i++)
-    {
-        test = registerRead(i);
-    }
-
-    // for(uint8_t i = 0; i < 16; i++) //Fix start pin
+    // volatile uint16_t test;
+    // for(uint8_t i = 0; i < 10; i++)
     // {
-    //     channelRead();
+    //     test = registerRead(i);
     // }
+    for(uint8_t i = 0; i < 16; i++) //Fix start pin with only reading from all channels
+    {
+        channelRead(i);
+    }
+    offset = channelRead(16);
     adcInitialized |= adcNumber;
 }
 
@@ -64,28 +64,27 @@ uint8_t StallardOSExtAnalog::registerRead(uint8_t address)
     return data;
 }
 
-uint16_t StallardOSExtAnalog::channelRead()
+uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
 {
     uint8_t dataout, datain[3];
     dataout = (0b100 << 5); //Pulse convert command byte
-    registerWrite(0x02, 0xA2);//0xA2
-    if (channel >= 0 && channel <= 7)
+    if (channel >= 0 && channel < 8)
     {
-        // registerWrite(0x04, 1 << channel); //Select channel 0-7
-        // registerWrite(0x05, 0);
-        // registerWrite(0x06, 0);
+        registerWrite(0x04, 1 << channel); //Select channel 0-7
+        registerWrite(0x05, 0);
+        registerWrite(0x06, 0);
     }
-    else if (channel >= 8 && channel <= 15)
+    else if (channel >= 8 && channel < 16)
     {
-        // registerWrite(0x05, 1 << (channel - 7)); //Select channel 8-15
-        // registerWrite(0x04, 0);
-        // registerWrite(0x06, 0);
+        registerWrite(0x05, 1 << (channel - 8)); //Select channel 8-15
+        registerWrite(0x04, 0);
+        registerWrite(0x06, 0);
     }
-    else
+    else //offset Reading
     {
-        // registerWrite(0x04, 0);
-        // registerWrite(0x05, 0);
-        // registerWrite(0x06, 0x20);
+        registerWrite(0x04, 0);
+        registerWrite(0x05, 0);
+        registerWrite(0x06, 0x01);
     }
     cs = 0;
     spihandle.send(&dataout, sizeof(dataout)); //Send pulse convert command
@@ -99,27 +98,27 @@ uint16_t StallardOSExtAnalog::channelRead()
         }
     }
     cs = 0;
-    cs = 1;
-    cs = 0;
-    dataout = 0b00110000; //direct read command
+    dataout = 0b00110000; //channel read command
     spihandle.send(&dataout, sizeof(dataout));
     spihandle.receive(datain, sizeof(datain), HAL_MAX_DELAY); //Receive a 2 byte Analog Value
     cs = 1;
+    // cs = 0; //Toggle to reset spi interface of ADC
+    // cs = 1;
     // registerWrite(0x04, 0);
     // registerWrite(0x05, 0);
     // registerWrite(0x06, 0);
     return datain[1] << 8 | datain[2];
 }
 
-uint16_t StallardOSExtAnalog::getValue()
+int16_t StallardOSExtAnalog::getValue()
 {
-    uint16_t buf;
+    int16_t buf;
     #ifdef contextSwitch
     sem.take();
     #endif
-    buf = channelRead();
+    buf = channelRead(this->channel);
     #ifdef contextSwitch
     sem.give();
     #endif
-    return buf;
+    return buf - offset;
 }
