@@ -7,10 +7,13 @@
 // #define STOS_current_ECU_ID 4 //SWCU
 
 #define contextSwitch
+#define useFPU
 
-#define sizeStack 1000      //300 * 4 Byte (Stack size for Tasks)
+#define sizeStack 200      //300 * 4 Byte (Stack size for Tasks)
 #define countTasks 3
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
+
+// #define externalOszillator 25 //[MHz]
 #define externalOszillator 8 //[MHz]
 
 // #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
@@ -27,7 +30,7 @@
 
 #define CAN_FIFO_size 200    //[Messages] should be enough for 1 second of storing
 
-//#define CAN_debug
+// #define CAN_debug
 
 #define extADCSpiPort SPI2
 #define SPI_GPIO_PORT PORTB

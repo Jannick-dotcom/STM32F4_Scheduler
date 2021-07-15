@@ -64,6 +64,10 @@ public:
             }
             return temp;
         }
+        else
+        {
+            return val;
+        }
     }
     void unbuild(const uint64_t Val)
     {

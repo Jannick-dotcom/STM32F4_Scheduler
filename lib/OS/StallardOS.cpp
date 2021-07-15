@@ -51,6 +51,7 @@ StallardOS::StallardOS()
   TCBsCreated = 0;
   //Für Context Switch
   createTCBs();
+  StallardOS_SetSysClock(168);
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
@@ -321,8 +322,8 @@ void StallardOS::yield()
     currentTask->continueInUS = (1000000 / currentTask->refreshRate) - (usCurrentTimeSinceStart - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
     if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
       currentTask->continueInUS = 0;
-
-    StallardOS_delay();
+    else
+      StallardOS_delay();
 
     currentTask->lastStart = usCurrentTimeSinceStart;
   }
