@@ -250,8 +250,8 @@ int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     TxHeader.IDE = CAN_ID_STD;   //Set Standard Identifier -> 11 bit
     TxHeader.DLC = size;         //Set Amount of Data bytes
 
-    if (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 1)
-        HAL_CAN_AbortTxRequest(&canhandle,-1);                                                                                           //Wait until all TX Mailboxes are free
+    while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 1);
+        // HAL_CAN_AbortTxRequest(&canhandle,-1);         //Wait until all TX Mailboxes are free
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
