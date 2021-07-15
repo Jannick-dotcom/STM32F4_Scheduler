@@ -29,7 +29,7 @@ void StallardOS_SetSysClock(uint8_t clockspeed)
     RCC_OscInitStruct.HSEState = RCC_HSE_ON; /* External 8 MHz xtal on OSC_IN/OSC_OUT */
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM = externalOszillator;             // VCO input clock = 1 MHz (8 MHz / 8)
+    RCC_OscInitStruct.PLL.PLLM = (HSE_VALUE / 1000000);             // VCO input clock = 1 MHz (8 MHz / 8)
     RCC_OscInitStruct.PLL.PLLN = clockspeed * 2;           // VCO output clock = 360 MHz (1 MHz * 360)
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2; // PLLCLK = 180 MHz (360 MHz / 2)
     RCC_OscInitStruct.PLL.PLLQ = 7;             //

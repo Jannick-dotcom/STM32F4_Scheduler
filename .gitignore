@@ -3,5 +3,7 @@
 src/
 toDos/
 *.code-workspace
-*.ini
+# *.ini
 *.csv
+*.test
+disassemble.sh

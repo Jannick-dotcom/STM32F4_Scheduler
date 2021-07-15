@@ -52,6 +52,10 @@ StallardOS::StallardOS()
   //Für Context Switch
   createTCBs();
   StallardOS_SetSysClock(168);
+  if(SystemCoreClock != 168000000)
+  {
+    asm("bkpt"); //Make a software breakpoint to stop the debugger here so we can check
+  }
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
