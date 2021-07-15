@@ -14,15 +14,15 @@ struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x100;
 	uint16_t _size;
-	CAN_Signal<int8_t> activate_blip = {0, 1, 60, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> activate_cut = {0, 1, 61, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> blip_state = {0, 4, 28, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> cut_level_gcu = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> engaged_gear = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> gearpot = {0, 10, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> shift_state = {0, 4, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> state_cut = {0, 4, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> target_engine_speed = {0, 14, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<int8_t> activate_blip = {0, 1, 60, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> activate_cut = {0, 1, 61, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> blip_state = {0, 4, 28, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> cut_level_gcu = {0, 8, 48, 0, 0, 0.0196078, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> engaged_gear = {0, 8, 0, 0, 0, 0.5, -1.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> gearpot = {0, 10, 8, 0, 0, 4888, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> shift_state = {0, 4, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> state_cut = {0, 4, 56, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> target_engine_speed = {0, 14, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		activate_blip.unbuild(Val);
@@ -55,10 +55,10 @@ struct STOS_CAN_PDU_ABS_wheelspeeds : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x24A;
 	uint16_t _size;
-	CAN_Signal<uint16_t> speedABSfl = {0, 16, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> speedABSfr = {0, 16, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> speedABSrl = {0, 16, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> speedABSrr = {0, 16, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> speedABSfl = {0, 16, 0, 0, 0, 0.015625, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> speedABSfr = {0, 16, 16, 0, 0, 0.015625, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> speedABSrl = {0, 16, 32, 0, 0, 0.015625, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> speedABSrr = {0, 16, 48, 0, 0, 0.015625, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		speedABSfl.unbuild(Val);
@@ -86,11 +86,11 @@ struct STOS_CAN_PDU_ABS_switch_state_slip_and_speed : public StallardOSCanMessag
 public:
 	static const uint16_t _id = 0x5C0;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ax1_Bremse60ABS = {0, 16, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ay1_Bremse60ABS = {0, 16, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> blsABS = {0, 1, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int16_t> p_HzABS = {0, 16, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> switchstateABS = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ax1_Bremse60ABS = {0, 16, 32, 0, 0, 0.00012742, -41768};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ay1_Bremse60ABS = {0, 16, 48, 0, 0, 0.00012742, -41768};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> blsABS = {0, 1, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int16_t> p_HzABS = {0, 16, 8, 0, 0, 0.0153, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> switchstateABS = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ax1_Bremse60ABS.unbuild(Val);
@@ -119,14 +119,14 @@ struct STOS_CAN_PDU_Injection_1 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x770;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ti_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_3 = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_4 = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_5 = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_6 = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_7 = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ti_8 = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ti_1 = {0, 8, 0, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_2 = {0, 8, 8, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_3 = {0, 8, 16, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_4 = {0, 8, 24, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_5 = {0, 8, 32, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_6 = {0, 8, 40, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_7 = {0, 8, 48, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ti_8 = {0, 8, 56, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ti_1.unbuild(Val);
@@ -158,13 +158,13 @@ struct STOS_CAN_PDU_Injection_2 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x771;
 	uint16_t _size;
-	CAN_Signal<uint8_t> injang = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> injoff = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lamctrl_2k = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lamctrl_k = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tibase = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tibatt_o = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> timap = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> injang = {0, 8, 24, 0, 0, 28125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> injoff = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lamctrl_2k = {0, 8, 48, 0, 0, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lamctrl_k = {0, 8, 40, 0, 0, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tibase = {0, 8, 0, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tibatt_o = {0, 8, 8, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> timap = {0, 8, 16, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		injang.unbuild(Val);
@@ -195,14 +195,14 @@ struct STOS_CAN_PDU_Ignition : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x772;
 	uint16_t _size;
-	CAN_Signal<int8_t> ign_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_3 = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_4 = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_5 = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_6 = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_7 = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ign_8 = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<int8_t> ign_1 = {0, 8, 0, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_2 = {0, 8, 8, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_3 = {0, 8, 16, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_4 = {0, 8, 24, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_5 = {0, 8, 32, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_6 = {0, 8, 40, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_7 = {0, 8, 48, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ign_8 = {0, 8, 56, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ign_1.unbuild(Val);
@@ -234,12 +234,12 @@ struct STOS_CAN_PDU_Ignition_Rev_Ath : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x773;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ath = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> dath = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ignbase = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> ignmap = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> rev = {0, 16, 24, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tdwell = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ath = {0, 8, 40, 0, 0, 0.390625, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> dath = {0, 8, 48, 0, 0, 12, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ignbase = {0, 8, 0, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> ignmap = {0, 8, 8, 0, 0, 0.75, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> rev = {0, 16, 24, 0, 1, 0.5, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tdwell = {0, 8, 16, 0, 0, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ath.unbuild(Val);
@@ -269,14 +269,14 @@ struct STOS_CAN_PDU_Lambda : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x774;
 	uint16_t _size;
-	CAN_Signal<uint8_t> lam = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lam_2 = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> lami = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> lami_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lammap = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lammap_2 = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> lamp = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> lamp_2 = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> lam = {0, 8, 32, 0, 0, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lam_2 = {0, 8, 40, 0, 0, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> lami = {0, 8, 0, 0, 0, 0.25, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> lami_2 = {0, 8, 8, 0, 0, 0.25, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lammap = {0, 8, 48, 0, 0, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lammap_2 = {0, 8, 56, 0, 0, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> lamp = {0, 8, 16, 0, 0, 0.25, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> lamp_2 = {0, 8, 24, 0, 0, 0.25, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		lam.unbuild(Val);
@@ -308,11 +308,11 @@ struct STOS_CAN_PDU_Speed : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x775;
 	uint16_t _size;
-	CAN_Signal<uint16_t> speed = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> speedfl = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> speedfr = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> speedrl = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> speedrr = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> speed = {0, 16, 0, 0, 1, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> speedfl = {0, 8, 16, 0, 0, 2, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> speedfr = {0, 8, 24, 0, 0, 2, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> speedrl = {0, 8, 32, 0, 0, 2, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> speedrr = {0, 8, 40, 0, 0, 2, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		speed.unbuild(Val);
@@ -341,10 +341,10 @@ struct STOS_CAN_PDU_Lapfunc : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x776;
 	uint16_t _size;
-	CAN_Signal<uint16_t> lapdist = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> laptime = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> laptimediff = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> laptimefast = {0, 16, 48, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> lapdist = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> laptime = {0, 16, 16, 0, 1, 0.01, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> laptimediff = {0, 16, 32, 0, 1, 0.01, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> laptimefast = {0, 16, 48, 0, 1, 0.01, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		lapdist.unbuild(Val);
@@ -372,14 +372,14 @@ struct STOS_CAN_PDU_Gear_Dashboard_Acceleration : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x777;
 	uint16_t _size;
-	CAN_Signal<int8_t> accx = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> accy = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> accz = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ddugear = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> gcstate = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> gear = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> gearcut_u = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> gearratio = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<int8_t> accx = {0, 8, 40, 0, 0, 0.03125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> accy = {0, 8, 48, 0, 0, 0.03125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> accz = {0, 8, 56, 0, 0, 0.03125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ddugear = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> gcstate = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> gear = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> gearcut_u = {0, 8, 24, 0, 0, 0.0196078, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> gearratio = {0, 8, 16, 0, 0, 0.0625, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		accx.unbuild(Val);
@@ -411,12 +411,12 @@ struct STOS_CAN_PDU_Traction_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x778;
 	uint16_t _size;
-	CAN_Signal<uint8_t> slipsp = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> slra = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int8_t> tcpfac = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tcsw = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> vdraxle = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> vref = {0, 16, 48, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> slipsp = {0, 8, 16, 0, 0, 0.078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> slra = {0, 8, 24, 0, 0, 0.078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int8_t> tcpfac = {0, 8, 0, 0, 0, 0.78125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tcsw = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> vdraxle = {0, 16, 32, 0, 1, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> vref = {0, 16, 48, 0, 1, 0.0078125, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		slipsp.unbuild(Val);
@@ -446,13 +446,13 @@ struct STOS_CAN_PDU_Electronic_Throttle_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x779;
 	uint16_t _size;
-	CAN_Signal<uint8_t> aps = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> batt_u = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> camshaftpos = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> etb = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> etb_sp = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lap_c = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> p1 = {0, 16, 24, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> aps = {0, 8, 16, 0, 0, 0.5, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> batt_u = {0, 8, 48, 0, 0, 0.0706949, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> camshaftpos = {0, 8, 40, 0, 0, 0.5, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> etb = {0, 8, 0, 0, 0, 0.5, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> etb_sp = {0, 8, 8, 0, 0, 0.5, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lap_c = {0, 8, 56, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> p1 = {0, 16, 24, 0, 1, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		aps.unbuild(Val);
@@ -483,53 +483,53 @@ struct STOS_CAN_PDU_States_Temp_Press : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x77A;
 	uint16_t _size;
-	CAN_Signal<uint8_t> battlow_b = {0, 1, 61, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> etbsys_e = {0, 1, 25, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> fuellap = {0, 16, 32, 0x3, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<int16_t> fueltank = {0, 16, 48, 0x3, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> gearcut_b = {0, 1, 9, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> idle_b = {0, 1, 23, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ignoff_b = {0, 1, 31, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> injcut_b = {0, 1, 15, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> injcutin_b = {0, 1, 14, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> injenrich_b = {0, 1, 13, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> injstartphase_b = {0, 1, 12, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> knockadaptenable_b = {0, 1, 27, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> knockenable_b = {0, 1, 26, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lamctrl_2b = {0, 1, 10, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lamctrl_b = {0, 1, 11, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> lap_b = {0, 1, 22, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> laptrig_b = {0, 1, 21, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> mappos = {0, 8, 48, 0x2, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> mil_b = {0, 1, 20, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> oillamp_b = {0, 1, 19, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> pamb = {0, 16, 32, 0x2, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> pcrank = {0, 8, 32, 0x1, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> pfuel = {0, 8, 56, 0x1, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> phsok_b = {0, 1, 18, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> phsokset_b = {0, 1, 17, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> poil = {0, 8, 40, 0x1, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> pwat = {0, 8, 48, 0x1, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> rev_b = {0, 1, 30, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> revlimit_b = {0, 1, 29, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> rowcounter_0x77A = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> shled1_b = {0, 1, 56, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> shled2_b = {0, 1, 57, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> shled3_b = {0, 1, 58, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> shled4_b = {0, 1, 59, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> shled5_b = {0, 1, 60, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> speedlimit_b = {0, 1, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> speedlimitreq_b = {0, 1, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> startend_b = {0, 1, 28, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tair = {0, 8, 56, 0x2, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tc_b = {0, 1, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tex = {0, 8, 40, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tex_2 = {0, 8, 48, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tfuel = {0, 8, 32, 0x4, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tlam = {0, 8, 48, 0x4, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tlam_2 = {0, 8, 56, 0x4, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> tmot = {0, 8, 32, 0x5, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> toil = {0, 8, 40, 0x4, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> battlow_b = {0, 1, 61, 0x5, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> etbsys_e = {0, 1, 25, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> fuellap = {0, 16, 32, 0x3, 1, 0.00035791, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int16_t> fueltank = {0, 16, 48, 0x3, 1, 0.00572656, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> gearcut_b = {0, 1, 9, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> idle_b = {0, 1, 23, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ignoff_b = {0, 1, 31, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> injcut_b = {0, 1, 15, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> injcutin_b = {0, 1, 14, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> injenrich_b = {0, 1, 13, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> injstartphase_b = {0, 1, 12, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> knockadaptenable_b = {0, 1, 27, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> knockenable_b = {0, 1, 26, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lamctrl_2b = {0, 1, 10, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lamctrl_b = {0, 1, 11, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> lap_b = {0, 1, 22, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> laptrig_b = {0, 1, 21, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> mappos = {0, 8, 48, 0x2, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> mil_b = {0, 1, 20, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> oillamp_b = {0, 1, 19, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> pamb = {0, 16, 32, 0x2, 1, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> pcrank = {0, 8, 32, 0x1, 0, 5, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> pfuel = {0, 8, 56, 0x1, 0, 0.0514, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> phsok_b = {0, 1, 18, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> phsokset_b = {0, 1, 17, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> poil = {0, 8, 40, 0x1, 0, 0.0514, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> pwat = {0, 8, 48, 0x1, 0, 0.0514, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> rev_b = {0, 1, 30, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> revlimit_b = {0, 1, 29, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> rowcounter_0x77A = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> shled1_b = {0, 1, 56, 0x5, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> shled2_b = {0, 1, 57, 0x5, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> shled3_b = {0, 1, 58, 0x5, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> shled4_b = {0, 1, 59, 0x5, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> shled5_b = {0, 1, 60, 0x5, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> speedlimit_b = {0, 1, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> speedlimitreq_b = {0, 1, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> startend_b = {0, 1, 28, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tair = {0, 8, 56, 0x2, 0, 1, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tc_b = {0, 1, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tex = {0, 8, 40, 0x5, 0, 5, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tex_2 = {0, 8, 48, 0x5, 0, 5, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tfuel = {0, 8, 32, 0x4, 0, 1, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tlam = {0, 8, 48, 0x4, 0, 5, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tlam_2 = {0, 8, 56, 0x4, 0, 5, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> tmot = {0, 8, 32, 0x5, 0, 1, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> toil = {0, 8, 40, 0x4, 0, 1, -40};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		if((Val & 0xFF) == 0x5) //If the rowcounter points to this row 
@@ -622,12 +622,12 @@ struct STOS_CAN_PDU_Boost_Pressures_Wastegate : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x77C;
 	uint16_t _size;
-	CAN_Signal<uint16_t> p22_2m_pwg_m = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> p22_m = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> p22_sp = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> pwg_sp = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> wgdc_2_wgdchold = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> wgdc_wgdcvent = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> p22_2m_pwg_m = {0, 16, 16, 0, 1, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> p22_m = {0, 16, 0, 0, 1, 0.1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> p22_sp = {0, 8, 32, 0, 0, 44402, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> pwg_sp = {0, 8, 40, 0, 0, 44402, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> wgdc_2_wgdchold = {0, 8, 56, 0, 0, 0.392157, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> wgdc_wgdcvent = {0, 8, 48, 0, 0, 0.392157, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		p22_2m_pwg_m.unbuild(Val);
@@ -657,9 +657,9 @@ struct STOS_CAN_PDU_Acceleration_1 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x150;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_X = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Y = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Z = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_X = {0, 16, 0, 0, 1, 3, -7.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Y = {0, 16, 16, 0, 1, 3, -7.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_1_Z = {0, 16, 32, 0, 1, 5, -12.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Accel_1_X.unbuild(Val);
@@ -686,9 +686,9 @@ struct STOS_CAN_PDU_Acceleration_2 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x151;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_X = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Y = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Z = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_X = {0, 16, 0, 0, 1, 3, -7.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Y = {0, 16, 16, 0, 1, 3, -7.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_2_Z = {0, 16, 32, 0, 1, 5, -12.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Accel_2_X.unbuild(Val);
@@ -715,8 +715,8 @@ struct STOS_CAN_PDU_Aero_Fan_PWM : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x157;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_AE_Fan_L_PWM = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_AE_Fan_R_PWM = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_AE_Fan_L_PWM = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_AE_Fan_R_PWM = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_AE_Fan_L_PWM.unbuild(Val);
@@ -742,8 +742,8 @@ struct STOS_CAN_PDU_Aero_Fan_Telemetry : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x158;
 	uint16_t _size;
-	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_1 = {0, 32, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_2 = {0, 32, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_1 = {0, 32, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint32_t> ADCAN_AE_Fan_Telemetry_2 = {0, 32, 32, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_AE_Fan_Telemetry_1.unbuild(Val);
@@ -769,7 +769,7 @@ struct STOS_CAN_PDU_Aero_Fan_Warnings : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x105;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_AE_Warnings = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_AE_Warnings = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_AE_Warnings.unbuild(Val);
@@ -794,7 +794,7 @@ struct STOS_CAN_PDU_Airbox_Position : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x200;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Airbox_Pos = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_PT_Airbox_Pos = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_PT_Airbox_Pos.unbuild(Val);
@@ -819,8 +819,8 @@ struct STOS_CAN_PDU_ARH_Homing : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x201;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_Homing = {0, 1, 7, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_Homing = {0, 1, 6, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_Homing = {0, 1, 7, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_Homing = {0, 1, 6, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_ARH_1_Homing.unbuild(Val);
@@ -846,8 +846,8 @@ struct STOS_CAN_PDU_ARH_PWM : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x160;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_PWM = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_PWM = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_1_PWM = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_2_PWM = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_ARH_1_PWM.unbuild(Val);
@@ -873,9 +873,9 @@ struct STOS_CAN_PDU_Battery_Temp_48V : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x203;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_3 = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_1 = {0, 8, 0, 0, 0, 100, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_2 = {0, 8, 8, 0, 0, 100, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_48V_Temp_3 = {0, 8, 16, 0, 0, 100, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_Battery_48V_Temp_1.unbuild(Val);
@@ -902,8 +902,8 @@ struct STOS_CAN_PDU_Brake_Disc_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x205;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FL = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FR = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FL = {0, 16, 0, 0, 1, 200, -100};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_FR = {0, 16, 16, 0, 1, 200, -100};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Brake_Disc_Temp_FL.unbuild(Val);
@@ -929,8 +929,8 @@ struct STOS_CAN_PDU_Brake_Disc_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x206;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RL = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RR = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RL = {0, 16, 0, 0, 1, 200, -100};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Disc_Temp_RR = {0, 16, 16, 0, 1, 200, -100};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Brake_Disc_Temp_RL.unbuild(Val);
@@ -956,9 +956,9 @@ struct STOS_CAN_PDU_Brake_Pressure : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x155;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Front = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Rear = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Brake_Bias = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Front = {0, 16, 0, 0, 1, 40, -20};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Brake_Pressure_Rear = {0, 16, 16, 0, 1, 40, -20};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Brake_Bias = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Brake_Pressure_Front.unbuild(Val);
@@ -985,14 +985,14 @@ struct STOS_CAN_PDU_Current_Sensors : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x208;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_3 = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_4 = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_5 = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_6 = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_7 = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_8 = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_1 = {0, 8, 0, 0, 0, 10, -25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_2 = {0, 8, 8, 0, 0, 10, -25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_3 = {0, 8, 16, 0, 0, 10, -25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_4 = {0, 8, 24, 0, 0, 10, -25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_5 = {0, 8, 32, 0, 0, 15.1515, -37.8787};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_6 = {0, 8, 40, 0, 0, 15.1515, -37.8787};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_7 = {0, 8, 48, 0, 0, 15.1515, -37.8787};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Current_Sensor_8 = {0, 8, 56, 0, 0, 50, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_Current_Sensor_1.unbuild(Val);
@@ -1024,9 +1024,9 @@ struct STOS_CAN_PDU_FCU_ECU_Bat_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x210;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_Battery_24V_Temp = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_1 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_2 = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_Battery_24V_Temp = {0, 8, 0, 0, 0, 100, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_1 = {0, 8, 8, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_FCU_2 = {0, 8, 16, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_Battery_24V_Temp.unbuild(Val);
@@ -1053,10 +1053,10 @@ struct STOS_CAN_PDU_FCU_Switches : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x212;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_ARB_Switch = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Activated = {0, 1, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Switch = {0, 8, 31, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Switch = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_ARB_Switch = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Activated = {0, 1, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_LaunchC_Switch = {0, 8, 31, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Switch = {0, 8, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_ARB_Switch.unbuild(Val);
@@ -1084,13 +1084,13 @@ struct STOS_CAN_PDU_FDS_Parameters : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x215;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Friction_LC = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_mue_max = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Swim_VDE = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_FDS_Velo_VDE = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RL = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RR = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Yaw_VDE = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Friction_LC = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_mue_max = {0, 8, 56, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Swim_VDE = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_FDS_Velo_VDE = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RL = {0, 8, 40, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Wheel_Slip_RR = {0, 8, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Yaw_VDE = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_FDS_Friction_LC.unbuild(Val);
@@ -1121,14 +1121,14 @@ struct STOS_CAN_PDU_FDS_Wheel_Signals : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x216;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FL = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FR = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RL = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RR = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FL = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FR = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RL = {0, 8, 48, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RR = {0, 8, 56, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FL = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_FR = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RL = {0, 8, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Slip_Angle_RR = {0, 8, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FL = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_FR = {0, 8, 40, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RL = {0, 8, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_FDS_Whl_Load_RR = {0, 8, 56, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_FDS_Slip_Angle_FL.unbuild(Val);
@@ -1160,8 +1160,8 @@ struct STOS_CAN_PDU_Flash_Over_Can : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x222;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_FoC_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_FoC_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_FoC_1 = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_FoC_2 = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_FoC_1.unbuild(Val);
@@ -1187,7 +1187,7 @@ struct STOS_CAN_PDU_Frame_Pressure : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x218;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_CH_Frame_Pressure = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_CH_Frame_Pressure = {0, 8, 0, 0, 0, 2.5, -1.25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_CH_Frame_Pressure.unbuild(Val);
@@ -1212,9 +1212,9 @@ struct STOS_CAN_PDU_Gyroscope_1 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x152;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_X = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Y = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Z = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_X = {0, 16, 0, 0, 1, 25, -62.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Y = {0, 16, 16, 0, 1, 25, -62.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_1_Z = {0, 16, 32, 0, 1, 50, -125};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Gyro_1_X.unbuild(Val);
@@ -1241,9 +1241,9 @@ struct STOS_CAN_PDU_Gyroscope_2 : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x153;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_X = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Y = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Z = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_X = {0, 16, 0, 0, 1, 25, -62.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Y = {0, 16, 16, 0, 1, 25, -62.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Gyro_2_Z = {0, 16, 32, 0, 1, 50, -125};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Gyro_2_X.unbuild(Val);
@@ -1270,8 +1270,8 @@ struct STOS_CAN_PDU_Niveau_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x111;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Niveau = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Niveau = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Niveau = {0, 8, 0, 0, 0, 25, 25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Niveau = {0, 8, 8, 0, 0, 25, 25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Niveau_FL_Niveau.unbuild(Val);
@@ -1297,12 +1297,12 @@ struct STOS_CAN_PDU_Niveau_Front_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x219;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Error = {0, 1, 23, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Function = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_on_off = {0, 1, 22, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Error = {0, 1, 18, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Function = {0, 8, 21, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_on_off = {0, 1, 20, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Error = {0, 1, 23, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_Function = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FL_on_off = {0, 1, 22, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Error = {0, 1, 18, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_Function = {0, 8, 21, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_FR_on_off = {0, 1, 20, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Niveau_FL_Error.unbuild(Val);
@@ -1332,7 +1332,7 @@ struct STOS_CAN_PDU_Niveau_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x110;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Niveau = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Niveau = {0, 8, 0, 0, 0, 25, 25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Niveau_R_Niveau.unbuild(Val);
@@ -1357,8 +1357,8 @@ struct STOS_CAN_PDU_Niveau_Rear_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x220;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Error = {0, 1, 15, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Function = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Error = {0, 1, 15, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Niveau_R_Function = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Niveau_R_Error.unbuild(Val);
@@ -1384,7 +1384,7 @@ struct STOS_CAN_PDU_Oil_Pressure : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x163;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Pressure = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Pressure = {0, 8, 0, 0, 0, 2.5, -1.25};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_PT_Oil_Pressure.unbuild(Val);
@@ -1409,9 +1409,9 @@ struct STOS_CAN_PDU_Oil_Pressure_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x224;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level_RS232 = {0, 1, 23, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Temp = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Level_RS232 = {0, 1, 23, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Temp = {0, 8, 8, 0, 0, 57.5, -83.75};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_PT_Oil_Level.unbuild(Val);
@@ -1438,10 +1438,10 @@ struct STOS_CAN_PDU_PDU_ECU_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x230;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_3 = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_4 = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_1 = {0, 8, 0, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_2 = {0, 8, 8, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_3 = {0, 8, 16, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_PDU_4 = {0, 8, 24, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_ECU_Temp_PDU_1.unbuild(Val);
@@ -1469,38 +1469,38 @@ struct STOS_CAN_PDU_PDU_Status : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x226;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_L_1 = {0, 1, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_R_1 = {0, 1, 1, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_BOTS_Diag_1 = {0, 1, 2, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_BSPD_Shutdown_Out = {0, 1, 3, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Cockpit_Diag_1 = {0, 1, 4, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Crash_Diag = {0, 1, 5, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_1 = {0, 1, 6, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_10 = {0, 1, 7, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_11 = {0, 1, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_12 = {0, 1, 9, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_13 = {0, 1, 10, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_14 = {0, 1, 11, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_15 = {0, 1, 12, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_16 = {0, 1, 13, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_17 = {0, 1, 14, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_18 = {0, 1, 15, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_19 = {0, 1, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_2 = {0, 1, 17, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_3 = {0, 1, 18, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_4 = {0, 1, 19, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_5 = {0, 1, 20, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_6 = {0, 1, 21, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_7 = {0, 1, 22, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_8 = {0, 1, 23, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_9 = {0, 1, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_1 = {0, 1, 25, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_2 = {0, 1, 26, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Shutdown_Cockpit = {0, 1, 27, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Fuel_Pump_Signal = {0, 1, 28, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_L = {0, 1, 29, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_R = {0, 1, 30, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_Pump_Signal = {0, 1, 31, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_L_1 = {0, 1, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_CH_Mainhoop_Diag_R_1 = {0, 1, 1, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_BOTS_Diag_1 = {0, 1, 2, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_BSPD_Shutdown_Out = {0, 1, 3, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Cockpit_Diag_1 = {0, 1, 4, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Crash_Diag = {0, 1, 5, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_1 = {0, 1, 6, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_10 = {0, 1, 7, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_11 = {0, 1, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_12 = {0, 1, 9, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_13 = {0, 1, 10, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_14 = {0, 1, 11, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_15 = {0, 1, 12, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_16 = {0, 1, 13, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_17 = {0, 1, 14, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_18 = {0, 1, 15, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_19 = {0, 1, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_2 = {0, 1, 17, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_3 = {0, 1, 18, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_4 = {0, 1, 19, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_5 = {0, 1, 20, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_6 = {0, 1, 21, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_7 = {0, 1, 22, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_8 = {0, 1, 23, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Fuse_Status_9 = {0, 1, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_1 = {0, 1, 25, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Relais_Status_2 = {0, 1, 26, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Shutdown_Cockpit = {0, 1, 27, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Fuel_Pump_Signal = {0, 1, 28, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_L = {0, 1, 29, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Reserve_Signal_R = {0, 1, 30, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Pump_Signal = {0, 1, 31, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_CH_Mainhoop_Diag_L_1.unbuild(Val);
@@ -1556,9 +1556,9 @@ struct STOS_CAN_PDU_Pitot : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x232;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_AE_Pitot_1 = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_AE_Pitot_2 = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_AE_Pitot_3 = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_AE_Pitot_1 = {0, 16, 0, 0, 1, 17.5, -8.75};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_AE_Pitot_2 = {0, 16, 16, 0, 1, 17.5, -8.75};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_AE_Pitot_3 = {0, 16, 32, 0, 1, 17.5, -8.75};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_AE_Pitot_1.unbuild(Val);
@@ -1585,8 +1585,8 @@ struct STOS_CAN_PDU_RAS_PWM : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x161;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_L = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_R = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_L = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_PWM_R = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_RAS_PWM_L.unbuild(Val);
@@ -1612,9 +1612,9 @@ struct STOS_CAN_PDU_RAS_Status_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x234;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Angle = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_L = {0, 1, 15, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_R = {0, 1, 14, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Angle = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_L = {0, 1, 15, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_RAS_Homing_R = {0, 1, 14, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_RAS_Angle.unbuild(Val);
@@ -1641,8 +1641,8 @@ struct STOS_CAN_PDU_RCU_ECU_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x236;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_1 = {0, 8, 0, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_RCU_2 = {0, 8, 8, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_ECU_Temp_RCU_1.unbuild(Val);
@@ -1668,10 +1668,10 @@ struct STOS_CAN_PDU_RCU_Test_A : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x165;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_1 = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_2 = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_3 = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_4 = {0, 16, 48, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_1 = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_2 = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_3 = {0, 16, 32, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_4 = {0, 16, 48, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_ZZ_Test_RCU_1.unbuild(Val);
@@ -1699,10 +1699,10 @@ struct STOS_CAN_PDU_RCU_Test_B : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x166;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_5 = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_6 = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_7 = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_8 = {0, 16, 48, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_5 = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_6 = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_7 = {0, 16, 32, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_8 = {0, 16, 48, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_ZZ_Test_RCU_5.unbuild(Val);
@@ -1730,8 +1730,8 @@ struct STOS_CAN_PDU_RCU_Test_C : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x167;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_10 = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_9 = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_10 = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_RCU_9 = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_ZZ_Test_RCU_10.unbuild(Val);
@@ -1757,8 +1757,8 @@ struct STOS_CAN_PDU_Rocker_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x238;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FL = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FR = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FL = {0, 16, 0, 0, 1, 20, -5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_FR = {0, 16, 16, 0, 1, 20, -5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Rocker_FL.unbuild(Val);
@@ -1784,8 +1784,8 @@ struct STOS_CAN_PDU_Rocker_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x239;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RL = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RR = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RL = {0, 16, 0, 0, 1, 20, -5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Rocker_RR = {0, 16, 16, 0, 1, 20, -5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Rocker_RL.unbuild(Val);
@@ -1811,12 +1811,12 @@ struct STOS_CAN_PDU_Shift_Clutch : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x170;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_DigIn = {0, 1, 21, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_LaunchC = {0, 1, 20, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_PT_Shift_Force_Sensor = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Clutch_DigIn = {0, 1, 23, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Clutch_LaunchC = {0, 1, 22, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Shift_Force_on_off = {0, 1, 19, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_DigIn = {0, 1, 21, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Gearshift_LaunchC = {0, 1, 20, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_PT_Shift_Force_Sensor = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Clutch_DigIn = {0, 1, 23, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Clutch_LaunchC = {0, 1, 22, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Shift_Force_on_off = {0, 1, 19, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_PT_Gearshift_DigIn.unbuild(Val);
@@ -1846,7 +1846,7 @@ struct STOS_CAN_PDU_Steering_Whl_Angle : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x172;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Steering_Wheel_Angle = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Steering_Wheel_Angle = {0, 16, 0, 0, 1, 75, -187.5};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Steering_Wheel_Angle.unbuild(Val);
@@ -1871,7 +1871,7 @@ struct STOS_CAN_PDU_SWCU_ECU_Temp : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x244;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_SWCU = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_ECU_Temp_SWCU = {0, 8, 0, 0, 0, 100, -50};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_ECU_Temp_SWCU.unbuild(Val);
@@ -1896,9 +1896,9 @@ struct STOS_CAN_PDU_SWCU_Oh_Shit : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x175;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_EL_INCR_1 = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_INCR_2 = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Oh_Shit = {0, 1, 23, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_EL_INCR_1 = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_INCR_2 = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Oh_Shit = {0, 1, 23, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_EL_INCR_1.unbuild(Val);
@@ -1925,12 +1925,12 @@ struct STOS_CAN_PDU_SWCU_Switches : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x099;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_AE_Switch_1 = {0, 1, 2, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_EL_Radio_Switch = {0, 1, 3, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Shift_Down = {0, 1, 4, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Shift_Up = {0, 1, 5, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_ARH_switch_1 = {0, 1, 6, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_SP_Clutch_Signal = {0, 1, 7, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_AE_Switch_1 = {0, 1, 2, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_EL_Radio_Switch = {0, 1, 3, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Shift_Down = {0, 1, 4, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Shift_Up = {0, 1, 5, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_ARH_switch_1 = {0, 1, 6, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_SP_Clutch_Signal = {0, 1, 7, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_AE_Switch_1.unbuild(Val);
@@ -1960,9 +1960,9 @@ struct STOS_CAN_PDU_Test_FCU_A : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x177;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_1 = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_2 = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_3 = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_1 = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_2 = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_3 = {0, 16, 32, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_ZZ_Test_FCU_1.unbuild(Val);
@@ -1989,9 +1989,9 @@ struct STOS_CAN_PDU_Test_FCU_B : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x178;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_4 = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_5 = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_6 = {0, 16, 32, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_4 = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_5 = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_ZZ_Test_FCU_6 = {0, 16, 32, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_ZZ_Test_FCU_4.unbuild(Val);
@@ -2018,12 +2018,12 @@ struct STOS_CAN_PDU_Water_Oil_Status_Control : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x246;
 	uint16_t _size;
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_Fan_Percent = {0, 8, 0, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Oil_PWM = {0, 8, 8, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_1_PWM = {0, 8, 16, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_2_PWM = {0, 8, 24, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_1_Percent = {0, 8, 32, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_2_Percent = {0, 8, 40, 0, 0};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_Fan_Percent = {0, 8, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Oil_PWM = {0, 8, 8, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_1_PWM = {0, 8, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_2_PWM = {0, 8, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_1_Percent = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_2_Percent = {0, 8, 40, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_PT_Oil_Fan_Percent.unbuild(Val);
@@ -2053,8 +2053,8 @@ struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x180;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FL = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FR = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FL = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_FR = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Wheel_Speed_FL.unbuild(Val);
@@ -2080,8 +2080,8 @@ struct STOS_CAN_PDU_Whl_Speed_R : public StallardOSCanMessage
 public:
 	static const uint16_t _id = 0x181;
 	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RL = {0, 16, 0, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
-	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RR = {0, 16, 16, 0, 1};//init,bitcount,startbit,rowcount,isMotorola 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RL = {0, 16, 0, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Wheel_Speed_RR = {0, 16, 16, 0, 1, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_SP_Wheel_Speed_RL.unbuild(Val);

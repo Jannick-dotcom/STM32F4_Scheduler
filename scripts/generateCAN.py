@@ -37,6 +37,9 @@ for x in infileArray: #Go through every line
         startingAtBit = str(lineArray[10]) #get the Bit at which the signal starts
         canType = str(lineArray[5])
         byteOrder = str(lineArray[12])
+        factor = str(lineArray[15])
+        offset = str(lineArray[16])
+        byteOrderBool = 0
 
         if(not rowcounter.__contains__("= 0x")):
             rowcounter = "0"
@@ -68,7 +71,7 @@ for x in infileArray: #Go through every line
 
                     outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
                     outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
-                    outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
+                    outfileStructs.write("\t\tif(temp % 8 != 0) temp = temp / 8 + 1;\n\t\telse temp = temp / 8;\n")
                     outfileStructs.write("\t\tif(temp > 8) temp = 8;\n")
                     outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
 
@@ -93,8 +96,10 @@ for x in infileArray: #Go through every line
             if(prevSigName != signame): #if new signal
 
                 bitcountWholeMessage += bitcountIn
-                if(byteOrder == "Motorola" and bitcountIn % 8 == 0 and bitcountIn > 8):
+                if(byteOrder == "Motorola" and bitcountIn % 8 == 0 and bitcountIn > 8):########################################################################
                     startingAtBit = int(startingAtBit) - int(bitcountIn - 8)
+                    byteOrderBool = 1
+
                 if(int(startingAtBit) + bitcountIn > 64):
                     print("Something is wrong with bit positions of PDU:" + msgname)
 
@@ -115,7 +120,7 @@ for x in infileArray: #Go through every line
                 if(signed == "Unsigned"):      #is unsigned?
                     outfileStructs.write("u")
                 outfileStructs.write("int"+ str(bitcount) + "_t> ")
-                outfileStructs.write(signame + " = {" + initVal + ", " + str(bitcountIn) + ", " + str(startingAtBit) + ", " + str(rowcounter) + "};//init,bitcount,startbit,rowcount \n") #write a signal
+                outfileStructs.write(signame + " = {" + initVal + ", " + str(bitcountIn) + ", " + str(startingAtBit) + ", " + str(rowcounter) + ", " + str(byteOrderBool) + ", " + str(factor) + ", " + str(offset) + "};//init,bitcount,startbit,rowcount,isMotorola,factor,offset \n") #write a signal
                 prevSigName = signame
             else:
                 print("Something is wrong with Signals of PDU:" + msgname + "!!!")
