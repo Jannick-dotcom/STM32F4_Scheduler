@@ -12,7 +12,7 @@ StallardOSGPIO StallardOSExtAnalog::cs1(5, PORTB, Output, false);
 StallardOSGPIO StallardOSExtAnalog::cs2(6, PORTB, Output, false);
 
 StallardOSGPIO StallardOSExtAnalog::drdy1(7, PORTB, Output, false);
-StallardOSGPIO StallardOSExtAnalog::drdy2(7, PORTB, Output, false);
+StallardOSGPIO StallardOSExtAnalog::drdy2(8, PORTB, Output, false);
 
 StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber) : spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10))
 {
@@ -121,7 +121,7 @@ uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
     {
         while (drdy1 == true) //Wait for the drdy pin or timeout
         {
-            if (usCurrentTimeSinceStart - timestart > 100000)
+            if ((usCurrentTimeSinceStart - timestart) > 100000)
             {
                 return 0; //No reading error!!!!
             }
@@ -131,7 +131,7 @@ uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
     {
         while (drdy2 == true) //Wait for the drdy pin or timeout
         {
-            if (usCurrentTimeSinceStart - timestart > 100000)
+            if ((usCurrentTimeSinceStart - timestart) > 100000)
             {
                 return 0; //No reading error!!!!
             }
