@@ -14,10 +14,11 @@ StallardOSGPIO StallardOSExtAnalog::cs2(6, PORTB, Output, false);
 StallardOSGPIO StallardOSExtAnalog::drdy1(7, PORTB, Input, false);
 StallardOSGPIO StallardOSExtAnalog::drdy2(8, PORTB, Input, false);
 
-StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber) : spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10))
+StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber, StallardOSSPI *spihandle) //: spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10))
 {
     if (adcNumber > 2 || channel > 15 || adcNumber == 0)
         return;
+    this->spihandle = spihandle;
     this->channel = channel;
     this->adcNumber = adcNumber;
 
@@ -57,7 +58,7 @@ void StallardOSExtAnalog::registerWrite(uint8_t address, uint8_t value)
         cs1 = 0;
     else if (adcNumber == 2)
         cs2 = 0;
-    spihandle.send(data, sizeof(data));
+    spihandle->send(data, sizeof(data));
     if (adcNumber == 1)
         cs1 = 1;
     else if (adcNumber == 2)
@@ -75,8 +76,8 @@ uint8_t StallardOSExtAnalog::registerRead(uint8_t address)
         cs1 = 0;
     else if (adcNumber == 2)
         cs2 = 0;
-    spihandle.send(&data, sizeof(data));
-    spihandle.receive(&data, sizeof(data), HAL_MAX_DELAY);
+    spihandle->send(&data, sizeof(data));
+    spihandle->receive(&data, sizeof(data), HAL_MAX_DELAY);
     if (adcNumber == 1)
         cs1 = 1;
     else if (adcNumber == 2)
@@ -110,7 +111,7 @@ uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
         cs1 = 0;
     else if (adcNumber == 2)
         cs2 = 0;
-    spihandle.send(&dataout, sizeof(dataout)); //Send pulse convert command
+    spihandle->send(&dataout, sizeof(dataout)); //Send pulse convert command
     if (adcNumber == 1)
         cs1 = 1;
     else if (adcNumber == 2)
@@ -142,8 +143,8 @@ uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
     else if (adcNumber == 2)
         cs2 = 0;
     dataout = 0b00110000; //channel read command
-    spihandle.send(&dataout, sizeof(dataout));
-    spihandle.receive(datain, sizeof(datain), HAL_MAX_DELAY); //Receive a 2 byte Analog Value
+    spihandle->send(&dataout, sizeof(dataout));
+    spihandle->receive(datain, sizeof(datain), HAL_MAX_DELAY); //Receive a 2 byte Analog Value
     if (adcNumber == 1)
         cs1 = 1;
     else if (adcNumber == 2)

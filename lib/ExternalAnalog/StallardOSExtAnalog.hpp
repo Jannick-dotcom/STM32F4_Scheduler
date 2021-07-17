@@ -15,7 +15,7 @@ extern "C" void StallardOSGeneralFaultHandler();
 class StallardOSExtAnalog
 {
 private:
-    StallardOSSPI spihandle;
+    StallardOSSPI *spihandle;
     uint8_t channel;
     uint8_t adcNumber;
     
@@ -44,7 +44,7 @@ public:
  * @param adcNumber which adc to use
  * @param channel Number of channel
  */
-    StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber);
+    StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber, StallardOSSPI *spihandle);
 
 /**
  * get a analog reading.
