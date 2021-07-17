@@ -53,7 +53,7 @@ public:
     uint64_t build()
     {
         uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1)) << (uint64_t)startbit;
-        val = val * factor + offset;
+        // val = val * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
             uint8_t *arr = (uint8_t*)&val;
@@ -72,7 +72,7 @@ public:
     void unbuild(const uint64_t Val)
     {
         rawValue = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
-        rawValue = rawValue * factor + offset;
+        // rawValue = rawValue * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
             uint8_t *arr = (uint8_t*)&rawValue;

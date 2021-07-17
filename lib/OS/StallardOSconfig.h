@@ -9,7 +9,7 @@
 #define contextSwitch
 #define useFPU
 
-#define sizeStack 200      //300 * 4 Byte (Stack size for Tasks)
+#define sizeStack 2500      //300 * 4 Byte (Stack size for Tasks)
 #define countTasks 5
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 

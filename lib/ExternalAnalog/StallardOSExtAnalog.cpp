@@ -11,8 +11,8 @@ StallardOSGPIO StallardOSExtAnalog::reset2(3, PORTD, Output, false);
 StallardOSGPIO StallardOSExtAnalog::cs1(5, PORTB, Output, false);
 StallardOSGPIO StallardOSExtAnalog::cs2(6, PORTB, Output, false);
 
-StallardOSGPIO StallardOSExtAnalog::drdy1(7, PORTB, Output, false);
-StallardOSGPIO StallardOSExtAnalog::drdy2(8, PORTB, Output, false);
+StallardOSGPIO StallardOSExtAnalog::drdy1(7, PORTB, Input, false);
+StallardOSGPIO StallardOSExtAnalog::drdy2(8, PORTB, Input, false);
 
 StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber) : spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10))
 {
