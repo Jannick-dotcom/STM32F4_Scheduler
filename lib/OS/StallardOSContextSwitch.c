@@ -9,82 +9,8 @@ extern struct function_struct *taskMainStruct;
 extern struct function_struct *nextTask;
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
-volatile uint32_t sysTickFreq = defaultSysTickFreq; //11Hz - ... how often context switches
-volatile uint32_t sysTickMicrosPerInt = 100;
 
 volatile uint64_t taskMainTime = 0; //Experimental
-
-/**
- * No Task available.
- *
- * @param
- * @return
- *//* code */
-__attribute__((always_inline)) inline void StallardOS_noTask()
-{
-    // asm("MOV R7, #0");
-    asm("SVC #0");
-}
-
-/**
- * Get super Rights
- *
- * @param
- * @return
- */
-__attribute__((always_inline)) inline void StallardOS_sudo()
-{
-    // asm("MOV R7, #3");
-    asm("SVC #3");
-}
-
-/**
- * Release super Rights.
- *
- * @param
- * @return
- */
-__attribute__((always_inline)) inline void StallardOS_unSudo()
-{
-    // asm("MOV R7, #4");
-    asm("SVC #4");
-}
-
-/**
- * Start the OS.
- *
- * @param
- * @return
- */
-__attribute__((always_inline)) inline void StallardOS_start()
-{
-    // asm("MOV R7, #5");
-    asm("SVC #5");
-}
-
-/**
- * Delay a Task.
- *
- * @param
- * @return
- */
-__attribute__((always_inline)) inline void StallardOS_delay()
-{
-    // asm("MOV R7, #2");
-    asm("SVC #2");
-}
-
-/**
- * end a Task.
- *
- * @param
- * @return
- */
-__attribute__((always_inline)) inline void StallardOS_endTask()
-{
-    // asm("MOV R7, #1");
-    asm("SVC #1");
-}
 
 /**
  * Jump to Bootloader.
@@ -94,8 +20,8 @@ __attribute__((always_inline)) inline void StallardOS_endTask()
  */
 __attribute__((always_inline)) inline void StallardOS_goBootloader()
 {
-    // asm("MOV R7, #6");
-    asm("SVC #6");
+    // __ASM volatile("MOV R7, #6");
+    __ASM volatile("SVC #1");
 }
 
 /**
@@ -106,7 +32,7 @@ __attribute__((always_inline)) inline void StallardOS_goBootloader()
  */
 __attribute__((always_inline)) inline void enable_interrupts()
 {
-    asm("CPSIE I"); //Instruction for enabling interrupts
+    __ASM volatile("CPSIE I"); //Instruction for enabling interrupts
 }
 
 /**
@@ -117,7 +43,7 @@ __attribute__((always_inline)) inline void enable_interrupts()
  */
 __attribute__((always_inline)) inline void disable_interrupts() 
 {
-    asm("CPSID I"); //Instruction for disabling interrupts
+    __ASM volatile("CPSID I"); //Instruction for disabling interrupts
 }
 
 /**
@@ -130,17 +56,6 @@ __attribute__((always_inline)) inline void pendPendSV()
 {
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
-
-/**
- * Configure the systick timer to fire every "ticks".
- *
- * @param
- * @return
- */
-// __attribute__((always_inline)) inline void StallardOS_SysTick_Config(uint32_t ticks)
-// {
-//     SysTick_Config(ticks);
-// }
 
 void jumpToBootloader(void) 
 {
@@ -183,13 +98,13 @@ void findNextFunction()
             continue;
         }
 
-        if (temp->continueInUS <= sysTickMicrosPerInt)
+        if (temp->continueInUS <= 1000)//sysTickMicrosPerInt)
         {
             temp->continueInUS = 0;
         }
         else
         {
-            temp->continueInUS -= sysTickMicrosPerInt; //dekrementieren
+            temp->continueInUS -= 1000;//sysTickMicrosPerInt; //dekrementieren
         }
         
         if (temp->executable && temp->continueInUS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
@@ -228,13 +143,9 @@ void findNextFunction()
 #ifdef contextSwitch
 void taskOnEnd(void)
 {
-    disable_interrupts();
     currentTask->used = 0;
-    currentTask->executable = 0;
-    currentTask->State = NEW; 
     currentTask = taskMainStruct;
-    enable_interrupts();
-    StallardOS_endTask(); //Create a system call to the SVC Handler
+    pendPendSV();
 }
 #endif
 
@@ -252,39 +163,36 @@ __attribute__((always_inline)) inline void switchTask(void)
 
     if ((currentTask->State == RUNNING)) //Hier Task anhalten
     {
-        asm("MRS r0, PSP");         //Get Process Stack Pointer
-        // asm("MRS r3, CONTROL");
-        asm("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
-        #ifdef useFPU
-        asm("VSTMDB r0!, {s16-s31}");
-        #endif
-        // asm("MSR PSP, r0"); //Set Modified Stack pointer
-        asm("MOV %0, r0" : "=r"(currentTask->Stack)); //Save Stack pointer
+        __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
+        __ASM volatile("ISB");
 
+        __ASM volatile("TST r14, #0x10");
+        __ASM volatile("IT eq");
+        __ASM volatile("VSTMDBeq r0!, {s16-s31}");
+        
+        __ASM volatile("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
+
+        __ASM volatile("LDR r1, =currentTask");
+        __ASM volatile("LDR r2, [r1]");
+        __ASM volatile("STR r0, [r2]"); //Save stack pointer
+        __ASM volatile("DSB");
+        __ASM volatile("ISB");
         currentTask->State = PAUSED; //Save function state
-        // if(&currentTask->vals[sizeStack] - currentTask->Stack > currentTask->stackUsage) 
-        // {
-        //     currentTask->stackUsage = &currentTask->vals[sizeStack] - currentTask->Stack;
-        // }
         currentTask = nextTask;
     }
 
     if (currentTask->State == NEW) //New Task
     {
-        // asm("MOV r4, #0");  //R0
-        // asm("MOV r5, #1");  //R1
-        // asm("MOV r6, #2");  //R2
-        // asm("MOV r7, #3");  //R3
-        // asm("MOV r8, #12"); //R12
-        // asm("MOV r9, %0"  : : "r"((uint32_t)taskOnEnd)); //LR
-        asm("MOV r9, #0"); //LR (Temporär)
-        asm("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier)); //PC
-        asm("MOV r11, #0x01000000");                                    //XPSR
-        asm("MOV r14, #0xFFFFFFFD");                                    //Default return value
+        __ASM volatile("MOV r9, %0"  : : "r"((uint32_t)taskOnEnd)); //LR
+        __ASM volatile("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier)); //PC
+        __ASM volatile("MOV r11, #0x01000000");                                    //XPSR
+        __ASM volatile("MOV r14, #0xFFFFFFFD");                                    //Default return value
 
-        asm("MOV r0, %0"  : : "r"(currentTask->Stack)); //get saved Stack pointer
-        asm("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
-        asm("MSR PSP, r0");             //set PSP
+        __ASM volatile("LDR r1, =currentTask");
+        __ASM volatile("LDR r2, [r1]");
+        __ASM volatile("LDR r0, [r2]");
+        __ASM volatile("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
+        __ASM volatile("MSR PSP, r0");             //set PSP
 
         currentTask->State = RUNNING; //Save state as running
         currentTask->lastStart = usCurrentTimeSinceStart;
@@ -292,12 +200,18 @@ __attribute__((always_inline)) inline void switchTask(void)
 
     if (currentTask->State == PAUSED) //Hier Task fortsetzen
     {
-        asm("MOV r0, %0" : : "r"(currentTask->Stack)); //get saved Stack pointer
-        #ifdef useFPU
-        asm("VLDMIA r0!, {s16-s31}");
-        #endif
-        asm("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
-        asm("MSR PSP, r0");           //set PSP
+        __ASM volatile("LDR r1, =currentTask");
+        __ASM volatile("LDR r2, [r1]");
+        __ASM volatile("LDR r0, [r2]");
+
+        __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
+
+        __ASM volatile("TST r14, #0x10");
+        __ASM volatile("IT eq");
+        __ASM volatile("VLDMIAeq r0!, {s16-s31}");
+        
+        __ASM volatile("MSR PSP, r0");           //set PSP
+        __ASM volatile("ISB");
         
         currentTask->State = RUNNING; //Save state as running
         nextTask = NULL;
@@ -317,80 +231,23 @@ void SVC_Handler()
     // disable_interrupts();
     uint8_t handleMode;
 
-    asm("TST    LR, #4");
-    asm("ITE    EQ");
-	asm("MRSEQ	R0, MSP");
-	asm("MRSNE	R0, PSP");
+    __ASM volatile("TST    LR, #4");
+    __ASM volatile("ITE    EQ");
+	__ASM volatile("MRSEQ	R0, MSP");
+	__ASM volatile("MRSNE	R0, PSP");
 
-	asm("LDR	R0, [R0, #24]");
-	asm("LDRB	R0, [R0, #-2]");
-    asm("MOV    %0, r0" : "=r"(handleMode));
+	__ASM volatile("LDR	R0, [R0, #24]");
+	__ASM volatile("LDRB	R0, [R0, #-2]");
+    __ASM volatile("MOV    %0, r0" : "=r"(handleMode));
 
     switch (handleMode)
     {
-    case 0: //No Task
-        currentTask = NULL;
-        // switchTask();
-        // asm("bx r14");
-        pendPendSV();
-        break;
+        case 1: //Enter Bootloader
+            jumpToBootloader();
+            break;
 
-    case 1: //Task has Ended
-        currentTask = NULL;
-        // switchTask();
-        // asm("bx r14");
-        pendPendSV();
-        break;
-
-    case 2: //Delay
-        nextTask = NULL;
-        // switchTask();
-        // asm("bx r14");
-        pendPendSV();
-        break;
-
-    case 3: //Switch to privileged mode
-        asm("MOV R0, r14");
-        asm("AND R0, #0xFFFFFFF1");
-        asm("MOV r14, R0");
-        // asm("ISB"); //After modifying the control Register flush all instructions (I don't understand why but ok)
-        break;
-
-    case 4: //Switch to unprivileged mode
-        asm("MOV R0, r14");
-        asm("ORR R0, #1");
-        asm("MOV r14, R0");
-        // asm("ISB"); //After modifying the control Register flush all instructions (I don't understand why but ok)
-        break;
-
-    case 5: //Start the os
-        SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
-        asm("DSB");
-        asm("ISB");
-        // StallardOS_SetSysClock(168);
-        SysTick_Config(sysTickTicks);
-        NVIC_SetPriority(SysTick_IRQn, 0x00);
-        NVIC_SetPriority(PendSV_IRQn, 0xFF);
-
-        NVIC_EnableIRQ(PendSV_IRQn);
-        NVIC_EnableIRQ(SysTick_IRQn);
-        NVIC_EnableIRQ(SVCall_IRQn);
-        NVIC_EnableIRQ(FPU_IRQn);
-        NVIC_EnableIRQ(UsageFault_IRQn);
-        NVIC_EnableIRQ(BusFault_IRQn);
-        NVIC_EnableIRQ(MemoryManagement_IRQn);
-        NVIC_EnableIRQ(NonMaskableInt_IRQn);
-        // switchTask();
-        // asm("bx r14");
-        pendPendSV();
-        break;
-
-    case 6: //Enter Bootloader
-        jumpToBootloader();
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
     // enable_interrupts(); //Enable all interrupts
 }
@@ -408,18 +265,14 @@ void SysTick_Handler(void) //In C Language
     disable_interrupts();
 
     usCurrentTimeSinceStart += 10;
-    if(usCurrentTimeSinceStart % (sysTickFreq / 1000) == 0) //Every millisecond
+    if((usCurrentTimeSinceStart % 1000) == 0) //Every millisecond
     {
         HAL_IncTick();
 #ifdef contextSwitch
         if(currentTask != NULL)
         {
-            // if(currentTask == taskMainStruct && taskMainStruct != NULL) 
-            // {
-            //     taskMainTime += sysTickMillisPerInt; //Auslastungsberechnung
-            // }
             findNextFunction();
-            if(currentTask != nextTask && currentTask != NULL)
+            if(currentTask != nextTask)
             {
                 pendPendSV(); //If nextTask is not this task, set the PendSV to pending
             }
@@ -436,11 +289,11 @@ void SysTick_Handler(void) //In C Language
  * @return
  */
 #ifdef contextSwitch
-void PendSV_Handler()
+__attribute__( ( naked ) ) void PendSV_Handler()
 {
     disable_interrupts();
     switchTask();
     enable_interrupts(); //Enable all interrupts
-    // asm("bx r14");
+    __ASM volatile("bx r14");
 }
 #endif
