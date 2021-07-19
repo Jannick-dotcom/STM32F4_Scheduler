@@ -40,6 +40,7 @@ typedef enum
 struct function_struct
 {
 #ifdef contextSwitch
+  volatile uint32_t *Stack;             //Stack pointer
   uint32_t vals[sizeStack];
 #endif
   //Verkettete Liste
@@ -68,7 +69,6 @@ struct function_struct
   uint64_t lastStart;
   // volatile uint32_t stackUsage;
   volatile taskState State;             //Status des Tasks
-  volatile uint32_t *Stack;             //Stack pointer
   volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore
   volatile uint16_t *semVal;
 #endif
