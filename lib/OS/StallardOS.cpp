@@ -9,14 +9,13 @@ struct function_struct *currentTask = nullptr;
 struct function_struct *nextTask = nullptr;
 struct function_struct *taskMainStruct = nullptr;
 
-extern "C" void StallardOS_SetSysClock(uint8_t clockspeed);
-extern "C" void StallardOS_start();
-extern "C" void StallardOS_delay();
-extern "C" void StallardOS_noTask();
-extern "C" void StallardOS_sudo();
-extern "C" void StallardOS_unSudo();
-extern "C" void StallardOS_delay();
-extern "C" void StallardOS_endTask();
+// extern "C" void StallardOS_SetSysClock(uint8_t clockspeed);
+// extern "C" void StallardOS_start();
+// extern "C" void StallardOS_noTask();
+// extern "C" void StallardOS_sudo();
+// extern "C" void StallardOS_unSudo();
+// extern "C" void StallardOS_delay();
+// extern "C" void StallardOS_endTask();
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
@@ -51,16 +50,17 @@ StallardOS::StallardOS()
   TCBsCreated = 0;
   //Für Context Switch
   createTCBs();
-  StallardOS_SetSysClock(168);
-  if(SystemCoreClock != 168000000)
+  StallardOS_SetSysClock(runFreq);
+  if(SystemCoreClock != (runFreq * 1000000))
   {
     asm("bkpt"); //Make a software breakpoint to stop the debugger here so we can check
   }
 #ifdef contextSwitch
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
+
   NVIC_EnableIRQ(SysTick_IRQn);
-  SysTick_Config((uint32_t)(SystemCoreClock / sysTickFreq));
+  SysTick_Config((uint32_t)(SystemCoreClock / defaultSysTickFreq));
 #else
   first_function_struct = taskMainStruct = addFunction(taskMain, -2, 255, 1);
   
@@ -306,7 +306,8 @@ void StallardOS::delay(uint32_t milliseconds)
   else
   {
     currentTask->continueInUS += (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-    StallardOS_delay();
+    nextTask = taskMainStruct;
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
   }
 }
 
@@ -327,7 +328,8 @@ void StallardOS::yield()
     if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
       currentTask->continueInUS = 0;
     else
-      StallardOS_delay();
+      nextTask = taskMainStruct;
+      SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
     currentTask->lastStart = usCurrentTimeSinceStart;
   }
@@ -374,14 +376,23 @@ void StallardOS::startOS(void)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
 #ifdef contextSwitch
-    NVIC_EnableIRQ(SVCall_IRQn);
+    SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+    asm("DSB");
+    asm("ISB");
+
     asm("MRS R0, MSP");
     asm("SUB R0, #200"); //Reserve some space for Handlers (200*4 Byte)
     asm("MSR PSP, R0");
-    asm("MOV R0, #3");
-    asm("MSR CONTROL, R0");
-    asm("ISB");
-    StallardOS_start();
+    
+    NVIC_SetPriority(SysTick_IRQn, 0xFF);
+    NVIC_SetPriority(PendSV_IRQn, 0xFF);
+
+    NVIC_EnableIRQ(PendSV_IRQn);
+    NVIC_EnableIRQ(SysTick_IRQn);
+    NVIC_EnableIRQ(SVCall_IRQn);
+    NVIC_EnableIRQ(FPU_IRQn);
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+
 #else
     while (SysTick_Config(SystemCoreClock / (uint32_t)1000)) //millisecond counter
       ;
