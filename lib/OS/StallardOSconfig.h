@@ -9,12 +9,12 @@
 #define contextSwitch
 #define useFPU
 
-#define sizeStack 2500      //300 * 4 Byte (Stack size for Tasks)
-#define countTasks 5
+#define sizeStack 500      //300 * 4 Byte (Stack size for Tasks)
+#define countTasks 6
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 
-// #define HSE_VALUE              25000000U /*!< Value of the External oscillator in Hz */
 #define externalOszillator (HSE_VALUE / 1000000) //[MHz]
+#define runFreq 168 //[MHz]
 
 // #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
 
