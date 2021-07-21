@@ -18,6 +18,7 @@
 
 // #define useSystickAltering  //Change the firing rate of Systick to maximize throughput
 
+#ifdef STM32F417xx
 #define CAN1_t_pin 0
 #define CAN1_r_pin 1
 #define CAN1_t_port PORTD
@@ -27,6 +28,14 @@
 #define CAN2_r_pin 12
 #define CAN2_t_port PORTB
 #define CAN2_r_port PORTB
+#endif
+
+#ifdef STM32F415xx
+#define CAN2_t_pin 13
+#define CAN2_r_pin 12
+#define CAN2_t_port PORTB
+#define CAN2_r_port PORTB
+#endif
 
 #define CAN_FIFO_size 200    //[Messages] should be enough for 1 second of storing
 

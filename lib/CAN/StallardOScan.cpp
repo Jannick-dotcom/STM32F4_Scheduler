@@ -11,6 +11,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     this->sem.take();
 #endif
     CAN_FilterTypeDef sFilterConfig;
+    #ifdef STM32F417xx
     if (port == StallardOSCAN1 && can1used == false)
     {
         CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFPP, nopull, GPIO_AF9_CAN1);
@@ -19,7 +20,9 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         __CAN1_CLK_ENABLE();
         can1used = true;
     }
-    else if (port == StallardOSCAN2 && can2used == false)
+    else 
+    #endif
+    if (port == StallardOSCAN2 && can2used == false)
     {
         CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFPP, nopull, GPIO_AF9_CAN2);
         CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFPP, nopull, GPIO_AF9_CAN2);
