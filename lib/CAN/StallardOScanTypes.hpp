@@ -52,22 +52,22 @@ public:
     }
     uint64_t build()
     {
-        uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1)) << (uint64_t)startbit;
+        uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1));
         // val = val * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
             uint64_t tempVal = val;
             uint64_t tempOut = 0;
-            for(uint8_t i = 0; i < countOfBits/8; i--)
+            for(uint8_t i = 0; i < countOfBits/8; i++)
             {
                 tempOut |= (tempVal & (0xFF)) << (((countOfBits/8)-i-1) * 8);
                 tempVal = tempVal >> 8;
             }
-            return tempOut;
+            return tempOut << (uint64_t)startbit;
         }
         else
         {
-            return val;
+            return val << (uint64_t)startbit;
         }
     }
     void unbuild(const uint64_t Val)
