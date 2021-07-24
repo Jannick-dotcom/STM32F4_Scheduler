@@ -6,7 +6,7 @@
 class StallardOS
 {
 private:
-  struct function_struct taskArray[countTasks];
+  struct function_struct taskArray[countTasks + 2];
   struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint8_t TCBsCreated;
 

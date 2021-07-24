@@ -97,15 +97,6 @@ void findNextFunction()
             temp = temp->next;
             continue;
         }
-
-        if (temp->continueInUS <= 1000)//sysTickMicrosPerInt)
-        {
-            temp->continueInUS = 0;
-        }
-        else
-        {
-            temp->continueInUS -= 1000;//sysTickMicrosPerInt; //dekrementieren
-        }
         
         if (temp->executable && temp->continueInUS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
@@ -271,6 +262,22 @@ void SysTick_Handler(void) //In C Language
 #ifdef contextSwitch
         if(currentTask != NULL)
         {
+            struct function_struct *temp = currentTask->next;
+            do
+            {
+                //Handle delay times
+                if (temp->continueInUS <= 1000)
+                {
+                    temp->continueInUS = 0;
+                }
+                else
+                {
+                    temp->continueInUS -= 1000; //dekrementieren
+                }
+                temp = temp->next;
+            }
+            while (temp != currentTask);
+
             findNextFunction();
             if(currentTask != nextTask)
             {

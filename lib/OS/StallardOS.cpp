@@ -19,6 +19,7 @@ struct function_struct *taskMainStruct = nullptr;
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
+extern "C" void findNextFunction();
 
 /**
  * Waste Time if all tasks are in delay.
@@ -75,12 +76,12 @@ StallardOS::StallardOS()
  */
 void StallardOS::createTCBs()
 {
-  if (TCBsCreated >= countTasks) //Wenn schon genug TCBs erstellt wurden, nicht nochmal erstellen
+  if (TCBsCreated >= countTasks + 2) //Wenn schon genug TCBs erstellt wurden, nicht nochmal erstellen
   {
     return;
   }
 
-  for (uint8_t i = 0; i < countTasks; i++)
+  for (uint8_t i = 0; i < countTasks + 2; i++)
   {
     struct function_struct *temp;
     temp = &taskArray[i]; //new struct function_struct;
@@ -306,7 +307,8 @@ void StallardOS::delay(uint32_t milliseconds)
   else
   {
     currentTask->continueInUS += (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-    nextTask = taskMainStruct;
+    // nextTask = taskMainStruct;
+    findNextFunction();
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
   }
 }
@@ -328,7 +330,8 @@ void StallardOS::yield()
     if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
       currentTask->continueInUS = 0;
     else
-      nextTask = taskMainStruct;
+      // nextTask = taskMainStruct;
+      findNextFunction();
       SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
     currentTask->lastStart = usCurrentTimeSinceStart;
