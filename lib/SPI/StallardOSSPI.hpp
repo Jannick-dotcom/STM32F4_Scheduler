@@ -8,7 +8,7 @@
 #include "StallardOSsem.hpp"
 #include "StallardOSGPIO.hpp"
 
-extern "C" void StallardOSGeneralFaultHandler();
+extern "C" inline void StallardOSGeneralFaultHandler();
 
 typedef enum SPIBauds
 {
@@ -27,7 +27,7 @@ private:
 public:
     StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck);
     void send(uint8_t *data, uint16_t size);
-    void receive(uint8_t *data, uint16_t size, uint16_t timeout);
+    void receive(uint8_t *data, uint16_t size, uint32_t timeout);
 };
 
 #endif

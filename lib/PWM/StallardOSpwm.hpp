@@ -9,7 +9,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 
-extern "C" void StallardOSGeneralFaultHandler();
+extern "C" inline void StallardOSGeneralFaultHandler();
 
 typedef enum PWMChannel
 {

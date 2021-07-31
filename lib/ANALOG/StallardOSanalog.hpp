@@ -7,7 +7,7 @@
 #include "StallardOSsem.hpp"
 #include "StallardOSGPIO.hpp"
 
-extern "C" void StallardOSGeneralFaultHandler();
+extern "C" inline void StallardOSGeneralFaultHandler();
 
 typedef enum StallardOSADC
 {

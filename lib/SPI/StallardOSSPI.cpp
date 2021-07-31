@@ -61,7 +61,7 @@ void StallardOSSPI::send(uint8_t *data, uint16_t size)
 #endif
 }
 
-void StallardOSSPI::receive(uint8_t *data, uint16_t size, uint16_t timeout)
+void StallardOSSPI::receive(uint8_t *data, uint16_t size, uint32_t timeout)
 {
 #ifdef contextSwitch
     sem.take();
