@@ -21,8 +21,8 @@ public:
     uint8_t used = 0;
     uint64_t timestamp = -1; //Set Timestamp to maximum
     uint8_t dlc = 0;
-    uint16_t ID;         //Just 11 Bit !!!!
-    volatile uint64_t Val;            //Up to 8 Bytes
+    uint16_t ID = 0;         //Just 11 Bit !!!!
+    volatile uint64_t Val = 0;            //Up to 8 Bytes
 };
 
 template <typename valueTemplate>
@@ -32,19 +32,19 @@ struct CAN_Signal
     const uint16_t startbit;
     const uint8_t rowcount;
     const uint8_t isMotorola;
-    const float factor;
-    const float offset;
+    // const float factor;
+    // const float offset;
 public:
     volatile valueTemplate rawValue;
-    volatile float physValue;
+    // volatile float physValue;
     
     CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start, uint8_t row, uint8_t isMoto, float factor, float offset) : 
     countOfBits(bitcount), 
     startbit(start), 
     rowcount(row), 
-    isMotorola(isMoto),
-    factor(factor),
-    offset(offset)
+    isMotorola(isMoto)//,
+    // factor(factor),
+    // offset(offset)
     {
         rawValue = val;
         // countOfBits = bitcount;
@@ -78,7 +78,7 @@ public:
         {
             uint64_t tempVal = rawValue;
             uint64_t tempOut = 0;
-            for(uint8_t i = 0; i < countOfBits/8; i--)
+            for(uint8_t i = 0; i < countOfBits/8; i++)
             {
                 tempOut |= (tempVal & (0xFF)) << (((countOfBits/8)-i-1) * 8);
                 tempVal = tempVal >> 8;
