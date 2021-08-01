@@ -2,7 +2,7 @@
 
 // StallardOSSPI StallardOSExtAnalog::spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10));
 uint8_t StallardOSExtAnalog::adcInitialized = 0;
-// StallardOSSemaphore StallardOSExtAnalog::sem;
+StallardOSSemaphore StallardOSExtAnalog::sem;
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 
 StallardOSGPIO StallardOSExtAnalog::reset1(4, PORTD, Output, false);
@@ -30,19 +30,18 @@ StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber, Sta
     else if (adcNumber == 2)
         reset2 = 1;
     StallardOS::delay(100);
-    registerWrite(0x00, 0b00000000); //Page 34f //CONFIG0
-    registerWrite(0x01, 0b00000011); //Page 36  //CONFIG1
+    registerWrite(0x00, reg0Value); //Page 34f //CONFIG0
+    registerWrite(0x01, reg1Value); //Page 36  //CONFIG1
 
-    // volatile uint16_t test;
-    // for(uint8_t i = 0; i < 10; i++)
-    // {
-    //     test = registerRead(i);
-    // }
+    if(registerRead(0) != reg0Value || registerRead(1) != reg1Value)
+    {
+        asm("bkpt");    //I got problems writing to the ADC
+    }
+
     for (uint8_t i = 0; i < 16; i++) //Fix start pin with only reading from all channels
     {
         channelRead(i);
     }
-    offset = channelRead(16);
     adcInitialized |= adcNumber;
 }
 
@@ -167,5 +166,5 @@ int16_t StallardOSExtAnalog::getValue()
 #ifdef contextSwitch
     sem.give();
 #endif
-    return buf - offset;
+    return buf;
 }

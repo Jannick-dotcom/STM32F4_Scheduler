@@ -10,7 +10,10 @@
 #include "StallardOSGPIO.hpp"
 #include "StallardOSClass.hpp"
 
-extern "C" void StallardOSGeneralFaultHandler();
+#define reg0Value 0
+#define reg1Value 3
+
+extern "C" void inline StallardOSGeneralFaultHandler();
 
 class StallardOSExtAnalog
 {
@@ -27,9 +30,8 @@ private:
     static StallardOSGPIO drdy2;
     static StallardOSGPIO reset2;
 
-    StallardOSSemaphore sem;
+    static StallardOSSemaphore sem;
     static uint8_t adcInitialized;
-    int16_t offset;
 
     uint8_t registerRead(uint8_t address);
     void registerWrite(uint8_t address, uint8_t value);
