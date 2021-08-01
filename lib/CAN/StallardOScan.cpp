@@ -5,13 +5,18 @@ extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of m
 bool StallardOSCAN::can1used = false;
 bool StallardOSCAN::can2used = false;
 
+volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo1[CAN_FIFO_size];
+volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo2[CAN_FIFO_size];
+
+CAN_HandleTypeDef StallardOSCAN::can1handle;
+CAN_HandleTypeDef StallardOSCAN::can2handle;
+
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
 #ifdef contextSwitch
     this->sem.take();
 #endif
-    CAN_FilterTypeDef sFilterConfig;
-    #ifdef STM32F417xx
+#ifdef STM32F417xx
     if (port == StallardOSCAN1 && can1used == false)
     {
         CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFPP, nopull, GPIO_AF9_CAN1);
@@ -20,8 +25,8 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         __CAN1_CLK_ENABLE();
         can1used = true;
     }
-    else 
-    #endif
+    else
+#endif
     if (port == StallardOSCAN2 && can2used == false)
     {
         CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFPP, nopull, GPIO_AF9_CAN2);
@@ -40,13 +45,13 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     }
     if (baud == CANBauds::CAN1M)
     {
-        canhandle.Init.Prescaler = 3; //3?
+        canhandle.Init.Prescaler = 3;          //3?
         canhandle.Init.TimeSeg1 = CAN_BS1_4TQ; //Sample Point 87.5%
         canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;
     }
     else if (baud == CANBauds::CAN500k)
     {
-        canhandle.Init.Prescaler = 6; //6?
+        canhandle.Init.Prescaler = 6;          //6?
         canhandle.Init.TimeSeg1 = CAN_BS1_4TQ; //Sample Point 87.5%
         canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;
     }
@@ -71,56 +76,14 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 #endif
         StallardOSGeneralFaultHandler();
     }
-    
-    if(port == StallardOSCAN1)
+
+    if (port == StallardOSCAN1)
     {
-        sFilterConfig.FilterBank = 0;
+        can1handle = canhandle;
     }
-    else if(port == StallardOSCAN2)
+    else
     {
-        sFilterConfig.FilterBank = 14;
-    }
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000 << 5; //When MSB low let it pass
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0400 << 5; //Just check msb
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
-    sFilterConfig.FilterActivation = ENABLE;
-    sFilterConfig.SlaveStartFilterBank = 14;
-    if (HAL_CAN_ConfigFilter(&canhandle, &sFilterConfig) != HAL_OK)
-    {
-#ifdef contextSwitch
-        this->sem.give(); //release Semaphore
-#endif
-        /* Filter configuration Error */
-        StallardOSGeneralFaultHandler();
-    }
-    if(port == StallardOSCAN1)
-    {
-        sFilterConfig.FilterBank = 1;
-    }
-    else if(port == StallardOSCAN2)
-    {
-        sFilterConfig.FilterBank = 15;
-    }
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0400 << 5; //When MSB high let it pass
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0400 << 5; // Just check MSB
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO1;
-    sFilterConfig.FilterActivation = ENABLE;
-    sFilterConfig.SlaveStartFilterBank = 14;
-    if (HAL_CAN_ConfigFilter(&canhandle, &sFilterConfig) != HAL_OK)
-    {
-#ifdef contextSwitch
-        this->sem.give(); //release Semaphore
-#endif
-        /* Filter configuration Error */
-        StallardOSGeneralFaultHandler();
+        can2handle = canhandle;
     }
 
     if (HAL_CAN_Start(&canhandle) != HAL_OK)
@@ -131,9 +94,51 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         StallardOSGeneralFaultHandler();
     }
 
+    NVIC_SetPriority(CAN1_RX0_IRQn, 0xFF);
+    NVIC_SetPriority(CAN1_RX1_IRQn, 0xFF);
+    NVIC_SetPriority(CAN2_RX0_IRQn, 0xFF);
+    NVIC_SetPriority(CAN2_RX1_IRQn, 0xFF);
+    if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO0_FULL) != HAL_OK)
+    {
+        /* Notification Error */
+        asm("bkpt");
+    }
+    if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO1_FULL) != HAL_OK)
+    {
+        /* Notification Error */
+        asm("bkpt");
+    }
+    HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
+    HAL_NVIC_ClearPendingIRQ(CAN1_RX1_IRQn);
+    HAL_NVIC_ClearPendingIRQ(CAN2_RX0_IRQn);
+    HAL_NVIC_ClearPendingIRQ(CAN2_RX1_IRQn);
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
+    NVIC_EnableIRQ(CAN1_RX1_IRQn);
+    NVIC_EnableIRQ(CAN2_RX0_IRQn);
+    NVIC_EnableIRQ(CAN2_RX1_IRQn);
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
 #endif
+}
+
+extern "C" void CAN2_RX0_IRQHandler()
+{
+    StallardOSCAN::receiveMessage_FIFO(&StallardOSCAN::can2handle);
+}
+
+extern "C" void CAN2_RX1_IRQHandler()
+{
+    StallardOSCAN::receiveMessage_FIFO(&StallardOSCAN::can2handle);
+}
+
+extern "C" void CAN1_RX0_IRQHandler()
+{
+    StallardOSCAN::receiveMessage_FIFO(&StallardOSCAN::can1handle);
+}
+
+extern "C" void CAN1_RX1_IRQHandler()
+{
+    StallardOSCAN::receiveMessage_FIFO(&StallardOSCAN::can1handle);
 }
 
 StallardOSCAN::~StallardOSCAN() //Destructor
@@ -145,10 +150,19 @@ StallardOSCAN::~StallardOSCAN() //Destructor
 uint16_t StallardOSCAN::getSWFiFoFillLevel()
 {
     uint16_t fillLevel = 0;
-    auto k = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage);
-    for (k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+    volatile StallardOSCanMessage *fifoPtr;
+    if(canhandle.Instance == CAN1)
+        fifoPtr = StallardOSCAN::StallardOSCanFifo1;
+    else if(canhandle.Instance == CAN2)
+        fifoPtr = StallardOSCAN::StallardOSCanFifo2;
+    else
     {
-        if (StallardOSCanFifo[k].used)
+        return 0;
+    }
+    auto k = CAN_FIFO_size;
+    for (k = 0; k < CAN_FIFO_size; k++) //Loop through whole fifo storage
+    {
+        if (fifoPtr[k].used)
         {
             fillLevel++;
         }
@@ -156,43 +170,53 @@ uint16_t StallardOSCAN::getSWFiFoFillLevel()
     return fillLevel;
 }
 
-void StallardOSCAN::receiveMessage_FIFO()
+void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
 {
-    auto oldestMessage = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 1; //initialize the oldest Message variable
+    CAN_RxHeaderTypeDef RxHeader;
+    volatile StallardOSCanMessage *fifoPtr;
+    if(canHand->Instance == CAN1)
+        fifoPtr = StallardOSCAN::StallardOSCanFifo1;
+    else if(canHand->Instance == CAN2)
+        fifoPtr = StallardOSCAN::StallardOSCanFifo2;
+    else
+    {
+        return;
+    }
+    auto oldestMessage = CAN_FIFO_size - 1; //initialize the oldest Message variable
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++)  //Loop through the two hardware fifos
     {
-        auto messageCount = HAL_CAN_GetRxFifoFillLevel(&canhandle, currentFifo); //Read amount of messages in HW FiFo [0,1]
+        auto messageCount = HAL_CAN_GetRxFifoFillLevel(canHand, currentFifo); //Read amount of messages in HW FiFo [0,1]
         for (auto i = uint32_t(0); i < messageCount; i++)                        //Loop through every new message in hardware FiFo
         {
-            auto k = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage);
-            for (k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+            auto k = CAN_FIFO_size;
+            for (k = 0; k < CAN_FIFO_size; k++) //Loop through whole fifo storage
             {
-                if (StallardOSCanFifo[k].used == 0) //If unused
+                if (fifoPtr[k].used == 0) //If unused
                 {
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, (uint8_t *)&StallardOSCanFifo[k].Val) == HAL_OK) //Get Message
+                    if (HAL_CAN_GetRxMessage(canHand, currentFifo, &RxHeader, (uint8_t *)&fifoPtr[k].Val) == HAL_OK) //Get Message
                     {
-                        StallardOSCanFifo[k].ID = RxHeader.StdId;                 //Copy to SW FiFo
-                        StallardOSCanFifo[k].used = 1;                            //Indicate Message is occupied
-                        StallardOSCanFifo[k].timestamp = usCurrentTimeSinceStart; //Save timestamp
-                        StallardOSCanFifo[k].dlc = RxHeader.DLC;
+                        fifoPtr[k].ID = RxHeader.StdId;                 //Copy to SW FiFo
+                        fifoPtr[k].used = 1;                            //Indicate Message is occupied
+                        fifoPtr[k].timestamp = usCurrentTimeSinceStart; //Save timestamp
+                        fifoPtr[k].dlc = RxHeader.DLC;
                     }
                     break; //If unused found go with next message
                 }
-                else if (k == sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage) - 2) //FIFO full?
+                else if (k == CAN_FIFO_size - 2) //FIFO full?
                 {
                     //When fifo full delete the oldest message
-                    if (HAL_CAN_GetRxMessage(&canhandle, currentFifo, &RxHeader, (uint8_t *)&StallardOSCanFifo[oldestMessage].Val) == HAL_OK) //Get Message
+                    if (HAL_CAN_GetRxMessage(canHand, currentFifo, &RxHeader, (uint8_t *)&fifoPtr[oldestMessage].Val) == HAL_OK) //Get Message
                     {
-                        StallardOSCanFifo[oldestMessage].ID = RxHeader.StdId;                 //Delete oldest message and overwrite with new
-                        StallardOSCanFifo[oldestMessage].used = 1;                            //Indicate still used
-                        StallardOSCanFifo[oldestMessage].timestamp = usCurrentTimeSinceStart; //save new Timestamp
-                        StallardOSCanFifo[oldestMessage].dlc = RxHeader.DLC;
+                        fifoPtr[oldestMessage].ID = RxHeader.StdId;                 //Delete oldest message and overwrite with new
+                        fifoPtr[oldestMessage].used = 1;                            //Indicate still used
+                        fifoPtr[oldestMessage].timestamp = usCurrentTimeSinceStart; //save new Timestamp
+                        fifoPtr[oldestMessage].dlc = RxHeader.DLC;
                     }
                     break; //If unused found go with next message
                 }
                 else //If used and fifo not full
                 {
-                    if (StallardOSCanFifo[oldestMessage].timestamp > StallardOSCanFifo[k].timestamp) //When oldest message newer than this one
+                    if (fifoPtr[oldestMessage].timestamp > fifoPtr[k].timestamp) //When oldest message newer than this one
                     {
                         oldestMessage = k; //Set this to the new oldest message
                     }
@@ -207,23 +231,39 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 #ifdef contextSwitch
     this->sem.take();
 #endif
-    receiveMessage_FIFO(); //Receive the Messages from Hardware FiFo ->6 Messages total
-    if (msg == nullptr)    //if provided message for storing is valid
+    // receiveMessage_FIFO(&canhandle); //Receive the Messages from Hardware FiFo ->6 Messages total
+    if (msg == nullptr) //if provided message for storing is valid
     {
 #ifdef contextSwitch
         this->sem.give(); //Set the Semaphore free
 #endif
         return false; //return false status
     }
-    auto k = sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage);
-    for (k = 0; k < sizeof(StallardOSCanFifo) / sizeof(StallardOSCanMessage); k++) //Loop through whole fifo storage
+
+    volatile StallardOSCanMessage *fifoPtr;
+    if(canhandle.Instance == CAN1)
+        fifoPtr = StallardOSCAN::StallardOSCanFifo1;
+    else if(canhandle.Instance == CAN2)
+        fifoPtr = StallardOSCAN::StallardOSCanFifo2;
+    else
     {
-        if (StallardOSCanFifo[k].used && (StallardOSCanFifo[k].ID == id || id == uint16_t(-1))) //If ID of message in FiFo is same as we are looking for
+        return false;
+    }
+    auto k = CAN_FIFO_size;
+    for (k = 0; k < CAN_FIFO_size; k++) //Loop through whole fifo storage
+    {
+        if (fifoPtr[k].used && (fifoPtr[k].ID == id || id == uint16_t(-1))) //If ID of message in FiFo is same as we are looking for
         {
-            *msg = StallardOSCanFifo[k];         //copy the message
-            StallardOSCanFifo[k].used = 0;       //set the FiFo message to unused
-            StallardOSCanFifo[k].timestamp = -1; //reset timestamp
-            StallardOSCanFifo[k].dlc = 0;
+            // *msg = (StallardOSCanMessage)(StallardOSCAN::StallardOSCanFifo[k]);         //copy the message
+            msg->dlc = fifoPtr[k].dlc;
+            msg->ID = fifoPtr[k].ID;
+            msg->timestamp = fifoPtr[k].timestamp;
+            msg->used = fifoPtr[k].used;
+            msg->Val = fifoPtr[k].Val;
+
+            fifoPtr[k].used = 0;       //set the FiFo message to unused
+            fifoPtr[k].timestamp = -1; //reset timestamp
+            fifoPtr[k].dlc = 0;
 #ifdef contextSwitch
             this->sem.give(); //release Semaphore
 #endif
@@ -238,6 +278,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 
 int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
+    uint32_t tempTransmMailb;
 #ifdef contextSwitch
     this->sem.take(); //Block the semaphore
 #endif
@@ -253,9 +294,10 @@ int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     TxHeader.IDE = CAN_ID_STD;   //Set Standard Identifier -> 11 bit
     TxHeader.DLC = size;         //Set Amount of Data bytes
 
-    while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 1);
-        // HAL_CAN_AbortTxRequest(&canhandle,-1);         //Wait until all TX Mailboxes are free
-    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, (uint32_t *)CAN_TX_MAILBOX0); //Add message to transmit mailbox
+    while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 1)
+        ;
+    // HAL_CAN_AbortTxRequest(&canhandle,-1);         //Wait until all TX Mailboxes are free
+    HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, &tempTransmMailb); //Add message to transmit mailbox
 #ifdef contextSwitch
     this->sem.give(); //release Semaphore
 #endif

@@ -1,6 +1,6 @@
 #ifndef StallardOSCAN_h
 #define StallardOSCAN_h
-// #include <typeinfo>
+
 #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
@@ -8,9 +8,10 @@
 #include "StallardOScanIDs.h"
 #include "StallardOScanTypes.hpp"
 #include "StallardOScanStructs.hpp"
+#include "StallardOSCANFilter.hpp"
 
 
-extern "C" void StallardOSGeneralFaultHandler();
+extern "C" inline void StallardOSGeneralFaultHandler();
 
 class StallardOSCAN
 {
@@ -18,19 +19,26 @@ private:
     CAN_HandleTypeDef canhandle;
     CANports interface;
     CAN_TxHeaderTypeDef TxHeader;
-    CAN_RxHeaderTypeDef RxHeader;
+    
     StallardOSGPIO CANT;
     StallardOSGPIO CANR;
     StallardOSSemaphore sem;
-    StallardOSCanMessage StallardOSCanFifo[CAN_FIFO_size];
+    volatile static StallardOSCanMessage StallardOSCanFifo1[CAN_FIFO_size];
+    volatile static StallardOSCanMessage StallardOSCanFifo2[CAN_FIFO_size];
 
     static bool can1used;
     static bool can2used;
 
-    // void init(CANports port, CANBauds baud);
-    void receiveMessage_FIFO();
+    // friend void CAN1_RX0_IRQHandler();
+    // friend void CAN1_RX1_IRQHandler();
+    // friend void CAN2_RX0_IRQHandler();
+    // friend void CAN2_RX1_IRQHandler();
 
 public:
+    static CAN_HandleTypeDef can1handle;
+    static CAN_HandleTypeDef can2handle;
+    static void receiveMessage_FIFO(CAN_HandleTypeDef *canhandle);
+
     /**
     * create a CAN interface.
     *
@@ -38,10 +46,8 @@ public:
     * @param[in] baud Baud rate of the CAN. Has to be same on all devices
     * @return true if a message is received, false otherwise
     */
-    StallardOSCAN(
-        /*Portname*/ CANports port,
-        /*CANPortnumber*/ CANBauds baud);
-    
+    StallardOSCAN(CANports port, CANBauds baud);
+
     /**
      *  Destroy a CAN interface
      */
