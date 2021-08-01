@@ -112,13 +112,13 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
     htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim.Init.RepetitionCounter = 0;
     htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_Base_Init(&htim) != HAL_OK)
-    {
-#ifdef contextSwitch
-        this->sem.give();
-#endif
-        StallardOSGeneralFaultHandler();
-    }
+//     if (HAL_TIM_Base_Init(&htim) != HAL_OK)
+//     {
+// #ifdef contextSwitch
+//         this->sem.give();
+// #endif
+//         StallardOSGeneralFaultHandler();
+//     }
     if (HAL_TIM_PWM_Init(&htim) != HAL_OK)
     {
 #ifdef contextSwitch
