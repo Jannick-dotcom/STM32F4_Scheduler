@@ -5,9 +5,9 @@ extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of m
 extern "C" volatile uint64_t taskMainTime;
 
 //Kontext Switch
-struct function_struct *currentTask = nullptr;
-struct function_struct *nextTask = nullptr;
-struct function_struct *taskMainStruct = nullptr;
+volatile struct function_struct* volatile currentTask = nullptr;
+volatile struct function_struct* volatile nextTask = nullptr;
+volatile struct function_struct* volatile taskMainStruct = nullptr;
 
 // extern "C" void StallardOS_SetSysClock(uint8_t clockspeed);
 // extern "C" void StallardOS_start();
@@ -44,6 +44,11 @@ void taskMain(void)
  */
 StallardOS::StallardOS()
 {
+  NVIC_EnableIRQ(BusFault_IRQn);
+  NVIC_EnableIRQ(UsageFault_IRQn);
+  NVIC_EnableIRQ(NonMaskableInt_IRQn);
+  NVIC_EnableIRQ(MemoryManagement_IRQn);
+  SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
   SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
   //Basiswerte Initialisieren
   first_function_struct = nullptr;
@@ -60,8 +65,25 @@ StallardOS::StallardOS()
   taskMainStruct = addFunction(taskMain, -2, 255);
   if(taskMainStruct == nullptr) while(1);
 
-  NVIC_EnableIRQ(SysTick_IRQn);
-  SysTick_Config((uint32_t)(SystemCoreClock / defaultSysTickFreq));
+  // NVIC_EnableIRQ(SysTick_IRQn);
+  // SysTick_Config((uint32_t)(SystemCoreClock / defaultSysTickFreq));
+
+  TIM_HandleTypeDef htim;
+  __TIM6_CLK_ENABLE();
+  htim.Instance = TIM6;
+  htim.Init.Prescaler = 0; //Because 21 MHz APB1 Clock -> 1 MHz timer interrupts
+  htim.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim.Init.Period = 41;
+  htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim.Init.RepetitionCounter = 0;
+  htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  __HAL_DBGMCU_FREEZE_TIM6();
+  HAL_TIM_Base_Init(&htim);
+  __HAL_TIM_CLEAR_FLAG(&htim, TIM_IT_UPDATE);
+  HAL_TIM_Base_Start_IT(&htim);
+  NVIC_SetPriority(TIM6_DAC_IRQn, 0x00);
+  HAL_NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
+  HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
 #else
   first_function_struct = taskMainStruct = addFunction(taskMain, -2, 255, 1);
   
@@ -110,7 +132,7 @@ void StallardOS::createTCBs()
     temp->id = -1;
 #ifdef contextSwitch
     temp->State = NEW;                        //New Task
-    temp->Stack = temp->vals + sizeStack - 4; //End of Stack
+    temp->Stack = temp->vals + sizeStack - sizeof(uint32_t); //End of Stack
 #endif
 #ifndef contextSwitch
     temp->lastExecTime = 0;
@@ -239,7 +261,7 @@ void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
 {
   uint16_t i = 0;
-  struct function_struct *temp = first_function_struct; //temporärer pointer erzeugen
+  volatile struct function_struct *temp = first_function_struct; //temporärer pointer erzeugen
 
   if (temp == nullptr)
   {
@@ -259,7 +281,7 @@ struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
     }
   }
   //Hier haben wir das richtige element schon gefunden -> temp
-  return temp; //Element übergeben
+  return (function_struct*)temp; //Element übergeben
 }
 
 /**
@@ -269,7 +291,7 @@ struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
 struct function_struct *StallardOS::searchFreeFunction(void)
 {
   uint16_t i = 0;
-  struct function_struct *temp = first_function_struct; //temporärer pointer erzeugen
+  volatile struct function_struct *temp = first_function_struct; //temporärer pointer erzeugen
 
   if (temp == nullptr)
   {
@@ -289,7 +311,7 @@ struct function_struct *StallardOS::searchFreeFunction(void)
     }
   }
   //Hier haben wir das richtige element schon gefunden -> temp
-  return temp; //Element übergeben
+  return (function_struct*)temp; //Element übergeben
 }
 
 /**
@@ -326,13 +348,21 @@ void StallardOS::yield()
   currentTask->lastYield = usCurrentTimeSinceStart;
   if (currentTask->refreshRate != 0)
   {
-    currentTask->continueInUS = (1000000 / currentTask->refreshRate) - (usCurrentTimeSinceStart - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-    if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
-      currentTask->continueInUS = 0;
-    else
-      // nextTask = taskMainStruct;
-      findNextFunction();
-      SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+      if(currentTask != nullptr)
+      {
+        currentTask->continueInUS = (1000000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
+        if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
+          currentTask->continueInUS = 0;
+        else
+        {
+          findNextFunction();
+          SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+        }
+      }
+      else
+      {
+        return;
+      }
 
     currentTask->lastStart = usCurrentTimeSinceStart;
   }
@@ -380,13 +410,11 @@ void StallardOS::startOS(void)
     currentTask = first_function_struct; //The current Task is the first one in the List
 #ifdef contextSwitch
     SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+    FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
     asm("DSB");
     asm("ISB");
 
-    asm("MRS R0, MSP");
-    asm("SUB R0, #200"); //Reserve some space for Handlers (200*4 Byte)
-    asm("MSR PSP, R0");
-    
+    SysTick_Config(SystemCoreClock / (uint32_t)1000);
     NVIC_SetPriority(SysTick_IRQn, 0xFF);
     NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
@@ -394,6 +422,9 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(SVCall_IRQn);
     NVIC_EnableIRQ(FPU_IRQn);
+    asm("MRS R0, MSP");
+    asm("SUB R0, #200"); //Reserve some space for Handlers (200*4 Byte)
+    asm("MSR PSP, R0");
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
 #else

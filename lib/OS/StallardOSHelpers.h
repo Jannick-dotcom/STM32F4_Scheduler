@@ -5,23 +5,14 @@
 
 #include "StallardOSconfig.h"
 
-extern volatile uint32_t sysTickFreq;
-
 #define functionModifier (uint32_t)0xFFFFFFFE //Use the function pointer with lowest bit zero
-#define sysTickTicks (uint32_t)(SystemCoreClock / sysTickFreq)
+// #define sysTickTicks (uint32_t)(SystemCoreClock / 1000)
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
   void StallardOS_SetSysClock(uint8_t clockspeed);
-  void StallardOS_start();
-  void StallardOS_delay();
-  void StallardOS_noTask();
-  void StallardOS_sudo();
-  void StallardOS_unSudo();
-  void StallardOS_delay();
-  void StallardOS_endTask();
   void StallardOS_goBootloader();
   void enable_interrupts();
   void disable_interrupts();
@@ -31,7 +22,7 @@ extern "C"
 
 typedef enum
 {
-  NEW,
+  NEW = 0,
   RUNNING,
   PAUSED,
   STOPPED
@@ -41,20 +32,20 @@ struct function_struct
 {
 #ifdef contextSwitch
   volatile uint32_t *Stack;             //Stack pointer
-  uint32_t vals[sizeStack];
+  volatile uint32_t vals[sizeStack];
 #endif
   //Verkettete Liste
-  struct function_struct *prev; //für verkettete liste
-  struct function_struct *next; //für verkettete liste
+  volatile struct function_struct *prev; //für verkettete liste
+  volatile struct function_struct *next; //für verkettete liste
 
   //Must have Variablen
   void (*function)();          //Auszuführende Funktion
-  uint8_t priority;            //Priorität 0 wird nicht unterbrochen außer Prozess wünscht es durch ein Delay
-  uint16_t id;                 //ID des Tasks
+  volatile uint8_t priority;            //Priorität 0 wird nicht unterbrochen außer Prozess wünscht es durch ein Delay
+  volatile uint16_t id;                 //ID des Tasks
   volatile uint8_t used;       //Ist dieser TCB schon belegt?
   volatile uint8_t executable; //Funktion ausführen?
 
-  uint8_t error; //Error in Task scheduling has happened
+  volatile uint8_t error; //Error in Task scheduling has happened
 
 #ifndef contextSwitch
   //nur für normalen Schedule betrieb
@@ -64,9 +55,9 @@ struct function_struct
 
 #ifdef contextSwitch
   //nur für KontextSwitch
-  uint16_t refreshRate;
-  uint64_t lastYield;
-  uint64_t lastStart;
+  volatile uint16_t refreshRate;
+  volatile uint64_t lastYield;
+  volatile uint64_t lastStart;
   // volatile uint32_t stackUsage;
   volatile taskState State;             //Status des Tasks
   volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore

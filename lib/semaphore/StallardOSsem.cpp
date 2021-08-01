@@ -1,27 +1,33 @@
 #include "StallardOSsem.hpp"
 
-extern struct function_struct *currentTask;
+extern volatile struct function_struct *currentTask;
 
 #ifdef contextSwitch
 
 StallardOSSemaphore::StallardOSSemaphore()
 {
-    this->val = 1;
+    val = 1;
 }
 
 void StallardOSSemaphore::give()
 {
-    this->val++;
+    val++;
+    currentTask->semVal = nullptr;
 }
 
 void StallardOSSemaphore::take()
 {
-    currentTask->semVal = &this->val;
-    currentTask->waitingForSemaphore = 1;
-    while (this->val < 1);
-    this->val--;
-    currentTask->waitingForSemaphore = 0;
-    currentTask->semVal = nullptr;
+    if(currentTask != nullptr)
+    {
+        currentTask->semVal = &val;
+        currentTask->waitingForSemaphore = 1;
+    }
+    while (val < 1);
+    val--;
+    if(currentTask != nullptr)
+    {
+        currentTask->waitingForSemaphore = 0;
+    }
 }
 
 #endif

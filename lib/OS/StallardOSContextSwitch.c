@@ -4,9 +4,9 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
-extern struct function_struct *currentTask;
-extern struct function_struct *taskMainStruct;
-extern struct function_struct *nextTask;
+extern volatile struct function_struct* volatile currentTask;
+extern volatile struct function_struct* volatile taskMainStruct;
+extern volatile struct function_struct* volatile nextTask;
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
 
@@ -84,7 +84,7 @@ void jumpToBootloader(void)
 void findNextFunction()
 {
     nextTask = NULL;
-    struct function_struct *temp = currentTask->next;
+    volatile struct function_struct* volatile temp = taskMainStruct;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     if(temp == NULL)
     {
@@ -119,7 +119,7 @@ void findNextFunction()
 #endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
-    while (temp != currentTask);
+    while (temp != taskMainStruct);
     if(nextTask->continueInUS > 0) nextTask = NULL;    
 }
 #endif //contextSwitch
@@ -132,11 +132,12 @@ void findNextFunction()
  * @return
  */
 #ifdef contextSwitch
-void taskOnEnd(void)
+__attribute__((__used__)) void taskOnEnd(void)
 {
     currentTask->used = 0;
     currentTask = taskMainStruct;
     pendPendSV();
+    while(1);
 }
 #endif
 
@@ -163,13 +164,16 @@ __attribute__((always_inline)) inline void switchTask(void)
         
         __ASM volatile("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
 
-        __ASM volatile("LDR r1, =currentTask");
-        __ASM volatile("LDR r2, [r1]");
+        __ASM volatile("LDR r1, =currentTask"); //Current Task Pointer
+        __ASM volatile("LDR r2, [r1]"); //Load Stack pointer from first position of currentTask
         __ASM volatile("STR r0, [r2]"); //Save stack pointer
+        currentTask->State = PAUSED; //Save function state
+        __ASM volatile("LDR r0, =currentTask");
+        __ASM volatile("LDR r1, =nextTask");
+        __ASM volatile("LDR r1, [r1]");
+        __ASM volatile("STR r1, [r0]");
         __ASM volatile("DSB");
         __ASM volatile("ISB");
-        currentTask->State = PAUSED; //Save function state
-        currentTask = nextTask;
     }
 
     if (currentTask->State == NEW) //New Task
@@ -205,7 +209,9 @@ __attribute__((always_inline)) inline void switchTask(void)
         __ASM volatile("ISB");
         
         currentTask->State = RUNNING; //Save state as running
-        nextTask = NULL;
+        __ASM volatile("LDR r1, =nextTask");
+        __ASM volatile("MOV r2, #0");
+        __ASM volatile("STR r2, [r1]");
     }
 }
 #endif
@@ -217,7 +223,7 @@ __attribute__((always_inline)) inline void switchTask(void)
  * @return
  */
 #ifdef contextSwitch
-void SVC_Handler()
+__attribute__((__used__)) void SVC_Handler()
 {
     // disable_interrupts();
     uint8_t handleMode;
@@ -251,18 +257,17 @@ void SVC_Handler()
  * @param
  * @return
  */
-void SysTick_Handler(void) //In C Language
+__attribute__((used)) void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
-
-    usCurrentTimeSinceStart += 10;
-    if((usCurrentTimeSinceStart % 1000) == 0) //Every millisecond
-    {
-        HAL_IncTick();
+    // usCurrentTimeSinceStart += 10;
+    // if((usCurrentTimeSinceStart % 1000) == 0) //Every millisecond
+    // {
+        // HAL_IncTick();
 #ifdef contextSwitch
         if(currentTask != NULL)
         {
-            struct function_struct *temp = currentTask->next;
+            volatile struct function_struct* volatile temp = currentTask->next;
             do
             {
                 //Handle delay times
@@ -278,6 +283,11 @@ void SysTick_Handler(void) //In C Language
             }
             while (temp != currentTask);
 
+            if(currentTask->Stack < currentTask->vals)
+            {
+                asm("bkpt");
+                currentTask->executable = 0;
+            }
             findNextFunction();
             if(currentTask != nextTask)
             {
@@ -285,8 +295,13 @@ void SysTick_Handler(void) //In C Language
             }
         }
 #endif //contextSwitch
-    }
+    // }
     enable_interrupts(); //enable all interrupts
+}
+
+__attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
+    TIM6->SR &= ~TIM_SR_UIF;
+    usCurrentTimeSinceStart += 10;
 }
 
 /**
@@ -296,8 +311,9 @@ void SysTick_Handler(void) //In C Language
  * @return
  */
 #ifdef contextSwitch
-__attribute__( ( naked ) ) void PendSV_Handler()
+__attribute__( ( naked, __used__ ) ) void PendSV_Handler()
 {
+    // asm("bkpt");
     disable_interrupts();
     switchTask();
     enable_interrupts(); //Enable all interrupts

@@ -9,8 +9,8 @@
 #define contextSwitch
 #define useFPU
 
-#define sizeStack 500      //300 * 4 Byte (Stack size for Tasks)
-#define countTasks 6
+#define sizeStack 1000      //* 4 Byte (Stack size for Tasks)
+#define countTasks 2
 #define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
 
 #define externalOszillator (HSE_VALUE / 1000000) //[MHz]
