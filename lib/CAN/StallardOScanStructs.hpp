@@ -2024,6 +2024,7 @@ public:
 	CAN_Signal<uint8_t> ADCAN_PT_Water_2_PWM = {0, 8, 24, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_1_Percent = {0, 8, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	CAN_Signal<uint8_t> ADCAN_PT_Water_Fan_2_Percent = {0, 8, 40, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint8_t> ADCAN_PT_Water_Pump_Percent = {0, 8, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	void unbuild()
 	{
 		ADCAN_PT_Oil_Fan_Percent.unbuild(Val);
@@ -2032,18 +2033,19 @@ public:
 		ADCAN_PT_Water_2_PWM.unbuild(Val);
 		ADCAN_PT_Water_Fan_1_Percent.unbuild(Val);
 		ADCAN_PT_Water_Fan_2_Percent.unbuild(Val);
+		ADCAN_PT_Water_Pump_Percent.unbuild(Val);
 	}
 	STOS_CAN_PDU_Water_Oil_Status_Control() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_PT_Oil_Fan_Percent.countOfBits + ADCAN_PT_Oil_PWM.countOfBits + ADCAN_PT_Water_1_PWM.countOfBits + ADCAN_PT_Water_2_PWM.countOfBits + ADCAN_PT_Water_Fan_1_Percent.countOfBits + ADCAN_PT_Water_Fan_2_Percent.countOfBits;
+		uint8_t temp = ADCAN_PT_Oil_Fan_Percent.countOfBits + ADCAN_PT_Oil_PWM.countOfBits + ADCAN_PT_Water_1_PWM.countOfBits + ADCAN_PT_Water_2_PWM.countOfBits + ADCAN_PT_Water_Fan_1_Percent.countOfBits + ADCAN_PT_Water_Fan_2_Percent.countOfBits + ADCAN_PT_Water_Pump_Percent.countOfBits;
 		if(temp % 8 != 0) temp = temp / 8 + 1;
 		else temp = temp / 8;
 		if(temp > 8) temp = 8;
 		_size = dlc = temp;
 	}
 	void build() {
-		Val = ADCAN_PT_Oil_Fan_Percent.build() | ADCAN_PT_Oil_PWM.build() | ADCAN_PT_Water_1_PWM.build() | ADCAN_PT_Water_2_PWM.build() | ADCAN_PT_Water_Fan_1_Percent.build() | ADCAN_PT_Water_Fan_2_Percent.build();
+		Val = ADCAN_PT_Oil_Fan_Percent.build() | ADCAN_PT_Oil_PWM.build() | ADCAN_PT_Water_1_PWM.build() | ADCAN_PT_Water_2_PWM.build() | ADCAN_PT_Water_Fan_1_Percent.build() | ADCAN_PT_Water_Fan_2_Percent.build() | ADCAN_PT_Water_Pump_Percent.build();
 		ID = _id;
 	}
 };
