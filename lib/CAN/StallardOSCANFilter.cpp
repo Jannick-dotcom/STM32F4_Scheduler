@@ -30,6 +30,7 @@ StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports ca
         asm("bkpt");
         /* Filter configuration Error */
         StallardOSGeneralFaultHandler();
+        return;
     }
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_16BIT;
@@ -38,7 +39,7 @@ StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports ca
     sFilterConfig.FilterMaskIdHigh = 0xFFFF << 5; //Do nothing
     sFilterConfig.FilterMaskIdLow = 0xFFFF << 5;
 
-    if(n & 0b1 == 0) // Evenly split filters to fifos
+    if((n & 0b1) == 0) // Evenly split filters to fifos
     {
         sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     }
