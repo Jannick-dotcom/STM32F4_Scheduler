@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "StallardOSsem.hpp"
 
-extern const GPIO_TypeDef *portsToGPIOBase[];
+extern "C" void StallardOSGeneralFaultHandler();
 
 typedef enum ports
 {

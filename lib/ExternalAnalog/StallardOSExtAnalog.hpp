@@ -13,7 +13,7 @@
 #define reg0Value 0
 #define reg1Value 3
 
-extern "C" void inline StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSExtAnalog
 {

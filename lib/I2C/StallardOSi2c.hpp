@@ -7,7 +7,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 #include "StallardOSsem.hpp"
-extern "C" inline void StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSi2c
 {

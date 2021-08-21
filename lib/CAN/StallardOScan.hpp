@@ -11,7 +11,7 @@
 #include "StallardOSCANFilter.hpp"
 
 
-extern "C" inline void StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSCAN
 {

@@ -7,7 +7,7 @@
 #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
 
-extern "C" inline void StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSSerial
 {

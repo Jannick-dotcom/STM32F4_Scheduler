@@ -12,7 +12,7 @@
 * So that makes 14 per CAN
 */
 
-extern "C" void inline StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSCANFilter
 {

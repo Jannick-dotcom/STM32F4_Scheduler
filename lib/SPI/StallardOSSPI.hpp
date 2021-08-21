@@ -8,7 +8,7 @@
 #include "StallardOSsem.hpp"
 #include "StallardOSGPIO.hpp"
 
-extern "C" inline void StallardOSGeneralFaultHandler();
+extern "C" void StallardOSGeneralFaultHandler();
 
 typedef enum SPIBauds
 {
