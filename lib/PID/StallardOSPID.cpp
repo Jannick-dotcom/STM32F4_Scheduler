@@ -12,6 +12,7 @@ StallardosPID::StallardosPID(double p_gain, double i_gain, double d_gain)
     #ifdef contextSwitch
     this->sem.take();
     #endif
+    this->pid_i_mem = 0;
     this->pid_p_gain = p_gain;
     this->pid_i_gain = i_gain;
     this->pid_d_gain = d_gain;
@@ -36,7 +37,7 @@ double StallardosPID::calculate_pid(double setpoint, double input)
     double pid_error_temp;
     this->pid_setpoint = setpoint;
     this->pid_input = input;
-    pid_error_temp = input - setpoint;
+    pid_error_temp = setpoint - input;
     pid_i_mem += pid_i_gain * pid_error_temp;
     if (pid_i_mem > pid_max)
         pid_i_mem = pid_max;
