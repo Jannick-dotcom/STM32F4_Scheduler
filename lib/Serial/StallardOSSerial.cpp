@@ -67,6 +67,11 @@ void StallardOSSerial::send(const char *dat, uint16_t bytes)
 #endif
 }
 
+void StallardOSSerial::send(std::string str)
+{
+    send(str.c_str(), (uint16_t)str.size());
+}
+
 /**
  * read Data.
  *

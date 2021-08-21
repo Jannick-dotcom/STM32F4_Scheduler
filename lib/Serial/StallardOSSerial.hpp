@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
+#include <iostream>
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -17,6 +18,7 @@ private:
 public:
     StallardOSSerial(USART_TypeDef *serPort, uint32_t baud);
     void send(const char *dat, uint16_t bytes);
+    void send(std::string str);
     void read(char *dat, uint16_t bytes);
 
 };
