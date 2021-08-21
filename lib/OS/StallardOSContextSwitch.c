@@ -1,12 +1,31 @@
 #include "StallardOSconfig.h"
 #include "StallardOSHelpers.h"
 #include <stdint.h>
+#include <stdlib.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
 extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
+
+/**
+ * If a Task Returns, this function gets executed and calls the remove function of this task.
+ *
+ * @param
+ * @return
+ */
+#ifdef contextSwitch
+void taskOnEnd(void)
+{
+    currentTask->used = 0;
+    currentTask = taskMainStruct;
+    free((uint32_t*)currentTask->vals);
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    while(1);
+}
+#endif
+
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
 
@@ -124,23 +143,6 @@ void findNextFunction()
 }
 #endif //contextSwitch
 
-
-/**
- * If a Task Returns, this function gets executed and calls the remove function of this task.
- *
- * @param
- * @return
- */
-#ifdef contextSwitch
-__attribute__((__used__)) void taskOnEnd(void)
-{
-    currentTask->used = 0;
-    currentTask = taskMainStruct;
-    pendPendSV();
-    while(1);
-}
-#endif
-
 /**
  * Switching of a Task happens here.
  *
@@ -185,7 +187,7 @@ __attribute__((always_inline)) inline void switchTask(void)
 
         __ASM volatile("LDR r1, =currentTask");
         __ASM volatile("LDR r2, [r1]");
-        __ASM volatile("LDR r0, [r2]");
+        __ASM volatile("LDR r0, [r2]"); //get initial Stack pointer
         __ASM volatile("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
         __ASM volatile("MSR PSP, r0");             //set PSP
 
@@ -263,7 +265,7 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
     // usCurrentTimeSinceStart += 10;
     // if((usCurrentTimeSinceStart % 1000) == 0) //Every millisecond
     // {
-        // HAL_IncTick();
+        HAL_IncTick();
 #ifdef contextSwitch
         if(currentTask != NULL)
         {
@@ -283,7 +285,7 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
             }
             while (temp != currentTask);
 
-            if(currentTask->Stack < currentTask->vals)
+            if(currentTask->Stack > currentTask->vals)
             {
                 asm("bkpt");
                 currentTask->executable = 0;
@@ -300,8 +302,8 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
 }
 
 __attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
-    TIM6->SR &= ~TIM_SR_UIF;
-    usCurrentTimeSinceStart += 10;
+    TIM6->SR &= ~TIM_SR_UIF; //Reset interrupt
+    usCurrentTimeSinceStart += 1;
 }
 
 /**

@@ -18,8 +18,8 @@ __attribute__((always_inline)) void StallardOSGeneralFaultHandler() //restarts a
     asm("bkpt");
     if (taskMainStruct != 0)
     {
-        currentTask->Stack = currentTask->vals + sizeStack - sizeof(uint32_t); //End of Stack
-        currentTask->State = NEW;
+        currentTask->Stack = currentTask->vals + currentTask->stackSize - sizeof(stack_T); //End of Stack
+        currentTask->State = NEW; //Set Task state as new
         currentTask->waitingForSemaphore = 0;
         currentTask->continueInUS = 5000; //Restart Task in 5 ms
         if (currentTask->semVal != NULL)
@@ -89,5 +89,4 @@ void FPU_IRQHandler()
 
     asm("DMB");
     StallardOSGeneralFaultHandler();
-    // asm("BX LR");
 }

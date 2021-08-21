@@ -6,7 +6,7 @@
 class StallardOS
 {
 private:
-  struct function_struct taskArray[countTasks + 2];
+  struct function_struct taskArray[countTasks + 1];
   struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint8_t TCBsCreated;
 
@@ -19,7 +19,9 @@ public:
   //Constructor
   StallardOS(); //Create a Task Scheduler
   #ifdef contextSwitch
-  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
+  // struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
+  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint32_t stackSize, uint16_t refreshRate = 0);
+  struct function_struct *addFunctionStatic(void (*function)(), uint16_t id, uint8_t prio, uint32_t *stackPtr, uint32_t stackSize, uint16_t refreshRate = 0);
   #else
   struct function_struct *addFunction(
       /*Funktion*/ void (*function)(),
@@ -45,7 +47,7 @@ public:
   #endif
   #ifdef contextSwitch
   taskState getFunctionState(/*Funktion*/ uint16_t id);
-  uint8_t getCPUload();
+  // uint8_t getCPUload();
   #endif
   uint64_t getRuntimeMs();
   uint64_t getRuntimeUs(); 

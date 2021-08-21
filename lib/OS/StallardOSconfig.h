@@ -9,9 +9,8 @@
 #define contextSwitch
 #define useFPU
 
-#define sizeStack 1000      //* 4 Byte (Stack size for Tasks)
-#define countTasks 2
-#define defaultSysTickFreq 100000 //[Hz] -> 100kHz for 10µs time quantum
+#define countTasks 1
+#define defaultSysTickFreq 1000 //[Hz]
 
 #define externalOszillator (HSE_VALUE / 1000000) //[MHz]
 #define runFreq 168 //[MHz]
@@ -31,6 +30,18 @@
 #endif
 
 #ifdef STM32F415xx
+#define CAN2_t_pin 13
+#define CAN2_r_pin 12
+#define CAN2_t_port PORTB
+#define CAN2_r_port PORTB
+#endif
+
+#ifdef STM32F407xx
+#define CAN1_t_pin 0
+#define CAN1_r_pin 1
+#define CAN1_t_port PORTD
+#define CAN1_r_port PORTD
+
 #define CAN2_t_pin 13
 #define CAN2_r_pin 12
 #define CAN2_t_port PORTB

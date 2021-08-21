@@ -28,11 +28,14 @@ typedef enum
   STOPPED
 } taskState;
 
+typedef uint32_t stack_T;
+
 struct function_struct
 {
 #ifdef contextSwitch
-  volatile uint32_t *Stack;             //Stack pointer
-  volatile uint32_t vals[sizeStack];
+  volatile stack_T *Stack;             //Stack pointer
+  volatile stack_T *vals;
+  uint32_t stackSize;
 #endif
   //Verkettete Liste
   volatile struct function_struct *prev; //für verkettete liste
