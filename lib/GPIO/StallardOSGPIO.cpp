@@ -1,13 +1,5 @@
 #include "StallardOSGPIO.hpp"
 
-#ifdef STM32F417xx
-const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
-#else
-const GPIO_TypeDef *portsToGPIOBase[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH};
-#endif
-
-extern "C" inline void StallardOSGeneralFaultHandler();
-
 StallardOSGPIO::StallardOSGPIO() {}
 
 /**

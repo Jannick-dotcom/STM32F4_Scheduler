@@ -60,6 +60,12 @@ private:
     StallardOSSemaphore sem;
 
 public:
+    #ifdef STM32F417xx
+    const GPIO_TypeDef *portsToGPIOBase[9] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
+    #else
+    const GPIO_TypeDef *portsToGPIOBase[8] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH};
+    #endif
+
     StallardOSGPIO();
     StallardOSGPIO(
         /*Portnumber*/ uint8_t number,
