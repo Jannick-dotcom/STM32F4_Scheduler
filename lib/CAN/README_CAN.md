@@ -27,13 +27,13 @@ _______________________________________________________________
 receiveMessage(StallardOSCanMessage *msg, uint16_t id);
 ```
 
-Empfängt a CAN message, mit Boolean return (True/False)
+Empfängt eine CAN message, mit Boolean return (True/False).
 
 
 Funktion Parameter:
 ```
-msg -> Nachricht container
-id -> id der zu empfangener Nachricht
+msg -> Nachricht container                      (Pointer)
+id -> id der zu empfangener Nachricht           [16Bit Integer]
 ```
 
 
@@ -44,10 +44,10 @@ _______________________________________________________________
 ```
 sendMessage(StallardOSCanMessage *msg, uint8_t size);
 ````
-Send a CAN message
+Sendet a CAN message.
 
 Funktion Parameter:
 ```
 msg -> zu versendener Nachricht
-size -> NAchricht Große in Data Bytes (Max. 8)
+size -> NAchricht Große in Data Bytes           [8Bit Integer]
 ````

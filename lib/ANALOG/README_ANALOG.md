@@ -21,5 +21,5 @@ erzeugt einen analog Input instance.
 Funktion Parameter:
 ```
 number -> welche ADC nummer ist zu verwenden
-Channel -> Channel nummer für the ADC1
+Channel -> Channel nummer für the ADC1          [8Bit Integer]
 ```

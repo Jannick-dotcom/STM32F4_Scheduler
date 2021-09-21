@@ -11,17 +11,17 @@ erzeugt einen Analog input instance.
 
 Funktion Parameter:
 ```
-adcNumber -> Auswahl der ADC
-Channel -> Auswahl der Channel Nummer
+adcNumber  -> Auswahl der ADC                       [8Bit Integer]
+Channel    -> Auswahl der Channel Nummer            [8Bit Integer]
 ```
 
 
 _______________________________________________________________
 ```
-int16_t getValue();
+getValue();
 ```
 
-Die Funktion liesst (return) einen Analog Wert
+Die Funktion liesst (return) einen Analog Wert      [16Bit Integer]
 
 
 ```

@@ -17,12 +17,12 @@ Ausgabe Berechnung
 Funktion Parameter:
 
 ```
-instance -> welche Timer verwenden wir
+instance -> welche Timer verwenden wir      [Instance Pointer]
 channel  -> Timer channel zu verwenden
-number   -> nummer der pin auf der port
+number   -> nummer der pin auf der port     [8Bit Integer]
 port     -> gpio port
-freq     -> frequenz der pwm Signal
-bitcount -> Bit Menge der pwm
+freq     -> frequenz der pwm Signal         [16Bit Integer]
+bitcount -> Bit Menge der pwm               [8Bit Integer]
 ```
 
 
@@ -35,8 +35,8 @@ Data senden
 
 Funktion Parameter:
 ```
-dat   -> Data zu senden
-bytes -> Menge der versendete Data Bytes
+dat   -> Data zu senden                     [8Bit Char]
+bytes -> Menge der versendete Data Bytes    [16Bit Integer]
 ```
 
 
@@ -49,6 +49,6 @@ Data lesen/empofangen
 
 Funktion Parameter:
 ```
-dat   -> container der gelesene Data
-bytes -> Menge der gelesene Data Bytes
+dat   -> container der gelesene Data        [Char (Pointer)]
+bytes -> Menge der gelesene Data Bytes      [16Bit Integer]
 ```

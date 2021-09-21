@@ -15,8 +15,8 @@ Erzeugen einer Serieller Instance
 
 Funktion Parameter:
 ```
-serPort -> welche Serial verwenden wir
-baud    -> Baud Rate (Übertragungsgeschwindigkeit)
+serPort -> welche Serial verwenden wir                              (Pointer)
+baud    -> Baud Rate (Übertragungsgeschwindigkeit in Bit/s)         [32Bit Integer]
 ```
 
 
@@ -29,8 +29,8 @@ senden von Data
 
 Funktion Parameter:
 ```
-dat   -> Data zu senden
-bytes -> Menge an Bytes zu senden
+dat   -> Data zu senden                                             [Char (Pointer)]
+bytes -> Menge an Bytes zu senden                                   [16Bits Double]
 ```
 
 
@@ -43,7 +43,7 @@ Data lesen
 
 Funktion Parameter:
 ```
-dat   -> Container der gelesener Data
-bytes -> Große der gelesene Data
+dat   -> Container der gelesener Data                               [Char (Pointer)]
+bytes -> Große der gelesene Data                                    [16Bit Integer]
 ```
 

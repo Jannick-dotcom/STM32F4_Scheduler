@@ -6,83 +6,95 @@ Z 24-29, 40-44, 94-99;
 
 Funktionen Erklärung:
 
+
+
 ```
-function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)```
+addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)```
+
 Erzeugt einen neue Task in die "execute list"
 
 Funktion Parameter:
 ```
-funktion    -> task zu ausführen
-id          -> Einzigartig id der Task
-prio        -> Task priorität, geringere nummer bedeutet höhere Prio.
-refreshRate -> Frequenz der ausführung
-return      -> Pointer zu erzeugen tbc
+funktion    -> task zu ausführen                                           
+id          -> Einzigartig id der Task                                  [16Bit Integer]
+prio        -> Task priorität, geringere nummer bedeutet höhere Prio.   [8Bit Integer]
+refreshRate -> Frequenz der ausführung                                  [16Bit Integer]
+return      -> Pointer zu erzeugen tbc                                  [16Bit Integer]
 ```
 
+
+___________________________________________________________________________________________________
 ```
-StallardOS::changeFunctionEnabled(uint16_t id, bool act)
+changeFunctionEnabled(uint16_t id, bool act)
 
 Enable/disable Task aus die Task List
 ```
 
 Funktion Parameter:
 ```
-id  -> einzigartig id der Task
-act -> Boolean Wert, Task aktivierung
+id  -> einzigartig id der Task                                          [16Bit Integer]
+act -> Boolean Wert, Task aktivierung                                   [Boolean]
 ```
 
+
+___________________________________________________________________________________________________
 ```
-StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
+setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
 
 Neue Task Prioritizierung setzen
 ```
 Funktion Parameter:
 ```
-id  -> einzigartig id der Task
-prio -> neue Task Priorität, je kleiner der Wert, desto höher Prio
+id  -> einzigartig id der Task                                          [16Bit Integer]
+prio -> neue Task Priorität, je kleiner der Wert, desto höher Prio      [8Bit Integer]
 ```
 
+
+___________________________________________________________________________________________________
 ```
-function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
+searchFunction(/*ID*/ uint16_t id)
 
 Task in die Liste suchen
 ````
 
 Funktion Parameter:
 ```
-id     -> Einzigartig id des Tasks
+id     -> Einzigartig id des Tasks                                      [16Bit Integer]
 return -> Pointer zu tcb mit der Task
 ```
 
+
+___________________________________________________________________________________________________
 ```
-function_struct *StallardOS::searchFreeFunction(void)
+searchFreeFunction(void)
 
 sucht einen tcb die gerade nicht verwendet wird
 ```
 
 
-
+___________________________________________________________________________________________________
 ```
-StallardOS::delay(uint32_t milliseconds)
+delay(uint32_t milliseconds)
 
-delay in millisekunden
+delayFunktion in millisekunden
 
 Funktion PArameter:
 ```
-milliseconds -> Menge an ms zu warten
+milliseconds -> Menge an ms zu warten                                   [32Bit Integer]
 ```
 
 
-
+___________________________________________________________________________________________________
 ```
-StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
+getFunctionState(/*Funktion*/ uint16_t id)
+
 
 Check Task Status
 ```
 
 Funktion Parameter:
 ```
-id -> Einzigartig Task id
-return -> Task Status, siehe tasktate enum
+id      -> Einzigartig Task id                                          [16Bit Integer]
+return  -> Task Status, siehe tasktate enum
 ```
 

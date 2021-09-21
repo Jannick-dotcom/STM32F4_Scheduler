@@ -14,8 +14,8 @@ Ausgabe Berechnung
 
 Funktion Parameter:
 ```
-setpoint -> setpoint von der Controller
-input    -> input der pid Controller
+setpoint -> setpoint von der Controller         [64Bits Double]
+input    -> input der pid Controller            [64Bits Double]
 return   -> output der pid Controller
 ```
 
@@ -29,6 +29,6 @@ Enable/disable Task aus die Task List
 
 Funktion Parameter:
 ```
-id  -> einzigartig id der Task
-act -> Boolean Wert, Task aktivierung
+id  -> einzigartig id der Task                  [16Bit Integer]
+act -> Boolean Wert, Task aktivierung           [Boolean]
 ```
