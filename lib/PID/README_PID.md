@@ -5,8 +5,10 @@
 
 Funktionen Erklärung:
 
+
+___________________________________________________________________________________
 ```
-StallardosPID::calculate_pid(double setpoint, double input)
+calculate_pid(double setpoint, double input)
 ```
 Ausgabe Berechnung
 
@@ -17,8 +19,10 @@ input    -> input der pid Controller
 return   -> output der pid Controller
 ```
 
+
+___________________________________________________________________________________
 ```
-StallardOS::changeFunctionEnabled(uint16_t id, bool act)
+changeFunctionEnabled(uint16_t id, bool act)
 
 Enable/disable Task aus die Task List
 ```

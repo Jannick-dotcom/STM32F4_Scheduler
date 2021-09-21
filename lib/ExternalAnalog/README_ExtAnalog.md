@@ -3,7 +3,7 @@
 
 
 Funktionen Erklärung:
-
+_______________________________________________________________
 ```
 StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber, StallardOSSPI *spihandle);
 ````
@@ -16,11 +16,12 @@ Channel -> Auswahl der Channel Nummer
 ```
 
 
-
+_______________________________________________________________
 ```
 int16_t getValue();
 ```
-liesst einen Analog Wert
 
-Return: Analog Wert
+Die Funktion liesst (return) einen Analog Wert
+
+
 ```

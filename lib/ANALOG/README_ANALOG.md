@@ -8,9 +8,10 @@ Es ist ein General Purpouse Input/Output, oder "Allzweckeeingabe/-ausgabe",
 dessen Verhalten, unabhängig on Eingabe oder Ausgabe, programiert werden kann.
 
 
-Der **StallardOS ANALOG** ermöglicht die Einstellung von unterschiedliche Pins der Microcontroller, die mit andere Hardware komunizieren.
+Der **StallardOS ANALOG** ermöglicht die Einstellung von unterschiedliche Pins der Microcontroller,
+die mit andere Hardware komunizieren.
 
-
+_______________________________________________________________
 Die Funktion:
 ```
 StallardOSAnalog(StallardOSADC number, uint8_t channel)

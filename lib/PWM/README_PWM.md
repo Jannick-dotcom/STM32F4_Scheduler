@@ -5,13 +5,17 @@
 
 Funktionen Erklärung:
 
+
+___________________________________________________________________________________
 ```
-StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t number, ports port, uint16_t freq, uint8_t bitcount) : 
+StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t number, ports port, uint16_t freq, uint8_t bitcount) : 
     gpio(number, port, AFPP, nopull, mapToAlternateFunction(instance))
 ```
 Ausgabe Berechnung
 
+
 Funktion Parameter:
+
 ```
 instance -> welche Timer verwenden wir
 channel  -> Timer channel zu verwenden
@@ -21,8 +25,10 @@ freq     -> frequenz der pwm Signal
 bitcount -> Bit Menge der pwm
 ```
 
+
+___________________________________________________________________________________
 ```
-StallardOSSerial::send(const char *dat, uint16_t bytes)
+send(const char *dat, uint16_t bytes)
 
 Data senden
 ```
@@ -34,8 +40,9 @@ bytes -> Menge der versendete Data Bytes
 ```
 
 
+___________________________________________________________________________________
 ```
-StallardOSSerial::read(const char *dat, uint16_t bytes)
+read(const char *dat, uint16_t bytes)
 
 Data lesen/empofangen
 ```
