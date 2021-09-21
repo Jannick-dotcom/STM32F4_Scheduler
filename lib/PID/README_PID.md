@@ -7,6 +7,9 @@ Funktionen Erklärung:
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 calculate_pid(double setpoint, double input)
 ```
@@ -21,6 +24,9 @@ return   -> output der pid Controller
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 changeFunctionEnabled(uint16_t id, bool act)
 

@@ -12,11 +12,13 @@ Der **StallardOS ANALOG** ermöglicht die Einstellung von unterschiedliche Pins 
 die mit andere Hardware komunizieren.
 
 _______________________________________________________________
-Die Funktion:
+
+
+Funktion:
 ```
 StallardOSAnalog(StallardOSADC number, uint8_t channel)
 ````
-erzeugt einen analog Input instance.
+Erzeugt einen analog Input instance.
 
 Funktion Parameter:
 ```

@@ -7,11 +7,14 @@ Funktionen Erklärung:
 
 
 _________________________________________________________________________________________
+
+
+Funktion:
 ```
-StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
+StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
 ```
 
-Erzeugen einer Serieller Instance
+Erzeugen einer Serieller Instance.
 
 Funktion Parameter:
 ```
@@ -21,11 +24,14 @@ baud    -> Baud Rate (Übertragungsgeschwindigkeit in Bit/s)         [32Bit Inte
 
 
 _________________________________________________________________________________________
+
+
+Funktion:
 ```
 send(const char *dat, uint16_t bytes)
 ```
 
-senden von Data
+Senden von Data.
 
 Funktion Parameter:
 ```
@@ -35,11 +41,14 @@ bytes -> Menge an Bytes zu senden                                   [16Bits Doub
 
 
 _________________________________________________________________________________________
+
+
+Funktion:
 ```
 read(char *dat, uint16_t bytes)
 ```
 
-Data lesen
+Data lesen.
 
 Funktion Parameter:
 ```

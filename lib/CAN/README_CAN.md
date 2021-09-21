@@ -5,7 +5,10 @@
 Funktionen Erklärung:
 
 
-_______________________________________________________________
+_________________________________________________________________________________________
+
+
+Funktion:
 ```
 StallardOSCAN(CANports port, CANBauds baud);
 
@@ -23,6 +26,8 @@ baud -> auswahl der Kommunikations Geschwindigkeit [Baud]
 
 _______________________________________________________________
 
+
+Funktion:
 ```
 receiveMessage(StallardOSCanMessage *msg, uint16_t id);
 ```
@@ -41,6 +46,7 @@ id -> id der zu empfangener Nachricht           [16Bit Integer]
 _______________________________________________________________
 
 
+Funktion:
 ```
 sendMessage(StallardOSCanMessage *msg, uint8_t size);
 ````

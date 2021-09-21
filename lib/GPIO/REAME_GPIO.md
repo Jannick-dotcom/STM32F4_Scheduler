@@ -4,6 +4,10 @@
 
 Funktionen Erklärung:
 
+_________________________________________________________________________________________
+
+
+Funktion:
 ```
 StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool initialState, pullMode pull)
 ```
@@ -11,14 +15,17 @@ Erzeugt einen GPIO Pin.
 
 Funktion Parameter:
 ```
-number-> Port Nummer Auswahl                                    [8Bit Integer]
-port  -> Port Auswahl                                           [8Bit Integer]
-dir   -> input oder output                                      [Boolean]
-pull  -> internal pull-up oder pull-down                        [Boolean]
+number     -> Port Nummer Auswahl                                [8Bit Integer]
+port       -> Port Auswahl                                       [8Bit Integer]
+dir        -> input oder output                                  [Boolean]
+pull       -> internal pull-up oder pull-down                    [Boolean]
 ```
 
 
 _______________________________________________________________
+
+
+Funktion:
 ```
 StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull, uint32_t alternate)
 ```
@@ -37,6 +44,9 @@ pull      -> internal pull-up oder pull-down
 alternate -> alternative zu einen normaler gpio Port            [32Bit Integer]
 ```
 _______________________________________________________________
+
+
+Funktion:
 ```
 operator=(bool state)
 ```
@@ -45,7 +55,7 @@ Die Funktion ändert der Pin Status.
 
 Funktion Parameter:
 ```
-state  -> neue status, high oder low                            [Boolean]
-return -> neue status                                           [Boolean]
+state     -> neue status, high oder low                            [Boolean]
+return    -> neue status                                           [Boolean]
 ```
 

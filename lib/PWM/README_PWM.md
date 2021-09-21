@@ -7,11 +7,15 @@ Funktionen Erklärung:
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t number, ports port, uint16_t freq, uint8_t bitcount) : 
     gpio(number, port, AFPP, nopull, mapToAlternateFunction(instance))
 ```
-Ausgabe Berechnung
+
+Ausgabe Berechnung.
 
 
 Funktion Parameter:
@@ -27,11 +31,15 @@ bitcount -> Bit Menge der pwm               [8Bit Integer]
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 send(const char *dat, uint16_t bytes)
-
-Data senden
 ```
+
+Data senden.
+
 
 Funktion Parameter:
 ```
@@ -41,11 +49,15 @@ bytes -> Menge der versendete Data Bytes    [16Bit Integer]
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 read(const char *dat, uint16_t bytes)
-
-Data lesen/empofangen
 ```
+
+Data lesen/empofangen.
+
 
 Funktion Parameter:
 ```

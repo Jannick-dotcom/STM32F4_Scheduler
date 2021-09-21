@@ -4,7 +4,11 @@
 
 Funktionen Erklärung:
 
-___________________________________________________________________________________
+
+____________________________________________________________________
+
+
+Funktion:
 ```
 StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
 ```
@@ -18,6 +22,9 @@ freq     -> Frequenz der Übertragung                               [32 Bit Inte
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 write(uint16_t addr, uint8_t *data, uint16_t bytes)
 ```
@@ -34,6 +41,9 @@ bytes -> Große der Data Container                                  [16 Bit Inte
 
 
 ___________________________________________________________________________________
+
+
+Funktion:
 ```
 read(uint16_t addr, uint8_t *data, uint16_t bytes)
 ```

@@ -7,9 +7,13 @@ Z 24-29, 40-44, 94-99;
 Funktionen Erklärung:
 
 
+_________________________________________________________________________________________
 
+
+Funktion:
 ```
 addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)```
+```
 
 Erzeugt einen neue Task in die "execute list"
 
@@ -23,12 +27,18 @@ return      -> Pointer zu erzeugen tbc                                  [16Bit I
 ```
 
 
+
+
 ___________________________________________________________________________________________________
+
+
+Funktion:
 ```
 changeFunctionEnabled(uint16_t id, bool act)
+```
 
 Enable/disable Task aus die Task List
-```
+
 
 Funktion Parameter:
 ```
@@ -38,11 +48,15 @@ act -> Boolean Wert, Task aktivierung                                   [Boolean
 
 
 ___________________________________________________________________________________________________
+
+
+Funktion:
 ```
 setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
+```
 
 Neue Task Prioritizierung setzen
-```
+
 Funktion Parameter:
 ```
 id  -> einzigartig id der Task                                          [16Bit Integer]
@@ -51,11 +65,15 @@ prio -> neue Task Priorität, je kleiner der Wert, desto höher Prio      [8Bit 
 
 
 ___________________________________________________________________________________________________
+
+
+Funktion:
 ```
 searchFunction(/*ID*/ uint16_t id)
+```
 
 Task in die Liste suchen
-````
+
 
 Funktion Parameter:
 ```
@@ -65,18 +83,26 @@ return -> Pointer zu tcb mit der Task
 
 
 ___________________________________________________________________________________________________
+
+
+Funktion:
 ```
 searchFreeFunction(void)
+```
 
 sucht einen tcb die gerade nicht verwendet wird
-```
+
 
 
 ___________________________________________________________________________________________________
+
+
+Funktion:
 ```
 delay(uint32_t milliseconds)
+```
 
-delayFunktion in millisekunden
+delay Funktion in millisekunden
 
 Funktion PArameter:
 ```
@@ -85,16 +111,18 @@ milliseconds -> Menge an ms zu warten                                   [32Bit I
 
 
 ___________________________________________________________________________________________________
+
+
+Funktion:
 ```
 getFunctionState(/*Funktion*/ uint16_t id)
-
+```
 
 Check Task Status
-```
+
 
 Funktion Parameter:
 ```
 id      -> Einzigartig Task id                                          [16Bit Integer]
 return  -> Task Status, siehe tasktate enum
 ```
-
