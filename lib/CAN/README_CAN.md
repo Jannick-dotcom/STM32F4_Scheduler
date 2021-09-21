@@ -6,8 +6,11 @@ Funktionen Erklärung:
 
 ```
 StallardOSCAN(CANports port, CANBauds baud);
+
 ````
-erzeugt einen CAN interface.
+Die Funktion erzeugt einen CAN interface.
+
+
 
 Funktion Parameter:
 ```
@@ -16,11 +19,14 @@ baud -> auswahl der Kommunikations Geschwindigkeit [Baud]
 ```
 
 
+_______________________________________________________________
 
 ```
 receiveMessage(StallardOSCanMessage *msg, uint16_t id);
 ```
-Receive a CAN message, mit Boolean return (True/False)
+
+Empfängt a CAN message, mit Boolean return (True/False)
+
 
 Funktion Parameter:
 ```
@@ -28,6 +34,9 @@ msg -> Nachricht container
 id -> id der zu empfangener Nachricht
 ```
 
+
+
+_______________________________________________________________
 
 
 ```
