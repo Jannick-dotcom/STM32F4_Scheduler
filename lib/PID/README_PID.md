@@ -6,6 +6,21 @@
 Funktionen Erklärung:
 
 
+Funktion:
+```
+StallardosPID(double p_gain, double i_gain, double d_gain)
+
+Creates a PID Controler
+```
+
+Funktion Parameter:
+```
+p_gain  -> Gain of the P part
+i_gain  -> Gain of the I part
+d_gain  -> Gain of the D part
+```
+
+
 ___________________________________________________________________________________
 
 
@@ -20,21 +35,4 @@ Funktion Parameter:
 setpoint -> setpoint von der Controller         [64Bits Double]
 input    -> input der pid Controller            [64Bits Double]
 return   -> output der pid Controller
-```
-
-
-___________________________________________________________________________________
-
-
-Funktion:
-```
-changeFunctionEnabled(uint16_t id, bool act)
-
-Enable/disable Task aus die Task List
-```
-
-Funktion Parameter:
-```
-id  -> einzigartig id der Task                  [16Bit Integer]
-act -> Boolean Wert, Task aktivierung           [Boolean]
 ```

@@ -1,10 +1,37 @@
 ## **Stallardo Operating System**
 **StallardOS_OS**
 
-info STALLARDO_OS: In mache  Zeilen fehlen Komentare, bzw nicht selbstverständlich wie man die Funktion verwendet:
-Z 24-29, 40-44, 94-99; 
 
 Funktionen Erklärung:
+
+
+Funktion:
+```
+StallardOS()
+```
+
+Erzeugt StallardOS RTOS
+
+Funktion Parameter:
+```
+void
+```
+
+
+_________________________________________________________________________________________
+
+
+Funktion:
+```
+createTBCs()
+```
+
+Erzeugt Task controll blocks.
+
+Funktion Parameter:
+```
+void
+```
 
 
 _________________________________________________________________________________________
@@ -23,7 +50,7 @@ funktion    -> task zu ausführen
 id          -> Einzigartig id der Task                                  [16Bit Integer]
 prio        -> Task priorität, geringere nummer bedeutet höhere Prio.   [8Bit Integer]
 refreshRate -> Frequenz der ausführung                                  [16Bit Integer]
-return      -> Pointer zu erzeugen tbc                                  [16Bit Integer]
+return      -> Pointer zu der erzeugten tbc                             [16Bit Integer]
 ```
 
 
@@ -125,4 +152,51 @@ Funktion Parameter:
 ```
 id      -> Einzigartig Task id                                          [16Bit Integer]
 return  -> Task Status, siehe tasktate enum
+```
+
+
+
+_________________________________________________________________________
+**StallardOSClass**
+
+Funktionen Erklärung:
+
+
+Funktion:
+```
+StakkardOS();
+```
+
+creates a TaskScheduler
+
+```
+addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
+```
+
+Weisst eine eingegebene Funktion Eigenschaften diz zu Scheduling benötigt werden.
+
+Funktion Parameter:
+```
+*function   -> Zeiger zur Funktion die gescheduled werden muss
+id          -> Einzigartige ID des Tasks
+prio        -> 0 - 255, je kleiner der Wert, desto großer die Priotität
+refreshrate -> Muss großer sein als 0 !, nicht verwendet von Contextswitch
+```
+
+
+_________________________________________________________________________________________
+
+Funktion:
+```
+setFunctionPriority(/*Funktion*/ uint16_t id, /*New Priority*/ uint8_t prio);
+```
+
+Weisst eine Funktion einen neue Prio.
+
+
+
+Funktion Parameter:
+```
+id   -> Einzigartige ID der Funktion
+prio -> neue Prio Wert [0 bis 255]
 ```
