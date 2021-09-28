@@ -2,8 +2,6 @@
 
 extern volatile struct function_struct *currentTask;
 
-#ifdef contextSwitch
-
 StallardOSSemaphore::StallardOSSemaphore()
 {
     val = 1;
@@ -29,5 +27,3 @@ void StallardOSSemaphore::take()
         currentTask->waitingForSemaphore = 0;
     }
 }
-
-#endif

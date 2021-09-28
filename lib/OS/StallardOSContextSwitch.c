@@ -15,7 +15,6 @@ extern volatile struct function_struct* volatile nextTask;
  * @param
  * @return
  */
-#ifdef contextSwitch
 void taskOnEnd(void)
 {
     currentTask->used = 0;
@@ -24,7 +23,6 @@ void taskOnEnd(void)
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     while(1);
 }
-#endif
 
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
@@ -99,7 +97,6 @@ void jumpToBootloader(void)
     while(1);
 }
 
-#ifdef contextSwitch
 void findNextFunction()
 {
     nextTask = NULL;
@@ -141,7 +138,6 @@ void findNextFunction()
     while (temp != taskMainStruct);
     if(nextTask->continueInUS > 0) nextTask = NULL;    
 }
-#endif //contextSwitch
 
 /**
  * Switching of a Task happens here.
@@ -149,7 +145,6 @@ void findNextFunction()
  * @param
  * @return
  */
-#ifdef contextSwitch
 __attribute__((always_inline)) inline void switchTask(void)
 {
     if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
@@ -216,7 +211,6 @@ __attribute__((always_inline)) inline void switchTask(void)
         __ASM volatile("STR r2, [r1]");
     }
 }
-#endif
 
 /**
  * SuperVisorCall Handler for the supervisor Exception.
@@ -224,7 +218,6 @@ __attribute__((always_inline)) inline void switchTask(void)
  * @param
  * @return
  */
-#ifdef contextSwitch
 __attribute__((__used__)) void SVC_Handler()
 {
     // disable_interrupts();
@@ -250,7 +243,6 @@ __attribute__((__used__)) void SVC_Handler()
     }
     // enable_interrupts(); //Enable all interrupts
 }
-#endif
 
 
 /**
@@ -266,7 +258,6 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
     // if((usCurrentTimeSinceStart % 1000) == 0) //Every millisecond
     // {
         HAL_IncTick();
-#ifdef contextSwitch
         if(currentTask != NULL)
         {
             volatile struct function_struct* volatile temp = currentTask->next;
@@ -287,7 +278,9 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
 
             if(currentTask->Stack > currentTask->vals)
             {
-                asm("bkpt");
+                #ifndef UNIT_TEST
+                asm("bkpt");  //Zeige debugger
+                #endif
                 currentTask->executable = 0;
             }
             findNextFunction();
@@ -296,7 +289,6 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
                 pendPendSV(); //If nextTask is not this task, set the PendSV to pending
             }
         }
-#endif //contextSwitch
     // }
     enable_interrupts(); //enable all interrupts
 }
@@ -312,7 +304,6 @@ __attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
  * @param
  * @return
  */
-#ifdef contextSwitch
 __attribute__( ( naked, __used__ ) ) void PendSV_Handler()
 {
     // asm("bkpt");
@@ -321,4 +312,3 @@ __attribute__( ( naked, __used__ ) ) void PendSV_Handler()
     enable_interrupts(); //Enable all interrupts
     __ASM volatile("bx r14");
 }
-#endif

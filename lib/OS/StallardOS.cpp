@@ -1,8 +1,7 @@
 #include "StallardOS.hpp"
 
-// extern "C" volatile uint64_t msCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
-extern "C" volatile uint64_t taskMainTime;
+// extern "C" volatile uint64_t taskMainTime;
 
 //Kontext Switch
 volatile struct function_struct* volatile currentTask = nullptr;
@@ -22,11 +21,11 @@ extern "C" void findNextFunction();
  */
 void taskMain(void)
 {
-  #ifdef contextSwitch
+  
   while (1)
   {
   }
-  #endif
+  
 }
 
 /**
@@ -52,14 +51,13 @@ StallardOS::StallardOS()
   StallardOS_SetSysClock(runFreq);
   if(SystemCoreClock != (runFreq * 1000000))
   {
-    asm("bkpt"); //Make a software breakpoint to stop the debugger here so we can check
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
   }
-#ifdef contextSwitch
+
   taskMainStruct = addFunction(taskMain, -2, 255, 200);
   if(taskMainStruct == nullptr) while(1);
-
-  // NVIC_EnableIRQ(SysTick_IRQn);
-  // SysTick_Config((uint32_t)(SystemCoreClock / defaultSysTickFreq));
 
   TIM_HandleTypeDef htim;
   __TIM6_CLK_ENABLE();
@@ -77,10 +75,6 @@ StallardOS::StallardOS()
   NVIC_SetPriority(TIM6_DAC_IRQn, 0x00);
   HAL_NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
   HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
-#else
-  first_function_struct = taskMainStruct = addFunction(taskMain, -2, 255, 1);
-  
-#endif
 }
 
 /**
@@ -123,15 +117,12 @@ void StallardOS::createTCBs()
     temp->priority = -1;
 
     temp->id = -1;
-#ifdef contextSwitch
+
     temp->State = NEW;                        //New Task
     // temp->Stack = temp->vals + sizeStack - sizeof(uint32_t); //End of Stack
-#endif
-#ifndef contextSwitch
-    temp->lastExecTime = 0;
-    temp->frequency = 0;
+
+
     temp->executable = true;
-#endif
     temp->used = false;
     temp->continueInUS = 0;
 
@@ -139,72 +130,6 @@ void StallardOS::createTCBs()
   }
 }
 
-#ifndef contextSwitch
-/**
- * Add a new Task to execute list.
- *
- * @param function Task to execute.
- * @param id unique id of the task.
- * @param prio priority of the task, lower means higher.
- * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
- * @param Execcount amount of executes of this task, no value is endless.
- * @return pointer to the created tcb.
- */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate, uint16_t Execcount)
-{
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000) //Make sure the parameters are correct
-  {
-    return nullptr;
-  }
-#ifndef contextSwitch
-  if (refreshRate == 0)
-  {
-    return nullptr;
-  }
-#endif
-
-  struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
-
-  function_struct_ptr = searchFreeFunction();
-  if (function_struct_ptr == nullptr)
-  {
-    //function_struct_ptr = new struct function_struct; //ein neues erstellen
-    //if (function_struct_ptr == nullptr)               //Wenn kein HEAP Platz mehr frei ist...
-    //{
-    return nullptr; //Aus der Funktion rausspringen
-    //}
-  }
-
-  if (first_function_struct == nullptr) //Wenn schon funktionen hinzugefügt wurden
-  {
-    return nullptr;
-  }
-
-  //alle Werte übertragen
-  function_struct_ptr->function = function;
-  function_struct_ptr->executable = true;
-  function_struct_ptr->priority = prio;
-  function_struct_ptr->id = id;
-  function_struct_ptr->error = 0;
-
-#ifdef contextSwitch
-  function_struct_ptr->refreshRate = refreshRate;
-  function_struct_ptr->lastYield = 0;
-  function_struct_ptr->State = NEW;                                       //New Task
-  function_struct_ptr->Stack = function_struct_ptr->vals + sizeStack - 4; //End of Stack
-  function_struct_ptr->waitingForSemaphore = 0;
-#else
-  function_struct_ptr->lastExecTime = 0; //ab hier wird die nächste ausfürzeit berechnet
-  function_struct_ptr->frequency = refreshRate;
-#endif
-  function_struct_ptr->used = true;
-  
-  function_struct_ptr->continueInUS = 0;
-  return function_struct_ptr;
-}
-#endif
-
-#ifdef contextSwitch
 /**
  * Add a new Task to execute list.
  * Also allocates Stack space for the Task
@@ -220,6 +145,9 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
 {
   if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0) //Make sure the parameters are correct
   {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
     return nullptr;
   }
 
@@ -228,15 +156,25 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr = searchFreeFunction();
   if (function_struct_ptr == nullptr)
   {
-    //function_struct_ptr = new struct function_struct; //ein neues erstellen
-    //if (function_struct_ptr == nullptr)               //Wenn kein HEAP Platz mehr frei ist...
-    //{
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
     return nullptr; //Aus der Funktion rausspringen
-    //}
   }
 
-  if (first_function_struct == nullptr) //Wenn schon funktionen hinzugefügt wurden
+  if (first_function_struct == nullptr) //Wenn noch keine funktionen hinzugefügt wurden
   {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
+    return nullptr;
+  }
+  stack_T *stackPtr = (stack_T*)malloc(sizeof(stack_T) * stackSize); //Stack speicher für funktion allokieren
+  if(stackPtr == nullptr) //Wenn kein Stack gefunden
+  {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
     return nullptr;
   }
 
@@ -245,13 +183,12 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
   function_struct_ptr->id = id;
-  function_struct_ptr->error = 0;
+  // function_struct_ptr->error = 0;
 
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
   function_struct_ptr->State = NEW;                                       //New Task
-  stack_T *stackPtr = (stack_T*)malloc(sizeof(stack_T) * stackSize);
   function_struct_ptr->Stack = function_struct_ptr->vals = stackPtr + stackSize - sizeof(stack_T); //End of Stack
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
@@ -276,8 +213,11 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
  */
 struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16_t id, uint8_t prio, uint32_t *stackPtr, uint32_t stackSize, uint16_t refreshRate)
 {
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0) //Make sure the parameters are correct
+  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0 || stackPtr == nullptr) //Make sure the parameters are correct
   {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
     return nullptr;
   }
 
@@ -286,15 +226,17 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
   function_struct_ptr = searchFreeFunction();
   if (function_struct_ptr == nullptr)
   {
-    //function_struct_ptr = new struct function_struct; //ein neues erstellen
-    //if (function_struct_ptr == nullptr)               //Wenn kein HEAP Platz mehr frei ist...
-    //{
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
     return nullptr; //Aus der Funktion rausspringen
-    //}
   }
 
   if (first_function_struct == nullptr) //Wenn schon funktionen hinzugefügt wurden
   {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
     return nullptr;
   }
 
@@ -303,7 +245,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
   function_struct_ptr->id = id;
-  function_struct_ptr->error = 0;
+  // function_struct_ptr->error = 0;
 
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
@@ -317,7 +259,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
   function_struct_ptr->continueInUS = 0;
   return function_struct_ptr;
 }
-#endif
+
 
 /**
  * Here we en/disable a Task from the List.
@@ -325,7 +267,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
  * @param id unique id of the task.
  * @param act boolean value, activation of task.
  */
-void StallardOS::changeFunctionEnabled(uint16_t id, bool act)
+void StallardOS::setFunctionEnabled(uint16_t id, bool act)
 {
   struct function_struct *temp = searchFunction(id); //Funktion suchen
   if (temp != nullptr)                               //Wenn die übergebene Funktion gültig ist
@@ -439,7 +381,7 @@ void StallardOS::delay(uint32_t milliseconds)
  * @param id unique id of the task.
  * @param prio new priority, lower means higher
  */
-#ifdef contextSwitch
+
 void StallardOS::yield()
 {
   currentTask->lastYield = usCurrentTimeSinceStart;
@@ -459,7 +401,7 @@ void StallardOS::yield()
     currentTask->lastStart = usCurrentTimeSinceStart;
   }
 }
-#endif
+
 
 /**
  * Check the state of a task
@@ -467,7 +409,7 @@ void StallardOS::yield()
  * @param id unique id of the task.
  * @return state of the task, see taskstate enum
  */
-#ifdef contextSwitch
+
 taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 {
   struct function_struct *temp = searchFunction(id); //Hier die Funktion suchen
@@ -488,7 +430,7 @@ taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 //   return val;
 // }
 
-#endif
+
 
 /**
  * Start the StallardOS operating system
@@ -500,7 +442,7 @@ void StallardOS::startOS(void)
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
-#ifdef contextSwitch
+
     SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
     FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
     asm("DSB");
@@ -518,14 +460,6 @@ void StallardOS::startOS(void)
     asm("SUB R0, #200"); //Reserve some space for Handlers (200*4 Byte)
     asm("MSR PSP, R0");
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-
-#else
-    while (SysTick_Config(SystemCoreClock / (uint32_t)1000)) //millisecond counter
-      ;
-    NVIC_SetPriority(SysTick_IRQn, 0x00);
-    NVIC_EnableIRQ(SysTick_IRQn);
-    NVIC_EnableIRQ(FPU_IRQn);
-#endif
   }
 }
 
@@ -535,7 +469,6 @@ void StallardOS::startOS(void)
  * @param id unique id of the task.
  * @param exec_freq new execution frequency of the task
  */
-#ifndef contextSwitch
 void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
 {
   if (exec_freq <= 0) //Make sure the parameters are correct
@@ -546,10 +479,9 @@ void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
   function_struct *temp = searchFunction(id); //Hier die Funktion speichern von der die Priorität geändert werden soll
   if (temp != nullptr)                        //Wenn die übergebene Funktion gültig ist
   {
-    temp->frequency = exec_freq; //Die Frequenz ändern
+    temp->refreshRate = exec_freq; 
   }
 }
-#endif
 
 uint64_t StallardOS::getRuntimeMs()
 {
@@ -565,34 +497,3 @@ void StallardOS::goBootloader()
 {
   StallardOS_goBootloader();
 }
-
-/**
- * Basic scheduling algorithm
- *
- */
-#ifndef contextSwitch
-void StallardOS::schedule()
-{
-  // uint16_t endOfList = 0;                     //Merker für das traversieren der Liste
-  function_struct *function_struct_ptr;       //Pointer auf Structs zu den Funktionen mit dem ich arbeite
-  lastScheduleTime = usCurrentTimeSinceStart; //Jetzige Schedule Zeit speichern
-
-  function_struct_ptr = first_function_struct->next;
-  // endOfList = 0;
-  while (function_struct_ptr != first_function_struct)
-  {
-    if (function_struct_ptr->frequency <= 0 || function_struct_ptr->used == 0)
-    {
-      function_struct_ptr = function_struct_ptr->next;
-      continue;
-    }
-    if ((function_struct_ptr->lastExecTime + (1000.0 / function_struct_ptr->frequency)) < usCurrentTimeSinceStart && function_struct_ptr->priority < 255)
-    {
-      function_struct_ptr->lastExecTime = usCurrentTimeSinceStart;
-      (*function_struct_ptr->function)();
-      break;
-    }
-    function_struct_ptr = function_struct_ptr->next;
-  }
-}
-#endif

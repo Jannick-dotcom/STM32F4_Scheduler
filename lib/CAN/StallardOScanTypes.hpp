@@ -16,7 +16,7 @@ typedef enum CANBauds
 struct StallardOSCanMessage
 {
 private:
-    virtual void nothing(){};
+    // virtual void nothing(){};
 public:
     uint8_t used = 0;
     uint64_t timestamp = -1; //Set Timestamp to maximum

@@ -9,16 +9,16 @@
  */
 StallardosPID::StallardosPID(double p_gain, double i_gain, double d_gain)
 {
-    #ifdef contextSwitch
+    
     this->sem.take();
-    #endif
+    
     this->pid_i_mem = 0;
     this->pid_p_gain = p_gain;
     this->pid_i_gain = i_gain;
     this->pid_d_gain = d_gain;
-    #ifdef contextSwitch
+    
     this->sem.give();
-    #endif
+    
 }
 
 
@@ -31,9 +31,9 @@ StallardosPID::StallardosPID(double p_gain, double i_gain, double d_gain)
  */
 double StallardosPID::calculate_pid(double setpoint, double input)
 {
-    #ifdef contextSwitch
+    
     this->sem.take();
-    #endif
+    
     double pid_error_temp;
     this->pid_setpoint = setpoint;
     this->pid_input = input;
@@ -51,8 +51,8 @@ double StallardosPID::calculate_pid(double setpoint, double input)
         pid_output = pid_max * -1;
 
     pid_last_d_error = pid_error_temp;
-    #ifdef contextSwitch
+    
     this->sem.give();
-    #endif
+    
     return pid_output;
 }

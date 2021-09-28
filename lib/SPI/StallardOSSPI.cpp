@@ -2,9 +2,9 @@
 
 StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (inst == SPI2)
     {
         this->miso = StallardOSGPIO(miso.pin, miso.port, AFPP, nopull, GPIO_AF5_SPI2);
@@ -40,34 +40,34 @@ StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio m
     handle.Init.CRCPolynomial = 10;
     if (HAL_SPI_Init(&handle) != HAL_OK)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         StallardOSGeneralFaultHandler();
     }
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
 
 void StallardOSSPI::send(uint8_t *data, uint16_t size)
 {
-#ifdef contextSwitch
+
     sem.take();
-#endif
+
     HAL_SPI_Transmit(&handle, data, size, HAL_MAX_DELAY);
-#ifdef contextSwitch
+
     sem.give();
-#endif
+
 }
 
 void StallardOSSPI::receive(uint8_t *data, uint16_t size, uint32_t timeout)
 {
-#ifdef contextSwitch
+
     sem.take();
-#endif
+
     HAL_SPI_Receive(&handle, data, size, timeout);
-#ifdef contextSwitch
+
     sem.give();
-#endif
+
 }

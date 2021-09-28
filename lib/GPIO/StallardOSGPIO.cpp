@@ -12,14 +12,14 @@ StallardOSGPIO::StallardOSGPIO() {}
  */
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool initialState, pullMode pull)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (number > 31) //Error check
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         StallardOSGeneralFaultHandler();
     }
 
@@ -50,9 +50,9 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
 
     HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(initialState));
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
 
 /**
@@ -66,14 +66,14 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
  */
 StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode pull, uint32_t alternate)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (number > 31 || alternate == uint32_t(-1)) //Error check
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         StallardOSGeneralFaultHandler();
     }
 
@@ -104,9 +104,9 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     GPIO_InitStruct.Alternate = alternate;
 
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
 
 StallardOSGPIO::~StallardOSGPIO()
@@ -128,42 +128,42 @@ bool StallardOSGPIO::operator=(bool state)
 bool StallardOSGPIO::read()
 {
     bool returnVal;
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (this->dir == Input)
     {
         returnVal = HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return returnVal;
     }
     else if (this->dir == Output)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return this->state;
     }
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
     return 0;
 }
 
 bool StallardOSGPIO::write(bool state)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (this->dir == Output || this->dir == OutputOD)
     {
         HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
         this->state = state;
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return this->state;
     }
     else if (this->dir == Input)
@@ -175,9 +175,9 @@ bool StallardOSGPIO::write(bool state)
         GPIO_InitStruct.Pull = pullMode(int(state) + 1);
 
         HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return state;
     }
     return 0;

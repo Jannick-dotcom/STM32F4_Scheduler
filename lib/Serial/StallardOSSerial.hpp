@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
+#include "StallardOSGPIO.hpp"
 #include <iostream>
 
 extern "C" void StallardOSGeneralFaultHandler();
@@ -15,11 +16,12 @@ class StallardOSSerial
 private:
     UART_HandleTypeDef huart;
     StallardOSSemaphore sem;
+    StallardOSGPIO tx;
+    StallardOSGPIO rx;
 public:
-    StallardOSSerial(USART_TypeDef *serPort, uint32_t baud);
+    StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uint32_t baud);
     void send(const char *dat, uint16_t bytes);
     void send(std::string str);
     void read(char *dat, uint16_t bytes);
-
 };
 #endif

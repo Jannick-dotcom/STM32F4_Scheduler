@@ -13,9 +13,9 @@ CAN_HandleTypeDef StallardOSCAN::can2handle;
 
 StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
 #ifdef STM32F417xx
     if (port == StallardOSCAN1 && can1used == false)
     {
@@ -38,9 +38,9 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     }
     else //Already initialized
     {
-#ifdef contextSwitch
+
         this->sem.give(); //release Semaphore
-#endif
+
         return;
     }
     if (baud == CANBauds::CAN1M)
@@ -71,9 +71,9 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 
     if (HAL_CAN_Init(&canhandle) != HAL_OK)
     {
-#ifdef contextSwitch
+
         this->sem.give(); //release Semaphore
-#endif
+
         StallardOSGeneralFaultHandler();
     }
 
@@ -88,9 +88,9 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
 
     if (HAL_CAN_Start(&canhandle) != HAL_OK)
     {
-#ifdef contextSwitch
+
         this->sem.give(); //release Semaphore
-#endif
+
         StallardOSGeneralFaultHandler();
     }
 
@@ -101,12 +101,16 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO0_FULL) != HAL_OK)
     {
         /* Notification Error */
-        asm("bkpt");
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
     }
     if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO1_FULL) != HAL_OK)
     {
         /* Notification Error */
-        asm("bkpt");
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
     }
     HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_ClearPendingIRQ(CAN1_RX1_IRQn);
@@ -116,9 +120,9 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
     NVIC_EnableIRQ(CAN1_RX1_IRQn);
     NVIC_EnableIRQ(CAN2_RX0_IRQn);
     NVIC_EnableIRQ(CAN2_RX1_IRQn);
-#ifdef contextSwitch
+
     this->sem.give(); //release Semaphore
-#endif
+
 }
 
 extern "C" void CAN2_RX0_IRQHandler()
@@ -228,15 +232,15 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
 
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     // receiveMessage_FIFO(&canhandle); //Receive the Messages from Hardware FiFo ->6 Messages total
     if (msg == nullptr) //if provided message for storing is valid
     {
-#ifdef contextSwitch
+
         this->sem.give(); //Set the Semaphore free
-#endif
+
         return false; //return false status
     }
 
@@ -264,29 +268,29 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
             fifoPtr[k].used = 0;       //set the FiFo message to unused
             fifoPtr[k].timestamp = -1; //reset timestamp
             fifoPtr[k].dlc = 0;
-#ifdef contextSwitch
+
             this->sem.give(); //release Semaphore
-#endif
+
             return true; //indicate success
         }
     }
-#ifdef contextSwitch
+
     this->sem.give(); //release semaphore
-#endif
+
     return false; //return false status
 }
 
 int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
     uint32_t tempTransmMailb;
-#ifdef contextSwitch
+
     this->sem.take(); //Block the semaphore
-#endif
+
     if (msg == nullptr || size > 8 || size == 0) //Check if the size and the message are valid
     {
-#ifdef contextSwitch
+
         this->sem.give(); //release semaphore
-#endif
+
         return -1;
     }
     TxHeader.StdId = msg->ID;    //copy the id
@@ -298,9 +302,9 @@ int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
         ;
     // HAL_CAN_AbortTxRequest(&canhandle,-1);         //Wait until all TX Mailboxes are free
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, &tempTransmMailb); //Add message to transmit mailbox
-#ifdef contextSwitch
+
     this->sem.give(); //release Semaphore
-#endif
+
     return HAL_CAN_GetError(&canhandle);
 }
 

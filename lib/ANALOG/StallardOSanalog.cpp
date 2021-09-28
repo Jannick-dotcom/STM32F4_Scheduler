@@ -2,9 +2,9 @@
 
 StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel channel, ports port, uint8_t pin) : gpio(pin,port,Analog)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     // gpio = StallardOSGPIO(pin,port,Analog); //initialize the gpio as analog input pin
     __HAL_RCC_ADC1_CLK_ENABLE();
     __HAL_RCC_ADC2_CLK_ENABLE();
@@ -25,9 +25,9 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel ch
     hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
     if (HAL_ADC_Init(&hadc1) != HAL_OK)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         StallardOSGeneralFaultHandler();
     }
     // Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
@@ -38,30 +38,30 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel ch
     sConfig.Offset = 0;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         StallardOSGeneralFaultHandler();
     }
 
     this->number = number;
     this->channel = channel;
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
 
 
 uint32_t StallardOSAnalog::getValue()
 {
     uint32_t retVal;
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     HAL_ADC_Start(&hadc1);
     retVal = HAL_ADC_GetValue(&hadc1);
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
     return retVal;
 }

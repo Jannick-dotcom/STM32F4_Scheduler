@@ -32,12 +32,10 @@ typedef uint32_t stack_T;
 
 struct function_struct
 {
-#ifdef contextSwitch
   volatile stack_T *Stack;             //Stack pointer
-  volatile stack_T *vals;
+  volatile stack_T *vals;              //Stack pointer for future knowledge of initial stack ptr, for example in fault handlers
   uint32_t stackSize;
-#endif
-  //Verkettete Liste
+
   volatile struct function_struct *prev; //für verkettete liste
   volatile struct function_struct *next; //für verkettete liste
 
@@ -48,15 +46,8 @@ struct function_struct
   volatile uint8_t used;       //Ist dieser TCB schon belegt?
   volatile uint8_t executable; //Funktion ausführen?
 
-  volatile uint8_t error; //Error in Task scheduling has happened
+  // volatile uint8_t error; //Error in Task scheduling has happened
 
-#ifndef contextSwitch
-  //nur für normalen Schedule betrieb
-  float frequency;       //Soll ... mal pro Sekunde ausgeführt werden
-  uint64_t lastExecTime; //Letzter Zeitpunkt der Ausführung
-#endif
-
-#ifdef contextSwitch
   //nur für KontextSwitch
   volatile uint16_t refreshRate;
   volatile uint64_t lastYield;
@@ -65,7 +56,6 @@ struct function_struct
   volatile taskState State;             //Status des Tasks
   volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore
   volatile uint16_t *semVal;
-#endif
   volatile uint64_t continueInUS; //Delay amount
 };
 

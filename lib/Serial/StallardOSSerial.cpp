@@ -5,24 +5,56 @@
  * @param serPort which Serial to use
  * @param baud baud rate
  */
-StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
+StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uint32_t baud)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (baud == 0)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return;
     }
-    __HAL_RCC_USART1_CLK_ENABLE();
-    __HAL_RCC_USART2_CLK_ENABLE();
-    __HAL_RCC_USART3_CLK_ENABLE();
-    __HAL_RCC_USART6_CLK_ENABLE();
-    __HAL_RCC_UART4_CLK_ENABLE();
-    __HAL_RCC_UART5_CLK_ENABLE();
+    uint8_t alternateFunction;
+    if(serPort == USART1)
+    {
+        __HAL_RCC_USART1_CLK_ENABLE();
+        alternateFunction = GPIO_AF7_USART1;
+    }
+    else if(serPort == USART2)
+    {
+        __HAL_RCC_USART2_CLK_ENABLE();
+        alternateFunction = GPIO_AF7_USART2;
+    }
+    else if(serPort == USART3)
+    {
+        __HAL_RCC_USART3_CLK_ENABLE();
+        alternateFunction = GPIO_AF7_USART3;
+    }
+    else if(serPort == UART4)
+    {
+        __HAL_RCC_UART4_CLK_ENABLE();
+        alternateFunction = GPIO_AF8_UART4;
+    }
+    else if(serPort == UART5)
+    {
+        __HAL_RCC_UART5_CLK_ENABLE();
+        alternateFunction = GPIO_AF8_UART5;
+    }
+    else if(serPort == USART6)
+    {
+        __HAL_RCC_USART6_CLK_ENABLE();
+        alternateFunction = GPIO_AF8_USART6;
+    }
+    else //Not implemented
+    {
+        StallardOSGeneralFaultHandler();
+    }
+
+    this->rx = StallardOSGPIO(rx.pin,rx.port, AFPP, nopull, alternateFunction);
+    this->tx = StallardOSGPIO(tx.pin,tx.port, AFPP, nopull, alternateFunction);
     huart.Instance = serPort;
     huart.Init.BaudRate = baud;
     huart.Init.WordLength = UART_WORDLENGTH_8B;
@@ -33,14 +65,14 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
     huart.Init.OverSampling = UART_OVERSAMPLING_16;
     if (HAL_UART_Init(&huart) != HAL_OK)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         StallardOSGeneralFaultHandler();
     }
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
 
 /**
@@ -51,20 +83,20 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, uint32_t baud)
  */
 void StallardOSSerial::send(const char *dat, uint16_t bytes)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (dat == nullptr)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return;
     }
     HAL_UART_Transmit(&huart, (uint8_t *)dat, bytes, 0xFFFF);
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
 
 void StallardOSSerial::send(std::string str)
@@ -80,18 +112,18 @@ void StallardOSSerial::send(std::string str)
  */
 void StallardOSSerial::read(char *dat, uint16_t bytes)
 {
-#ifdef contextSwitch
+
     this->sem.take();
-#endif
+
     if (dat == nullptr)
     {
-#ifdef contextSwitch
+
         this->sem.give();
-#endif
+
         return;
     }
     HAL_UART_Receive(&huart, (uint8_t *)dat, bytes, 0xFFFF);
-#ifdef contextSwitch
+
     this->sem.give();
-#endif
+
 }
