@@ -16,7 +16,7 @@ private:
   #endif
 
 public:
-  //Constructor
+  //Constructor 
   StallardOS(); //Create a Task Scheduler
   #ifdef contextSwitch
   // struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
@@ -25,10 +25,10 @@ public:
   #else
   struct function_struct *addFunction(
       /*Funktion*/ void (*function)(),
-      /*ID of task*/ uint16_t id,                  //The ID must be different for different tasks
-      /*Prioritaet*/ uint8_t prio,                 //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
+      /*ID of task*/ uint16_t id,                   //The ID must be different for different tasks
+      /*Prioritaet*/ uint8_t prio,                  //Tasks with prio 0 won't be interrupted and Tasks with prio 255 will only be executed to waste Time
       /*Executions per sec*/ uint16_t refreshRate,  //Must be bigger than 0 ! //not used by context switch
-      /*Number of execs*/ uint16_t Execcount = 0); //not used by context switch
+      /*Number of execs*/ uint16_t Execcount = 0);  //not used by context switch
   #endif
   void changeFunctionEnabled(
       /*Funktion*/ uint16_t id,
