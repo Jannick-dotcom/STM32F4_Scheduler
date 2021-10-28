@@ -16,7 +16,7 @@ private:
 
 
 public:
-  //Constructor
+  //Constructor 
   StallardOS(); //Create a Task Scheduler
   // struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
   struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint32_t stackSize, uint16_t refreshRate = 0);
