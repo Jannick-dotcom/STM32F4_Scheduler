@@ -91,6 +91,7 @@ public:
         rawValue = val;
         return *this;
     }
+    operator int() const { return rawValue; }
 };
 
 #endif

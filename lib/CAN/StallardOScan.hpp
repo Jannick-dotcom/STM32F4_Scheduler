@@ -46,7 +46,7 @@ public:
     * @param[in] baud Baud rate of the CAN. Has to be same on all devices
     * @return true if a message is received, false otherwise
     */
-    StallardOSCAN(CANports port, CANBauds baud);
+    StallardOSCAN(CANports port, CANBauds baud, bool debug = false);
 
     /**
      *  Destroy a CAN interface

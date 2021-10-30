@@ -11,7 +11,7 @@ volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo2[CAN_FIFO_size];
 CAN_HandleTypeDef StallardOSCAN::can1handle;
 CAN_HandleTypeDef StallardOSCAN::can2handle;
 
-StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
+StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud, bool debug)
 {
 
     this->sem.take();
@@ -56,11 +56,14 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud)
         canhandle.Init.TimeSeg2 = CAN_BS2_2TQ;
     }
 
-#ifdef CAN_debug
-    canhandle.Init.Mode = CAN_MODE_LOOPBACK; //For Debugging -> the CAN sends message to itself
-#else
-    canhandle.Init.Mode = CAN_MODE_NORMAL; //Real CAN Networking
-#endif
+    if(debug)
+    {
+        canhandle.Init.Mode = CAN_MODE_LOOPBACK; //For Debugging -> the CAN sends message to itself
+    }
+    else
+    {
+        canhandle.Init.Mode = CAN_MODE_NORMAL; //Real CAN Networking
+    }
     canhandle.Init.SyncJumpWidth = CAN_SJW_1TQ;
     canhandle.Init.TimeTriggeredMode = DISABLE;
     canhandle.Init.AutoBusOff = DISABLE;
