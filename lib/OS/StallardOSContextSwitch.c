@@ -19,7 +19,10 @@ void taskOnEnd(void)
 {
     currentTask->used = 0;
     currentTask = taskMainStruct;
-    free((uint32_t*)currentTask->vals);
+    if(!currentTask->staticAlloc)
+    {
+        free((uint32_t*)currentTask->vals);
+    }
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     while(1);
 }
