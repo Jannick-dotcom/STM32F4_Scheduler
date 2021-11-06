@@ -9,6 +9,32 @@ extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
 
+static MPU_Region_InitTypeDef MPU_StackCfg = {
+    /* these values are always the same (for stack)
+     * do not assign them at each context switch
+     */
+    .Enable = MPU_REGION_ENABLE,
+    .TypeExtField = MPU_TEX_LEVEL0,
+    .SubRegionDisable = 0x00,
+
+    /* stack region is
+    * Full access
+    * shareable
+    * cachable
+    * not bufferable
+    * not executable
+    */
+    .AccessPermission = MPU_REGION_FULL_ACCESS,
+    .IsShareable = MPU_ACCESS_SHAREABLE,
+    .IsCacheable = MPU_ACCESS_CACHEABLE,
+    .IsBufferable = MPU_ACCESS_NOT_BUFFERABLE,
+    .DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE,
+
+    /* always use MPU region 3 for stack */
+    .Number = MPU_REGION_NUMBER3
+}; 
+
+
 /**
  * If a Task Returns, this function gets executed and calls the remove function of this task.
  *
@@ -19,7 +45,7 @@ void taskOnEnd(void)
 {
     currentTask->used = 0;
     currentTask = taskMainStruct;
-    free((uint32_t*)currentTask->vals);
+    free((stack_T*)currentTask->stackBase);
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     while(1);
 }
@@ -155,7 +181,7 @@ __attribute__((always_inline)) inline void switchTask(void)
         __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
         __ASM volatile("ISB");
 
-        __ASM volatile("TST r14, #0x10");
+        __ASM volatile("TST r14, #0x10");       //store vfp registers, if task was using FPU
         __ASM volatile("IT eq");
         __ASM volatile("VSTMDBeq r0!, {s16-s31}");
         
@@ -186,6 +212,9 @@ __attribute__((always_inline)) inline void switchTask(void)
         __ASM volatile("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
         __ASM volatile("MSR PSP, r0");             //set PSP
 
+        __ASM volatile("MOV r0, #01");      // go into unprivileged mode
+        __ASM volatile("MSR control, r0");
+
         currentTask->State = RUNNING; //Save state as running
         currentTask->lastStart = usCurrentTimeSinceStart;
     }
@@ -204,12 +233,33 @@ __attribute__((always_inline)) inline void switchTask(void)
         
         __ASM volatile("MSR PSP, r0");           //set PSP
         __ASM volatile("ISB");
+
+        __ASM volatile("MOV r0, #01");      // go into unprivileged mode
+        __ASM volatile("MSR control, r0");
         
         currentTask->State = RUNNING; //Save state as running
         __ASM volatile("LDR r1, =nextTask");
         __ASM volatile("MOV r2, #0");
         __ASM volatile("STR r2, [r1]");
     }
+}
+
+
+void setMPU(void){
+    /* same check is done in switchTask,
+     * needs to be present in both methods, 
+     * in case MPU config is disabled
+     */
+
+    if (nextTask == NULL) nextTask = taskMainStruct;
+
+    HAL_MPU_Disable();
+    
+    MPU_StackCfg.BaseAddress = (stack_T)nextTask->stackBase;
+    MPU_StackCfg.Size = nextTask->stackSize_MPU;
+
+    HAL_MPU_ConfigRegion(&MPU_StackCfg);
+    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
 /**
@@ -308,7 +358,12 @@ __attribute__( ( naked, __used__ ) ) void PendSV_Handler()
 {
     // asm("bkpt");
     disable_interrupts();
+
+    #ifdef useMPU
+        setMPU(); /* MUST be called before switchTask, not fully sure why */
+    #endif // useMPU
     switchTask();
+
     enable_interrupts(); //Enable all interrupts
-    __ASM volatile("bx r14");
+    __ASM volatile("bx r14");  //perform Exception return
 }

@@ -46,6 +46,7 @@ optional
 * C++ Intellisense
 * GitLens
 * Markdown All in One
+* Doxygen Documentation Generator
 * ...
 
 if the language server keeps crashing, try to downgrade the `C/C++` version. 

@@ -39,7 +39,7 @@ ________________________________________________________________________________
 
 Funktion:
 ```
-addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate)```
+addFunction(void (*function)(), uint16_t id, uint8_t prio, stack_T stackSize, uint16_t refreshRate)```
 ```
 
 Erzeugt einen neue Task in die "execute list"
@@ -49,6 +49,7 @@ Funktion Parameter:
 funktion    -> task zu ausführen                                           
 id          -> Einzigartig id der Task                                  [16Bit Integer]
 prio        -> Task priorität, geringere nummer bedeutet höhere Prio.   [8Bit Integer]
+stackSize   -> number of elements to store on stack (NOT size in Bytes) [32Bit Integer on STM32]
 refreshRate -> Frequenz der ausführung                                  [16Bit Integer]
 return      -> Pointer zu der erzeugten tbc                             [16Bit Integer]
 ```
@@ -170,7 +171,7 @@ StakkardOS();
 creates a TaskScheduler
 
 ```
-addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
+addFunction(void (*function)(), uint16_t id, uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0);
 ```
 
 Weisst eine eingegebene Funktion Eigenschaften diz zu Scheduling benötigt werden.
@@ -180,6 +181,7 @@ Funktion Parameter:
 *function   -> Zeiger zur Funktion die gescheduled werden muss
 id          -> Einzigartige ID des Tasks
 prio        -> 0 - 255, je kleiner der Wert, desto großer die Priotität
+stackSize   -> number of elements to store on stack (NOT size in Bytes)
 refreshrate -> Muss großer sein als 0 !, nicht verwendet von Contextswitch
 ```
 

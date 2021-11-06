@@ -18,13 +18,15 @@ Es wird nur ein StallardOS pro CPU Kern benötigt
 
 **Funktion hinzufügen**
 ```
-void addFunction(void (*function)(), uint16_t id, uint8_t prio);
+void addFunction(void (*function)(), uint16_t id, uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0);
 ```  
 > void (*function)()      ->  Funktion, die hinzugefügt werden soll
 
 > uint16_t id           ->  Eindeutige ID des Tasks - (2 identische möglich)
 
 > uint8_t prio            ->  Priorität der Funktion (kleiner ist höher)
+
+> stack_T stackSize     -> number of elements to store on stack (NOT size in Bytes)
 
 
 **Priorität verändern** 
