@@ -358,7 +358,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   stack_T *stackPtr;
   stackSizeBytes = sizeof(stack_T)*stackSize;
 
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSizeBytes == 0 || stackSizeBytes > 0x4'0000'0000) //Make sure the parameters are correct
+  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSizeBytes == 0 || stackSizeBytes > 0x1'0000'0000) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
@@ -454,7 +454,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
   stack_T stackSizeBytes;
   stackSizeBytes = sizeof(stack_T)*stackSize;
 
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSizeBytes > 0x4'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
+  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSizeBytes > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
@@ -626,7 +626,7 @@ void StallardOS::delay(uint32_t milliseconds)
     currentTask->continueInUS = (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     // nextTask = taskMainStruct;
     findNextFunction();
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    StallardOS::call_pendPendSV();
   }
 }
 
@@ -651,7 +651,7 @@ void StallardOS::yield()
         else
         {
           findNextFunction();
-          SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+          StallardOS::call_pendPendSV();
         }
       }
     currentTask->lastStart = usCurrentTimeSinceStart;

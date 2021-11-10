@@ -288,6 +288,10 @@ __attribute__((__used__)) void SVC_Handler()
             jumpToBootloader();
             break;
 
+        case SV_PENDSV:
+            pendPendSV();
+            break;
+
         default:
             break;
     }
@@ -360,7 +364,7 @@ __attribute__( ( naked, __used__ ) ) void PendSV_Handler()
     disable_interrupts();
 
     #ifdef useMPU
-        setMPU(); /* MUST be called before switchTask, not fully sure why */
+        //setMPU(); /* MUST be called before switchTask, not fully sure why */
     #endif // useMPU
     switchTask();
 

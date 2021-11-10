@@ -16,6 +16,9 @@ private:
   void initMPU(void);                                               // setup the static part of the MPU configuration
   uint8_t bytesToMPUSize(stack_T bytes);                             // convert bytes to MPU size macro
 
+  static void call_pendPendSV(void);
+  
+
 
 public:
   //Constructor 

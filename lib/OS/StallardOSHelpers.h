@@ -28,6 +28,11 @@ typedef enum
   STOPPED
 } taskState;
 
+
+typedef enum{
+  SV_PENDSV = 2
+} svCalls;
+
 typedef uint32_t stack_T;
 
 struct function_struct
