@@ -32,11 +32,11 @@ typedef uint32_t stack_T;
 
 struct function_struct
 {
-  uint8_t staticAlloc;                    //Is the stack static or dynamically allocated?
   volatile stack_T *Stack;             //Stack pointer
   volatile stack_T *vals;              //Stack pointer for future knowledge of initial stack ptr, for example in fault handlers
   uint32_t stackSize;
-
+  uint8_t staticAlloc;                    //Is the stack static or dynamically allocated?
+  
   volatile struct function_struct *prev; //für verkettete liste
   volatile struct function_struct *next; //für verkettete liste
 
