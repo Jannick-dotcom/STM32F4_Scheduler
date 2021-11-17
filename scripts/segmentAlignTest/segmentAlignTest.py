@@ -1,5 +1,6 @@
 
 import os
+import math
 from elf_size_analyze import get_sections
 
 Import("env", "projenv")
@@ -28,18 +29,34 @@ def after_build(source, target, env):
     # continue with analyzing the file...
 
     sections = get_sections(f'{build_path}/{elf_name}')
+
     ram_only = list(filter(lambda s: s.address >= 0x20000000, sections))  # filter for RAM adress range
+    ram_only = list(filter(lambda s: s.name not in ignore_sections, ram_only))  # filter out ignored elements
 
-    invalid_segments = list(filter(lambda s: s.address%s.size != 0, ram_only))  # easy check for aligment, using a%b==0
-    invalid_segments = list(filter(lambda s: s.name not in ignore_sections, invalid_segments))  # apply whitelist
+    invalid_segment_size = list(filter(lambda s: not math.log2(s.size).is_integer(), ram_only))  # invalid segment size overwrites align error
+    invalid_segment_align = list(filter(lambda s: (s not in invalid_segment_size) and s.address%s.size != 0, ram_only))  # easy check for aligment, using a%b==0
 
-    if invalid_segments:
+
+    error = False
+
+    if invalid_segment_size:
+        error = True
+        print('ERROR: invalid segment size detected')
+        for segment in invalid_segment_size:
+            print(f'{segment.name} ({segment.type}): size 0x{segment.size:x} is not power of 2')
+
+    if invalid_segment_align:
+        error = True
         print('ERROR: misaligned segments detected')
-        for segment in invalid_segments:
-            print(f'{segment.name} ({segment.flags}): start address 0x{segment.address:x} not aligned to its size 0x{segment.size:x}')
-        return -1
+        for segment in invalid_segment_align:
+            print(f'{segment.name} ({segment.type}): start address 0x{segment.address:x} not aligned to its size 0x{segment.size:x}')
 
-    print('IONF: alignment is OK')
-    return 0
+
+    if error:
+        return -1
+    else:
+        print('INFO: alignment is OK')
+        return 0
+
 
 env.AddPostAction("buildprog", after_build)

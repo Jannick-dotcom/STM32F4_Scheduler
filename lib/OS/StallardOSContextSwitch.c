@@ -162,7 +162,8 @@ void findNextFunction()
         temp = temp->next; //Nächsten Task
     }
     while (temp != taskMainStruct);
-    if(nextTask->continueInUS > 0) nextTask = NULL;    
+
+    if(nextTask && nextTask->continueInUS > 0) nextTask = NULL;    
 }
 
 /**
@@ -244,22 +245,70 @@ __attribute__((always_inline)) inline void switchTask(void)
     }
 }
 
+/**
+ * @brief exact copy of HAL_MPU_ConfigRegion, but inlined
+ * 
+ */
+__attribute__((always_inline)) inline static void inline_mpu_configRegion(MPU_Region_InitTypeDef *MPU_Init){
+    /* Set the Region number */
+    MPU->RNR = MPU_Init->Number;
 
-void setMPU(void){
-    /* same check is done in switchTask,
-     * needs to be present in both methods, 
-     * in case MPU config is disabled
-     */
+    if ((MPU_Init->Enable) != RESET)
+    {
+        /* Check the parameters */
+        assert_param(IS_MPU_INSTRUCTION_ACCESS(MPU_Init->DisableExec));
+        assert_param(IS_MPU_REGION_PERMISSION_ATTRIBUTE(MPU_Init->AccessPermission));
+        assert_param(IS_MPU_TEX_LEVEL(MPU_Init->TypeExtField));
+        assert_param(IS_MPU_ACCESS_SHAREABLE(MPU_Init->IsShareable));
+        assert_param(IS_MPU_ACCESS_CACHEABLE(MPU_Init->IsCacheable));
+        assert_param(IS_MPU_ACCESS_BUFFERABLE(MPU_Init->IsBufferable));
+        assert_param(IS_MPU_SUB_REGION_DISABLE(MPU_Init->SubRegionDisable));
+        assert_param(IS_MPU_REGION_SIZE(MPU_Init->Size));
+        
+        MPU->RBAR = MPU_Init->BaseAddress;
+        MPU->RASR = ((uint32_t)MPU_Init->DisableExec             << MPU_RASR_XN_Pos)   |
+                    ((uint32_t)MPU_Init->AccessPermission        << MPU_RASR_AP_Pos)   |
+                    ((uint32_t)MPU_Init->TypeExtField            << MPU_RASR_TEX_Pos)  |
+                    ((uint32_t)MPU_Init->IsShareable             << MPU_RASR_S_Pos)    |
+                    ((uint32_t)MPU_Init->IsCacheable             << MPU_RASR_C_Pos)    |
+                    ((uint32_t)MPU_Init->IsBufferable            << MPU_RASR_B_Pos)    |
+                    ((uint32_t)MPU_Init->SubRegionDisable        << MPU_RASR_SRD_Pos)  |
+                    ((uint32_t)MPU_Init->Size                    << MPU_RASR_SIZE_Pos) |
+                    ((uint32_t)MPU_Init->Enable                  << MPU_RASR_ENABLE_Pos);
+    }
+    else
+    {
+        MPU->RBAR = 0x00U;
+        MPU->RASR = 0x00U;
+    }
+}
 
-    if (nextTask == NULL) nextTask = taskMainStruct;
+/**
+ * @brief exact copy of HAL_MPU_Disable, but inlined
+ * 
+ */
+__attribute__((always_inline)) inline static void inline_mpu_disable(void){
+    __DMB();
+    /* Disable fault exceptions */
+    SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;
+    /* Disable the MPU and clear the control register*/
+    MPU->CTRL = 0U;
+}
 
-    HAL_MPU_Disable();
+/**
+ * @brief exact copy of HAL_MPU_Enable, but inlined
+ * 
+ */
+__attribute__((always_inline)) inline static void inline_mpu_enable(uint32_t MPU_Control){
+    /* Enable the MPU */
+    MPU->CTRL = MPU_Control | MPU_CTRL_ENABLE_Msk;
     
-    MPU_StackCfg.BaseAddress = (stack_T)nextTask->stackBase;
-    MPU_StackCfg.Size = nextTask->stackSize_MPU;
-
-    HAL_MPU_ConfigRegion(&MPU_StackCfg);
-    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+    /* Enable fault exceptions */
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+    
+    /* Ensure MPU setting take effects */
+    __DSB();
+    __ISB();
 }
 
 /**
@@ -354,6 +403,7 @@ __attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
 
 /**
  * PendSV Exception Handler.
+ * MUST NOT call any functions, only always_inline functions allowed
  *
  * @param
  * @return
@@ -363,10 +413,15 @@ __attribute__( ( naked, __used__ ) ) void PendSV_Handler()
     // asm("bkpt");
     disable_interrupts();
 
-    #ifdef useMPU
-        //setMPU(); /* MUST be called before switchTask, not fully sure why */
-    #endif // useMPU
     switchTask();
+
+    #ifdef useMPU
+        inline_mpu_disable();
+        MPU_StackCfg.BaseAddress = (stack_T)currentTask->stackBase;
+        MPU_StackCfg.Size = currentTask->stackSize_MPU;
+        inline_mpu_configRegion(&MPU_StackCfg);
+        inline_mpu_enable(MPU_PRIVILEGED_DEFAULT);
+    #endif
 
     enable_interrupts(); //Enable all interrupts
     __ASM volatile("bx r14");  //perform Exception return
