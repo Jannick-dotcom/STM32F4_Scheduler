@@ -245,27 +245,12 @@ void StallardOS::initMPU(void){
   /* configure EXT device */
   /* EXT device not avail */
   
-  /* configure peripeheral bus */
-  /* TODO: what to do with peripheral bus? */
-  #if 0
-  MPU_Init.BaseAddress = 0xE0000000;
-  MPU_Init.Size = MPU_REGION_SIZE_1MB;
-  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
-
-  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
-  MPU_Init.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_Init.IsBufferable = MPU_ACCESS_BUFFERABLE;
-
-  MPU_Init.Number = MPU_REGION_NUMBER5;
-  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  HAL_MPU_ConfigRegion(&MPU_Init);
-  #endif
-
+  /* configure private peripeheral bus */
+  /* no access, only in privileged mode */
+  
 
   /* configure Vendior-specific memory */
-  MPU_Init.BaseAddress = 0xE0100000;
-  MPU_Init.Size = MPU_REGION_SIZE_512MB;
-  /* TODO: what about vendor memory? */
+  /* not avail */
 
 
   /* PRIVILEGED_DEFAULT will allow all access to privileged proceses
