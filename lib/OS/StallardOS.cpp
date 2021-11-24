@@ -404,6 +404,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
   function_struct_ptr->id = id;
+  function_struct_ptr->staticAlloc = 0;
   // function_struct_ptr->error = 0;
 
   function_struct_ptr->refreshRate = refreshRate;
@@ -496,6 +497,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
+  function_struct_ptr->staticAlloc = 1;
   
   function_struct_ptr->continueInUS = 0;
   return function_struct_ptr;
