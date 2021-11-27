@@ -18,13 +18,13 @@ void testfunction() {}
 
 void test_addFunction()
 {
-    uint32_t stack[500];
+    uint32_t stack[512];
     function_struct *temp;
-    temp = StallardOSJanniq.addFunction(testfunction, 1, 3, 100); //This should not return a nullptr
+    temp = StallardOSJanniq.addFunction(testfunction, 1, 3, 128); //This should not return a nullptr
     TEST_ASSERT_NOT_EQUAL_MESSAGE(nullptr, temp, "normal dynamic function add");
-    temp = StallardOSJanniq.addFunction(testfunction, 1, 1, 100); //This should return a nullptr because already given id
+    temp = StallardOSJanniq.addFunction(testfunction, 1, 1, 128); //This should return a nullptr because already given id
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "dynamic add function with same id");
-    temp = StallardOSJanniq.addFunction(testfunction, 2, 3, -1); //Try allocating a lot of stack space
+    temp = StallardOSJanniq.addFunction(testfunction, 2, 3, (uint32_t)(0x1<<31)); //Try allocating a lot of stack space (but x^2)
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "dynamic add function with too much stack");
 
     temp = StallardOSJanniq.addFunctionStatic(testfunction, 3, 1, stack, sizeof(stack));

@@ -2,6 +2,10 @@
 
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 // extern "C" volatile uint64_t taskMainTime;
+extern "C" stack_T _sdata;  // sizes of .data and .bss
+extern "C" stack_T _edata;  // used for MPU config
+extern "C" stack_T _sbss;
+extern "C" stack_T _ebss;
 
 //Kontext Switch
 volatile struct function_struct* volatile currentTask = nullptr;
@@ -56,7 +60,11 @@ StallardOS::StallardOS()
     #endif
   }
 
-  taskMainStruct = addFunction(taskMain, -2, 255, 200);
+  #ifdef useMPU
+  initMPU();
+  #endif // useMPU
+
+  taskMainStruct = addFunction(taskMain, -2, 255, 256);
   if(taskMainStruct == nullptr) while(1);
 
   TIM_HandleTypeDef htim;
@@ -130,6 +138,194 @@ void StallardOS::createTCBs()
   }
 }
 
+
+void StallardOS::initMPU(void){
+
+  /* for correctly setting up the region attributes
+   * for each type of memory, consider
+   * 4.2.4 Table 42, of the programming manual PM0214
+   */
+  MPU_Region_InitTypeDef MPU_Init;
+
+  HAL_MPU_Disable();
+
+  /* setup general settings, which are equal for all regions */
+  MPU_Init.Enable = MPU_REGION_ENABLE;
+  MPU_Init.TypeExtField = MPU_TEX_LEVEL0;
+  MPU_Init.SubRegionDisable = 0x00;
+
+  /* configure FLASH/CODE region 
+   * not shareable
+   * cachable
+   * not bufferable
+   * executable
+   * RO for all permission levels
+   */
+  MPU_Init.BaseAddress = FLASH_BASE;
+  MPU_Init.Size = MPU_REGION_SIZE_1MB;    // "G" model has 1MB flash
+  MPU_Init.AccessPermission = MPU_REGION_PRIV_RO_URO;
+
+  MPU_Init.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+  MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  MPU_Init.Number = MPU_REGION_NUMBER0;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  HAL_MPU_ConfigRegion(&MPU_Init);
+
+
+  /* configure SRAM .data region 
+   * shareable
+   * cachable
+   * not bufferable
+   * not executable
+   * RW for privileged tasks
+   * 
+   * linker script is forcing .data to be 4096 aligned
+   */
+  MPU_Init.BaseAddress = (stack_T)&_sdata;
+  MPU_Init.Size = bytesToMPUSize((&_edata)-(&_sdata));  // size of .data region
+  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+
+  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  MPU_Init.Number = MPU_REGION_NUMBER1;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  HAL_MPU_ConfigRegion(&MPU_Init);
+
+  
+  /* configure .bss 
+   * same properties as .data settings
+   * 
+   * linker script is forcing .bss to be 4096 aligned
+   */
+
+  MPU_Init.BaseAddress = (stack_T)&_sbss;
+  MPU_Init.Size = bytesToMPUSize((&_ebss)-(&_sbss));  // size of .data region
+  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+
+  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  MPU_Init.Number = MPU_REGION_NUMBER2;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  HAL_MPU_ConfigRegion(&MPU_Init);
+
+
+  /* configure Task stack */
+  /* -> is configured at each contextSwitch
+   * Region 3 (NUMBER3) is used for stack
+   */
+
+
+  /* configure Peripherals 
+   * sharable
+   * not cachable
+   * bufferable
+   */
+  MPU_Init.BaseAddress = PERIPH_BASE;
+  MPU_Init.Size = MPU_REGION_SIZE_512MB;
+  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+
+  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_Init.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_Init.IsBufferable = MPU_ACCESS_BUFFERABLE;
+
+  MPU_Init.Number = MPU_REGION_NUMBER4;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  HAL_MPU_ConfigRegion(&MPU_Init);
+
+  
+  /* configure EXT Ram */
+  /* EXT Ram not avail */
+
+  /* configure EXT device */
+  /* EXT device not avail */
+  
+  /* configure private peripeheral bus */
+  /* no access, only in privileged mode */
+  
+
+  /* configure Vendior-specific memory */
+  /* not avail */
+
+
+  /* PRIVILEGED_DEFAULT will allow all access to privileged proceses
+   * and to fault handlers
+   * only non-privileged tasks are affected by the MPU
+   */
+  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+}
+
+
+
+uint8_t StallardOS::bytesToMPUSize(stack_T bytes){
+  switch(bytes){
+    case 0x20:
+      return MPU_REGION_SIZE_32B;
+    case 0x40:
+      return MPU_REGION_SIZE_64B;
+    case 0x80:
+      return MPU_REGION_SIZE_128B;
+    case 0x100:
+      return MPU_REGION_SIZE_256B;
+    case 0x200:
+      return MPU_REGION_SIZE_512B;
+    case 0x400:
+      return MPU_REGION_SIZE_1KB;
+    case 0x800:
+      return MPU_REGION_SIZE_2KB;
+    case 0x1000:
+      return MPU_REGION_SIZE_4KB;
+    case 0x2000:
+      return MPU_REGION_SIZE_8KB;
+    case 0x4000:
+      return MPU_REGION_SIZE_16KB;
+    case 0x8000:
+      return MPU_REGION_SIZE_32KB;
+    case 0x1'0000:
+      return MPU_REGION_SIZE_64KB;
+    case 0x2'0000:
+      return MPU_REGION_SIZE_128KB;
+    case 0x4'0000:
+      return MPU_REGION_SIZE_256KB;
+    case 0x8'0000:
+      return MPU_REGION_SIZE_512KB;
+    case 0x10'0000:
+      return MPU_REGION_SIZE_1MB;
+    case 0x20'0000:
+      return MPU_REGION_SIZE_2MB;
+    case 0x40'0000:
+      return MPU_REGION_SIZE_4MB;
+    case 0x80'0000:
+      return MPU_REGION_SIZE_8MB;
+    case 0x100'0000:
+      return MPU_REGION_SIZE_16MB;
+    case 0x200'0000:
+      return MPU_REGION_SIZE_32MB;
+    case 0x400'0000:
+      return MPU_REGION_SIZE_64MB;
+    case 0x800'0000:
+      return MPU_REGION_SIZE_128MB;
+    case 0x1000'0000:
+      return MPU_REGION_SIZE_256MB;
+    case 0x2000'0000:
+      return MPU_REGION_SIZE_512MB;
+    case 0x4000'0000:
+      return MPU_REGION_SIZE_1GB;
+    case 0x8000'0000:
+      return MPU_REGION_SIZE_2GB;
+    case (uint32_t)0x1'0000'0000:
+      return MPU_REGION_SIZE_4GB;
+    default:
+      return 0x0;  // invalid reg value, will cause Hardfault
+  }
+}
+
+
 /**
  * Add a new Task to execute list.
  * Also allocates Stack space for the Task
@@ -137,19 +333,36 @@ void StallardOS::createTCBs()
  * @param function Task to execute.
  * @param id unique id of the task.
  * @param prio priority of the task, lower means higher.
- * @param stackSize amount of Stack words to allocate.
+ * @param stackSize amount of Stack words to allocate, stackSize*address_len must be power of 2 in MPU mode.
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, uint32_t stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id, uint8_t prio, stack_T stackSize, uint16_t refreshRate)
 {
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0) //Make sure the parameters are correct
+  stack_T stackSizeBytes;
+  stack_T *stackPtr;
+  stackSizeBytes = sizeof(stack_T)*stackSize;
+
+  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSizeBytes == 0 || stackSizeBytes > 0x1'0000'0000) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
     #endif
     return nullptr;
   }
+
+  #ifdef useMPU
+  // MPU requires at least 32 Bytes
+  // and stack size to be a pwr of 2
+  if (stackSizeBytes < 32 ||\
+     (stackSizeBytes & (stackSizeBytes-1)) != 0)  // number is not pwr of 2, if more than 1 bit is !=0
+  {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
+    return nullptr;
+  }
+  #endif // useMPU
 
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
 
@@ -169,7 +382,15 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
     #endif
     return nullptr;
   }
-  stack_T *stackPtr = (stack_T*)malloc(sizeof(stack_T) * stackSize); //Stack speicher für funktion allokieren
+
+
+  // get memory aligned (alignment, size)
+  #ifdef useMPU
+    stackPtr = (stack_T *)memalign(stackSizeBytes, stackSizeBytes);
+  #else
+    stackPtr = (stack_T *)malloc(stackSizeBytes);
+  #endif // useMPU
+
   if(stackPtr == nullptr) //Wenn kein Stack gefunden
   {
     #ifndef UNIT_TEST
@@ -190,7 +411,9 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
   function_struct_ptr->State = NEW;                                       //New Task
+  function_struct_ptr->stackBase = stackPtr;
   function_struct_ptr->Stack = function_struct_ptr->vals = stackPtr + stackSize - sizeof(stack_T); //End of Stack
+  function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSizeBytes);
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
@@ -207,20 +430,36 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint16_t id,
  * @param function Task to execute.
  * @param id unique id of the task.
  * @param prio priority of the task, lower means higher.
- * @param stackPtr pointer to the stack memory allocated by the user
- * @param stackSize amount of Stack words to allocate.
+ * @param stackPtr pointer to the stack memory allocated by the user, must be aligned to stackSize in MPU mode
+ * @param stackSize amount of Stack words to allocate, stackSize*word_len must be power of 2 in MPU mode.
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16_t id, uint8_t prio, uint32_t *stackPtr, uint32_t stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16_t id, uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate)
 {
-  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0 || stackPtr == nullptr) //Make sure the parameters are correct
+  stack_T stackSizeBytes;
+  stackSizeBytes = sizeof(stack_T)*stackSize;
+
+  if (function == nullptr || searchFunction(id) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSizeBytes > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
     #endif
     return nullptr;
   }
+
+  #ifdef useMPU
+  // MPU requires at least 32 Bytes
+  // and stack size to be a pwr of 2
+  if (stackSizeBytes < 32 ||\
+     (stackSizeBytes & (stackSizeBytes-1)) != 0)  // number is not pwr of 2, if more than 1 bit is !=0
+  {
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
+    return nullptr;
+  }
+  #endif // useMPU
 
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
 
@@ -251,8 +490,10 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint16
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
-  function_struct_ptr->State = NEW;                                       //New Task
+  function_struct_ptr->State = NEW;      //New Task
+  function_struct_ptr->stackBase = stackPtr;
   function_struct_ptr->Stack = function_struct_ptr->vals = stackPtr + stackSize - sizeof(stack_T); //End of Stack
+  function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSizeBytes);
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
@@ -372,7 +613,7 @@ void StallardOS::delay(uint32_t milliseconds)
     currentTask->continueInUS = (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     // nextTask = taskMainStruct;
     findNextFunction();
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    StallardOS::call_pendPendSV();
   }
 }
 
@@ -397,7 +638,7 @@ void StallardOS::yield()
         else
         {
           findNextFunction();
-          SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+          StallardOS::call_pendPendSV();
         }
       }
     currentTask->lastStart = usCurrentTimeSinceStart;

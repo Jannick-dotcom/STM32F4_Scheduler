@@ -2,6 +2,7 @@
 #define StallardOS_h
 
 #include <stdint.h>
+#include <malloc.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
