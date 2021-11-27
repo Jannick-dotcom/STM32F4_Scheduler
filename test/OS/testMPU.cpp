@@ -33,7 +33,7 @@ void test_stackSizeValid()
 
         // WARN: if the mpu defines change their layout
         // this method is no longer valid, a LUT must be used then
-        tmp->stackSize_MPU == mpu_iter;
+        TEST_ASSERT_EQUAL_MESSAGE(tmp->stackSize_MPU, mpu_iter, "correct mpu-size config");
     }
     #endif
 }
