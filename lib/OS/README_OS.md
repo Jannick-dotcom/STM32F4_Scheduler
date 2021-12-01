@@ -188,6 +188,35 @@ refreshrate -> Muss großer sein als 0 !, nicht verwendet von Contextswitch
 
 _________________________________________________________________________________________
 
+
+
+
+```
+addFunction(void (*function)(), uint16_t id, uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0);
+```
+
+Weisst eine eingegebene Funktion Eigenschaften diz zu Scheduling benötigt werden.
+
+Funktion Parameter:
+```
+ *function      -> Task to execute.
+ id             -> unique id of the task.
+ prio           -> priority of the task, lower means higher.
+ stackPtr       -> pointer to the stack memory, aligned to stackSize in MPU mode
+ stackSize      -> amount of Stack words to allocate, power of 2 in MPU mode.
+ refreshRate    -> frequency of execution through the normal scheduler. <= 1000 !
+ 
+```
+
+To enforce alignment of statically allocated variables `gcc` directives can be uesd.
+Make sure to align the variable to its size in Bytes, **not** to the number of elements.
+
+```
+stack_T static_stack[128] __attribute__((aligned(512)));
+```
+
+_________________________________________________________________________________________
+
 Funktion:
 ```
 setFunctionPriority(/*Funktion*/ uint16_t id, /*New Priority*/ uint8_t prio);

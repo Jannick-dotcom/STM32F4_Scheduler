@@ -24,6 +24,7 @@ void test_stackSizeValid()
     uint16_t id = 1;
     uint16_t mpu_iter = 4;
 
+    //TODO: make sure OS has enough structs for allocation
     #ifdef useMPU
     for(int i=32; i<=0x1'0000'0000; (i=i<<2), id++, mpu_iter++){
         // use static allocation to not overflow the heap
