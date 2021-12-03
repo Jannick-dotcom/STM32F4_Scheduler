@@ -16,14 +16,15 @@ extern "C"
   void StallardOS_goBootloader();
   void enable_interrupts();
   void disable_interrupts();
+  void switchTask(void);
 #ifdef __cplusplus
 }
 #endif
 
 typedef enum
 {
-  NEW = 0,
-  RUNNING,
+  // NEW = 0,
+  RUNNING = 1,
   PAUSED,
   STOPPED
 } taskState;

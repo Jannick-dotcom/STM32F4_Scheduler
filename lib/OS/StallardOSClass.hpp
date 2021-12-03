@@ -13,14 +13,15 @@ private:
   struct function_struct *searchFunction(/*Funktion*/ uint16_t id); //Search a TCB that matches the provided function
   struct function_struct *searchFreeFunction(void);                 //Search a TCB that isn't used
   void createTCBs(void);                                            //create the structs for all the functions (count is "countTasks")
+  uint16_t countTCBsInUse;
 
 
 public:
   //Constructor 
   StallardOS(); //Create a Task Scheduler
   // struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint16_t refreshRate = 0);
-  struct function_struct *addFunction(void (*function)(), uint16_t id, uint8_t prio, uint32_t stackSize, uint16_t refreshRate = 0);
-  struct function_struct *addFunctionStatic(void (*function)(), uint16_t id, uint8_t prio, uint32_t *stackPtr, uint32_t stackSize, uint16_t refreshRate = 0);
+  struct function_struct *addFunction(void (*function)(), uint8_t prio, uint32_t stackSize, uint16_t refreshRate = 0);
+  struct function_struct *addFunctionStatic(void (*function)(), uint8_t prio, uint32_t *stackPtr, uint32_t stackSize, uint16_t refreshRate = 0);
 
   //Setters
   void setFunctionEnabled(/*Funktion*/ uint16_t id, /*Aktivieren oder Deaktivieren*/ bool act);
