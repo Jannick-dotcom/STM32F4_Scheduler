@@ -9,6 +9,31 @@ extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
 
+static MPU_Region_InitTypeDef MPU_StackCfg = {
+    /* these values are always the same (for stack)
+     * do not assign them at each context switch
+     */
+    .Enable = MPU_REGION_ENABLE,
+    .TypeExtField = MPU_TEX_LEVEL0,
+    .SubRegionDisable = 0x00,
+
+    /* stack region is
+    * Full access
+    * shareable
+    * cachable
+    * not bufferable
+    * not executable
+    */
+    .AccessPermission = MPU_REGION_FULL_ACCESS,
+    .IsShareable = MPU_ACCESS_SHAREABLE,
+    .IsCacheable = MPU_ACCESS_CACHEABLE,
+    .IsBufferable = MPU_ACCESS_NOT_BUFFERABLE,
+    .DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE,
+
+    /* always use MPU region 3 for stack */
+    .Number = MPU_REGION_NUMBER3
+};
+
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
 
@@ -123,7 +148,8 @@ void findNextFunction()
         temp = temp->next; //Nächsten Task
     }
     while (temp != currentTask);
-    if(nextTask->continueInUS > 0) nextTask = NULL;    
+
+    if(nextTask && nextTask->continueInUS > 0) nextTask = NULL;    
 }
 
 /**
@@ -140,12 +166,12 @@ __attribute__((always_inline)) inline void switchTask(void)
     //Pausing Task
     __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
     __ASM volatile("ISB");
-
-    __ASM volatile("TST r14, #0x10");
+    __ASM volatile("TST r14, #0x10");       //store vfp registers, if task was using FPU
     __ASM volatile("IT eq");
     __ASM volatile("VSTMDBeq r0!, {s16-s31}");
     
     __ASM volatile("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
+
 
     __ASM volatile("LDR r1, =currentTask"); //Current Task Pointer
     __ASM volatile("LDR r2, [r1]"); //Load Stack pointer from first position of currentTask
@@ -172,10 +198,79 @@ __attribute__((always_inline)) inline void switchTask(void)
     __ASM volatile("MSR PSP, r0");           //set PSP
     __ASM volatile("ISB");
     
+    __ASM volatile("MOV r0, #01");      // go into unprivileged mode
+    __ASM volatile("MSR control, r0");
+
     __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
     __ASM volatile("LDR r1, =nextTask");
     __ASM volatile("MOV r2, #0");
     __ASM volatile("STR r2, [r1]");
+}
+
+/**
+ * @brief exact copy of HAL_MPU_ConfigRegion, but inlined
+ * 
+ */
+__attribute__((always_inline)) inline static void inline_mpu_configRegion(MPU_Region_InitTypeDef *MPU_Init){
+    /* Set the Region number */
+    MPU->RNR = MPU_Init->Number;
+
+    if ((MPU_Init->Enable) != RESET)
+    {
+        /* Check the parameters */
+        assert_param(IS_MPU_INSTRUCTION_ACCESS(MPU_Init->DisableExec));
+        assert_param(IS_MPU_REGION_PERMISSION_ATTRIBUTE(MPU_Init->AccessPermission));
+        assert_param(IS_MPU_TEX_LEVEL(MPU_Init->TypeExtField));
+        assert_param(IS_MPU_ACCESS_SHAREABLE(MPU_Init->IsShareable));
+        assert_param(IS_MPU_ACCESS_CACHEABLE(MPU_Init->IsCacheable));
+        assert_param(IS_MPU_ACCESS_BUFFERABLE(MPU_Init->IsBufferable));
+        assert_param(IS_MPU_SUB_REGION_DISABLE(MPU_Init->SubRegionDisable));
+        assert_param(IS_MPU_REGION_SIZE(MPU_Init->Size));
+        
+        MPU->RBAR = MPU_Init->BaseAddress;
+        MPU->RASR = ((uint32_t)MPU_Init->DisableExec             << MPU_RASR_XN_Pos)   |
+                    ((uint32_t)MPU_Init->AccessPermission        << MPU_RASR_AP_Pos)   |
+                    ((uint32_t)MPU_Init->TypeExtField            << MPU_RASR_TEX_Pos)  |
+                    ((uint32_t)MPU_Init->IsShareable             << MPU_RASR_S_Pos)    |
+                    ((uint32_t)MPU_Init->IsCacheable             << MPU_RASR_C_Pos)    |
+                    ((uint32_t)MPU_Init->IsBufferable            << MPU_RASR_B_Pos)    |
+                    ((uint32_t)MPU_Init->SubRegionDisable        << MPU_RASR_SRD_Pos)  |
+                    ((uint32_t)MPU_Init->Size                    << MPU_RASR_SIZE_Pos) |
+                    ((uint32_t)MPU_Init->Enable                  << MPU_RASR_ENABLE_Pos);
+    }
+    else
+    {
+        MPU->RBAR = 0x00U;
+        MPU->RASR = 0x00U;
+    }
+}
+
+/**
+ * @brief exact copy of HAL_MPU_Disable, but inlined
+ * 
+ */
+__attribute__((always_inline)) inline static void inline_mpu_disable(void){
+    __DMB();
+    /* Disable fault exceptions */
+    SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;
+    /* Disable the MPU and clear the control register*/
+    MPU->CTRL = 0U;
+}
+
+/**
+ * @brief exact copy of HAL_MPU_Enable, but inlined
+ * 
+ */
+__attribute__((always_inline)) inline static void inline_mpu_enable(uint32_t MPU_Control){
+    /* Enable the MPU */
+    MPU->CTRL = MPU_Control | MPU_CTRL_ENABLE_Msk;
+    
+    /* Enable fault exceptions */
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+    
+    /* Ensure MPU setting take effects */
+    __DSB();
+    __ISB();
 }
 
 /**
@@ -204,7 +299,11 @@ __attribute__((__used__)) void SVC_Handler()
             jumpToBootloader();
             break;
 
-        case 2: //Start first task
+        case SV_PENDSV:
+            pendPendSV();
+            break;
+
+        case 3: //Start first task
             //Resuming process
             __ASM volatile("LDR r1, =currentTask");
             __ASM volatile("LDR r2, [r1]");
@@ -225,6 +324,7 @@ __attribute__((__used__)) void SVC_Handler()
             __ASM volatile("STR r2, [r1]");
             __ASM volatile("MOV lr, #0xfffffffd");
             __ASM volatile("bx lr");
+
         default:
             break;
     }
@@ -287,6 +387,7 @@ __attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
 
 /**
  * PendSV Exception Handler.
+ * MUST NOT call any functions, only always_inline functions allowed
  *
  * @param
  * @return
@@ -295,7 +396,17 @@ __attribute__( ( naked, __used__ ) ) void PendSV_Handler()
 {
     // asm("bkpt");
     disable_interrupts();
+
     switchTask();
+
+    #ifdef useMPU
+        inline_mpu_disable();
+        MPU_StackCfg.BaseAddress = (stack_T)currentTask->stackBase;
+        MPU_StackCfg.Size = currentTask->stackSize_MPU;
+        inline_mpu_configRegion(&MPU_StackCfg);
+        inline_mpu_enable(MPU_PRIVILEGED_DEFAULT);
+    #endif
+
     enable_interrupts(); //Enable all interrupts
-    __ASM volatile("bx r14");
+    __ASM volatile("bx r14");  //perform Exception return
 }

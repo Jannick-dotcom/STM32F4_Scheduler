@@ -5,6 +5,8 @@
 StallardOS StallardOSJanniq;
 function_struct *ref;
 
+uint32_t stack[512] __attribute__((aligned(2048)));
+
 void setUp(void)
 {
     unittest_uart_begin();
@@ -18,19 +20,18 @@ void testfunction() {}
 
 void test_addFunction()
 {
-    uint32_t stack[500];
     function_struct *temp;
-    temp = StallardOSJanniq.addFunction(testfunction, 1, 3, 100); //This should not return a nullptr
+    temp = StallardOSJanniq.addFunction(testfunction, 1, 3, 128); //This should not return a nullptr
     TEST_ASSERT_NOT_EQUAL_MESSAGE(nullptr, temp, "normal dynamic function add");
-    temp = StallardOSJanniq.addFunction(testfunction, 1, 1, 100); //This should return a nullptr because already given id
+    temp = StallardOSJanniq.addFunction(testfunction, 1, 1, 128); //This should return a nullptr because already given id
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "dynamic add function with same id");
-    temp = StallardOSJanniq.addFunction(testfunction, 2, 3, -1); //Try allocating a lot of stack space
+    temp = StallardOSJanniq.addFunction(testfunction, 2, 3, (uint32_t)(0x1<<31)); //Try allocating a lot of stack space (but x^2)
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "dynamic add function with too much stack");
 
-    temp = StallardOSJanniq.addFunctionStatic(testfunction, 3, 1, stack, sizeof(stack));
+    temp = StallardOSJanniq.addFunctionStatic(testfunction, 3, 1, stack, sizeof(stack)/sizeof(stack[0]));
     TEST_ASSERT_NOT_EQUAL_MESSAGE(nullptr, temp, "normal static function add");
     ref = temp; //Save the function_struct
-    temp = StallardOSJanniq.addFunctionStatic(testfunction, 4, 1, nullptr, sizeof(stack));
+    temp = StallardOSJanniq.addFunctionStatic(testfunction, 4, 1, nullptr, sizeof(stack)/sizeof(stack[0]));
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "nullptr static function add");
     temp = StallardOSJanniq.addFunctionStatic(testfunction, 5, 1, stack, 0);
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "zero size static function add");

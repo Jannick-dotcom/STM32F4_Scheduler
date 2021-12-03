@@ -7,6 +7,7 @@
 // #define STOS_current_ECU_ID 4 //SWCU
 
 #define useFPU
+#define useMPU
 #define countTasks 10
 #define defaultSysTickFreq 1000 //[Hz]
 #define runFreq 168 //[MHz]
@@ -56,7 +57,6 @@
 #endif
 
 #define CAN_FIFO_size 200    //[Messages] should be enough for 1 second of storing
-// #define CAN_debug
 /////////////////////////////////////////////
 
 /////////////////////////////////////////////

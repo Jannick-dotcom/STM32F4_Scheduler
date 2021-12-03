@@ -2,6 +2,7 @@
 #define StallardOS_h
 
 #include <stdint.h>
+#include <malloc.h>
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 
@@ -19,13 +20,13 @@
 #include "StallardOSDAC.hpp"
 
 #ifdef STM32F417xx
-static StallardOSCAN MS4_CAN(StallardOSCAN2, CAN1M, CAN_DEBUG);
-static StallardOSCAN AD_CAN(StallardOSCAN1, CAN500k, CAN_DEBUG);
+static StallardOSCAN MS4_CAN(StallardOSCAN2, CAN1M);
+static StallardOSCAN AD_CAN(StallardOSCAN1, CAN500k);
 #define AD_CAN_PORT StallardOSCAN1
 #define MS4_CAN_PORT StallardOSCAN2
 #endif
 #ifdef STM32F415xx
-static StallardOSCAN AD_CAN(StallardOSCAN2, CAN500k, CAN_DEBUG);
+static StallardOSCAN AD_CAN(StallardOSCAN2, CAN500k);
 #define AD_CAN_PORT StallardOSCAN2
 #endif
 #ifdef STM32F407xx
