@@ -32,26 +32,7 @@ static MPU_Region_InitTypeDef MPU_StackCfg = {
 
     /* always use MPU region 3 for stack */
     .Number = MPU_REGION_NUMBER3
-}; 
-
-
-/**
- * If a Task Returns, this function gets executed and calls the remove function of this task.
- *
- * @param
- * @return
- */
-void taskOnEnd(void)
-{
-    currentTask->used = 0;
-    currentTask = taskMainStruct;
-    if(!currentTask->staticAlloc)
-    {
-        free((stack_T*)currentTask->stackBase);
-    }
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-    while(1);
-}
+};
 
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
@@ -79,6 +60,7 @@ __attribute__((always_inline)) inline void StallardOS_goBootloader()
 __attribute__((always_inline)) inline void enable_interrupts()
 {
     __ASM volatile("CPSIE I"); //Instruction for enabling interrupts
+    __ASM volatile("CPSIE F"); //Instruction for enabling interrupts
 }
 
 /**
@@ -90,6 +72,7 @@ __attribute__((always_inline)) inline void enable_interrupts()
 __attribute__((always_inline)) inline void disable_interrupts() 
 {
     __ASM volatile("CPSID I"); //Instruction for disabling interrupts
+    __ASM volatile("CPSID F"); //Instruction for disabling interrupts
 }
 
 /**
@@ -129,7 +112,7 @@ void jumpToBootloader(void)
 void findNextFunction()
 {
     nextTask = NULL;
-    volatile struct function_struct* volatile temp = taskMainStruct;
+    volatile struct function_struct* volatile temp = currentTask->next;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     if(temp == NULL)
     {
@@ -145,7 +128,7 @@ void findNextFunction()
         
         if (temp->executable && temp->continueInUS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
-            if(temp->waitingForSemaphore && &temp->semVal != NULL && temp->semVal == 0) //If this task is still waiting for the semaphore
+            if(temp->waitingForSemaphore && temp->semVal != NULL && *(temp->semVal) == 0) //If this task is still waiting for the semaphore
             {
                 temp = temp->next;
                 continue;
@@ -164,7 +147,7 @@ void findNextFunction()
 #endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
-    while (temp != taskMainStruct);
+    while (temp != currentTask);
 
     if(nextTask && nextTask->continueInUS > 0) nextTask = NULL;    
 }
@@ -177,75 +160,51 @@ void findNextFunction()
  */
 __attribute__((always_inline)) inline void switchTask(void)
 {
-    if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
-    if (nextTask == NULL) nextTask = taskMainStruct;
+    //if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
+    //if (nextTask == NULL) nextTask = taskMainStruct;
 
-    if ((currentTask->State == RUNNING)) //Hier Task anhalten
-    {
-        __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
-        __ASM volatile("ISB");
+    //Pausing Task
+    __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
+    __ASM volatile("ISB");
+    __ASM volatile("TST r14, #0x10");       //store vfp registers, if task was using FPU
+    __ASM volatile("IT eq");
+    __ASM volatile("VSTMDBeq r0!, {s16-s31}");
+    
+    __ASM volatile("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
 
-        __ASM volatile("TST r14, #0x10");       //store vfp registers, if task was using FPU
-        __ASM volatile("IT eq");
-        __ASM volatile("VSTMDBeq r0!, {s16-s31}");
-        
-        __ASM volatile("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
 
-        __ASM volatile("LDR r1, =currentTask"); //Current Task Pointer
-        __ASM volatile("LDR r2, [r1]"); //Load Stack pointer from first position of currentTask
-        __ASM volatile("STR r0, [r2]"); //Save stack pointer
-        currentTask->State = PAUSED; //Save function state
-        __ASM volatile("LDR r0, =currentTask");
-        __ASM volatile("LDR r1, =nextTask");
-        __ASM volatile("LDR r1, [r1]");
-        __ASM volatile("STR r1, [r0]");
-        __ASM volatile("DSB");
-        __ASM volatile("ISB");
-    }
+    __ASM volatile("LDR r1, =currentTask"); //Current Task Pointer
+    __ASM volatile("LDR r2, [r1]"); //Load Stack pointer from first position of currentTask
+    __ASM volatile("STR r0, [r2]"); //Save stack pointer
+    __ASM volatile("MOV %0, #2" : "=r"(currentTask->State)); //Set function state to paused
+    __ASM volatile("LDR r0, =currentTask");
+    __ASM volatile("LDR r1, =nextTask");
+    __ASM volatile("LDR r1, [r1]");
+    __ASM volatile("STR r1, [r0]");
+    __ASM volatile("DSB");
+    __ASM volatile("ISB");
 
-    if (currentTask->State == NEW) //New Task
-    {
-        __ASM volatile("MOV r9, %0"  : : "r"((uint32_t)taskOnEnd)); //LR
-        __ASM volatile("MOV r10, %0" : : "r"((uint32_t)currentTask->function & functionModifier)); //PC
-        __ASM volatile("MOV r11, #0x01000000");                                    //XPSR
-        __ASM volatile("MOV r14, #0xFFFFFFFD");                                    //Default return value
+    //Resuming process
+    __ASM volatile("LDR r1, =currentTask");
+    __ASM volatile("LDR r2, [r1]");
+    __ASM volatile("LDR r0, [r2]");
 
-        __ASM volatile("LDR r1, =currentTask");
-        __ASM volatile("LDR r2, [r1]");
-        __ASM volatile("LDR r0, [r2]"); //get initial Stack pointer
-        __ASM volatile("STMDB r0!, {r4-r11}");     //Store prepared initial Data for Control, R0-R3, R12, LR, PC, XPSR
-        __ASM volatile("MSR PSP, r0");             //set PSP
+    __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
 
-        __ASM volatile("MOV r0, #01");      // go into unprivileged mode
-        __ASM volatile("MSR control, r0");
+    __ASM volatile("TST r14, #0x10");
+    __ASM volatile("IT eq");
+    __ASM volatile("VLDMIAeq r0!, {s16-s31}");
+    
+    __ASM volatile("MSR PSP, r0");           //set PSP
+    __ASM volatile("ISB");
+    
+    __ASM volatile("MOV r0, #01");      // go into unprivileged mode
+    __ASM volatile("MSR control, r0");
 
-        currentTask->State = RUNNING; //Save state as running
-        currentTask->lastStart = usCurrentTimeSinceStart;
-    }
-
-    if (currentTask->State == PAUSED) //Hier Task fortsetzen
-    {
-        __ASM volatile("LDR r1, =currentTask");
-        __ASM volatile("LDR r2, [r1]");
-        __ASM volatile("LDR r0, [r2]");
-
-        __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
-
-        __ASM volatile("TST r14, #0x10");
-        __ASM volatile("IT eq");
-        __ASM volatile("VLDMIAeq r0!, {s16-s31}");
-        
-        __ASM volatile("MSR PSP, r0");           //set PSP
-        __ASM volatile("ISB");
-
-        __ASM volatile("MOV r0, #01");      // go into unprivileged mode
-        __ASM volatile("MSR control, r0");
-        
-        currentTask->State = RUNNING; //Save state as running
-        __ASM volatile("LDR r1, =nextTask");
-        __ASM volatile("MOV r2, #0");
-        __ASM volatile("STR r2, [r1]");
-    }
+    __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
+    __ASM volatile("LDR r1, =nextTask");
+    __ASM volatile("MOV r2, #0");
+    __ASM volatile("STR r2, [r1]");
 }
 
 /**
@@ -325,10 +284,10 @@ __attribute__((__used__)) void SVC_Handler()
     // disable_interrupts();
     uint8_t handleMode;
 
-    __ASM volatile("TST    LR, #4");
-    __ASM volatile("ITE    EQ");
-	__ASM volatile("MRSEQ	R0, MSP");
-	__ASM volatile("MRSNE	R0, PSP");
+    // __ASM volatile("TST    LR, #4");
+    // __ASM volatile("ITE    EQ");
+	// __ASM volatile("MRSEQ	R0, MSP"); //Warum pusht er bem exception entry IMMER auf den Prozess stack pointer? Bei startOS müsste er doch auf den MSP pushen?????
+	__ASM volatile("MRS	R0, PSP");
 
 	__ASM volatile("LDR	R0, [R0, #24]");
 	__ASM volatile("LDRB	R0, [R0, #-2]");
@@ -343,6 +302,28 @@ __attribute__((__used__)) void SVC_Handler()
         case SV_PENDSV:
             pendPendSV();
             break;
+
+        case 3: //Start first task
+            //Resuming process
+            __ASM volatile("LDR r1, =currentTask");
+            __ASM volatile("LDR r2, [r1]");
+            __ASM volatile("LDR r0, [r2]");
+
+            __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
+
+            __ASM volatile("TST r14, #0x10");
+            __ASM volatile("IT eq");
+            __ASM volatile("VLDMIAeq r0!, {s16-s31}");
+            
+            __ASM volatile("MSR PSP, r0");           //set PSP
+            __ASM volatile("ISB");
+            
+            __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
+            __ASM volatile("LDR r1, =nextTask");
+            __ASM volatile("MOV r2, #0");
+            __ASM volatile("STR r2, [r1]");
+            __ASM volatile("MOV lr, #0xfffffffd");
+            __ASM volatile("bx lr");
 
         default:
             break;

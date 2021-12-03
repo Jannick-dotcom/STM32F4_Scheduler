@@ -16,7 +16,7 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud, bool debug)
 
     this->sem.take();
 
-#ifdef STM32F417xx
+#ifndef STM32F415xx
     if (port == StallardOSCAN1 && can1used == false)
     {
         CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFPP, nopull, GPIO_AF9_CAN1);
