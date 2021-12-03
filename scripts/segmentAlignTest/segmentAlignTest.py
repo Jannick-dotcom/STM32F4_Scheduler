@@ -1,12 +1,64 @@
 
 import os
+import re
 import math
 from elf_size_analyze import get_sections
 
 Import("env", "projenv")
 
+def get_defines(header_file):
+    """extract defines of file into dict
+       ignores all ifdef blocks
+       // within strings will breake the parser
+    """
+
+    if not os.path.exists(header_file):
+        print(f'WARN: header file not found {header_file}')
+        return {}
+
+    content = ''.join(open(header_file, 'r').readlines())
+
+    # remove all block comments
+    content = re.sub(r'\/\*(\*(?!\/)|[^*])*\*\/', '', content, flags=re.M)
+    # single line comments, must only be matched after block comments
+    content = re.sub(r'\/\/.*$', '', content, flags=re.M)
+
+    # ifdefs are not supported, just remove all of them for now
+    content = re.sub(r'#ifdef(.*\n)*?#endif', '', content, flags=re.M)
+
+    def_list = list(filter(lambda l: l!='\n', content.split('#define ')))
+
+    defs = {}
+
+    for define in def_list:
+        split = define.replace('\n', '').split(' ')
+        key = split[0]
+
+        if len(split) == 1:
+            defs[key] = True
+        else:
+            val = split[1]
+
+            try: val = int(val) 
+            except ValueError: pass
+
+            if val == 'true':
+                val = True
+            elif val == 'false':
+                val = False
+
+            defs[key] = val
+        
+    return defs
+
 
 def after_build(source, target, env):
+    
+    defs = get_defines('ECU_Defines/StallardOSconfig.h')
+    if 'useMPU' not in defs or not defs['useMPU']:
+        print('INFO: MPU config disabled, skipping alignment checks')
+        return
+
     print('checking .data/.bss alignment...')
     
     build_env = env['PIOENV']
@@ -34,7 +86,7 @@ def after_build(source, target, env):
     ram_only = list(filter(lambda s: s.name not in ignore_sections, ram_only))  # filter out ignored elements
 
     invalid_segment_size = list(filter(lambda s: not math.log2(s.size).is_integer(), ram_only))  # invalid segment size overwrites align error
-    invalid_segment_align = list(filter(lambda s: (s not in invalid_segment_size) and s.address%s.size != 0, ram_only))  # easy check for aligment, using a%b==0
+    invalid_segment_align = list(filter(lambda s: s.address%s.size != 0, ram_only))  # easy check for aligment, using a%b==0
 
 
     error = False
@@ -43,20 +95,20 @@ def after_build(source, target, env):
         error = True
         print('ERROR: invalid segment size detected')
         for segment in invalid_segment_size:
-            print(f'{segment.name} ({segment.type}): size 0x{segment.size:x} is not power of 2')
+            print(f'{segment.name}: size 0x{segment.size:x} is not power of 2, modify ".=ALIGN()" in {segment.name}')
 
     if invalid_segment_align:
         error = True
         print('ERROR: misaligned segments detected')
         for segment in invalid_segment_align:
-            print(f'{segment.name} ({segment.type}): start address 0x{segment.address:x} not aligned to its size 0x{segment.size:x}')
-
+            print(f'{segment.name}: start address 0x{segment.address:x} not aligned to its size 0x{segment.size:x}')
 
     if error:
         return -1
     else:
         print('INFO: alignment is OK')
         return 0
+
 
 
 env.AddPostAction("buildprog", after_build)
