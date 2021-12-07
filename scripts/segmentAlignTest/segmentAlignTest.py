@@ -52,6 +52,17 @@ def get_defines(header_file):
     return defs
 
 
+def nextPow2(n):
+    p = 1
+    if (n and not(n & (n - 1))):
+        return n
+ 
+    while (p < n):
+        p <<= 1
+         
+    return p
+
+
 def after_build(source, target, env):
     
     defs = get_defines('ECU_Defines/StallardOSconfig.h')
@@ -95,13 +106,17 @@ def after_build(source, target, env):
         error = True
         print('ERROR: invalid segment size detected')
         for segment in invalid_segment_size:
-            print(f'{segment.name}: size 0x{segment.size:x} is not power of 2, modify ".=ALIGN()" in {segment.name}')
+            print(f'{segment.name}: size 0x{segment.size:x} is not power of 2, try ".=ALIGN({nextPow2(segment.size)})" in {segment.name}')
 
     if invalid_segment_align:
         error = True
         print('ERROR: misaligned segments detected')
         for segment in invalid_segment_align:
             print(f'{segment.name}: start address 0x{segment.address:x} not aligned to its size 0x{segment.size:x}')
+
+
+    for seg in sections:
+        print(f'{seg.name} from {seg.address:x} to {(seg.address + seg.size):x}')
 
     if error:
         return -1
@@ -111,4 +126,4 @@ def after_build(source, target, env):
 
 
 
-env.AddPostAction("buildprog", after_build)
+env.AddPostAction("checkprogsize", after_build)
