@@ -11,6 +11,7 @@ extern "C" stack_T _ebss;
 volatile struct function_struct* volatile currentTask = nullptr;
 volatile struct function_struct* volatile nextTask = nullptr;
 volatile struct function_struct* volatile taskMainStruct = nullptr;
+stack_T taskmainStack[200];
 
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
@@ -43,7 +44,7 @@ void taskOnEnd(void)
     currentTask->used = 0;
     if(!currentTask->staticAlloc)
     {
-        free((uint32_t*)currentTask->vals);
+        free((uint32_t*)currentTask->stackBase);
     }
     currentTask = taskMainStruct;
     nextTask = taskMainStruct;
@@ -83,7 +84,7 @@ StallardOS::StallardOS()
   initMPU();
   #endif // useMPU
 
-  taskMainStruct = addFunction(taskMain, -2, 255, 256);
+  taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
   if(taskMainStruct == nullptr) while(1);
 
   TIM_HandleTypeDef htim;
@@ -344,47 +345,20 @@ uint8_t StallardOS::bytesToMPUSize(stack_T bytes){
   }
 }
 
-
 /**
  * Add a new Task to execute list.
- * Also allocates Stack space for the Task
+ * Does not allocate stack space
  *
  * @param function Task to execute.
- * @param id unique id of the task.
  * @param prio priority of the task, lower means higher.
- * @param stackSize amount of Stack words to allocate, stackSize*address_len must be power of 2 in MPU mode.
+ * @param stackPtr pointer to the stack memory allocated by the user, must be aligned to stackSize in MPU mode
+ * @param stackSizeBytes amount of Stack Bytes to allocate, stackSize*word_len must be power of 2 in MPU mode.
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate)
 {
-  stack_T stackSizeBytes;
-  stack_T *stackPtr;
-  stackSizeBytes = sizeof(stack_T)*stackSize;
-
-  if (function == nullptr || searchFunction(countTCBsInUse) != nullptr || refreshRate > 1000 || stackSizeBytes == 0 || stackSizeBytes > 0x1'0000'0000) //Make sure the parameters are correct
-  {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
-    return nullptr;
-  }
-
-  #ifdef useMPU
-  // MPU requires at least 32 Bytes
-  // and stack size to be a pwr of 2
-  if (stackSizeBytes < 32 ||\
-     (stackSizeBytes & (stackSizeBytes-1)) != 0)  // number is not pwr of 2, if more than 1 bit is !=0
-  {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
-    return nullptr;
-  }
-  #endif // useMPU
-
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
-
   function_struct_ptr = searchFreeFunction();
   if (function_struct_ptr == nullptr)
   {
@@ -401,23 +375,6 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
     #endif
     return nullptr;
   }
-
-
-  // get memory aligned (alignment, size)
-  #ifdef useMPU
-    stackPtr = (stack_T *)memalign(stackSizeBytes, stackSizeBytes);
-  #else
-    stackPtr = (stack_T *)malloc(stackSizeBytes);
-  #endif // useMPU
-
-  if(stackPtr == nullptr) //Wenn kein Stack gefunden
-  {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
-    return nullptr;
-  }
-
   //alle Werte übertragen
   function_struct_ptr->function = function;
   function_struct_ptr->executable = true;
@@ -425,20 +382,20 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   function_struct_ptr->id = countTCBsInUse;
   countTCBsInUse++;
   function_struct_ptr->staticAlloc = 0;
-  // function_struct_ptr->error = 0;
 
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
   function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
-  function_struct_ptr->Stack = function_struct_ptr->vals = stackPtr + stackSize - sizeof(stack_T); //End of Stack
-  function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSizeBytes);
+  function_struct_ptr->Stack = stackPtr + (stackSize - sizeof(stack_T)); //End of Stack
+  function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSize);
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
   
   function_struct_ptr->continueInUS = 0;
+
   //Prepare initial stack trace
   function_struct_ptr->Stack--;
   *function_struct_ptr->Stack = (uint32_t)0x01000000;
@@ -469,25 +426,20 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   return function_struct_ptr;
 }
 
-
 /**
  * Add a new Task to execute list.
- * Does not allocate stack space
+ * Also allocates Stack space for the Task
  *
  * @param function Task to execute.
- * @param id unique id of the task.
  * @param prio priority of the task, lower means higher.
- * @param stackPtr pointer to the stack memory allocated by the user, must be aligned to stackSize in MPU mode
- * @param stackSize amount of Stack words to allocate, stackSize*word_len must be power of 2 in MPU mode.
+ * @param stackSize amount of Stack bytes to allocate, stackSize*address_len must be power of 2 in MPU mode.
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate)
 {
-  stack_T stackSizeBytes;
-  stackSizeBytes = sizeof(stack_T)*stackSize;
-
-  if (function == nullptr || searchFunction(countTCBsInUse) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSizeBytes > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
+  stack_T *stackPtr;
+  if (function == nullptr || searchFunction(countTCBsInUse) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
@@ -508,18 +460,38 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
   }
   #endif // useMPU
 
-  struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
+  // get memory aligned (alignment, size)
+  #ifdef useMPU
+    stackPtr = (stack_T *)memalign(stackSize, stackSize);
+  #else
+    stackPtr = (stack_T *)malloc(stackSize);
+  #endif // useMPU
 
-  function_struct_ptr = searchFreeFunction();
-  if (function_struct_ptr == nullptr)
+  if(stackPtr == nullptr) //Wenn kein Stack gefunden
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
     #endif
-    return nullptr; //Aus der Funktion rausspringen
+    return nullptr;
   }
+  return initTask(function, prio, stackPtr, stackSize, refreshRate);
+}
 
-  if (first_function_struct == nullptr) //Wenn schon funktionen hinzugefügt wurden
+
+/**
+ * Add a new Task to execute list.
+ * Does not allocate stack space
+ *
+ * @param function Task to execute.
+ * @param prio priority of the task, lower means higher.
+ * @param stackPtr pointer to the stack memory allocated by the user, must be aligned to stackSize in MPU mode
+ * @param stackSize amount of Stack bytes to allocate, stackSize*word_len must be power of 2 in MPU mode.
+ * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
+ * @return pointer to the created tcb.
+ */
+struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate)
+{
+  if (function == nullptr || searchFunction(countTCBsInUse) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
@@ -527,56 +499,19 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
     return nullptr;
   }
 
-  //alle Werte übertragen
-  function_struct_ptr->function = function;
-  function_struct_ptr->executable = true;
-  function_struct_ptr->priority = prio;
-  function_struct_ptr->id = countTCBsInUse;
-  countTCBsInUse++;
-  // function_struct_ptr->error = 0;
-
-  function_struct_ptr->refreshRate = refreshRate;
-  function_struct_ptr->lastYield = 0;
-  function_struct_ptr->lastStart = 0;
-  function_struct_ptr->State = PAUSED;                                       //New Task
-  function_struct_ptr->stackBase = stackPtr;
-  function_struct_ptr->Stack = function_struct_ptr->vals = stackPtr + stackSize - sizeof(stack_T); //End of Stack
-  function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSizeBytes);
-  function_struct_ptr->stackSize = stackSize;
-  function_struct_ptr->waitingForSemaphore = 0;
-  function_struct_ptr->used = true;
-  function_struct_ptr->staticAlloc = 1;
-  
-  function_struct_ptr->continueInUS = 0;
-  //Prepare initial stack trace
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)0x01000000;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)function & (~1);
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)taskOnEnd;
-
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)0x12;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)3;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)2;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)1;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)0;
-
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = 0xFFFFFFFD;
-  for(uint8_t i = 4; i < 12; i++)
+  #ifdef useMPU
+  // MPU requires at least 32 Bytes
+  // and stack size to be a pwr of 2
+  if (stackSize < 32 ||\
+     (stackSize & (stackSize-1)) != 0)  // number is not pwr of 2, if more than 1 bit is !=0
   {
-    function_struct_ptr->Stack--;
-    *function_struct_ptr->Stack = 0;
+    #ifndef UNIT_TEST
+    asm("bkpt");  //Zeige debugger
+    #endif
+    return nullptr;
   }
-  
-  //////////////////////////////
-  return function_struct_ptr;
+  #endif // useMPU
+  return initTask(function, prio, stackPtr, stackSize, refreshRate);
 }
 
 
@@ -728,7 +663,6 @@ void StallardOS::yield()
  * @param id unique id of the task.
  * @return state of the task, see taskstate enum
  */
-
 taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
 {
   struct function_struct *temp = searchFunction(id); //Hier die Funktion suchen
@@ -741,13 +675,6 @@ taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
     return STOPPED;
   }
 }
-
-// uint8_t StallardOS::getCPUload()
-// {
-//   float val;
-//   val = (1.0 - float(taskMainTime) / float(getRuntimeMs())) * 100.0;
-//   return val;
-// }
 
 /**
  * Start the StallardOS operating system
@@ -778,12 +705,12 @@ void StallardOS::startOS(void)
     asm("MRS R0, MSP");
     asm("SUB R0, #200"); //Reserve some space for Handlers (200 Byte)
     asm("MSR PSP, R0");
-    asm("mov r0, #0");
-    asm("msr control, r0");
+    // asm("mov r0, #0");
+    // asm("msr control, r0");
     // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     asm("dsb");
     asm("isb");
-    asm("SVC 3");
+    asm("SVC #3");
   }
 }
 

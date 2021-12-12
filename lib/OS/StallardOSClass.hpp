@@ -18,7 +18,7 @@ private:
   uint8_t bytesToMPUSize(stack_T bytes);                             // convert bytes to MPU size macro
 
   static void call_pendPendSV(void);
-  
+  struct function_struct *initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0);
 
 
 public:

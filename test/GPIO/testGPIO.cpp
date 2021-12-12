@@ -39,6 +39,10 @@ int main()
     {
         for (uint8_t iPORT = 0; iPORT < sizeof(StallardOSGPIO::portsToGPIOBase) / sizeof(GPIO_TypeDef *); iPORT++)
         {
+            if((iPORT == PORTA && iPIN == 13) || (iPORT == PORTA && iPIN == 14)) //Please don't mess with SWD pins
+            {
+                continue;
+            }
             testGPIO = StallardOSGPIO(iPIN, ports(iPORT), Output, 1);
             RUN_TEST(test_pin_state_high);
             RUN_TEST(test_pin_state_low);
@@ -47,7 +51,7 @@ int main()
 
     UNITY_END(); // stop unit testing
     StallardOS::delay(1000);
-    HAL_NVIC_SystemReset();
+    // HAL_NVIC_SystemReset();
     while (1)
     {
     }

@@ -9,6 +9,7 @@ extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
 
+#ifdef useMPU
 static MPU_Region_InitTypeDef MPU_StackCfg = {
     /* these values are always the same (for stack)
      * do not assign them at each context switch
@@ -33,6 +34,7 @@ static MPU_Region_InitTypeDef MPU_StackCfg = {
     /* always use MPU region 3 for stack */
     .Number = MPU_REGION_NUMBER3
 };
+#endif
 
 // volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
 volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
@@ -149,7 +151,7 @@ void findNextFunction()
     }
     while (temp != currentTask);
 
-    if(nextTask && nextTask->continueInUS > 0) nextTask = NULL;    
+    if(nextTask && nextTask->continueInUS > 0) nextTask = taskMainStruct;    
 }
 
 /**
@@ -161,7 +163,8 @@ void findNextFunction()
 __attribute__((always_inline)) inline void switchTask(void)
 {
     //if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
-    //if (nextTask == NULL) nextTask = taskMainStruct;
+    if (nextTask == NULL) nextTask = taskMainStruct;
+
 
     //Pausing Task
     __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
@@ -279,55 +282,53 @@ __attribute__((always_inline)) inline static void inline_mpu_enable(uint32_t MPU
  * @param
  * @return
  */
-__attribute__((__used__)) void SVC_Handler()
+__attribute__((naked, __used__)) void SVC_Handler()
 {
     // disable_interrupts();
-    uint8_t handleMode;
+    // uint8_t handleMode;
 
-    // __ASM volatile("TST    LR, #4");
-    // __ASM volatile("ITE    EQ");
-	// __ASM volatile("MRSEQ	R0, MSP"); //Warum pusht er bem exception entry IMMER auf den Prozess stack pointer? Bei startOS müsste er doch auf den MSP pushen?????
-	__ASM volatile("MRS	R0, PSP");
+    __ASM volatile("TST    LR, #4");
+    __ASM volatile("ITE    EQ");
+	__ASM volatile("MRSEQ	R0, MSP"); //Warum pusht er den exception entry IMMER auf den Prozess stack pointer? Bei startOS müsste er doch auf den MSP pushen?????
+	__ASM volatile("MRSNE	R0, PSP");
+    // __ASM volatile("MRS	R0, PSP");
 
 	__ASM volatile("LDR	R0, [R0, #24]");
 	__ASM volatile("LDRB	R0, [R0, #-2]");
-    __ASM volatile("MOV    %0, r0" : "=r"(handleMode));
+    // __ASM volatile("MOV    %0, r0" : "=r"(handleMode));
 
-    switch (handleMode)
-    {
-        case 1: //Enter Bootloader
-            jumpToBootloader();
-            break;
+    //SV_PENDSV
+    __ASM volatile("CMP r0, #2");
+    __ASM volatile("ITTTT eq");
+    __ASM volatile("MOVeq r1, #0xED04");
+    __ASM volatile("MOVTeq r1, #0xE000");
+    __ASM volatile("MOVeq r2, #0x10000000");
+    __ASM volatile("STReq r2, [r1]");
+    // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
-        case SV_PENDSV:
-            pendPendSV();
-            break;
+    //Start first task
+    __ASM volatile("CMP r0, #3");
+    __ASM volatile("IT NE");
+    __ASM volatile("BXne lr");
+    __ASM volatile("LDR r1, =currentTask");
+    __ASM volatile("LDR r2, [r1]");
+    __ASM volatile("LDR r0, [r2]");
 
-        case 3: //Start first task
-            //Resuming process
-            __ASM volatile("LDR r1, =currentTask");
-            __ASM volatile("LDR r2, [r1]");
-            __ASM volatile("LDR r0, [r2]");
+    __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
 
-            __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
-
-            __ASM volatile("TST r14, #0x10");
-            __ASM volatile("IT eq");
-            __ASM volatile("VLDMIAeq r0!, {s16-s31}");
-            
-            __ASM volatile("MSR PSP, r0");           //set PSP
-            __ASM volatile("ISB");
-            
-            __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
-            __ASM volatile("LDR r1, =nextTask");
-            __ASM volatile("MOV r2, #0");
-            __ASM volatile("STR r2, [r1]");
-            __ASM volatile("MOV lr, #0xfffffffd");
-            __ASM volatile("bx lr");
-
-        default:
-            break;
-    }
+    __ASM volatile("TST r14, #0x10");
+    __ASM volatile("IT eq");
+    __ASM volatile("VLDMIAeq r0!, {s16-s31}");
+    
+    __ASM volatile("MSR PSP, r0");           //set PSP
+    __ASM volatile("ISB");
+    
+    __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
+    __ASM volatile("LDR r1, =nextTask");
+    __ASM volatile("MOV r2, #0");
+    __ASM volatile("STR r2, [r1]");
+    __ASM volatile("MOV lr, #0xfffffffd");
+    __ASM volatile("bx lr");
     // enable_interrupts(); //Enable all interrupts
 }
 
@@ -363,7 +364,7 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
             }
             while (temp != currentTask);
 
-            if(currentTask->Stack > currentTask->vals)
+            if(currentTask->Stack > (currentTask->stackBase + currentTask->stackSize))
             {
                 #ifndef UNIT_TEST
                 asm("bkpt");  //Zeige debugger
@@ -392,7 +393,7 @@ __attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
  * @param
  * @return
  */
-__attribute__( ( naked, __used__ ) ) void PendSV_Handler()
+__attribute__( (__used__ ) ) void PendSV_Handler()
 {
     // asm("bkpt");
     disable_interrupts();

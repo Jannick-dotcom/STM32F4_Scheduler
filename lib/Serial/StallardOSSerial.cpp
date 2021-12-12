@@ -50,7 +50,10 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uin
     }
     else //Not implemented
     {
-        StallardOSGeneralFaultHandler();
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
+        return;
     }
 
     this->rx = StallardOSGPIO(rx.pin,rx.port, AFPP, nopull, alternateFunction);
