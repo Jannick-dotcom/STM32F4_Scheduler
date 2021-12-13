@@ -44,8 +44,10 @@ void taskOnEnd(void)
     currentTask->used = 0;
     if(!currentTask->staticAlloc)
     {
-        free((uint32_t*)currentTask->stackBase);
+      free((uint32_t*)currentTask->stackBase);
     }
+    currentTask->prev->next = currentTask->next;
+    currentTask->next->prev = currentTask->prev;
     currentTask = taskMainStruct;
     nextTask = taskMainStruct;
     while(1);
@@ -126,19 +128,19 @@ void StallardOS::createTCBs()
       return; //Aus der Funktion rausspringen
     }
 
-    if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
-    {
-      first_function_struct = temp; //Funktion als erste setzen
-      temp->next = temp;
-      temp->prev = temp;
-    }
-    else //wenn bereits eine funktion hinzugefügt wurde
-    {
-      temp->next = first_function_struct;
-      first_function_struct->prev->next = temp;
-      temp->prev = first_function_struct->prev;
-      first_function_struct->prev = temp;
-    }
+    // if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
+    // {
+    //   first_function_struct = temp; //Funktion als erste setzen
+    //   temp->next = temp;
+    //   temp->prev = temp;
+    // }
+    // else //wenn bereits eine funktion hinzugefügt wurde
+    // {
+    //   temp->next = first_function_struct;
+    //   first_function_struct->prev->next = temp;
+    //   temp->prev = first_function_struct->prev;
+    //   first_function_struct->prev = temp;
+    // }
     //alle Werte übertragen
     temp->function = nullptr;
     temp->priority = -1;
@@ -358,6 +360,7 @@ uint8_t StallardOS::bytesToMPUSize(stack_T bytes){
 struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate)
 {
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
+
   function_struct_ptr = searchFreeFunction();
   if (function_struct_ptr == nullptr)
   {
@@ -367,12 +370,18 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
     return nullptr; //Aus der Funktion rausspringen
   }
 
-  if (first_function_struct == nullptr) //Wenn noch keine funktionen hinzugefügt wurden
+  if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
   {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
-    return nullptr;
+    first_function_struct = function_struct_ptr; //Funktion als erste setzen
+    function_struct_ptr->next = function_struct_ptr;
+    function_struct_ptr->prev = function_struct_ptr;
+  }
+  else //wenn bereits eine funktion hinzugefügt wurde
+  {
+    function_struct_ptr->next = first_function_struct;
+    first_function_struct->prev->next = function_struct_ptr;
+    function_struct_ptr->prev = first_function_struct->prev;
+    first_function_struct->prev = function_struct_ptr;
   }
   //alle Werte übertragen
   function_struct_ptr->function = function;
@@ -585,28 +594,15 @@ struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
  */
 struct function_struct *StallardOS::searchFreeFunction(void)
 {
-  uint16_t i = 0;
-  volatile struct function_struct *temp = first_function_struct; //temporärer pointer erzeugen
-
-  if (temp == nullptr)
+  for(uint8_t i = 0; i < sizeof(this->taskArray) / sizeof(function_struct); i++)
   {
-    return nullptr;
-  }
-
-  while (temp->used) //Solange Funktion noch nicht gefunden wurde
-  {
-    if (temp != first_function_struct || i == 0)
+    if(taskArray[i].used == 0)
     {
-      temp = temp->next; //wenn nicht nächstes element anschauen
-      i++;
-    }
-    else
-    {
-      return nullptr; //wenn am ende der liste angekommen aufhören und zurück in main springen
+      return &taskArray[i];
     }
   }
   //Hier haben wir das richtige element schon gefunden -> temp
-  return (function_struct*)temp; //Element übergeben
+  return nullptr; //Element übergeben
 }
 
 /**
