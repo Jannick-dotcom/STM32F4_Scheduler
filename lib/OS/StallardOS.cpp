@@ -48,7 +48,6 @@ void taskOnEnd(void)
     }
     currentTask = taskMainStruct;
     nextTask = taskMainStruct;
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     while(1);
 }
 
@@ -381,7 +380,6 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->priority = prio;
   function_struct_ptr->id = countTCBsInUse;
   countTCBsInUse++;
-  function_struct_ptr->staticAlloc = 0;
 
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
@@ -474,7 +472,9 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
     #endif
     return nullptr;
   }
-  return initTask(function, prio, stackPtr, stackSize, refreshRate);
+  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  ptr->staticAlloc = 0;
+  return ptr;
 }
 
 
@@ -511,7 +511,9 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
     return nullptr;
   }
   #endif // useMPU
-  return initTask(function, prio, stackPtr, stackSize, refreshRate);
+  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  ptr->staticAlloc = 1;
+  return ptr;
 }
 
 
