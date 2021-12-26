@@ -1,4 +1,5 @@
 #include "StallardOS.hpp"
+#include "shared_params.hpp"
 
 extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 // extern "C" volatile uint64_t taskMainTime;
@@ -80,6 +81,8 @@ StallardOS::StallardOS()
     #endif
   }
 
+  initShared();
+
   #ifdef useMPU
   initMPU();
   #endif // useMPU
@@ -158,6 +161,27 @@ void StallardOS::createTCBs()
   }
 }
 
+
+void StallardOS::initShared(void){
+  /* init in any case
+   * does not re-init if already init 
+   */
+  SharedParamsInit();
+
+  /* set default parameters at OS boot */
+
+  /* the default parames will make the FlashLoader
+   * boot back to the OS, in case a reset handler is hit
+   * or in case someone hits the reset button of the controller
+   */
+
+  /* first param is "from_OS" */
+  SharedParamsWriteByIndex(0, 1);
+
+  /* 2nd param is "reboot" */
+  SharedParamsWriteByIndex(1, 1);
+
+}
 
 void StallardOS::initMPU(void){
 
