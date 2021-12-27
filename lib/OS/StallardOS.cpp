@@ -619,7 +619,7 @@ void StallardOS::delay(uint32_t milliseconds)
   }
   else
   {
-    currentTask->continueInUS = (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+    currentTask->continueInUS = usCurrentTimeSinceStart + (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     // nextTask = taskMainStruct;
     findNextFunction();
     StallardOS::call_pendPendSV();
@@ -641,9 +641,9 @@ void StallardOS::yield()
   {
       if(currentTask != nullptr)
       {
-        currentTask->continueInUS = (1000000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-        if(currentTask->continueInUS > (1000000 / currentTask->refreshRate))
-          currentTask->continueInUS = 0;
+        currentTask->continueInUS = usCurrentTimeSinceStart + (1000000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
+        if(currentTask->continueInUS > (1000000 / currentTask->refreshRate) + usCurrentTimeSinceStart)
+          currentTask->continueInUS = usCurrentTimeSinceStart;
         else
         {
           findNextFunction();
