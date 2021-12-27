@@ -14,6 +14,7 @@ private:
   struct function_struct *searchFreeFunction(void);                 //Search a TCB that isn't used
   void createTCBs(void);                                            //create the structs for all the functions (count is "countTasks")
   uint16_t countTCBsInUse;
+  void initShared(void);
   void initMPU(void);                                               // setup the static part of the MPU configuration
   uint8_t bytesToMPUSize(stack_T bytes);                             // convert bytes to MPU size macro
 
