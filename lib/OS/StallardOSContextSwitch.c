@@ -128,7 +128,7 @@ void findNextFunction()
             continue;
         }
         
-        if (temp->executable && temp->continueInUS == 0 && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if (temp->executable && temp->continueInUS <= usCurrentTimeSinceStart && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
             if(temp->waitingForSemaphore && temp->semVal != NULL && *(temp->semVal) == 0) //If this task is still waiting for the semaphore
             {
@@ -138,20 +138,9 @@ void findNextFunction()
             nextTask = temp;          //set nextF to right now highest priority task
             prioMin = temp->priority; //save prio
         }
-#ifdef useSystickAltering
-        if(minDelayT != NULL)
-        {
-            if (*minDelayT > temp->continueInUS)
-            {
-                *minDelayT = temp->continueInUS;
-            }
-        }
-#endif //useSystickAltering
         temp = temp->next; //Nächsten Task
     }
-    while (temp != currentTask);
-
-    if(nextTask && nextTask->continueInUS > 0) nextTask = taskMainStruct;    
+    while (temp != currentTask);   
 }
 
 /**
@@ -342,42 +331,22 @@ __attribute__((naked, __used__)) void SVC_Handler()
 __attribute__((used)) void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
-    // usCurrentTimeSinceStart += 10;
-    // if((usCurrentTimeSinceStart % 1000) == 0) //Every millisecond
-    // {
-        HAL_IncTick();
-        if(currentTask != NULL)
+    HAL_IncTick();
+    if(currentTask != NULL)
+    {
+        if(currentTask->Stack > (currentTask->stackBase + currentTask->stackSize) || currentTask->Stack < currentTask->stackBase)
         {
-            volatile struct function_struct* volatile temp = currentTask->next;
-            do
-            {
-                //Handle delay times
-                if (temp->continueInUS <= 1000)
-                {
-                    temp->continueInUS = 0;
-                }
-                else
-                {
-                    temp->continueInUS -= 1000; //dekrementieren
-                }
-                temp = temp->next;
-            }
-            while (temp != currentTask);
-
-            if(currentTask->Stack > (currentTask->stackBase + currentTask->stackSize))
-            {
-                #ifndef UNIT_TEST
-                asm("bkpt");  //Zeige debugger
-                #endif
-                currentTask->executable = 0;
-            }
-            findNextFunction();
-            if(currentTask != nextTask)
-            {
-                pendPendSV(); //If nextTask is not this task, set the PendSV to pending
-            }
+            #ifndef UNIT_TEST
+            asm("bkpt");  //Zeige debugger
+            #endif
+            currentTask->executable = 0;
         }
-    // }
+        findNextFunction();
+        if(currentTask != nextTask)
+        {
+            pendPendSV(); //If nextTask is not this task, set the PendSV to pending
+        }
+    }
     enable_interrupts(); //enable all interrupts
 }
 
@@ -395,7 +364,6 @@ __attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
  */
 __attribute__( (__used__ ) ) void PendSV_Handler()
 {
-    // asm("bkpt");
     disable_interrupts();
 
     switchTask();

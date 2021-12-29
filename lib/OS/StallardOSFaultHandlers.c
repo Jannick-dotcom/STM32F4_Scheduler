@@ -19,7 +19,7 @@ __attribute__((always_inline)) void StallardOSGeneralFaultHandler() //restarts a
     #endif
     if (taskMainStruct != 0)
     {
-        currentTask->Stack = currentTask->vals + currentTask->stackSize - sizeof(stack_T); //End of Stack
+        currentTask->Stack = currentTask->stackBase + currentTask->stackSize - sizeof(stack_T); //End of Stack
         currentTask->State = PAUSED; //Set Task state as new
         currentTask->waitingForSemaphore = 0;
         currentTask->continueInUS = 5000; //Restart Task in 5 ms
@@ -28,7 +28,7 @@ __attribute__((always_inline)) void StallardOSGeneralFaultHandler() //restarts a
             *(currentTask->semVal) = 1; //Semaphore freigeben
         }
         currentTask->semVal = 0; //Semaphore von task lösen
-
+        currentTask = taskMainStruct;
         nextTask = taskMainStruct;
         SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     }
