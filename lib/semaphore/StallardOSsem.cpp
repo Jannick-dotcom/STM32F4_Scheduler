@@ -9,8 +9,11 @@ StallardOSSemaphore::StallardOSSemaphore()
 
 void StallardOSSemaphore::give()
 {
-    val++;
-    currentTask->semVal = nullptr;
+    if(currentTask != nullptr)
+    {
+        val++;
+        currentTask->semVal = nullptr;
+    }
 }
 
 void StallardOSSemaphore::take()
@@ -19,11 +22,10 @@ void StallardOSSemaphore::take()
     {
         currentTask->semVal = &val;
         currentTask->waitingForSemaphore = 1;
-    }
-    while (val < 1);
-    val--;
-    if(currentTask != nullptr)
-    {
+        while (val < 1);
+        disable_interrupts();
+        val--;
         currentTask->waitingForSemaphore = 0;
+        enable_interrupts();
     }
 }
