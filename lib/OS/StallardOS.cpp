@@ -646,7 +646,7 @@ void StallardOS::delay(uint32_t milliseconds)
     currentTask->continueInUS = usCurrentTimeSinceStart + (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     // nextTask = taskMainStruct;
     findNextFunction();
-    StallardOS::call_pendPendSV();
+    CALL_PENDSV();
   }
 }
 
@@ -671,7 +671,7 @@ void StallardOS::yield()
         else
         {
           findNextFunction();
-          StallardOS::call_pendPendSV();
+          CALL_PENDSV();
         }
       }
     currentTask->lastStart = usCurrentTimeSinceStart;
@@ -732,7 +732,7 @@ void StallardOS::startOS(void)
     // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     asm("dsb");
     asm("isb");
-    asm("SVC #3");
+    CALL_STARTMAIN();
   }
 }
 
@@ -768,5 +768,9 @@ uint64_t StallardOS::getRuntimeUs()
 
 void StallardOS::goBootloader()
 {
-  StallardOS_goBootloader();
+  CALL_BOOTLOADER();
+}
+
+void StallardOS::goFlashloader(){
+  CALL_FLASHLOADER();
 }

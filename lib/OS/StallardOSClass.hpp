@@ -18,7 +18,6 @@ private:
   void initMPU(void);                                               // setup the static part of the MPU configuration
   uint8_t bytesToMPUSize(stack_T bytes);                             // convert bytes to MPU size macro
 
-  static void call_pendPendSV(void);
   struct function_struct *initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0);
 
 
@@ -40,6 +39,7 @@ public:
 
   //Control
   static void goBootloader();
+  static void goFlashloader();
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
   static void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
   void yield();                      //RTOS sagen, dass jetzt der Code zuende ist

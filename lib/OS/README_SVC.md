@@ -6,15 +6,15 @@ Therfore a convention was defined
 _________________________________________________________________________________________
 
 ### Calling the SVC
-All SVCs are called from within an StallardOS method.
-These method abide the naming convention `call_xxx`.
-> `call_pendPendSV(void);`
+All SVCs are called by using preprocessor macros, which help abstracting assembly calls to C/C++.
+These method abide the naming convention `CALL_xxx`.
+> `CALL_PENDSV();`
 
-All functionality implemented in the call function, is a single assembly instruction
-`svc x`, where x is the number of the requested syscall.
+The macro expands to a single assembly instruction
+`SVC #x`, where x is the number of the requested syscall, defined as `SV_XXX`.
 
 The method does **not** check if the caller is privileged or unprivileged. Calls from privileged tasks
-will result in an SVC aswell, causing overhead.
+will result in an SVC aswell, causing unneseccary overhead.
 
 #### __Calling Restrictions__
 There's no calling restrictions in place. All unprivileged tasks are allowed to execute any implemented SVC
@@ -24,11 +24,11 @@ ________________________________________________________________________________
 ### Handling the SVC
 
 Hall SVCs are calling the assigned interrupt handler
-> `__attribute__((__used__)) void SVC_Handler()`
+> `void SVC_Handler()`
 
 The handler is currently in `StallardOSContextSwitch.c` but might be moved into a separate file in the future.
 
-The handler gets the SVC number and executes the corresponding method (e.g. `pendPendSV()`).
+The handler gets the SVC number and executes the corresponding method (e.g. `pendPendSV()` for `SV_PENDSV`).
 
 _________________________________________________________________________________________
 
