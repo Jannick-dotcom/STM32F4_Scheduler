@@ -36,9 +36,6 @@ static MPU_Region_InitTypeDef MPU_StackCfg = {
 };
 #endif
 
-// volatile uint64_t msCurrentTimeSinceStart = 0; //about 584 942 417 years of millisecond counting
-volatile uint64_t usCurrentTimeSinceStart = 0; //about 584 942 years of microsecond counting
-
 volatile uint64_t taskMainTime = 0; //Experimental
 
 /**
@@ -114,21 +111,27 @@ void jumpToBootloader(void)
 void findNextFunction()
 {
     nextTask = NULL;
-    volatile struct function_struct* volatile temp = currentTask->next;
+    volatile struct function_struct* temp = currentTask->next;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     if(temp == NULL)
     {
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
         return;
     }
     do
     {
         if(temp->used == 0) //If the TCB is unused, continue with the next one
         {
+            #ifndef UNIT_TEST
+            asm("bkpt");  //Zeige debugger
+            #endif
             temp = temp->next;
             continue;
         }
         
-        if (temp->executable && temp->continueInUS <= usCurrentTimeSinceStart && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if (temp->executable && temp->continueInMS <= HAL_GetTick() && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
             if(temp->waitingForSemaphore && temp->semVal != NULL && *(temp->semVal) == 0) //If this task is still waiting for the semaphore
             {
@@ -140,7 +143,7 @@ void findNextFunction()
         }
         temp = temp->next; //Nächsten Task
     }
-    while (temp != currentTask);   
+    while (temp != currentTask->next);   
 }
 
 /**
@@ -273,27 +276,36 @@ __attribute__((always_inline)) inline static void inline_mpu_enable(uint32_t MPU
  */
 __attribute__((naked, __used__)) void SVC_Handler()
 {
-    // disable_interrupts();
-    // uint8_t handleMode;
-
     __ASM volatile("TST    LR, #4");
     __ASM volatile("ITE    EQ");
-	__ASM volatile("MRSEQ	R0, MSP"); //Warum pusht er den exception entry IMMER auf den Prozess stack pointer? Bei startOS müsste er doch auf den MSP pushen?????
-	__ASM volatile("MRSNE	R0, PSP");
-    // __ASM volatile("MRS	R0, PSP");
+	__ASM volatile("MRSeq	R0, MSP"); //Warum pusht er den exception entry IMMER auf den Prozess stack pointer? Bei startOS müsste er doch auf den MSP pushen?????
+	__ASM volatile("MRSne	R0, PSP");
 
 	__ASM volatile("LDR	R0, [R0, #24]");
 	__ASM volatile("LDRB	R0, [R0, #-2]");
-    // __ASM volatile("MOV    %0, r0" : "=r"(handleMode));
+
+    //Enable Privilege
+    __ASM volatile("CMP r0, #0");
+    __ASM volatile("ITTT eq");
+    __ASM volatile("MRSeq r1, control");
+    __ASM volatile("BICeq r1, #1");
+    __ASM volatile("MSReq control, r1");
+
+    //Disable Privilege
+    __ASM volatile("CMP r0, #1");
+    __ASM volatile("ITTT eq");
+    __ASM volatile("MRSeq r1, control");
+    __ASM volatile("ORReq r1, #1");
+    __ASM volatile("MSReq control, r1");
 
     //SV_PENDSV
+    // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     __ASM volatile("CMP r0, #2");
     __ASM volatile("ITTTT eq");
     __ASM volatile("MOVeq r1, #0xED04");
     __ASM volatile("MOVTeq r1, #0xE000");
     __ASM volatile("MOVeq r2, #0x10000000");
     __ASM volatile("STReq r2, [r1]");
-    // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
     //Start first task
     __ASM volatile("CMP r0, #3");
@@ -305,9 +317,9 @@ __attribute__((naked, __used__)) void SVC_Handler()
 
     __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
 
-    __ASM volatile("TST r14, #0x10");
-    __ASM volatile("IT eq");
-    __ASM volatile("VLDMIAeq r0!, {s16-s31}");
+    // __ASM volatile("TST r14, #0x10");
+    // __ASM volatile("IT eq");
+    // __ASM volatile("VLDMIAeq r0!, {s16-s31}");
     
     __ASM volatile("MSR PSP, r0");           //set PSP
     __ASM volatile("ISB");
@@ -318,9 +330,7 @@ __attribute__((naked, __used__)) void SVC_Handler()
     __ASM volatile("STR r2, [r1]");
     __ASM volatile("MOV lr, #0xfffffffd");
     __ASM volatile("bx lr");
-    // enable_interrupts(); //Enable all interrupts
 }
-
 
 /**
  * Systick Handler for an Exception every x ms. Minimum is 11 Hz
@@ -328,7 +338,7 @@ __attribute__((naked, __used__)) void SVC_Handler()
  * @param
  * @return
  */
-__attribute__((used)) void SysTick_Handler(void) //In C Language
+__attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
     HAL_IncTick();
@@ -342,17 +352,12 @@ __attribute__((used)) void SysTick_Handler(void) //In C Language
             currentTask->executable = 0;
         }
         findNextFunction();
-        if(currentTask != nextTask)
+        if(currentTask != nextTask && !(currentTask == taskMainStruct && nextTask == NULL))
         {
             pendPendSV(); //If nextTask is not this task, set the PendSV to pending
         }
     }
     enable_interrupts(); //enable all interrupts
-}
-
-__attribute__((__used__)) void TIM6_DAC_IRQHandler(void) {
-    TIM6->SR &= ~TIM_SR_UIF; //Reset interrupt
-    usCurrentTimeSinceStart += 1;
 }
 
 /**

@@ -111,7 +111,7 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
 
 StallardOSGPIO::~StallardOSGPIO()
 {
-    HAL_GPIO_DeInit((GPIO_TypeDef *)portsToGPIOBase[this->port], this->pin);
+    HAL_GPIO_DeInit((GPIO_TypeDef *)portsToGPIOBase[this->port], 1<<this->pin);
 }
 
 /**

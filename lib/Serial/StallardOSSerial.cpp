@@ -53,6 +53,7 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uin
         #ifndef UNIT_TEST
         asm("bkpt");  //Zeige debugger
         #endif
+        this->sem.give();
         return;
     }
 

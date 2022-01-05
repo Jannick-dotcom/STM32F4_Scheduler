@@ -3,7 +3,7 @@
 // StallardOSSPI StallardOSExtAnalog::spihandle(extADCSpiPort, Normal, gpio(PORTB, 15), gpio(PORTB, 14), gpio(PORTB, 10));
 uint8_t StallardOSExtAnalog::adcInitialized = 0;
 StallardOSSemaphore StallardOSExtAnalog::sem;
-extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
+// extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
 
 StallardOSGPIO StallardOSExtAnalog::reset1(4, PORTD, Output, false);
 StallardOSGPIO StallardOSExtAnalog::reset2(3, PORTD, Output, false);
@@ -117,13 +117,13 @@ uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
         cs1 = 1;
     else if (adcNumber == 2)
         cs2 = 1;
-    uint64_t timestart = usCurrentTimeSinceStart;
+    uint64_t timestart = StallardOSTime_getTimeMs();
 
     if (adcNumber == 1)
     {
         while (drdy1 == true) //Wait for the drdy pin or timeout
         {
-            if ((usCurrentTimeSinceStart - timestart) > 100000)
+            if ((StallardOSTime_getTimeMs() - timestart) > 100)
             {
                 return 0; //No reading error!!!!
             }
@@ -133,7 +133,7 @@ uint16_t StallardOSExtAnalog::channelRead(uint8_t channel)
     {
         while (drdy2 == true) //Wait for the drdy pin or timeout
         {
-            if ((usCurrentTimeSinceStart - timestart) > 100000)
+            if ((StallardOSTime_getTimeMs() - timestart) > 100)
             {
                 return 0; //No reading error!!!!
             }

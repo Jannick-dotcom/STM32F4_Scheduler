@@ -7,13 +7,12 @@ class StallardOS
 {
 private:
   struct function_struct taskArray[countTasks + 1];
-  struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
+  volatile struct function_struct *first_function_struct; //Pointer auf das erste erstellte Function struct
   uint8_t TCBsCreated;
 
   struct function_struct *searchFunction(/*Funktion*/ uint16_t id); //Search a TCB that matches the provided function
   struct function_struct *searchFreeFunction(void);                 //Search a TCB that isn't used
   void createTCBs(void);                                            //create the structs for all the functions (count is "countTasks")
-  uint16_t countTCBsInUse;
   void initShared(void);
   void initMPU(void);                                               // setup the static part of the MPU configuration
   uint8_t bytesToMPUSize(stack_T bytes);                             // convert bytes to MPU size macro
@@ -35,8 +34,6 @@ public:
 
   //Getters
   taskState getFunctionState(/*Funktion*/ uint16_t id);
-  uint64_t getRuntimeMs();
-  uint64_t getRuntimeUs(); 
 
   //Control
   static void goBootloader();

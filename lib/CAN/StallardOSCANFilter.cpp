@@ -6,7 +6,9 @@ StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports ca
 {
     if(id1 > 2047 || id2 > 2047 || this->countFilters > 27)
     {
-        asm("bkpt");
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
         StallardOSGeneralFaultHandler();
     }
     this->id1 = id1;
@@ -27,10 +29,11 @@ StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports ca
     }
     else
     {
-        asm("bkpt");
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
         /* Filter configuration Error */
         StallardOSGeneralFaultHandler();
-        return;
     }
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_16BIT;
@@ -51,7 +54,9 @@ StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports ca
     sFilterConfig.SlaveStartFilterBank = 14;
     if (HAL_CAN_ConfigFilter(canhandle, &sFilterConfig) != HAL_OK)
     {
-        asm("bkpt");
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
         /* Filter configuration Error */
         StallardOSGeneralFaultHandler();
     }

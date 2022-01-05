@@ -9,6 +9,7 @@
 #include "StallardOSSPI.hpp"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSClass.hpp"
+#include "StallardOSTime.h"
 
 #define reg0Value 0
 #define reg1Value 3

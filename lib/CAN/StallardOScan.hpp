@@ -10,6 +10,7 @@
 #include "StallardOScanStructs.hpp"
 #include "StallardOSCANFilter.hpp"
 
+#include "StallardOSTime.h"
 
 extern "C" void StallardOSGeneralFaultHandler();
 

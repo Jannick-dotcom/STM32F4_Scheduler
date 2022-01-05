@@ -1,8 +1,6 @@
 #include "StallardOS.hpp"
 #include "shared_params.hpp"
 
-extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
-// extern "C" volatile uint64_t taskMainTime;
 extern "C" stack_T _sdata;  // sizes of .data and .bss
 extern "C" stack_T _edata;  // used for MPU config
 extern "C" stack_T _sbss;
@@ -49,8 +47,10 @@ void taskOnEnd(void)
     }
     currentTask->prev->next = currentTask->next;
     currentTask->next->prev = currentTask->prev;
+    currentTask->executable = 0;
     currentTask = taskMainStruct;
     nextTask = taskMainStruct;
+    __ASM volatile("SVC #3");
     while(1);
 }
 
@@ -68,7 +68,6 @@ StallardOS::StallardOS()
   NVIC_EnableIRQ(MemoryManagement_IRQn);
   
   //Basiswerte Initialisieren
-  countTCBsInUse = 0;
   first_function_struct = nullptr;
   currentTask = nullptr;
   TCBsCreated = 0;
@@ -91,22 +90,6 @@ StallardOS::StallardOS()
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
   if(taskMainStruct == nullptr) while(1);
 
-  TIM_HandleTypeDef htim;
-  __TIM6_CLK_ENABLE();
-  htim.Instance = TIM6;
-  htim.Init.Prescaler = 0; //Because 21 MHz APB1 Clock -> 1 MHz timer interrupts
-  htim.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim.Init.Period = 41;
-  htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim.Init.RepetitionCounter = 0;
-  htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  __HAL_DBGMCU_FREEZE_TIM6();
-  HAL_TIM_Base_Init(&htim);
-  __HAL_TIM_CLEAR_FLAG(&htim, TIM_IT_UPDATE);
-  HAL_TIM_Base_Start_IT(&htim);
-  NVIC_SetPriority(TIM6_DAC_IRQn, 0x00);
-  HAL_NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
-  HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
 }
 
 /**
@@ -130,38 +113,23 @@ void StallardOS::createTCBs()
     {
       return; //Aus der Funktion rausspringen
     }
-
-    // if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
-    // {
-    //   first_function_struct = temp; //Funktion als erste setzen
-    //   temp->next = temp;
-    //   temp->prev = temp;
-    // }
-    // else //wenn bereits eine funktion hinzugefügt wurde
-    // {
-    //   temp->next = first_function_struct;
-    //   first_function_struct->prev->next = temp;
-    //   temp->prev = first_function_struct->prev;
-    //   first_function_struct->prev = temp;
-    // }
     //alle Werte übertragen
     temp->function = nullptr;
     temp->priority = -1;
 
-    temp->id = -1;
+    temp->id = i;
 
     temp->State = STOPPED;                        //New Task
     // temp->Stack = temp->vals + sizeStack - sizeof(uint32_t); //End of Stack
 
 
-    temp->executable = true;
+    temp->executable = false;
     temp->used = false;
-    temp->continueInUS = 0;
+    temp->continueInMS = 0;
 
     TCBsCreated++;
   }
 }
-
 
 void StallardOS::initShared(void){
   /* init in any case
@@ -305,8 +273,6 @@ void StallardOS::initMPU(void){
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
-
-
 uint8_t StallardOS::bytesToMPUSize(stack_T bytes){
   switch(bytes){
     case 0x20:
@@ -411,8 +377,15 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->function = function;
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
-  function_struct_ptr->id = countTCBsInUse;
-  countTCBsInUse++;
+  for (uint16_t i = 0; i < countTasks+1; i++)
+  {
+    if(this->taskArray[i].used == 0)
+    {
+      function_struct_ptr->id = i;
+      break;
+    }
+  }
+  /////////////////////////////////////////////
 
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
@@ -425,7 +398,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
   
-  function_struct_ptr->continueInUS = 0;
+  function_struct_ptr->continueInMS = 0;
 
   //Prepare initial stack trace
   function_struct_ptr->Stack--;
@@ -470,7 +443,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
 struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate)
 {
   stack_T *stackPtr;
-  if (function == nullptr || searchFunction(countTCBsInUse) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
+  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
@@ -510,7 +483,6 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   return ptr;
 }
 
-
 /**
  * Add a new Task to execute list.
  * Does not allocate stack space
@@ -524,7 +496,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
  */
 struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate)
 {
-  if (function == nullptr || searchFunction(countTCBsInUse) != nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
+  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
@@ -638,12 +610,12 @@ void StallardOS::delay(uint32_t milliseconds)
 {
   if(currentTask == nullptr) //wenn im bootup
   {
-    uint64_t continueTimeStamp = usCurrentTimeSinceStart + (milliseconds * 1000);
-    while (usCurrentTimeSinceStart < continueTimeStamp);
+    uint64_t continueTimeStamp = StallardOSTime_getTimeMs() + milliseconds;
+    while (StallardOSTime_getTimeMs() < continueTimeStamp);
   }
   else
   {
-    currentTask->continueInUS = usCurrentTimeSinceStart + (uint64_t)milliseconds * 1000; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+    currentTask->continueInMS = StallardOSTime_getTimeMs() + (uint64_t)milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     // nextTask = taskMainStruct;
     findNextFunction();
     StallardOS::call_pendPendSV();
@@ -660,21 +632,23 @@ void StallardOS::delay(uint32_t milliseconds)
 
 void StallardOS::yield()
 {
-  currentTask->lastYield = usCurrentTimeSinceStart;
+  currentTask->lastYield = StallardOSTime_getTimeMs();
   if (currentTask->refreshRate != 0)
   {
-      if(currentTask != nullptr)
+    if(currentTask != nullptr)
+    {
+      currentTask->continueInMS = StallardOSTime_getTimeMs() + (1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
+      if(currentTask->continueInMS > (1000 / currentTask->refreshRate) + StallardOSTime_getTimeMs())
       {
-        currentTask->continueInUS = usCurrentTimeSinceStart + (1000000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-        if(currentTask->continueInUS > (1000000 / currentTask->refreshRate) + usCurrentTimeSinceStart)
-          currentTask->continueInUS = usCurrentTimeSinceStart;
-        else
-        {
-          findNextFunction();
-          StallardOS::call_pendPendSV();
-        }
+        currentTask->continueInMS = StallardOSTime_getTimeMs();
       }
-    currentTask->lastStart = usCurrentTimeSinceStart;
+      else
+      {
+        findNextFunction();
+        StallardOS::call_pendPendSV();
+      }
+    }
+    currentTask->lastStart = StallardOSTime_getTimeMs();
   }
 }
 
@@ -713,10 +687,10 @@ void StallardOS::startOS(void)
     #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
     SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
     #endif
-    asm("DSB");
-    asm("ISB");
+    __ASM volatile("DSB");
+    __ASM volatile("ISB");
 
-    SysTick_Config(SystemCoreClock / (uint32_t)1000);
+    SysTick_Config(SystemCoreClock / (uint32_t)1000); //Counting every processor clock
     NVIC_SetPriority(SysTick_IRQn, 0xFF);
     NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
@@ -724,15 +698,15 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(SVCall_IRQn);
     NVIC_EnableIRQ(FPU_IRQn);
-    asm("MRS R0, MSP");
-    asm("SUB R0, #200"); //Reserve some space for Handlers (200 Byte)
-    asm("MSR PSP, R0");
+    __ASM volatile("MRS R0, MSP");
+    __ASM volatile("SUB R0, #200"); //Reserve some space for Handlers (200 Byte)
+    __ASM volatile("MSR PSP, R0");
     // asm("mov r0, #0");
     // asm("msr control, r0");
     // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-    asm("dsb");
-    asm("isb");
-    asm("SVC #3");
+    __ASM volatile("dsb");
+    __ASM volatile("isb");
+    __ASM volatile("SVC #3");
   }
 }
 
@@ -754,16 +728,6 @@ void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
   {
     temp->refreshRate = exec_freq; 
   }
-}
-
-uint64_t StallardOS::getRuntimeMs()
-{
-  return usCurrentTimeSinceStart / 1000;
-}
-
-uint64_t StallardOS::getRuntimeUs()
-{
-  return usCurrentTimeSinceStart;
 }
 
 void StallardOS::goBootloader()

@@ -1,7 +1,5 @@
 #include "StallardOScan.hpp"
 
-extern "C" volatile uint64_t usCurrentTimeSinceStart; //about 585 000 years of microsecond counting
-
 bool StallardOSCAN::can1used = false;
 bool StallardOSCAN::can2used = false;
 
@@ -204,7 +202,7 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
                     {
                         fifoPtr[k].ID = RxHeader.StdId;                 //Copy to SW FiFo
                         fifoPtr[k].used = 1;                            //Indicate Message is occupied
-                        fifoPtr[k].timestamp = usCurrentTimeSinceStart; //Save timestamp
+                        fifoPtr[k].timestamp = StallardOSTime_getTimeUs(); //Save timestamp
                         fifoPtr[k].dlc = RxHeader.DLC;
                     }
                     break; //If unused found go with next message
@@ -216,7 +214,7 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
                     {
                         fifoPtr[oldestMessage].ID = RxHeader.StdId;                 //Delete oldest message and overwrite with new
                         fifoPtr[oldestMessage].used = 1;                            //Indicate still used
-                        fifoPtr[oldestMessage].timestamp = usCurrentTimeSinceStart; //save new Timestamp
+                        fifoPtr[oldestMessage].timestamp = StallardOSTime_getTimeUs(); //save new Timestamp
                         fifoPtr[oldestMessage].dlc = RxHeader.DLC;
                     }
                     break; //If unused found go with next message
