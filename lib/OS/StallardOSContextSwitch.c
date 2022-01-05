@@ -268,49 +268,42 @@ __attribute__((always_inline)) inline static void inline_mpu_enable(uint32_t MPU
     __ISB();
 }
 
+
 /**
- * SuperVisorCall Handler for the supervisor Exception.
- *
- * @param
- * @return
+ * @brief enables privileges for the current task
+ *        by setting the nPriv bit
+ * 
  */
-__attribute__((naked, __used__)) void SVC_Handler()
-{
-    __ASM volatile("TST    LR, #4");
-    __ASM volatile("ITE    EQ");
-	__ASM volatile("MRSeq	R0, MSP"); //Warum pusht er den exception entry IMMER auf den Prozess stack pointer? Bei startOS müsste er doch auf den MSP pushen?????
-	__ASM volatile("MRSne	R0, PSP");
+__attribute__((always_inline)) inline void enable_privilege(){
+    /* registers do not need to be preserved, 
+     * compiler preserves used registers
+     */
+    __ASM volatile("MRS r1, control");
+    __ASM volatile("BIC r1, #1");
+    __ASM volatile("MSR control, r1");
+}
 
-	__ASM volatile("LDR	R0, [R0, #24]");
-	__ASM volatile("LDRB	R0, [R0, #-2]");
+/**
+ * @brief disables privileges of the current task
+ *        by clearing the nPriv bit
+ * 
+ */
+__attribute__((always_inline)) inline void disable_privilege(){
+    /* registers do not need to be preserved, 
+     * compiler preserves used registers
+     */
+    __ASM volatile("MRS r1, control");
+    __ASM volatile("ORR r1, #1");
+    __ASM volatile("MSR control, r1");
+}
 
-    //Enable Privilege
-    __ASM volatile("CMP r0, #5");
-    __ASM volatile("ITTT eq");
-    __ASM volatile("MRSeq r1, control");
-    __ASM volatile("BICeq r1, #1");
-    __ASM volatile("MSReq control, r1");
 
-    //Disable Privilege
-    __ASM volatile("CMP r0, #6");
-    __ASM volatile("ITTT eq");
-    __ASM volatile("MRSeq r1, control");
-    __ASM volatile("ORReq r1, #1");
-    __ASM volatile("MSReq control, r1");
-
-    //SV_PENDSV
-    // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-    __ASM volatile("CMP r0, #2");
-    __ASM volatile("ITTTT eq");
-    __ASM volatile("MOVeq r1, #0xED04");
-    __ASM volatile("MOVTeq r1, #0xE000");
-    __ASM volatile("MOVeq r2, #0x10000000");
-    __ASM volatile("STReq r2, [r1]");
-
-    //Start first task
-    __ASM volatile("CMP r0, #3");
-    __ASM volatile("IT NE");
-    __ASM volatile("BXne lr");
+/**
+ * @brief starts the currentTask as maintask
+ *        only called from boot procedure
+ *        MUST be inlinend, to allow bx command to work
+ */
+__attribute__((always_inline)) inline void start_mainTask(){
     __ASM volatile("LDR r1, =currentTask");
     __ASM volatile("LDR r2, [r1]");
     __ASM volatile("LDR r0, [r2]");
@@ -331,6 +324,59 @@ __attribute__((naked, __used__)) void SVC_Handler()
     __ASM volatile("MOV lr, #0xfffffffd");
     __ASM volatile("bx lr");
 }
+
+
+void SVC_Handler_Main( unsigned int *svc_args )
+{
+    unsigned int svc_number;
+
+    /*
+    * Stack contains:
+    * r0, r1, r2, r3, r12, r14, the return address and xPSR
+    * First argument (r0) is svc_args[0]
+    */
+    svc_number = ( ( char * )svc_args[ 6 ] )[ -2 ] ;
+    switch( svc_number )
+    {
+    case SV_BOOTLOADER:  /* EnablePrivilegedMode */
+        jumpToBootloader();
+        break;
+    case SV_PENDSV:
+        pendPendSV();
+        break;
+    case SV_STARTMAIN:
+        start_mainTask();
+        break;
+    case SV_SYSRESET:
+        NVIC_SystemReset();
+        break;
+    case SV_ACTIVATE_PRIV:
+        enable_privilege();
+        break;
+    case SV_DEACTIVATE_PRIV:
+        disable_privilege();
+        break;
+    default:    /* unknown SVC */
+        break;
+    }
+}
+
+/**
+ * @brief SVC_Handler routine
+ * @see https://developer.arm.com/documentation/ka004005/latest
+ */
+void SVC_Handler(void)
+{
+  __asm(
+    ".global SVC_Handler_Main\n"
+    "TST lr, #4\n"
+    "ITE EQ\n"
+    "MRSEQ r0, MSP\n"
+    "MRSNE r0, PSP\n"
+    "B SVC_Handler_Main\n"
+  ) ;
+}
+
 
 /**
  * Systick Handler for an Exception every x ms. Minimum is 11 Hz

@@ -147,7 +147,10 @@ void StallardOS::initShared(void){
   /* first param is "from_OS" */
   SharedParamsWriteByIndex(0, 1);
 
-  /* 2nd param is "reboot" */
+  /* 2nd param is "reboot" 
+   * this way every reset will reboot 
+   * unless specifically modified before reset
+   */
   SharedParamsWriteByIndex(1, 1);
 
 }
@@ -736,5 +739,5 @@ void StallardOS::goBootloader()
 }
 
 void StallardOS::goFlashloader(){
-  CALL_FLASHLOADER();
+  CALL_SYSRESET();
 }
