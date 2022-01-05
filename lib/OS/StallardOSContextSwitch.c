@@ -47,7 +47,7 @@ volatile uint64_t taskMainTime = 0; //Experimental
 __attribute__((always_inline)) inline void StallardOS_goBootloader()
 {
     // __ASM volatile("MOV R7, #6");
-    __ASM volatile("SVC #1");
+    CALL_BOOTLOADER();
 }
 
 /**

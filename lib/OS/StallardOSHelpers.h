@@ -4,6 +4,7 @@
 #include "stdint.h"
 
 #include "StallardOSconfig.h"
+#include "StallardOSsyscalls.h"
 
 #define functionModifier (uint32_t)0xFFFFFFFE //Use the function pointer with lowest bit zero
 // #define sysTickTicks (uint32_t)(SystemCoreClock / 1000)
@@ -27,11 +28,6 @@ typedef enum
   PAUSED,
   STOPPED
 } taskState;
-
-
-typedef enum{
-  SV_PENDSV = 2
-} svCalls;
 
 typedef uint32_t stack_T;
 
