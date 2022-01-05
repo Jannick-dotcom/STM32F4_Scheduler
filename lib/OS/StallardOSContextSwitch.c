@@ -285,14 +285,14 @@ __attribute__((naked, __used__)) void SVC_Handler()
 	__ASM volatile("LDRB	R0, [R0, #-2]");
 
     //Enable Privilege
-    __ASM volatile("CMP r0, #0");
+    __ASM volatile("CMP r0, #5");
     __ASM volatile("ITTT eq");
     __ASM volatile("MRSeq r1, control");
     __ASM volatile("BICeq r1, #1");
     __ASM volatile("MSReq control, r1");
 
     //Disable Privilege
-    __ASM volatile("CMP r0, #1");
+    __ASM volatile("CMP r0, #6");
     __ASM volatile("ITTT eq");
     __ASM volatile("MRSeq r1, control");
     __ASM volatile("ORReq r1, #1");
