@@ -36,8 +36,6 @@ static MPU_Region_InitTypeDef MPU_StackCfg = {
 };
 #endif
 
-volatile uint64_t taskMainTime = 0; //Experimental
-
 /**
  * Jump to Bootloader.
  *

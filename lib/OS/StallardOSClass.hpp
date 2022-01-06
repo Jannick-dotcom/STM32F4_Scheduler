@@ -32,7 +32,7 @@ public:
   void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
 
   //Getters
-  taskState getFunctionState(/*Funktion*/ uint16_t id);
+  // taskState getFunctionState(/*Funktion*/ uint16_t id);
 
   //Control
   static void goBootloader();

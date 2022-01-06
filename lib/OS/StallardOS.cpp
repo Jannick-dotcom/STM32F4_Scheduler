@@ -119,7 +119,7 @@ void StallardOS::createTCBs()
 
     temp->id = i;
 
-    temp->State = STOPPED;                        //New Task
+    // temp->State = STOPPED;                        //New Task
     // temp->Stack = temp->vals + sizeStack - sizeof(uint32_t); //End of Stack
 
 
@@ -393,7 +393,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
-  function_struct_ptr->State = PAUSED;                                       //New Task
+  // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
   function_struct_ptr->Stack = stackPtr + (stackSize - sizeof(stack_T)); //End of Stack
   function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSize);
@@ -412,7 +412,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   *function_struct_ptr->Stack = (uint32_t)taskOnEnd;
 
   function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)0x12;
+  *function_struct_ptr->Stack = (uint32_t)12;
   function_struct_ptr->Stack--;
   *function_struct_ptr->Stack = (uint32_t)3;
   function_struct_ptr->Stack--;
@@ -424,10 +424,10 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   
   function_struct_ptr->Stack--;
   *function_struct_ptr->Stack = 0xFFFFFFFD;
-  for(uint8_t i = 4; i < 12; i++)
+  for(uint8_t i = 11; i > 3; i--)
   {
     function_struct_ptr->Stack--;
-    *function_struct_ptr->Stack = 0;
+    *function_struct_ptr->Stack = i;
   }
   //////////////////////////////
   return function_struct_ptr;
@@ -662,18 +662,18 @@ void StallardOS::yield()
  * @param id unique id of the task.
  * @return state of the task, see taskstate enum
  */
-taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
-{
-  struct function_struct *temp = searchFunction(id); //Hier die Funktion suchen
-  if (temp != nullptr)                               //Wenn die übergebene Funktion gültig ist
-  {
-    return temp->State;
-  }
-  else //Ansonsten
-  {
-    return STOPPED;
-  }
-}
+// taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
+// {
+//   struct function_struct *temp = searchFunction(id); //Hier die Funktion suchen
+//   if (temp != nullptr)                               //Wenn die übergebene Funktion gültig ist
+//   {
+//     return temp->State;
+//   }
+//   else //Ansonsten
+//   {
+//     return STOPPED;
+//   }
+// }
 
 /**
  * Start the StallardOS operating system

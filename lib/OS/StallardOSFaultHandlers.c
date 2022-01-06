@@ -20,7 +20,7 @@ __attribute__((always_inline)) void StallardOSGeneralFaultHandler() //restarts a
     if (taskMainStruct != 0)
     {
         currentTask->Stack = currentTask->stackBase + currentTask->stackSize - sizeof(stack_T); //End of Stack
-        currentTask->State = PAUSED; //Set Task state as new
+        // currentTask->State = PAUSED; //Set Task state as new
         currentTask->waitingForSemaphore = 0;
         currentTask->continueInMS = HAL_GetTick() + 5000; //Restart Task in 5 ms
         if (currentTask->semVal != NULL)

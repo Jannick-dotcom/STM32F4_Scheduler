@@ -56,7 +56,7 @@ struct function_struct
   volatile uint64_t lastYield;
   volatile uint64_t lastStart;
   // volatile uint32_t stackUsage;
-  volatile taskState State;             //Status des Tasks
+  // volatile taskState State;             //Status des Tasks
   volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore
   volatile uint16_t *semVal;
   volatile uint64_t continueInMS; //Delay amount
