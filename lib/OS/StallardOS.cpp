@@ -701,9 +701,9 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(SVCall_IRQn);
     NVIC_EnableIRQ(FPU_IRQn);
-    __ASM volatile("MRS R0, MSP");
-    __ASM volatile("SUB R0, #200"); //Reserve some space for Handlers (200 Byte)
-    __ASM volatile("MSR PSP, R0");
+    __ASM volatile("MRS R0, MSP\n"
+                   "SUB R0, #200\n" //Reserve some space for Handlers (200 Byte)
+                   "MSR PSP, R0");
     // asm("mov r0, #0");
     // asm("msr control, r0");
     // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;

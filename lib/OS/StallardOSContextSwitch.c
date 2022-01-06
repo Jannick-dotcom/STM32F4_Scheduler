@@ -157,49 +157,47 @@ __attribute__((always_inline)) inline void switchTask(void)
     //if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
     if (nextTask == NULL) nextTask = taskMainStruct;
 
-
     //Pausing Task
-    __ASM volatile("MRS r0, PSP");         //Get Process Stack Pointer
-    __ASM volatile("ISB");
-    __ASM volatile("TST r14, #0x10");       //store vfp registers, if task was using FPU
-    __ASM volatile("IT eq");
-    __ASM volatile("VSTMDBeq r0!, {s16-s31}");
-    
-    __ASM volatile("STMDB r0!, {r4-r11, r14}"); //Save additional not yet saved registers
+    __ASM volatile("MRS r0, PSP\n"         //Get Process Stack Pointer
+                    "ISB\n"
+                    "TST r14, #0x10\n"  //store vfp registers, if task was using FPU
+                    "IT eq\n"
+                    "VSTMDBeq r0!, {s16-s31}\n"
+                    
+                    "STMDB r0!, {r4-r11, r14}\n" //Save additional not yet saved registers
 
+                    "LDR r1, =currentTask\n" //Current Task Pointer
+                    "LDR r2, [r1]\n" //Load Stack pointer from first position of currentTask
+                    "STR r0, [r2]\n" //Save stack pointer
+                    // "MOV %0, #2\n" : "=r"(currentTask->State) //Set function state to paused
+                    "LDR r0, =currentTask\n"
+                    "LDR r1, =nextTask\n"
+                    "LDR r2, [r1]\n"
+                    "STR r2, [r0]\n"
+                    "DSB\n"
+                    "ISB\n"
 
-    __ASM volatile("LDR r1, =currentTask"); //Current Task Pointer
-    __ASM volatile("LDR r2, [r1]"); //Load Stack pointer from first position of currentTask
-    __ASM volatile("STR r0, [r2]"); //Save stack pointer
-    __ASM volatile("MOV %0, #2" : "=r"(currentTask->State)); //Set function state to paused
-    __ASM volatile("LDR r0, =currentTask");
-    __ASM volatile("LDR r1, =nextTask");
-    __ASM volatile("LDR r1, [r1]");
-    __ASM volatile("STR r1, [r0]");
-    __ASM volatile("DSB");
-    __ASM volatile("ISB");
+                    // Resuming process
+                    // "LDR r1, =currentTask\n"
+                    // "LDR r2, [r1]\n"
+                    "LDR r0, [r2]\n"
 
-    //Resuming process
-    __ASM volatile("LDR r1, =currentTask");
-    __ASM volatile("LDR r2, [r1]");
-    __ASM volatile("LDR r0, [r2]");
+                    "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
 
-    __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
+                    "TST r14, #0x10\n"
+                    "IT eq\n"
+                    "VLDMIAeq r0!, {s16-s31}\n"
+                    
+                    "MSR PSP, r0\n"           //set PSP
+                    "ISB\n"
+                    
+                    "MOV r0, #01\n"      //go into unprivileged mode
+                    "MSR control, r0\n"
 
-    __ASM volatile("TST r14, #0x10");
-    __ASM volatile("IT eq");
-    __ASM volatile("VLDMIAeq r0!, {s16-s31}");
-    
-    __ASM volatile("MSR PSP, r0");           //set PSP
-    __ASM volatile("ISB");
-    
-    __ASM volatile("MOV r0, #01");      // go into unprivileged mode
-    __ASM volatile("MSR control, r0");
-
-    __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
-    __ASM volatile("LDR r1, =nextTask");
-    __ASM volatile("MOV r2, #0");
-    __ASM volatile("STR r2, [r1]");
+                    // "MOV %0, #1" //Set function state to running
+                    "LDR r1, =nextTask\n"
+                    "MOV r2, #0\n"
+                    "STR r2, [r1]\n");
 }
 
 /**
@@ -278,9 +276,9 @@ __attribute__((always_inline)) inline void enable_privilege(){
     /* registers do not need to be preserved, 
      * compiler preserves used registers
      */
-    __ASM volatile("MRS r1, control");
-    __ASM volatile("BIC r1, #1");
-    __ASM volatile("MSR control, r1");
+    __ASM volatile("MRS r1, control\n"
+                    "BIC r1, #1\n"
+                    "MSR control, r1\n");
 }
 
 /**
@@ -292,9 +290,9 @@ __attribute__((always_inline)) inline void disable_privilege(){
     /* registers do not need to be preserved, 
      * compiler preserves used registers
      */
-    __ASM volatile("MRS r1, control");
-    __ASM volatile("ORR r1, #1");
-    __ASM volatile("MSR control, r1");
+    __ASM volatile("MRS r1, control\n"
+    "ORR r1, #1\n"
+    "MSR control, r1\n");
 }
 
 
@@ -304,25 +302,21 @@ __attribute__((always_inline)) inline void disable_privilege(){
  *        MUST be inlinend, to allow bx command to work
  */
 __attribute__((always_inline)) inline void start_mainTask(){
-    __ASM volatile("LDR r1, =currentTask");
-    __ASM volatile("LDR r2, [r1]");
-    __ASM volatile("LDR r0, [r2]");
+    __ASM volatile("LDR r1, =currentTask\n"
+    "LDR r2, [r1]\n"
+    "LDR r0, [r2]\n"
 
-    __ASM volatile("LDMIA r0!, {r4-r11, r14}");   //load registers from memory
-
-    // __ASM volatile("TST r14, #0x10");
-    // __ASM volatile("IT eq");
-    // __ASM volatile("VLDMIAeq r0!, {s16-s31}");
+    "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
     
-    __ASM volatile("MSR PSP, r0");           //set PSP
-    __ASM volatile("ISB");
+    "MSR PSP, r0\n"           //set PSP
+    "ISB\n"
     
-    __ASM volatile("MOV %0, #1" : "=r"(currentTask->State)); //Set function state to running
-    __ASM volatile("LDR r1, =nextTask");
-    __ASM volatile("MOV r2, #0");
-    __ASM volatile("STR r2, [r1]");
-    __ASM volatile("MOV lr, #0xfffffffd");
-    __ASM volatile("bx lr");
+    // "MOV %0, #1" //Set function state to running
+    "LDR r1, =nextTask\n"
+    "MOV r2, #0\n"
+    "STR r2, [r1]\n"
+    "MOV lr, #0xfffffffd\n"
+    "bx lr\n" /*: "=r"(currentTask->State)*/);
 }
 
 
