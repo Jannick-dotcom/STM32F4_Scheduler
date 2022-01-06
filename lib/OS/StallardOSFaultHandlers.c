@@ -21,12 +21,28 @@ __attribute__((always_inline)) void StallardOSGeneralFaultHandler() //restarts a
     {
         currentTask->Stack = currentTask->stackBase + currentTask->stackSize - sizeof(stack_T); //End of Stack
         currentTask->State = PAUSED; //Set Task state as new
-        currentTask->waitingForSemaphore = 0;
-        currentTask->continueInMS = 5000; //Restart Task in 5 ms
-        if (currentTask->semVal != NULL)
-        {
-            *(currentTask->semVal) = 1; //Semaphore freigeben
+        currentTask->continueInMS = 5000; //Restart Task in 5 s
+        if(currentTask->semVal != NULL){
+            if(currentTask->waitingForSemaphore == 0){
+                // only execute, if semaphore is actually owned by task (take finished)
+
+                /* normal write access to semaphore is ok in this context, 
+                * as no other task may execute during hardFault 
+                */
+                *(currentTask->semVal) = 1; //Semaphore freigeben
+                __CLREX();  // reset exclusive monitor
+            }
+            else{
+                // undefined state, task may or may not own the semaphore
+                // assume it didn't own it, as that's more likely?
+                // TODO: change this???
+                #ifndef UNIT_TEST
+                asm("bkpt");  //Zeige debugger
+                #endif
+            }
         }
+
+        currentTask->waitingForSemaphore = 0;
         currentTask->semVal = 0; //Semaphore von task lösen
         currentTask = taskMainStruct;
         nextTask = taskMainStruct;
