@@ -326,7 +326,7 @@ __attribute__((always_inline)) inline void start_mainTask(){
 }
 
 
-void SVC_Handler_Main( unsigned int *svc_args )
+__attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned int *svc_args ) //Optimize Attribute makes sure no frame pointer is used
 {
     unsigned int svc_number;
 
@@ -365,7 +365,7 @@ void SVC_Handler_Main( unsigned int *svc_args )
  * @brief SVC_Handler routine
  * @see https://developer.arm.com/documentation/ka004005/latest
  */
-void SVC_Handler(void)
+__attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler(void) //Optimize Attribute makes sure no frame pointer is used
 {
   __asm(
     ".global SVC_Handler_Main\n"
@@ -413,7 +413,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
  * @param
  * @return
  */
-__attribute__( (__used__ ) ) void PendSV_Handler()
+__attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize Attribute makes sure no frame pointer is used
 {
     disable_interrupts();
 
@@ -428,5 +428,4 @@ __attribute__( (__used__ ) ) void PendSV_Handler()
     #endif
 
     enable_interrupts(); //Enable all interrupts
-    __ASM volatile("bx r14");  //perform Exception return
 }
