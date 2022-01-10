@@ -1,5 +1,13 @@
 #include "StallardOScan.hpp"
 
+#ifdef STM32F417xx
+StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M);
+StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
+#endif
+#ifdef STM32F415xx
+StallardOSCAN AD_CAN(StallardOSCAN2, CAN500k);
+#endif
+
 bool StallardOSCAN::can1used = false;
 bool StallardOSCAN::can2used = false;
 
@@ -9,7 +17,9 @@ volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo2[CAN_FIFO_size];
 CAN_HandleTypeDef StallardOSCAN::can1handle;
 CAN_HandleTypeDef StallardOSCAN::can2handle;
 
-StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud, bool debug)
+StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, bool debug) :
+    CANT(tx.pin, tx.port, AFPP, nopull, GPIO_AF9_CAN1),
+    CANR(rx.pin, rx.port, AFPP, nopull, GPIO_AF9_CAN1)
 {
 
     this->sem.take();
@@ -17,8 +27,6 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud, bool debug)
 #ifndef STM32F415xx
     if (port == StallardOSCAN1 && can1used == false)
     {
-        CANR = StallardOSGPIO(CAN1_r_pin, CAN1_r_port, AFPP, nopull, GPIO_AF9_CAN1);
-        CANT = StallardOSGPIO(CAN1_t_pin, CAN1_t_port, AFPP, nopull, GPIO_AF9_CAN1);
         canhandle.Instance = CAN1;
         __CAN1_CLK_ENABLE();
         can1used = true;
@@ -27,8 +35,6 @@ StallardOSCAN::StallardOSCAN(CANports port, CANBauds baud, bool debug)
 #endif
     if (port == StallardOSCAN2 && can2used == false)
     {
-        CANR = StallardOSGPIO(CAN2_r_pin, CAN2_r_port, AFPP, nopull, GPIO_AF9_CAN2);
-        CANT = StallardOSGPIO(CAN2_t_pin, CAN2_t_port, AFPP, nopull, GPIO_AF9_CAN2);
         canhandle.Instance = CAN2;
         __CAN1_CLK_ENABLE();
         __CAN2_CLK_ENABLE();

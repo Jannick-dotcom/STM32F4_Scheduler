@@ -47,7 +47,7 @@ public:
     * @param[in] baud Baud rate of the CAN. Has to be same on all devices
     * @return true if a message is received, false otherwise
     */
-    StallardOSCAN(CANports port, CANBauds baud, bool debug = false);
+    StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, bool debug = false);
 
     /**
      *  Destroy a CAN interface
@@ -102,5 +102,21 @@ public:
 
 };
 
+#ifdef STM32F417xx
+extern StallardOSCAN MS4_CAN;
+extern StallardOSCAN AD_CAN;
+#define AD_CAN_PORT StallardOSCAN1
+#define MS4_CAN_PORT StallardOSCAN2
+#endif
+#ifdef STM32F415xx
+extern StallardOSCAN AD_CAN;
+#define AD_CAN_PORT StallardOSCAN2
+#endif
+#ifdef STM32F407xx
+extern StallardOSCAN MS4_CAN;
+extern StallardOSCAN AD_CAN;
+#define AD_CAN_PORT StallardOSCAN1
+#define MS4_CAN_PORT StallardOSCAN2
+#endif
 
 #endif
