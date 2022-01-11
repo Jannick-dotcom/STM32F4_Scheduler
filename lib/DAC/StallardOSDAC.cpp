@@ -1,11 +1,11 @@
 #include "StallardOSDAC.hpp"
 
-StallardOSDAC::StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number)
+StallardOSDAC::StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number) :
+    gpio(number, port, Analog)
 {
     __HAL_RCC_DAC_CLK_ENABLE();
     this->channel = channel;
     handle.Instance = dac;
-    gpio = StallardOSGPIO(number, port, Analog);
     chanconf.DAC_Trigger = DAC_TRIGGER_NONE;
     chanconf.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
     HAL_DAC_Init(&handle);
