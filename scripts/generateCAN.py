@@ -32,6 +32,8 @@ for x in infileArray: #Go through every line
         msgname = str(lineArray[7]) #get the name of the message
         rowcounter = str(lineArray[8]) #rowcounter from ms4
         signame = str(lineArray[9]) #get the name of the signal in the message
+        if(signame.__contains__(" ")):
+            signame = signame.replace(" ", "_")
         initVal = str(lineArray[14]) #get initial Value of the Signal
         signed = str(lineArray[13])  #is the signal signed or unsigned?
         startingAtBit = str(lineArray[10]) #get the Bit at which the signal starts
