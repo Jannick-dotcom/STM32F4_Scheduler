@@ -1,23 +1,8 @@
 #include "StallardOSSerial.hpp"
-/**
- * create a serial instance.
- *
- * @param serPort which Serial to use
- * @param baud baud rate
- */
-StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uint32_t baud)
+
+uint8_t StallardOSSerial::portToAlternateFunc(USART_TypeDef *serPort)
 {
-
-    this->sem.take();
-
-    if (baud == 0)
-    {
-
-        this->sem.give();
-
-        return;
-    }
-    uint8_t alternateFunction;
+    uint8_t alternateFunction = 0;
     if(serPort == USART1)
     {
         __HAL_RCC_USART1_CLK_ENABLE();
@@ -48,7 +33,31 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uin
         __HAL_RCC_USART6_CLK_ENABLE();
         alternateFunction = GPIO_AF8_USART6;
     }
-    else //Not implemented
+    return alternateFunction;
+}
+
+/**
+ * create a serial instance.
+ *
+ * @param serPort which Serial to use
+ * @param baud baud rate
+ */
+StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uint32_t baud) :
+    tx(tx.pin,tx.port, AFPP, nopull, portToAlternateFunc(serPort)),
+    rx(rx.pin,rx.port, AFPP, nopull, portToAlternateFunc(serPort))
+{
+
+    this->sem.take();
+
+    if (baud == 0)
+    {
+
+        this->sem.give();
+
+        return;
+    }
+    
+    if(portToAlternateFunc(serPort) == 0) //Not implemented
     {
         #ifndef UNIT_TEST
         asm("bkpt");  //Zeige debugger
@@ -57,8 +66,6 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uin
         return;
     }
 
-    this->rx = StallardOSGPIO(rx.pin,rx.port, AFPP, nopull, alternateFunction);
-    this->tx = StallardOSGPIO(tx.pin,tx.port, AFPP, nopull, alternateFunction);
     huart.Instance = serPort;
     huart.Init.BaudRate = baud;
     huart.Init.WordLength = UART_WORDLENGTH_8B;

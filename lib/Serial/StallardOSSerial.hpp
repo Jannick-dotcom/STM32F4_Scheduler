@@ -18,6 +18,7 @@ private:
     StallardOSSemaphore sem;
     StallardOSGPIO tx;
     StallardOSGPIO rx;
+    uint8_t portToAlternateFunc(USART_TypeDef *serPort);
 public:
     StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uint32_t baud);
     void send(const char *dat, uint16_t bytes);
