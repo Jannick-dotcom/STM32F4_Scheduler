@@ -10,7 +10,7 @@ ________________________________________________________________________________
 
 Funktion:
 ```
-StallardOSCAN(CANports port, CANBauds baud);
+StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud);
 
 ````
 Die Funktion erzeugt einen CAN interface.
@@ -19,7 +19,9 @@ Die Funktion erzeugt einen CAN interface.
 
 Funktion Parameter:
 ```
-Port -> auswahl der CAN Port
+tx   -> auswahl des tx Pins
+rx   -> auswahl des rx Pins
+port -> auswahl der CAN Port
 baud -> auswahl der Kommunikations Geschwindigkeit [Baud]
 ```
 
