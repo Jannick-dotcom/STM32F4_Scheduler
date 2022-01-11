@@ -1,31 +1,43 @@
 #include "StallardOSSPI.hpp"
 
-StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck)
+uint8_t StallardOSSPI::toAlternateFunc(SPI_TypeDef *inst)
+{
+    if(inst == SPI1)
+    {
+        __HAL_RCC_SPI1_CLK_ENABLE();
+        return GPIO_AF5_SPI1;
+    }
+    else if(inst == SPI2)
+    {
+        __HAL_RCC_SPI2_CLK_ENABLE();
+        return GPIO_AF5_SPI2;
+    }
+    else if(inst == SPI3)
+    {
+        __HAL_RCC_SPI3_CLK_ENABLE();
+        return GPIO_AF6_SPI3;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck) :
+    mosi(mosi.pin, mosi.port, AFPP, nopull, toAlternateFunc(inst)),
+    miso(miso.pin, miso.port, AFPP, nopull, toAlternateFunc(inst)),
+    sclk(sck.pin, sck.port, AFPP, nopull, toAlternateFunc(inst))
 {
 
     this->sem.take();
 
-    if (inst == SPI2)
+    if(toAlternateFunc(inst) == 0)
     {
-        this->miso = StallardOSGPIO(miso.pin, miso.port, AFPP, nopull, GPIO_AF5_SPI2);
-        this->mosi = StallardOSGPIO(mosi.pin, mosi.port, AFPP, nopull, GPIO_AF5_SPI2);
-        this->sclk = StallardOSGPIO(sck.pin, sck.port, AFPP, nopull, GPIO_AF5_SPI2);
-        __HAL_RCC_SPI2_CLK_ENABLE();
+        this->sem.give();
+        asm("bkpt");
+        StallardOSGeneralFaultHandler();
     }
-    else if (inst == SPI1)
-    {
-        this->miso = StallardOSGPIO(miso.pin, miso.port, AFPP, nopull, GPIO_AF5_SPI1);
-        this->mosi = StallardOSGPIO(mosi.pin, mosi.port, AFPP, nopull, GPIO_AF5_SPI1);
-        this->sclk = StallardOSGPIO(sck.pin, sck.port, AFPP, nopull, GPIO_AF5_SPI1);
-        __HAL_RCC_SPI1_CLK_ENABLE();
-    }
-    else if(inst == SPI3)
-    {
-        this->miso = StallardOSGPIO(miso.pin, miso.port, AFPP, nopull, GPIO_AF6_SPI3);
-        this->mosi = StallardOSGPIO(mosi.pin, mosi.port, AFPP, nopull, GPIO_AF6_SPI3);
-        this->sclk = StallardOSGPIO(sck.pin, sck.port, AFPP, nopull, GPIO_AF6_SPI3);
-        __HAL_RCC_SPI3_CLK_ENABLE();
-    }
+
     handle.Instance = inst;
     handle.Init.Mode = SPI_MODE_MASTER;                        //SPI_MODE_SLAVE
     handle.Init.Direction = SPI_DIRECTION_2LINES;              //SPI_DIRECTION_1LINE, SPI_DIRECTION_2LINES_RXONLY
@@ -42,7 +54,7 @@ StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio m
     {
 
         this->sem.give();
-
+        asm("bkpt");
         StallardOSGeneralFaultHandler();
     }
 

@@ -23,6 +23,7 @@ private:
     StallardOSGPIO mosi;
     StallardOSGPIO miso;
     StallardOSGPIO sclk;
+    uint8_t toAlternateFunc(SPI_TypeDef *inst);
 
 public:
     StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck);
