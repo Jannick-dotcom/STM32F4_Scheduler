@@ -424,6 +424,10 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   
   function_struct_ptr->Stack--;
   *function_struct_ptr->Stack = 0xFFFFFFFD;
+
+  function_struct_ptr->Stack--;
+  *function_struct_ptr->Stack = (CONTROL_nPRIV_Msk << CONTROL_nPRIV_Pos); //Control register (unprivileged)
+  
   for(uint8_t i = 11; i > 3; i--)
   {
     function_struct_ptr->Stack--;
