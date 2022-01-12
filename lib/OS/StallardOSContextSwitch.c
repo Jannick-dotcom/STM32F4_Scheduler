@@ -153,16 +153,25 @@ void findNextFunction()
 __attribute__((always_inline)) inline void switchTask(void)
 {
     //if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
-    if (nextTask == NULL) nextTask = taskMainStruct;
+    if (nextTask == NULL) 
+    {
+        nextTask = taskMainStruct;
+    }
 
     //Pausing Task
     __ASM volatile("MRS r0, PSP\n"         //Get Process Stack Pointer
                     "ISB\n"
                     "TST r14, #0x10\n"  //store vfp registers, if task was using FPU
                     "IT eq\n"
+
                     "VSTMDBeq r0!, {s16-s31}\n"
-                    
+
+                    #ifndef unprotectedBuild
+                    "MRS r12, CONTROL\n"                    
+                    "STMDB r0!, {r4-r12, r14}\n" //Save additional not yet saved registers
+                    #else
                     "STMDB r0!, {r4-r11, r14}\n" //Save additional not yet saved registers
+                    #endif
 
                     "LDR r3, =currentTask\n" //Current Task Pointer
                     "LDR r2, [r3]\n" //Load Stack pointer from first position of currentTask
@@ -180,7 +189,12 @@ __attribute__((always_inline)) inline void switchTask(void)
                     // "LDR r2, [r1]\n"
                     "LDR r0, [r2]\n"
 
+                    #ifndef unprotectedBuild
+                    "LDMIA r0!, {r4-r12, r14}\n"   //load registers from memory
+                    "MSR CONTROL, r12\n"
+                    #else
                     "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
+                    #endif
 
                     "TST r14, #0x10\n"
                     "IT eq\n"
@@ -189,11 +203,6 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "MSR PSP, r0\n"           //set PSP
                     "ISB\n"
                     
-                    #ifndef unprotectedBuild
-                    "MOV r0, #01\n"      //go into unprivileged mode
-                    "MSR control, r0\n"
-                    #endif
-
                     // "MOV %0, #1" //Set function state to running
                     "LDR r1, =nextTask\n"
                     "MOV r2, #0\n"
@@ -306,7 +315,12 @@ __attribute__((always_inline)) inline void start_mainTask(){
     "LDR r2, [r1]\n"
     "LDR r0, [r2]\n"
 
+    #ifndef unprotectedBuild
+    "LDMIA r0!, {r4-r12, r14}\n"   //load registers from memory
+    "MSR CONTROL, r12\n"
+    #else
     "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
+    #endif
     
     "MSR PSP, r0\n"           //set PSP
     "ISB\n"
