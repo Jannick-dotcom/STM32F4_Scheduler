@@ -164,14 +164,14 @@ __attribute__((always_inline)) inline void switchTask(void)
                     
                     "STMDB r0!, {r4-r11, r14}\n" //Save additional not yet saved registers
 
-                    "LDR r1, =currentTask\n" //Current Task Pointer
-                    "LDR r2, [r1]\n" //Load Stack pointer from first position of currentTask
+                    "LDR r3, =currentTask\n" //Current Task Pointer
+                    "LDR r2, [r3]\n" //Load Stack pointer from first position of currentTask
                     "STR r0, [r2]\n" //Save stack pointer
                     // "MOV %0, #2\n" : "=r"(currentTask->State) //Set function state to paused
-                    "LDR r0, =currentTask\n"
+                    //"LDR r0, =currentTask\n"
                     "LDR r1, =nextTask\n"
                     "LDR r2, [r1]\n"
-                    "STR r2, [r0]\n"
+                    "STR r2, [r3]\n"
                     "DSB\n"
                     "ISB\n"
 
