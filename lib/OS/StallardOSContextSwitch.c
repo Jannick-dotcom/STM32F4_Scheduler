@@ -189,8 +189,10 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "MSR PSP, r0\n"           //set PSP
                     "ISB\n"
                     
+                    #ifndef unprotectedBuild
                     "MOV r0, #01\n"      //go into unprivileged mode
                     "MSR control, r0\n"
+                    #endif
 
                     // "MOV %0, #1" //Set function state to running
                     "LDR r1, =nextTask\n"
@@ -342,12 +344,14 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
     case SV_SYSRESET:
         NVIC_SystemReset();
         break;
+    #ifndef unprotectedBuild
     case SV_ACTIVATE_PRIV:
         enable_privilege();
         break;
     case SV_DEACTIVATE_PRIV:
         disable_privilege();
         break;
+    #endif
     default:    /* unknown SVC */
         break;
     }

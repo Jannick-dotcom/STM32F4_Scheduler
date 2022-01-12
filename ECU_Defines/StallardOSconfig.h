@@ -7,7 +7,8 @@
 // #define STOS_current_ECU_ID 4 //SWCU
 
 #define useFPU
-#define useMPU
+//#define useMPU
+//#define unprotectedBuild
 #define countTasks 10
 #define defaultSysTickFreq 1000 //[Hz]
 #define runFreq 168 //[MHz]

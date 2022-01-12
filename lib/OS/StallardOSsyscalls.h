@@ -1,4 +1,5 @@
 #pragma  once
+#include "StallardOSconfig.h"
 
 
 /* "background" macros used to construct the syscall */
@@ -23,5 +24,11 @@
 #define CALL_PENDSV() _SVC(SV_PENDSV) 
 #define CALL_STARTMAIN() _SVC(SV_STARTMAIN)
 #define CALL_SYSRESET() _SVC(SV_SYSRESET)
-#define CALL_PRIVILEGED() _SVC(SV_ACTIVATE_PRIV)
-#define CALL_UNPRIVILEGED() _SVC(SV_DEACTIVATE_PRIV)
+
+#ifdef unprotectedBuild
+    #define CALL_PRIVILEGED() {}
+    #define CALL_UNPRIVILEGED() {}
+#else
+    #define CALL_PRIVILEGED() _SVC(SV_ACTIVATE_PRIV)
+    #define CALL_UNPRIVILEGED() _SVC(SV_DEACTIVATE_PRIV)
+#endif
