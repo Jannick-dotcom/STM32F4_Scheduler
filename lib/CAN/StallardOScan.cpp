@@ -5,7 +5,11 @@ StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
 #endif
 #ifdef STM32F415xx
-StallardOSCAN AD_CAN(StallardOSCAN2, CAN500k);
+StallardOSCAN AD_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN500k);
+#endif
+#ifdef STM32F407xx
+StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
+StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
 #endif
 
 bool StallardOSCAN::can1used = false;
@@ -16,6 +20,29 @@ volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo2[CAN_FIFO_size];
 
 CAN_HandleTypeDef StallardOSCAN::can1handle;
 CAN_HandleTypeDef StallardOSCAN::can2handle;
+
+void initFilters(CAN_HandleTypeDef *canHand)
+{
+    CAN_FilterTypeDef sFilterConfig;
+    if(canHand->Instance == CAN1)
+    {
+        sFilterConfig.FilterBank = 14; // 0..13 for CAN1, 14..27 for CAN2
+    }
+    else
+    {
+        sFilterConfig.FilterBank = 0; // 0..13 for CAN1, 14..27 for CAN2
+    }
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterActivation = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+    HAL_CAN_ConfigFilter(canHand, &sFilterConfig);
+}
 
 StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, bool debug) :
     CANT(tx.pin, tx.port, AFPP, nopull, GPIO_AF9_CAN1),
@@ -127,6 +154,8 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     NVIC_EnableIRQ(CAN1_RX1_IRQn);
     NVIC_EnableIRQ(CAN2_RX0_IRQn);
     NVIC_EnableIRQ(CAN2_RX1_IRQn);
+
+    initFilters(&canhandle);
 
     this->sem.give(); //release Semaphore
 
@@ -242,7 +271,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 
     this->sem.take();
 
-    // receiveMessage_FIFO(&canhandle); //Receive the Messages from Hardware FiFo ->6 Messages total
+    receiveMessage_FIFO(&canhandle); //Receive the Messages from Hardware FiFo ->6 Messages total
     if (msg == nullptr) //if provided message for storing is valid
     {
 
