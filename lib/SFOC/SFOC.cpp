@@ -25,7 +25,8 @@ SFOC::SFOC(uint16_t ecu_id, uint16_t host_id, uint16_t discovery_id, uint32_t ti
     timeout_ms(timeout_ms),
     last_activity(HAL_GetTick()),
     filter(ecu_id, discovery_id, AD_CAN_PORT),
-    state(BASE){}
+    state(stm_state::BASE),
+    state_out(SFOC_CONTINUE ){}
 
 /**
  * @brief send a single ack message to the host
@@ -42,10 +43,12 @@ void SFOC::ack_cmd(){
  * @brief send a single nack to the host, denying the request
  * 
  */
-void SFOC::nack_cmd(){
+void SFOC::nack_cmd(sfoc_nack_reason reason){
     response.id = host_id;
     response.opcode = sfoc_opcodes::NACK;
-    response.len = 0;
+    response.len = 1;
+    response.data[0] = reason;
+
     send();
 }
 
@@ -123,10 +126,13 @@ void SFOC::send_id(){
  */
 void SFOC::go_flashloader(){
     #ifdef SFOC_OS_DOMAIN
-    /* set arguments for Flashloader */
-    s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
-    ack_cmd();
-    CALL_SYSRESET();
+        /* set arguments for Flashloader */
+        s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
+        ack_cmd();
+        // TODO: wait until message is send
+        CALL_SYSRESET();
+    #else
+        nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
     #endif  // STOS_VERSION
     // do nothing if in FL
 }
@@ -139,11 +145,83 @@ void SFOC::go_flashloader(){
  */
 void SFOC::send_flash_hello(){
     #ifdef SFOC_FL_DOMAIN
-    response.opcode = sfoc_opcodes::FL_HELLO;
-    response.id = this->host_id;
-    response.len = 0;
+        response.opcode = sfoc_opcodes::FL_HELLO;
+        response.id = this->host_id;
+        response.len = 0;
 
-    send();
+        send();
+    #else
+        nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
+    #endif
+}
+
+/**
+ * @brief erase the specified sectors from flash
+ *        refuses to erase FL sectors
+ * 
+ */
+void SFOC::erase_flash(){
+    #ifdef SFOC_FL_DOMAIN
+        uint16_t start;
+        uint16_t end;
+        uint32_t ret;
+
+        start = cmd.data[0] | cmd.data[1]<<8;
+        end = cmd.data[2] | cmd.data[3]<<8;
+        
+        ret = Flash_Erase_Sectors(start, end);
+
+        if(ret == HAL_FLASH_ERROR_NONE){
+            ack_cmd();
+        }
+        else if(ret == HAL_FLASH_ERROR_WRP){
+            nack_cmd(sfoc_nack_reason::WRITE_PROTECTION);
+        }
+        else{
+            nack_cmd();
+        }
+    #else
+        nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
+    #endif
+
+}
+
+/**
+ * @brief write to flash
+ *
+ * 
+ */
+void SFOC::write_flash(){
+    #ifdef SFOC_FL_DOMAIN
+        uint32_t data[4];
+        uint32_t ret;
+
+        data[0] = 0xDE;
+        data[1] = 0xAD;
+        data[2] = 0xBE;
+        data[3] = 0xEF;
+
+        ret = Flash_Write_Data(0x800C000, data, 4);
+
+        if(!ret){
+            ack_cmd();
+        }
+        else{
+            nack_cmd();
+        }
+    #else
+        nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
+    #endif
+}
+
+
+void SFOC::go_os(){
+    #ifdef SFOC_FL_DOMAIN
+        s_params.set_boot_type(SharedParams::boot_type::T_REBOOT);
+        state = stm_state::REBOOT;
+        state_out = SFOC_EXIT_REBOOT;
+    #else
+        nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
     #endif
 }
 
@@ -167,7 +245,17 @@ void SFOC::read_cmd(){
         case sfoc_opcodes::GO_FL:
             go_flashloader();
             return;
+        case sfoc_opcodes::ERASE_SECTORS:
+            erase_flash();
+            return;
+        case sfoc_opcodes::WRITE_MEMORY:
+            write_flash();
+            return;
+        case sfoc_opcodes::GO_OS:
+            go_os();
+            return;
         default:
+            nack_cmd(sfoc_nack_reason::UNSUPPORTED_OPCODE);
             break;
     }
 }
@@ -184,11 +272,16 @@ void SFOC::STM_step(){
      * it might be a payload message
      */
     switch(state){
-        case BASE:
+        case stm_state::BASE:
             decode();
             read_cmd();
             break;
+        case stm_state::REBOOT:
+            // nop state
+            break;
         default:
+            /* state shouldn't be reachable */
+            state_out = SFOC_GENERAL_ERR;
             break;
     }
 }
@@ -214,7 +307,7 @@ SFOC_Status SFOC::stm_iterate(){
      *      * NACK
      *      * DATA (+ ACK)
      */
- 
+    
     bool ret;
     uint32_t tick;
     
@@ -228,15 +321,14 @@ SFOC_Status SFOC::stm_iterate(){
         tick = HAL_GetTick();
         if(timeout_ms > 0 && (tick-last_activity) > timeout_ms){
             // flashLoader is timed out with error
-            return SFOC_TIMEOUT;
+            state_out = SFOC_TIMEOUT;
         }
-        return SFOC_CONTINUE;
+        return state_out;
     }
-
 
     /* we've got a valid frame */
     STM_step();
     last_activity = HAL_GetTick();
 
-    return SFOC_CONTINUE;
+    return state_out;
 }

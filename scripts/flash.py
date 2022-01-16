@@ -65,7 +65,7 @@ def before_upload(source, target, env):
 
 
     # write the new upload command
-    cmd = 'program {$PROG_PATH} 0x8008000; reset; shutdown;'
+    cmd = 'program {$PROG_PATH} 0x800C000; reset; shutdown;'
     flags[c_idx+1] = cmd
     env['UPLOADERFLAGS'] = flags
 
@@ -76,11 +76,3 @@ def before_upload(source, target, env):
 
 
 env.AddPreAction("upload", before_upload)
-
-# env.AddPostAction(
-#     "$BUILD_DIR/${PROGNAME}.elf",
-#     env.VerboseAction(" ".join([
-#         "$OBJCOPY", "-O", "ihex", "-R", ".eeprom",
-#         "$BUILD_DIR/${PROGNAME}.elf", "$BUILD_DIR/${PROGNAME}.hex"
-#     ]), "Building $BUILD_DIR/${PROGNAME}.hex")
-# )

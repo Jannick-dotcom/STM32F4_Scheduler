@@ -38,6 +38,13 @@ class SFOC{
     private:
         /********************** TYPES **************************/
 
+        enum sfoc_nack_reason{
+            UNKNOWN = 0x00,
+            UNSUPPORTED_OPCODE = 0x01,
+            WRONG_DOMAIN = 0x02,
+            WRITE_PROTECTION = 0x03
+        };
+
         typedef enum sfoc_opcodes{
             NACK = 0x00,
             ACK = 0x01,
@@ -46,12 +53,24 @@ class SFOC{
             VERSION = 0x04,
             ID = 0x05,
             GO_FL = 0x06,
-            FL_HELLO = 0x07
+            FL_HELLO = 0x07,
+            ERASE_SECTORS = 0x08,
+            WRITE_MEMORY = 0x09,
+            READ_MEMORY = 0x0A,
+            GO_OS = 0x0B
         }SFOC_Opcodes;
 
-        typedef enum stm_state{
-            BASE
-        }STM_State;
+
+        /* stm variables
+         *
+         * stm holds state and output variable
+         * if the state does not change, the old output is repeated
+         * only on state change, the output may change
+         */
+        enum stm_state{
+            BASE,
+            REBOOT
+        };
 
         struct sfoc_message{
             uint16_t id;
@@ -70,7 +89,8 @@ class SFOC{
         uint32_t last_activity;  // timestamp of last activity
 
         const StallardOSCANFilter filter;
-        STM_State state;
+        enum stm_state state;
+        sfoc_status state_out;
 
         StallardOSCanMessage in_frame;
         sfoc_message cmd;
@@ -91,12 +111,16 @@ class SFOC{
 
         /* execute commands */
         void ack_cmd();
-        void nack_cmd();
+        void nack_cmd(sfoc_nack_reason reason=sfoc_nack_reason::UNKNOWN);
 
         void send_discovery();
         void send_version();
         void send_id();
         void go_flashloader();
+        void erase_flash();
+        void write_flash();
+        void read_flash();
+        void go_os();
 };
 
 #endif // _SFOC_H_
