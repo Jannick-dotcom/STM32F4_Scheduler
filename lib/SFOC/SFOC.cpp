@@ -1,9 +1,10 @@
 #include "SFOC.hpp"
 
-#include <string.h>
 #include "stm32f4xx_hal.h"
 
-//#include "FLASH_SECTOR_F4.h"
+#ifdef SFOC_FL_DOMAIN
+    #include "FLASH_SECTOR_F4.h"
+#endif
 
 /*
 uint32_t data[64];
@@ -77,8 +78,21 @@ void SFOC::send_version(){
     response.opcode = sfoc_opcodes::VERSION;
 
     response.len = 3;
-    response.data[0] = OS_VERSION;
-    response.data[1] = FLASH_LOADER_VERSION;
+
+    #if defined(SFOC_OS_DOMAIN)
+        response.data[0] = STOS_VERSION;
+        response.data[1] = s_params.get_fl_version();
+    #elif defined(SFOC_FL_DOMAIN)
+        response.data[0] = s_params.get_os_version();
+        response.data[1] = FL_VERSION;
+    #else
+        response.data[0] = 0;
+        response.data[1] = 0;
+        #ifndef UNIT_TEST
+        asm("bkpt");  //Zeige debugger
+        #endif
+    #endif
+
     response.data[2] = SFOC_VERSION;
     send();
 }
@@ -108,11 +122,29 @@ void SFOC::send_id(){
  *        sends NACK otherwise
  */
 void SFOC::go_flashloader(){
-    nack_cmd();
-    return;
-
+    #ifdef SFOC_OS_DOMAIN
     /* set arguments for Flashloader */
+    s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
+    ack_cmd();
     CALL_SYSRESET();
+    #endif  // STOS_VERSION
+    // do nothing if in FL
+}
+
+
+/**
+ * @brief sends the FLASH_HELLO Opcode to the host
+ *        send after switch from OS->FL to signal readyness
+ * 
+ */
+void SFOC::send_flash_hello(){
+    #ifdef SFOC_FL_DOMAIN
+    response.opcode = sfoc_opcodes::FL_HELLO;
+    response.id = this->host_id;
+    response.len = 0;
+
+    send();
+    #endif
 }
 
 
@@ -160,6 +192,7 @@ void SFOC::STM_step(){
             break;
     }
 }
+
 
 
 /**

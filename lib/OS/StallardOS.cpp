@@ -1,5 +1,5 @@
 #include "StallardOS.hpp"
-#include "shared_params.hpp"
+#include "sharedParams.hpp"
 
 extern "C" stack_T _sdata;  // sizes of .data and .bss
 extern "C" stack_T _edata;  // used for MPU config
@@ -132,10 +132,9 @@ void StallardOS::createTCBs()
 }
 
 void StallardOS::initShared(void){
-  /* init in any case
-   * does not re-init if already init 
-   */
-  SharedParamsInit();
+
+  /* constructor will init the struct */
+  SharedParams params;
 
   /* set default parameters at OS boot */
 
@@ -143,16 +142,8 @@ void StallardOS::initShared(void){
    * boot back to the OS, in case a reset handler is hit
    * or in case someone hits the reset button of the controller
    */
-
-  /* first param is "from_OS" */
-  SharedParamsWriteByIndex(0, 1);
-
-  /* 2nd param is "reboot" 
-   * this way every reset will reboot 
-   * unless specifically modified before reset
-   */
-  SharedParamsWriteByIndex(1, 1);
-
+  params.set_boot_type(SharedParams::boot_type::T_REBOOT);
+  params.set_os_version(STOS_VERSION);
 }
 
 void StallardOS::initMPU(void){

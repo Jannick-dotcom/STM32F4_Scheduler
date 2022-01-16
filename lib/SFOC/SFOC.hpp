@@ -1,12 +1,19 @@
-#pragma once
-#include "StallardOScan.hpp"
+#ifndef _SFOC_H_
+#define _SFOC_H_
+
+#include "sharedParams.hpp" 
 #include "StallardOScanTypes.hpp"
-#include "StallardOS.hpp"
+#include "StallardOScan.hpp"
+
+#ifdef STOS_VERSION
+    #define SFOC_OS_DOMAIN
+    #include "StallardOS.hpp"  // not sure why we even need this in OS
+#else
+    #define SFOC_FL_DOMAIN
+#endif
 
 
 #define SFOC_VERSION (0x01) // 0.1
-#define OS_VERSION (0x10)
-#define FLASH_LOADER_VERSION (0x01)
 
 #define ECU_ID 0x123
 #define HOST_ID 0x124
@@ -22,11 +29,11 @@ typedef enum sfoc_status{
 
 
 
-
 class SFOC{
     public:
         SFOC(uint16_t ecu_id, uint16_t host_id, uint16_t discovery_id, uint32_t timeout_ms=30000);
         SFOC_Status stm_iterate();
+        void send_flash_hello();
 
     private:
         /********************** TYPES **************************/
@@ -38,7 +45,8 @@ class SFOC{
             DISCOVERY_RESPONSE = 0x03,
             VERSION = 0x04,
             ID = 0x05,
-            GO_FL = 0x06
+            GO_FL = 0x06,
+            FL_HELLO = 0x07
         }SFOC_Opcodes;
 
         typedef enum stm_state{
@@ -69,6 +77,8 @@ class SFOC{
         sfoc_message response;
         StallardOSCanMessage out_frame;
 
+        SharedParams s_params;
+
         /********************** METHODS *************************/
         void STM_step();
         
@@ -88,3 +98,5 @@ class SFOC{
         void send_id();
         void go_flashloader();
 };
+
+#endif // _SFOC_H_
