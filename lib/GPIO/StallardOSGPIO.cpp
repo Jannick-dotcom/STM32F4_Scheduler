@@ -1,6 +1,6 @@
 #include "StallardOSGPIO.hpp"
 
-StallardOSGPIO::StallardOSGPIO() {}
+// StallardOSGPIO::StallardOSGPIO() {}
 
 /**
  * Create a gpio pin.
