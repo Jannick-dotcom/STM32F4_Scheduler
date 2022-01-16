@@ -6,14 +6,14 @@ extern struct function_struct *currentTask;
 extern struct function_struct *taskMainStruct;
 extern struct function_struct *nextTask;
 
-__attribute__((always_inline)) void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
+void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 {
-    asm("TST    LR, #4"); //firstly, find the PC
-    asm("ITE    EQ");
-    asm("MRSEQ	R0, MSP");
-    asm("MRSNE	R0, PSP");
+    // asm("TST    LR, #4"); //firstly, find the PC
+    // asm("ITE    EQ");
+    // asm("MRSEQ	R0, MSP");
+    // asm("MRSNE	R0, PSP");
 
-    asm("LDR	R0, [R0, #24]"); //PC is in R0
+    // asm("LDR	R0, [R0, #24]"); //PC is in R0
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
     #endif
