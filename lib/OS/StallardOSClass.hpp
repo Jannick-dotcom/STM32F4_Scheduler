@@ -3,6 +3,13 @@
 
 #include "StallardOSHelpers.h"
 
+class NonAssignable {
+public:
+    NonAssignable(NonAssignable const&) = delete;
+    NonAssignable& operator=(NonAssignable const&) = delete;
+    NonAssignable() {};
+};
+
 class StallardOS
 {
 private:

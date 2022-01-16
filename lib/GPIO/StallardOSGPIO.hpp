@@ -5,6 +5,7 @@
 #include <system_stm32f4xx.h>
 #include <stdint.h>
 #include "StallardOSsem.hpp"
+#include "StallardOSClass.hpp"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -49,7 +50,7 @@ typedef enum pullMode
     pullup = GPIO_PULLUP
 } pullMode;
 
-class StallardOSGPIO
+class StallardOSGPIO : public NonAssignable
 {
 private:
     bool state;
@@ -66,7 +67,6 @@ public:
     const GPIO_TypeDef *portsToGPIOBase[8] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH};
     #endif
 
-    StallardOSGPIO();
     StallardOSGPIO(
         /*Portnumber*/ uint8_t number,
         /*Portname*/ ports port,
@@ -89,19 +89,11 @@ public:
     bool operator&&(StallardOSGPIO &ref); //Logical operator
     bool operator||(StallardOSGPIO &ref); //Logical operator
     bool operator!=(StallardOSGPIO &ref); //Comparison
-    // bool operator<(StallardOSGPIO &ref);
-    // bool operator>(StallardOSGPIO &ref);
-    // bool operator<=(StallardOSGPIO &ref);
-    // bool operator>=(StallardOSGPIO &ref);
     bool operator==(StallardOSGPIO &ref);
 
     bool operator&&(bool ref); //Logical operator
     bool operator||(bool ref); //Logical operator
     bool operator!=(bool ref); //Comparison
-    // bool operator<(bool ref);
-    // bool operator>(bool ref);
-    // bool operator<=(bool ref);
-    // bool operator>=(bool ref);
     bool operator==(bool ref);
 };
 
