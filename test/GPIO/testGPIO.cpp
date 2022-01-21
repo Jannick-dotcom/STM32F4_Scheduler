@@ -5,7 +5,8 @@ StallardOS StallardOSJanniq;
 
 ports port = PORTA;
 uint8_t pin = 6;
-StallardOSGPIO testGPIO; //(pin, port, Output);
+// StallardOSGPIO testGPIO; //(pin, port, Output);
+StallardOSGPIO *ptestGPIO;
 
 void setUp(void)
 {
@@ -18,14 +19,14 @@ void tearDown(void)
 
 void test_pin_state_high(void)
 {
-    testGPIO = 1;
-    TEST_ASSERT_EQUAL(GPIO_PIN_SET, testGPIO.read());
+    ptestGPIO->write(1);
+    TEST_ASSERT_EQUAL(GPIO_PIN_SET, ptestGPIO->read());
 }
 
 void test_pin_state_low(void)
 {
-    testGPIO = 0;
-    TEST_ASSERT_EQUAL(GPIO_PIN_RESET, testGPIO.read());
+    ptestGPIO->write(0);
+    TEST_ASSERT_EQUAL(GPIO_PIN_RESET, ptestGPIO->read());
 }
 
 int main()
@@ -43,9 +44,11 @@ int main()
             {
                 continue;
             }
-            testGPIO = StallardOSGPIO(iPIN, ports(iPORT), Output, 1);
+            StallardOSGPIO testgpio(iPIN, ports(iPORT), Output, 1);
+            ptestGPIO = &testgpio;
             RUN_TEST(test_pin_state_high);
             RUN_TEST(test_pin_state_low);
+            testgpio.~StallardOSGPIO();
         }
     }
 
