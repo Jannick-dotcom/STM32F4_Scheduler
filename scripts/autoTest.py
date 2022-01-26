@@ -4,7 +4,6 @@ import time
 
 while True:
     result = subprocess.run(['git', 'pull'], stdout=subprocess.PIPE).stdout
-    result = "Du kleine Hässliche Transe"
     if(not str(result).__contains__("up to date")):
         with open("test/result.txt","wb") as out:
             result = subprocess.run(['platformio', 'test'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
