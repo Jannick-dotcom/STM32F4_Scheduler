@@ -678,14 +678,15 @@ void StallardOS::yield()
  */
 void StallardOS::startOS(void)
 {
-  enable_interrupts();
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
     FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
     // SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
+    #ifdef useFPU
     #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
     SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+    #endif
     #endif
     __ASM volatile("DSB");
     __ASM volatile("ISB");
@@ -697,15 +698,15 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(PendSV_IRQn);
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(SVCall_IRQn);
+    #ifdef useFPU
     NVIC_EnableIRQ(FPU_IRQn);
+    #endif
     __ASM volatile("MRS R0, MSP\n"
                    "SUB R0, #200\n" //Reserve some space for Handlers (200 Byte)
                    "MSR PSP, R0");
-    // asm("mov r0, #0");
-    // asm("msr control, r0");
-    // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     __ASM volatile("dsb");
     __ASM volatile("isb");
+    enable_interrupts();
     CALL_STARTMAIN();
   }
 }

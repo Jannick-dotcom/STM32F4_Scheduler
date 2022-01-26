@@ -75,6 +75,7 @@ void UsageFault_Handler()
     StallardOSGeneralFaultHandler();
 }
 
+#ifdef useFPU
 // FPU IRQ Handler
 void FPU_IRQHandler()
 {
@@ -106,3 +107,4 @@ void FPU_IRQHandler()
     asm("DMB");
     StallardOSGeneralFaultHandler();
 }
+#endif
