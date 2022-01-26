@@ -29,7 +29,7 @@ void test_stackSizeValid()
     for(int i=32; i<=0x1'0000'0000; (i=i<<2), id++, mpu_iter++){
         // use static allocation to not overflow the heap
         // it's not actually important if the given stack size is the actual stack isze
-        tmp = StallardOSJanniq.addFunctionStatic(testfunction, id, 1, stack, i);
+        tmp = StallardOSJanniq.addFunctionStatic(testfunction, 1, stack, i);
         TEST_ASSERT_NOT_EQUAL_MESSAGE(nullptr, tmp, "accepted correct stack size");
 
         // WARN: if the mpu defines change their layout
@@ -44,11 +44,11 @@ void test_stackSizeOutOfRange()
     function_struct *tmp;
 
     #ifdef useMPU
-    tmp = StallardOSJanniq.addFunction(testfunction, 1, 3, 16); //This should return a nullptr
+    tmp = StallardOSJanniq.addFunction(testfunction, 3, 16); //This should return a nullptr
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, tmp, "Too small stack size");
     #endif
 
-    tmp = StallardOSJanniq.addFunction(testfunction, 1, 3, 0x2'0000'0000); //This should return a nullptr
+    tmp = StallardOSJanniq.addFunction(testfunction, 3, 0x2'0000'0000); //This should return a nullptr
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, tmp, "Too large stack size");
 }
 
