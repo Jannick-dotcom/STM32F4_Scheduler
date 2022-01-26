@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "StallardOSsem.hpp"
 #include "StallardOSClass.hpp"
+#include "math.h"
 
 extern "C" void StallardOSGeneralFaultHandler();
 
@@ -21,6 +22,26 @@ typedef enum ports
     PORTH,
     PORTI
 } ports;
+
+typedef enum interruptNumber
+{
+    P0 = EXTI0_IRQn,
+    P1 = EXTI1_IRQn,
+    P2 = EXTI2_IRQn,
+    P3 = EXTI3_IRQn,
+    P4 = EXTI4_IRQn,
+    P5 = EXTI9_5_IRQn,
+    P6 = EXTI9_5_IRQn,
+    P7 = EXTI9_5_IRQn,
+    P8 = EXTI9_5_IRQn,
+    P9 = EXTI9_5_IRQn,
+    P10 = EXTI15_10_IRQn,
+    P11 = EXTI15_10_IRQn,
+    P12 = EXTI15_10_IRQn,
+    P13 = EXTI15_10_IRQn,
+    P14 = EXTI15_10_IRQn,
+    P15 = EXTI15_10_IRQn
+} interruptNumber;
 
 struct gpio
 {
@@ -40,7 +61,10 @@ typedef enum pinDir
     Output = GPIO_MODE_OUTPUT_PP,
     OutputOD = GPIO_MODE_OUTPUT_OD,
     AFOD = GPIO_MODE_AF_OD,
-    AFPP = GPIO_MODE_AF_PP
+    AFPP = GPIO_MODE_AF_PP,
+    InputITFalling = GPIO_MODE_IT_FALLING,
+    InputITRising = GPIO_MODE_IT_RISING,
+    InputITChange = GPIO_MODE_IT_RISING_FALLING
 } pinDir;
 
 typedef enum pullMode
@@ -59,6 +83,7 @@ private:
     pinDir dir;
     pullMode pull;
     StallardOSSemaphore sem;
+    // static uint32_t functions[16];
 
 public:
     #ifdef STM32F417xx
@@ -81,6 +106,8 @@ public:
         /*PullResistor*/ pullMode pull,
         /*AlternateFunction*/ uint32_t alternate);
     ~StallardOSGPIO(); //Destructor
+
+    void setISR(void (*function)());
     bool read();
     bool write(bool state);
     bool operator=(bool state);           //Operator for writing on the pin

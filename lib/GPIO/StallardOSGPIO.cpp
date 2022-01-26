@@ -1,5 +1,7 @@
 #include "StallardOSGPIO.hpp"
 
+volatile void *functions[16];
+
 // StallardOSGPIO::StallardOSGPIO() {}
 
 /**
@@ -106,12 +108,121 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
 
     this->sem.give();
-
 }
 
 StallardOSGPIO::~StallardOSGPIO()
 {
-    HAL_GPIO_DeInit((GPIO_TypeDef *)portsToGPIOBase[this->port], 1<<this->pin);
+    HAL_GPIO_DeInit((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+}
+
+interruptNumber pinToInterruptNumber(uint8_t pin)
+{
+    switch (pin)
+    {
+    case 0:
+        return P0;
+        break;
+    case 1:
+        return P1;
+        break;
+    case 2:
+        return P2;
+        break;
+    case 3:
+        return P3;
+        break;
+    case 4:
+        return P4;
+        break;
+    case 5:
+        return P5;
+        break;
+    case 6:
+        return P6;
+        break;
+    case 7:
+        return P7;
+        break;
+    case 8:
+        return P8;
+        break;
+    case 9:
+        return P9;
+        break;
+    case 10:
+        return P10;
+        break;
+    case 11:
+        return P11;
+        break;
+    case 12:
+        return P12;
+        break;
+    case 13:
+        return P13;
+        break;
+    case 14:
+        return P14;
+        break;
+    case 15:
+        return P15;
+        break;
+    }
+}
+
+void StallardOSGPIO::setISR(void (*function)())
+{
+    interruptNumber temp = pinToInterruptNumber(pin);
+    HAL_NVIC_SetPriority(IRQn_Type(temp), 0, 0);
+    HAL_NVIC_EnableIRQ(IRQn_Type(temp));
+    functions[this->pin] = (volatile void *)function;
+}
+
+extern "C"
+{
+    void EXTI0_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+    }
+    void EXTI1_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+    }
+    void EXTI2_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+    }
+    void EXTI3_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+    }
+    void EXTI4_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+    }
+    void EXTI9_5_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+    }
+    void EXTI15_10_IRQHandler()
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
+    }
+}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    uint8_t tempval = log2(GPIO_Pin);
+    void (*temp)() = (void (*)())functions[tempval];
+    temp();
 }
 
 /**
