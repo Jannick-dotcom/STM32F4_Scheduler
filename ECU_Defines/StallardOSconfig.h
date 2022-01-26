@@ -12,7 +12,7 @@
 #define useFPU
 //#define useMPU
 //#define unprotectedBuild
-#define countTasks 10
+#define countTasks 15
 #define defaultSysTickFreq 1000 //[Hz]
 #define runFreq 168 //[MHz]
 
