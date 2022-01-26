@@ -108,7 +108,7 @@ void jumpToBootloader(void)
 
 void findNextFunction()
 {
-    nextTask = NULL;
+    nextTask = taskMainStruct;
     volatile struct function_struct* temp = currentTask->next;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     if(temp == NULL)
@@ -152,19 +152,15 @@ void findNextFunction()
  */
 __attribute__((always_inline)) inline void switchTask(void)
 {
-    //if (currentTask == NULL) currentTask = taskMainStruct;//make sure Tasks are available
-    if (nextTask == NULL) 
-    {
-        nextTask = taskMainStruct;
-    }
-
     //Pausing Task
     __ASM volatile("MRS r0, PSP\n"         //Get Process Stack Pointer
                     "ISB\n"
+
+                    #ifdef useFPU
                     "TST r14, #0x10\n"  //store vfp registers, if task was using FPU
                     "IT eq\n"
-
                     "VSTMDBeq r0!, {s16-s31}\n"
+                    #endif
 
                     #ifndef unprotectedBuild
                     "MRS r12, CONTROL\n"                    
@@ -176,8 +172,6 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "LDR r3, =currentTask\n" //Current Task Pointer
                     "LDR r2, [r3]\n" //Load Stack pointer from first position of currentTask
                     "STR r0, [r2]\n" //Save stack pointer
-                    // "MOV %0, #2\n" : "=r"(currentTask->State) //Set function state to paused
-                    //"LDR r0, =currentTask\n"
                     "LDR r1, =nextTask\n"
                     "LDR r2, [r1]\n"
                     "STR r2, [r3]\n"
@@ -185,8 +179,6 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "ISB\n"
 
                     // Resuming process
-                    // "LDR r1, =currentTask\n"
-                    // "LDR r2, [r1]\n"
                     "LDR r0, [r2]\n"
 
                     #ifndef unprotectedBuild
@@ -196,14 +188,14 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
                     #endif
 
+                    #ifdef useFPU
                     "TST r14, #0x10\n"
                     "IT eq\n"
                     "VLDMIAeq r0!, {s16-s31}\n"
-                    
+                    #endif
                     "MSR PSP, r0\n"           //set PSP
                     "ISB\n"
                     
-                    // "MOV %0, #1" //Set function state to running
                     "LDR r1, =nextTask\n"
                     "MOV r2, #0\n"
                     "STR r2, [r1]\n");
