@@ -3,7 +3,6 @@
 
 /* static semaphore */
 //StallardOSSemaphore SharedParams::sem;
-//TODO: add semaphores without compile error
 /**
  * @brief Construct a new Shared Params:: Shared Params object
  *        initialize the shared buffer if not already done
@@ -52,6 +51,15 @@ bool SharedParams::set_os_version(uint8_t ver){
 uint8_t SharedParams::get_os_version(){
     uint8_t ret;
     read_locked(shared_pos::OS_VER, &ret);
+    return ret;
+}
+
+bool SharedParams::set_sw_version(uint8_t ver){
+    return write_locked(shared_pos::SW_VER, ver);
+}
+uint8_t SharedParams::get_sw_version(){
+    uint8_t ret;
+    read_locked(shared_pos::SW_VER, &ret);
     return ret;
 }
 

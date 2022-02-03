@@ -20,6 +20,9 @@ class SharedParams{
         bool set_os_version(uint8_t ver);
         uint8_t get_os_version();
 
+        bool set_sw_version(uint8_t ver);
+        uint8_t get_sw_version();
+
         bool set_boot_type(enum boot_type type);
         enum boot_type get_boot_type();
 
@@ -33,7 +36,8 @@ class SharedParams{
         enum shared_pos{
             FL_VER=0x0,
             OS_VER=0x1,
-            BOOT_TYPE=0x2
+            SW_VER=0x2,
+            BOOT_TYPE=0x3
         };
 
 };

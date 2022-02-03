@@ -144,6 +144,9 @@ void StallardOS::initShared(void){
    */
   params.set_boot_type(SharedParams::boot_type::T_REBOOT);
   params.set_os_version(STOS_VERSION);
+  #ifdef SW_VERSION
+    params.set_sw_version(SW_VERSION);
+  #endif
 }
 
 void StallardOS::initMPU(void){
