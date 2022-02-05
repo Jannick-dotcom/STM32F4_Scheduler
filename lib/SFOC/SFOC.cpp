@@ -41,10 +41,11 @@ StallardOSCanMessage SFOC::out_frame;
 
 SharedParams SFOC::s_params;
 
-//StallardOSCANFilter SFOC::filter(SFOC_ECU_ID, SFOC_DISCOVERY_ID, AD_CAN_PORT);
+StallardOSCANFilterDelayed SFOC::filter(SFOC_ECU_ID, SFOC_DISCOVERY_ID, AD_CAN_PORT);
 
 
 void SFOC::setup(uint32_t timeout_ms){
+    filter.setup();
     SFOC::timeout_ms = timeout_ms;
     last_activity = HAL_GetTick();
 }

@@ -2,8 +2,21 @@
 
 uint8_t StallardOSCANFilter::countFilters = 0;
 
-StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports can)
+StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports can): id1(id1), id2(id2)
 {
+    setup(can);
+}
+
+StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2): 
+    id1(id1), id2(id2){}
+
+StallardOSCANFilter::~StallardOSCANFilter()
+{
+    countFilters--;
+}
+
+
+void StallardOSCANFilter::setup(CANports can){
     if(id1 > 2047 || id2 > 2047 || this->countFilters > 27)
     {
         #ifndef UNIT_TEST
@@ -62,7 +75,13 @@ StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports ca
     }
 }
 
-StallardOSCANFilter::~StallardOSCANFilter()
-{
-    countFilters--;
+
+StallardOSCANFilterDelayed::StallardOSCANFilterDelayed(uint16_t id1, uint16_t id2, CANports can): 
+    StallardOSCANFilter(id1, id2), can(can), is_init(false){}
+
+void StallardOSCANFilterDelayed::setup(){
+    if(!is_init){
+        is_init=true;
+        StallardOSCANFilter::setup(can);
+    }
 }

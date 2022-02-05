@@ -169,7 +169,7 @@ class SFOC{
         static uint32_t timeout_ms;  // up to 136 years
         static uint32_t last_activity;  // timestamp of last activity
 
-        //static StallardOSCANFilter filter;
+        static StallardOSCANFilterDelayed filter;
         static enum stm_state state;
         static sfoc_status state_out;
         
