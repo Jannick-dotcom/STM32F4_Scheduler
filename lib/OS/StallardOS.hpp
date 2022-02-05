@@ -19,6 +19,6 @@
 #include "StallardOSSPI.hpp"
 #include "StallardOSDAC.hpp"
 
-
+#define STOS_VERSION 0x10
 
 #endif //StallardOS_h

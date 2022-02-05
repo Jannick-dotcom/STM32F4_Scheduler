@@ -7,9 +7,10 @@
 #include "StallardOScanTypes.hpp"
 #include "StallardOScan.hpp"
 
-#ifdef STOS_VERSION
+
+#if __has_include("StallardOS.hpp")
+    #include "StallardOS.hpp"  // OS define (and some other stuff)
     #define SFOC_OS_DOMAIN
-    #include "StallardOS.hpp"  // not sure why we even need this in OS
 #else
     #define SFOC_FL_DOMAIN
     #include "FLASH_SECTOR_DEFINES.h"

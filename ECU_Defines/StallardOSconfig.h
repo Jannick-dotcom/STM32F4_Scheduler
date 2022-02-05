@@ -1,7 +1,7 @@
 /********************************************
  * User Customization
 ********************************************/
-#define STOS_VERSION 0x10
+#define SW_VERSION 0x00
 
 /* must be equivalent to SFOC protocol definitions for CUID */
 #define STOS_current_ECU_ID 1 //FCU
