@@ -5,8 +5,8 @@ import time
 while True:
     result = subprocess.run(['git', 'pull'], stdout=subprocess.PIPE).stdout
     if(not str(result).__contains__("up to date")):
-        with open("test/result.txt","wb") as out:
-            result = subprocess.run(['pio', 'test'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
+        with open("test/result.txt","w") as out:
+            result = subprocess.run(['pio', 'test', '-e', 'black_f407ve'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
             out.write(result)
             subprocess.run(['git', 'add', 'test/result.txt'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.run(['git', 'commit', '-m', 'UnitTest result'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

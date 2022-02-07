@@ -32,7 +32,7 @@ void test_pin_state_low(void)
 int main()
 {
     HAL_Init(); // initialize the HAL library
-    StallardOS::delay(2000);
+    StallardOS::delay(5000);
     // HAL_Delay(2000);    // service delay
     UNITY_BEGIN();
 
