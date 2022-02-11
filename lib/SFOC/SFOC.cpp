@@ -167,6 +167,26 @@ void SFOC::send_id(){
 }
 
 /**
+ * @brief send the current domain to the host
+ * 
+ */
+void SFOC::send_domain(){
+    response.id = host_id;
+    response.opcode = sfoc_opcodes::DOMAIN_ID;
+    response.len=1;
+
+    #ifdef SFOC_OS_DOMAIN
+        response.data[0] = sfoc_domains::OS;
+    #elif defined(SFOC_FL_DOMAIN)
+        response.data[0] = sfoc_domains::FL;
+    #else
+        response.data[0] = sfoc_domains::RESERVED;
+    #endif
+
+    send();
+}
+
+/**
  * @brief checks if CU is allowed to switch to flashloader
  * 
  *        if allowed, will reboot an method will not return
@@ -176,8 +196,7 @@ void SFOC::go_flashloader(){
     #ifdef SFOC_OS_DOMAIN
         /* set arguments for Flashloader */
         s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
-        ack_cmd();
-        // TODO: wait until message is send
+        // command is not ACKED, only FL_HELLO after reboot
         CALL_SYSRESET();
     #else
         nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
@@ -360,6 +379,7 @@ void SFOC::go_os(){
             s_params.set_boot_type(SharedParams::boot_type::T_REBOOT);
             state = stm_state::REBOOT;
             state_out = SFOC_EXIT_REBOOT;
+            /* no ACK, only OS_HELLO */
         }
     #else
         nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
@@ -566,25 +586,10 @@ void SFOC::disable_hash(){
         uint8_t sector = GetSector(hash_base);
         uint32_t ret;
 
-
-        if(!sectorWritable[sector] || sectorHead[sector] > hash_base){
-            /* erase if sector not used */
-            if(GetSector(addr+len) < sector){
-                ret = Flash_Erase_Sectors(sector, sector);
-                if(ret){
-                    nack_cmd(ret==HAL_FLASH_ERROR_WRP ? sfoc_nack_reason::WRITE_PROTECTION : sfoc_nack_reason::GEN_FLASH_ERROR);
-                    return;
-                }
-            }
-            /* else error */
-            else{
-                nack_cmd(sfoc_nack_reason::SECTOR_OCCUPIED); 
-                return;
-            }
-        }
-
-
-        sectorHead[sector] = hash_base + 10*4;
+        /* setting flash to 0 is always possible
+         * no matter the write-state of this region
+         * therfore flash index is ignored and not updated
+         */
         memset(buffer, 0, 10*4);
         ret = Flash_Write_Data(hash_base, buffer, 10);
 
@@ -613,6 +618,9 @@ void SFOC::read_cmd(){
             return;
         case sfoc_opcodes::ID:
             send_id();
+            return;
+        case sfoc_opcodes::DOMAIN_ID:
+            send_domain();
             return;
         case sfoc_opcodes::GO_FL:
             go_flashloader();

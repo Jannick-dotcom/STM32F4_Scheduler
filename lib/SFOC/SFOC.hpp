@@ -94,22 +94,29 @@ class SFOC{
             DISCOVERY_REQUEST = 0x10,
             DISCOVERY_RESPONSE = 0x11,
 
-            VERSION = 0x12,
-            ID = 0x13,
+            VERSION = 0x20,
+            ID = 0x21,
+            DOMAIN_ID = 0x22,
 
-            GO_FL = 0x14,
-            FL_HELLO = 0x15,
-            GO_OS = 0x16,
-            OS_HELLO = 0x17,
+            GO_FL = 0x30,
+            FL_HELLO = 0x31,
+            GO_OS = 0x32,
+            OS_HELLO = 0x33,
 
-            ERASE_SECTORS = 0x20,
-            WRITE_MEMORY = 0x21,
-            FLUSH_BUFFERS = 0x22,
+            ERASE_SECTORS = 0x40,
+            WRITE_MEMORY = 0x41,
+            FLUSH_BUFFERS = 0x42,
 
-            SET_HASH = 0x30,
-            TEST_HASH = 0x31,
-            DISABLE_HASH = 0x32
+            SET_HASH = 0x50,
+            TEST_HASH = 0x51,
+            DISABLE_HASH = 0x52
         }SFOC_Opcodes;
+
+        enum sfoc_domains{
+            RESERVED=0x00,
+            OS=0x01,
+            FL=0x02
+        };
 
 
         /* stm variables
@@ -200,6 +207,7 @@ class SFOC{
         static void send_discovery();
         static void send_version();
         static void send_id();
+        static void send_domain();
         static void go_flashloader();
         static void erase_flash();
         static void write_request();
