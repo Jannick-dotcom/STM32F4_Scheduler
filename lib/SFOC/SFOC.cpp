@@ -281,10 +281,6 @@ void SFOC::write_request(){
         uint16_t start_sector;
         uint16_t end_sector;
 
-        if(cmd.len != 5){
-            nack_cmd(sfoc_nack_reason::INVALID_PARAMETERS);
-            return;
-        }
 
         n_frames = cmd.data[0];
         n_bytes = n_frames*stream_bytes_in_frame;
@@ -405,10 +401,6 @@ void SFOC::set_hash(){
         // block holds hash itself, address and length of checksum area
         uint8_t seq;
     
-        if(cmd.len != 5){
-            nack_cmd(sfoc_nack_reason::INVALID_PARAMETERS);
-            return;
-        }
         /* receive data */
         state = stm_state::HASH_RCV;
 
@@ -426,11 +418,6 @@ void SFOC::set_hash(){
 void SFOC::rcv_hash(){
     #ifdef SFOC_FL_DOMAIN
         uint8_t seq;
-
-        if(cmd.len != 5){
-            nack_cmd(sfoc_nack_reason::INVALID_PARAMETERS);
-            return;
-        }
 
         seq = cmd.data[0];
         buffer[seq] = cmd.data[1];
@@ -657,7 +644,6 @@ void SFOC::rcv_stream(){
 
     #ifdef SFOC_FL_DOMAIN
         uint64_t val = in_frame.Val;
-        uint8_t dlc = in_frame.dlc;
         uint16_t id = in_frame.ID;
         uint8_t seq;
         uint16_t buffer_idx;
@@ -669,19 +655,19 @@ void SFOC::rcv_stream(){
             return;
         }
 
-
-        if(dlc == 7){
-            seq = (uint8_t)((val&0xFF000000000000) >> 48);
+        seq = (uint8_t)(val&0xFF);
+        if(seq != 0xFF){
+            
 
             if(seq < expected_frames){
                 /* frames of 6 byte must be split into two buffer slots */
                 buffer_idx = (uint16_t)(seq*stream_bytes_in_frame/4);
                 if(seq%2==0){
-                    buffer[buffer_idx] = (uint32_t)(val & 0xFFFFFFFF);
-                    buffer[buffer_idx+1] |= (uint32_t)((val & 0xFFFF00000000) >> 32);  // lower 2 bytes
+                    buffer[buffer_idx] = (uint32_t)((val & 0xFFFFFFFF00) >> 8);
+                    buffer[buffer_idx+1] |= (uint32_t)((val & 0xFFFF0000000000) >> 40);  // lower 2 bytes
                 }else{
-                    buffer[buffer_idx] |= (uint32_t)((val&0xFFFF) << 16);  // upper 2 bytes
-                    buffer[buffer_idx+1] = (uint32_t)((val&0xFFFFFFFF0000)>>16);
+                    buffer[buffer_idx] |= (uint32_t)((val&0xFFFF00) << 8);  // upper 2 bytes
+                    buffer[buffer_idx+1] = (uint32_t)((val&0xFFFFFFFF000000)>>24);
                 }
                 buffer_mask.reset(seq);
             }
@@ -689,7 +675,7 @@ void SFOC::rcv_stream(){
                 nack_cmd(sfoc_nack_reason::INVALID_PARAMETERS);
             }
         }
-        else if(dlc == 1 && val==0xFF){
+        else if(seq==0xFF){
             /* end of stream frame 
              *
              * check for missing frames 
