@@ -4,7 +4,7 @@
 #include <stm32f4xx_hal.h>
 #include <system_stm32f4xx.h>
 #include <stdint.h>
-#include "StallardOSconfig.h"
+// #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
 #include "StallardOSGPIO.hpp"
 #include <iostream>

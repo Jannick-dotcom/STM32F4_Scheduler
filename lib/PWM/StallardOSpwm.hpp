@@ -2,7 +2,7 @@
 #define StallardOSPWM_h
 
 #include "StallardOSGPIO.hpp"
-#include "StallardOSconfig.h"
+// #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
 
 #include <stm32f4xx_hal.h>

@@ -1,7 +1,7 @@
 #ifndef StallardOSCAN_h
 #define StallardOSCAN_h
 
-#include "StallardOSconfig.h"
+// #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
 

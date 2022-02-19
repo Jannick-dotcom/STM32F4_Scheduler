@@ -1,7 +1,7 @@
 #ifndef StallardOSDAC_h
 #define StallardOSDAC_h
 
-#include "StallardOSconfig.h"
+// #include "StallardOSconfig.h"
 #include "StallardOSGPIO.hpp"
 #include "StallardOSsem.hpp"
 
