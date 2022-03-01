@@ -36,8 +36,13 @@ struct function_struct
   volatile stack_T *Stack;             //Stack pointer
   volatile stack_T *stackBase;         //lowest address of stack allocation, used for MPU config
   uint32_t stackSize;                  //Number of elements possible to store on stack, NOT size in bytes
-  uint8_t stackSize_MPU;
   uint8_t staticAlloc;                    //Is the stack static or dynamically allocated?
+
+  #ifdef useMPU
+    uint8_t mpu_regionSize;             // might be offset from atcual stack pointer, if subregions are used
+    uint32_t mpu_baseAddress;           // might be offset from actual size, if subregions are used
+    uint8_t mpu_subregions;
+  #endif // useMPU
 
   volatile struct function_struct *prev; //für verkettete liste
   volatile struct function_struct *next; //für verkettete liste

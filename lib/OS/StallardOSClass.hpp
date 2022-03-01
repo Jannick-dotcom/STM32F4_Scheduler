@@ -22,7 +22,6 @@ private:
   void createTCBs(void);                                            //create the structs for all the functions (count is "countTasks")
   void initShared(void);
   void initMPU(void);                                               // setup the static part of the MPU configuration
-  uint8_t bytesToMPUSize(stack_T bytes);                             // convert bytes to MPU size macro
 
   struct function_struct *initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0);
 

@@ -9,31 +9,12 @@ extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
 
+#
 #ifdef useMPU
-static MPU_Region_InitTypeDef MPU_StackCfg = {
-    /* these values are always the same (for stack)
-     * do not assign them at each context switch
-     */
-    .Enable = MPU_REGION_ENABLE,
-    .TypeExtField = MPU_TEX_LEVEL0,
-    .SubRegionDisable = 0x00,
-
-    /* stack region is
-    * Full access
-    * shareable
-    * cachable
-    * not bufferable
-    * not executable
-    */
-    .AccessPermission = MPU_REGION_FULL_ACCESS,
-    .IsShareable = MPU_ACCESS_SHAREABLE,
-    .IsCacheable = MPU_ACCESS_CACHEABLE,
-    .IsBufferable = MPU_ACCESS_NOT_BUFFERABLE,
-    .DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE,
-
-    /* always use MPU region 3 for stack */
-    .Number = MPU_REGION_NUMBER3
-};
+volatile uint8_t mpu_subregion_disable;
+volatile uint32_t mpu_baseAddress;
+volatile uint8_t mpu_size;
+volatile uint32_t rasr_content;
 #endif
 
 /**
@@ -201,70 +182,49 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "STR r2, [r1]\n");
 }
 
-/**
- * @brief exact copy of HAL_MPU_ConfigRegion, but inlined
- * 
- */
-__attribute__((always_inline)) inline static void inline_mpu_configRegion(MPU_Region_InitTypeDef *MPU_Init){
-    /* Set the Region number */
-    MPU->RNR = MPU_Init->Number;
 
-    if ((MPU_Init->Enable) != RESET)
-    {
-        /* Check the parameters */
-        assert_param(IS_MPU_INSTRUCTION_ACCESS(MPU_Init->DisableExec));
-        assert_param(IS_MPU_REGION_PERMISSION_ATTRIBUTE(MPU_Init->AccessPermission));
-        assert_param(IS_MPU_TEX_LEVEL(MPU_Init->TypeExtField));
-        assert_param(IS_MPU_ACCESS_SHAREABLE(MPU_Init->IsShareable));
-        assert_param(IS_MPU_ACCESS_CACHEABLE(MPU_Init->IsCacheable));
-        assert_param(IS_MPU_ACCESS_BUFFERABLE(MPU_Init->IsBufferable));
-        assert_param(IS_MPU_SUB_REGION_DISABLE(MPU_Init->SubRegionDisable));
-        assert_param(IS_MPU_REGION_SIZE(MPU_Init->Size));
-        
-        MPU->RBAR = MPU_Init->BaseAddress;
-        MPU->RASR = ((uint32_t)MPU_Init->DisableExec             << MPU_RASR_XN_Pos)   |
-                    ((uint32_t)MPU_Init->AccessPermission        << MPU_RASR_AP_Pos)   |
-                    ((uint32_t)MPU_Init->TypeExtField            << MPU_RASR_TEX_Pos)  |
-                    ((uint32_t)MPU_Init->IsShareable             << MPU_RASR_S_Pos)    |
-                    ((uint32_t)MPU_Init->IsCacheable             << MPU_RASR_C_Pos)    |
-                    ((uint32_t)MPU_Init->IsBufferable            << MPU_RASR_B_Pos)    |
-                    ((uint32_t)MPU_Init->SubRegionDisable        << MPU_RASR_SRD_Pos)  |
-                    ((uint32_t)MPU_Init->Size                    << MPU_RASR_SIZE_Pos) |
-                    ((uint32_t)MPU_Init->Enable                  << MPU_RASR_ENABLE_Pos);
-    }
-    else
-    {
-        MPU->RBAR = 0x00U;
-        MPU->RASR = 0x00U;
-    }
-}
+__attribute__((always_inline)) inline static void inline_set_mpu(){
+    #ifdef useMPU
+        /* KEEP THIS ASSIGNMENTS!
+        * the "compiler" thinks the subregion struct attr is not used
+        * and optimizes it away otherwise.
+        * Do not directly assign the struct attrs for this reason.
+        */
+        mpu_subregion_disable = currentTask->mpu_subregions;
+        mpu_size = currentTask->mpu_regionSize;
+        mpu_baseAddress = currentTask->mpu_baseAddress;
 
-/**
- * @brief exact copy of HAL_MPU_Disable, but inlined
- * 
- */
-__attribute__((always_inline)) inline static void inline_mpu_disable(void){
-    __DMB();
-    /* Disable fault exceptions */
-    SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;
-    /* Disable the MPU and clear the control register*/
-    MPU->CTRL = 0U;
-}
+        rasr_content = ((uint32_t)MPU_INSTRUCTION_ACCESS_DISABLE       << MPU_RASR_XN_Pos)   |
+                    ((uint32_t)MPU_REGION_FULL_ACCESS               << MPU_RASR_AP_Pos)   |
+                    ((uint32_t)MPU_TEX_LEVEL0                       << MPU_RASR_TEX_Pos)  |
+                    ((uint32_t)MPU_ACCESS_SHAREABLE                 << MPU_RASR_S_Pos)    |
+                    ((uint32_t)MPU_ACCESS_CACHEABLE                 << MPU_RASR_C_Pos)    |
+                    ((uint32_t)MPU_ACCESS_NOT_BUFFERABLE            << MPU_RASR_B_Pos)    |
+                    ((uint32_t)mpu_subregion_disable                << MPU_RASR_SRD_Pos)  |
+                    ((uint32_t)mpu_size                             << MPU_RASR_SIZE_Pos) |
+                    ((uint32_t)MPU_REGION_ENABLE                    << MPU_RASR_ENABLE_Pos);
 
-/**
- * @brief exact copy of HAL_MPU_Enable, but inlined
- * 
- */
-__attribute__((always_inline)) inline static void inline_mpu_enable(uint32_t MPU_Control){
-    /* Enable the MPU */
-    MPU->CTRL = MPU_Control | MPU_CTRL_ENABLE_Msk;
-    
-    /* Enable fault exceptions */
-    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
-    
-    /* Ensure MPU setting take effects */
-    __DSB();
-    __ISB();
+
+        // disable the MPU befero write
+        __DMB();
+        SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;
+        MPU->CTRL = 0U;
+
+
+        // configure the MPU, most values are static
+        // only address, size and disableRegion are dynamic values
+        MPU->RNR = MPU_REGION_NUMBER4;
+        MPU->RBAR = mpu_baseAddress;
+        MPU->RASR = rasr_content;
+
+
+        // enable MPU after configuration is done
+        MPU->CTRL = MPU_PRIVILEGED_DEFAULT | MPU_CTRL_ENABLE_Msk;
+        SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+
+        __DSB();
+        __ISB();
+    #endif
 }
 
 
@@ -422,11 +382,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
     switchTask();
 
     #ifdef useMPU
-        inline_mpu_disable();
-        MPU_StackCfg.BaseAddress = (stack_T)currentTask->stackBase;
-        MPU_StackCfg.Size = currentTask->stackSize_MPU;
-        inline_mpu_configRegion(&MPU_StackCfg);
-        inline_mpu_enable(MPU_PRIVILEGED_DEFAULT);
+        inline_set_mpu();
     #endif
 
     enable_interrupts(); //Enable all interrupts
