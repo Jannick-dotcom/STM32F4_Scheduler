@@ -173,8 +173,10 @@ interruptNumber pinToInterruptNumber(uint8_t pin)
 void StallardOSGPIO::setISR(void (*function)())
 {
     interruptNumber temp = pinToInterruptNumber(pin);
+    CALL_PRIVILEGED();
     HAL_NVIC_SetPriority(IRQn_Type(temp), 0, 0);
     HAL_NVIC_EnableIRQ(IRQn_Type(temp));
+    CALL_UNPRIVILEGED();
     functions[this->pin] = (volatile void *)function;
 }
 
@@ -291,6 +293,7 @@ bool StallardOSGPIO::write(bool state)
 
         return state;
     }
+    this->sem.give();
     return 0;
 }
 
