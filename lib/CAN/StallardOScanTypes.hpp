@@ -32,28 +32,27 @@ struct CAN_Signal
     const uint16_t startbit;
     const uint8_t rowcount;
     const uint8_t isMotorola;
-    // const float factor;
-    // const float offset;
-public:
+    const float factor;
+    const float offset;
+
     volatile valueTemplate rawValue;
-    // volatile float physValue;
+public:
+    volatile float physValue;
     
     CAN_Signal(valueTemplate val, uint8_t bitcount, uint16_t start, uint8_t row, uint8_t isMoto, float factor, float offset) : 
     countOfBits(bitcount), 
     startbit(start), 
     rowcount(row), 
-    isMotorola(isMoto)//,
-    // factor(factor),
-    // offset(offset)
+    isMotorola(isMoto),
+    factor(factor),
+    offset(offset)
     {
         rawValue = val;
-        // countOfBits = bitcount;
-        // startbit = start;
     }
     uint64_t build()
     {
+        rawValue = (physValue - offset) / factor;
         uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1));
-        // val = val * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
             uint64_t tempVal = val;
@@ -73,7 +72,6 @@ public:
     void unbuild(const uint64_t Val)
     {
         rawValue = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
-        // rawValue = rawValue * factor + offset;
         if(isMotorola && countOfBits > 8)
         {
             uint64_t tempVal = rawValue;
@@ -85,10 +83,11 @@ public:
             }
             rawValue = tempOut;
         }
+        physValue = rawValue * factor + offset;
     }
-    CAN_Signal operator=(valueTemplate val)
+    CAN_Signal operator=(float val)
     {
-        rawValue = val;
+        physValue = val;
         return *this;
     }
     operator int() const { return rawValue; }
