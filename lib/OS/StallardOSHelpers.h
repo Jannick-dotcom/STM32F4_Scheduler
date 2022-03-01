@@ -17,6 +17,7 @@ extern "C"
   void StallardOS_goBootloader();
   void enable_interrupts();
   void disable_interrupts();
+  void taskOnEnd(void);
 #ifdef __cplusplus
 }
 #endif
