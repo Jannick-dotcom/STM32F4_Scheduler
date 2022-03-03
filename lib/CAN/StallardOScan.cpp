@@ -11,6 +11,10 @@ StallardOSCAN AD_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),S
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
 #endif
+#ifdef STM32F446xx
+StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
+StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
+#endif
 
 bool StallardOSCAN::can1used = false;
 bool StallardOSCAN::can2used = false;

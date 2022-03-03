@@ -118,5 +118,11 @@ extern StallardOSCAN AD_CAN;
 #define AD_CAN_PORT StallardOSCAN1
 #define MS4_CAN_PORT StallardOSCAN2
 #endif
+#ifdef STM32F446xx
+extern StallardOSCAN MS4_CAN;
+extern StallardOSCAN AD_CAN;
+#define AD_CAN_PORT StallardOSCAN1
+#define MS4_CAN_PORT StallardOSCAN2
+#endif
 
 #endif
