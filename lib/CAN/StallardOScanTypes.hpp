@@ -91,6 +91,7 @@ public:
         return *this;
     }
     operator int() const { return rawValue; }
+    operator float() const { return physValue; }
 };
 
 #endif
