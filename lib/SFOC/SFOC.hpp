@@ -177,6 +177,7 @@ class SFOC{
         static uint32_t last_activity;  // timestamp of last activity
 
         static StallardOSCANFilterDelayed filter;
+        static StallardOSCANFilterDelayed ms4EngRPM;
         static enum stm_state state;
         static sfoc_status state_out;
         
@@ -185,7 +186,8 @@ class SFOC{
         static sfoc_message cmd;
         static sfoc_message response;
         static StallardOSCanMessage out_frame;
-
+        static STOS_CAN_PDU_Ignition_Rev_Ath ms4Message;
+        static float RPM;
         static SharedParams s_params;
 
 

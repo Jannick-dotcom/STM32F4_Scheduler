@@ -42,6 +42,7 @@ StallardOSCanMessage SFOC::out_frame;
 SharedParams SFOC::s_params;
 
 StallardOSCANFilterDelayed SFOC::filter(SFOC_ECU_ID, SFOC_DISCOVERY_ID, AD_CAN_PORT);
+StallardOSCANFilterDelayed SFOC::ms4EngRPM(STOS_CAN_ID_States_Temp_Press, 0, MS4_CAN_PORT);
 
 
 void SFOC::setup(uint32_t timeout_ms){
@@ -193,6 +194,8 @@ void SFOC::send_domain(){
  *        sends NACK otherwise
  */
 void SFOC::go_flashloader(){
+    if(SFOC::RPM == 0)
+    {
     #ifdef SFOC_OS_DOMAIN
         /* set arguments for Flashloader */
         s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
@@ -202,6 +205,11 @@ void SFOC::go_flashloader(){
         nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
     #endif  // STOS_VERSION
     // do nothing if in FL
+    }
+    else
+    {
+        nack_cmd(sfoc_nack_reason::INVALID_PARAMETERS);
+    }
 }
 
 
@@ -850,6 +858,11 @@ SFOC_Status SFOC::stm_iterate(){
         return state_out;
     }
 
+    ret = MS4_CAN.receiveMessage(&SFOC::ms4Message);
+    if(ret){
+        ms4Message.unbuild();
+        SFOC::RPM = ms4Message.rev;
+    }
     /* we've got a valid frame */
     STM_step();
     last_activity = HAL_GetTick();
