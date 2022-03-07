@@ -4,11 +4,6 @@
 #include "StallardOScanTypes.hpp"
 #include <math.h>
 
-inline uint64_t jk_pow(uint8_t exp)
-{
-	return (1 << exp);
-}
-
 struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage 
 {
 public:

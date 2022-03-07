@@ -12,7 +12,7 @@ outfileStructs = open("lib/CAN/StallardOScanStructs.hpp", "w") #the output for s
 
 outfileStructs.write("#ifndef StallardOScanStructs_hpp\n#define StallardOScanStructs_hpp\n")
 outfileStructs.write('#include "stdint.h"\n#include "StallardOScanTypes.hpp"\n#include <math.h>\n\n') #include the integer types to the struct file
-outfileStructs.write("inline uint64_t jk_pow(uint8_t exp)\n{\n\treturn (1 << exp);\n}\n\n")
+# outfileStructs.write("inline uint64_t jk_pow(uint8_t exp)\n{\n\treturn (1 << exp);\n}\n\n")
 
 infileText = infile.read(-1) #read all stuff from the csv
 infileArray = infileText.split("\n") #split the text into an array containing the lines

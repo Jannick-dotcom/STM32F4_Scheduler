@@ -29,6 +29,7 @@ template <typename valueTemplate>
 struct CAN_Signal
 {
     const uint8_t countOfBits;
+private:
     const uint16_t startbit;
     const uint8_t rowcount;
     const uint8_t isMotorola;

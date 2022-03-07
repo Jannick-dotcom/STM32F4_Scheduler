@@ -12,6 +12,10 @@
 
 #include "StallardOSTime.h"
 
+extern StallardOSCanMessage *canarray[];
+extern uint16_t idToOffset(uint16_t id);
+extern void copyToBuffer(const StallardOSCanMessage *msg);
+
 extern "C" void StallardOSGeneralFaultHandler();
 
 class StallardOSCAN
@@ -76,14 +80,16 @@ public:
     * @param[in,out] msg the message container to be filled
     * @return true if a message is received, false otherwise
     */
-    bool receiveMessage(StallardOSCanMessage *msg)
-    {
-        if (receiveMessage(msg, msg->ID))
-        {
-            return true;
-        }
-        return false;
-    }
+    bool receiveMessage(StallardOSCanMessage *msg);
+
+    /**
+    * receive a can message from an alternate software buffer.
+    * after reading the message persists -> only one bufferspace per message
+    *
+    * @param[in,out] msg the message container to be filled
+    * @return true if a message is received, false otherwise
+    */
+    bool receiveMessageOneMsgBuff(StallardOSCanMessage *msg);
 
     /**
     * send a can message.
