@@ -392,13 +392,19 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
     HAL_IncTick();
     if(currentTask != NULL)
     {
-        if(currentTask->Stack > (currentTask->stackBase + currentTask->stackSize) || currentTask->Stack < currentTask->stackBase)
+        struct function_struct *temp = currentTask;
+        do
         {
-            #ifndef UNIT_TEST
-            asm("bkpt");  //Zeige debugger
-            #endif
-            currentTask->executable = 0;
+            if(temp->Stack > (temp->stackBase + temp->stackSize) || temp->Stack < temp->stackBase)
+            {
+                #ifndef UNIT_TEST
+                asm("bkpt");  //Zeige debugger STACK OVERFLOW!!!!
+                #endif
+                temp->executable = 0;
+            }
+            temp = temp->next;
         }
+        while (temp != currentTask); 
         findNextFunction();
         if(currentTask != nextTask && !(currentTask == taskMainStruct && nextTask == NULL))
         {
