@@ -6,6 +6,21 @@
 #include "StallardOSconfig.h"
 #include "StallardOSsyscalls.h"
 
+
+
+
+
+#ifndef UNIT_TEST
+  #define DEBUGGER_BREAK() asm("bkpt")
+#else
+  #define DEBUGGER_BREAK()
+#endif
+
+
+#define GEN_HARDFAULT() DEBUGGER_BREAK();\
+                        StallardOSGeneralFaultHandler()
+
+
 #define functionModifier (uint32_t)0xFFFFFFFE //Use the function pointer with lowest bit zero
 // #define sysTickTicks (uint32_t)(SystemCoreClock / 1000)
 

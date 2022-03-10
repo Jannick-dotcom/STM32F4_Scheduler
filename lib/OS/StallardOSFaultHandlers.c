@@ -62,6 +62,7 @@ void NMI_Handler()
 
 void MemManage_Handler()
 {
+    DEBUGGER_BREAK();
     StallardOSGeneralFaultHandler();
 }
 

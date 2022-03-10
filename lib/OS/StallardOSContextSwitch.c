@@ -9,7 +9,7 @@ extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
 
-#
+
 #ifdef useMPU
 volatile uint8_t mpu_subregion_disable;
 volatile uint32_t mpu_baseAddress;
@@ -193,7 +193,8 @@ __attribute__((always_inline)) inline static void inline_set_mpu(){
         mpu_subregion_disable = currentTask->mpu_subregions;
         mpu_size = currentTask->mpu_regionSize;
         mpu_baseAddress = currentTask->mpu_baseAddress;
-
+        
+        // taken from HAL_MPU_ConfigRegion
         rasr_content = ((uint32_t)MPU_INSTRUCTION_ACCESS_DISABLE       << MPU_RASR_XN_Pos)   |
                     ((uint32_t)MPU_REGION_FULL_ACCESS               << MPU_RASR_AP_Pos)   |
                     ((uint32_t)MPU_TEX_LEVEL0                       << MPU_RASR_TEX_Pos)  |
@@ -205,22 +206,22 @@ __attribute__((always_inline)) inline static void inline_set_mpu(){
                     ((uint32_t)MPU_REGION_ENABLE                    << MPU_RASR_ENABLE_Pos);
 
 
-        // disable the MPU befero write
+        // disable the MPU before write
         __DMB();
-        SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;
-        MPU->CTRL = 0U;
+        SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;  // disable fault exceptions
+        MPU->CTRL = 0U;  // disable and clear CTRL register
 
 
         // configure the MPU, most values are static
         // only address, size and disableRegion are dynamic values
-        MPU->RNR = MPU_REGION_NUMBER4;
+        MPU->RNR = MPU_REGION_NUMBER7;
         MPU->RBAR = mpu_baseAddress;
         MPU->RASR = rasr_content;
 
 
-        // enable MPU after configuration is done
-        MPU->CTRL = MPU_PRIVILEGED_DEFAULT | MPU_CTRL_ENABLE_Msk;
-        SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+        // re-enable MPU after configuration is done
+        MPU->CTRL = MPU_PRIVILEGED_DEFAULT | MPU_CTRL_ENABLE_Msk;  // enable mpu
+        SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;  // re-enable fault exceptions
 
         __DSB();
         __ISB();
@@ -263,6 +264,9 @@ __attribute__((always_inline)) inline void disable_privilege(){
  *        MUST be inlinend, to allow bx command to work
  */
 __attribute__((always_inline)) inline void start_mainTask(){
+
+    // HAL_MPU_Disable(); // disable for first task? TODO: apply config for first task in init
+
     __ASM volatile("LDR r1, =currentTask\n"
     "LDR r2, [r1]\n"
     "LDR r0, [r2]\n"

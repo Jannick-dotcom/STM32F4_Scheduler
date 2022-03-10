@@ -1,5 +1,8 @@
 #include "StallardOSMPU.hpp"
 
+#include "StallardOSSerial.hpp"
+
+
 int StallardOSMPU::fix_config(MPU_Region_InitTypeDef *config, stack_T start_address, stack_T size){
 
   /* for correctly setting up the region attributes
@@ -8,74 +11,84 @@ int StallardOSMPU::fix_config(MPU_Region_InitTypeDef *config, stack_T start_addr
    */
 
     uint8_t sub_mask = 0;
-    uint8_t start_section;
-    uint8_t end_section;
+    uint8_t start_subsection;
+    uint8_t end_subsection;
 
     // check for valid region size
     // but ignore 0
     // due to limits of 32bit variable, no upper limit needs to be checked
     if((size > 0 && size < 32)){
+        DEBUGGER_BREAK();
         return -1;
     }
 
     // manage sub sections
     // only if resulting alignment size is larger equal to 256
-    if(start_address != 0 && size != 0 && size > 128){
+    // otherwise subregions are not supported
+    if(start_address != 0 && size != 0 && size >= 256){
 
-        // first get the next biggest section size
-        uint32_t align_size = ceilPow2(size);
+        // round up the requested region size
+        // to the next possible size (using full regions)
+        uint32_t aligned_size = ceilPow2(size);
 
-        // next test, if a valid config is still possible
-        // for this, the base address must start at a subregion
-        // and the length must end at another (or the same) subregion
-        uint32_t sub_size = align_size/8;
+
+        // test 1st condition
+        // requisted address must exactly fit into any number of subregions
+        // combination, if not, config not possible
+        uint32_t sub_size = aligned_size/8;
         if(size%sub_size){
-            // yields non-zero when sizes are not compatible
+            DEBUGGER_BREAK();
             return -1;
         }
 
-        // test if the start address is aligned to size
-        // or if it needs to be aligned to a subsection
-        uint32_t addr_misalign = start_address%align_size;
+        // 2nd condition
+        // start address must be aligned to size of entire region
+        // misalignmend can be fixed with a subregion offsett
+        uint32_t addr_misalign = start_address%aligned_size;
         if(addr_misalign == 0){
-            start_section = 0;  // good alignment
+            start_subsection = 0;  // good alignment
         }
         else{
             // determin in which subsection the start address is laying
             if(addr_misalign%sub_size == 0){
-                start_section = addr_misalign/sub_size;
+                start_subsection = addr_misalign/sub_size;
             }
             else{
-                // no sub-alignment possible
+                // start address doesn't fit any subregion start address
+                DEBUGGER_BREAK();
                 return -1;
             }
         }
 
         // in case we have a start_section, the start_address needs to be updated
-        if(start_section){
-            start_address = start_address - (start_section*sub_size);
+        if(start_subsection){
+            // calculate the mpu region start address based on the subregion offset
+            // (reverse the calculation)
+            start_address = start_address - (start_subsection*sub_size);
         }
 
-        // next get the end section, 
-        // based on the prev. selected start_section
-        end_section = start_section + (size/sub_size)-1;
+        // next calc how many subregions are required to fit the requested size, 
+        // the end section is calculated by taking the prev. determined start subregion
+        // adding the amount of subregions
+        // -> incr. steps are size of subregion length
+        end_subsection = start_subsection + (size/sub_size)-1;
 
-        // memory does not fit into selected region
-        // align_size must be increased
-        if(end_section > 7){
+        // there cannot be more than 8 subregions
+        if(end_subsection > 7){
+            DEBUGGER_BREAK();
             return -1;
         }
 
         // disable all sections not within the selected limits        
         for(int i=0; i<8; i++){
-            if(i < start_section || i > end_section){
+            if(i < start_subsection || i > end_subsection){
                 sub_mask |= (1<<i);
             }
         }
 
         config->SubRegionDisable = sub_mask;
         config->BaseAddress = start_address;
-        config->Size = bytesToMPUSize(align_size);
+        config->Size = bytesToMPUSize(aligned_size);  // this may be larger than the requested size
     }
     else if(start_address > 0 || size > 0){
         // subregions not possible, due to missing information
@@ -93,6 +106,7 @@ int StallardOSMPU::fix_config(MPU_Region_InitTypeDef *config, stack_T start_addr
         } 
         if((size & (size-1)) != 0){
             // filter out non pow2 numbers
+            DEBUGGER_BREAK();
             return -1;
         }
         else{
@@ -102,6 +116,7 @@ int StallardOSMPU::fix_config(MPU_Region_InitTypeDef *config, stack_T start_addr
 
         // base address alignment check is remaining
         if(start_address%size != 0){
+            DEBUGGER_BREAK();
             return -1;
         }
         
@@ -125,14 +140,18 @@ int StallardOSMPU::write_config(MPU_Region_InitTypeDef *config, stack_T start_ad
     config_result = fix_config(config, start_address, size);
 
     if(config_result < 0){
+        DEBUGGER_BREAK();
         return config_result;
     }
-    config->SubRegionDisable=0; // TODO: lolol
+
+    //TODO: remove debug excemption
+    config->SubRegionDisable=0;
     HAL_MPU_ConfigRegion(config);
 
     if(was_enabled){
         enable(MPU_PRIVILEGED_DEFAULT);
     }
+
     return 0;
 }
 

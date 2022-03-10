@@ -76,8 +76,6 @@ class StallardOSMPU{
 
     private:
 
-        
-
         /**
          * @brief ceil to the next power of 2
          *        only applicable for 32bit
