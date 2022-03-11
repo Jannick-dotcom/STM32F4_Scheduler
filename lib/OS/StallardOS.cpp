@@ -244,18 +244,18 @@ void StallardOS::initMPU
    * 
    */
 
-  // MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
-  // MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 
-  // MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
-  // MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
-  // MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
-  // MPU_Init.Number = MPU_REGION_NUMBER3;
-  // ret = StallardOSMPU::fix_config(&MPU_Init, (stack_T)&_sshared, (stack_T)(&_eshared - &_sshared));
-  // if(ret < 0)
-  //   DEBUGGER_BREAK();
-  // StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, (stack_T)(&_eshared - &_sshared));
+  MPU_Init.Number = MPU_REGION_NUMBER3;
+  ret = StallardOSMPU::fix_config(&MPU_Init, (stack_T)&_sshared, 64);
+  if(ret < 0)
+    DEBUGGER_BREAK();
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, 64);
 
 
   /* configure Peripherals 
@@ -290,7 +290,7 @@ void StallardOS::initMPU
   /* configure Vendior-specific memory */
   /* not avail */
 
-  // TODO: debug, allow access to entire RAM
+  // TODO: rm debug, allow access to entire RAM
   MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
   MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 

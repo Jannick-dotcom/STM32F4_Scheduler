@@ -58,7 +58,7 @@ SECTIONS
     *(.shared)
     *(.shared.*)
     KEEP(*(.shared))
-    . = ALIGN(16);
+    . = ALIGN(4);
     _eshared = .;
     __shared_end__ = _eshared;
   } >SHARED
