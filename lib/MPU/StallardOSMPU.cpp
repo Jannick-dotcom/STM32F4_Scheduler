@@ -139,7 +139,7 @@ int StallardOSMPU::write_config(MPU_Region_InitTypeDef *config, stack_T start_ad
 
     config_result = fix_config(config, start_address, size);
 
-    if(config_result < 0){
+    if(config_result < 0 && !force_write){
         DEBUGGER_BREAK();
         return config_result;
     }

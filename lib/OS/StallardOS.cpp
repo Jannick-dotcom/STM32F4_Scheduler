@@ -136,6 +136,7 @@ void StallardOS::createTCBs()
   }
 }
 
+
 void StallardOS::initShared(void){
 
   /* constructor will init the struct */
@@ -154,10 +155,8 @@ void StallardOS::initShared(void){
   #endif
 }
 
-void StallardOS::initMPU
-(void){
 
-  int ret;
+void StallardOS::initMPU(void){
 
   /* manually disable MPU here
    * to not reenable it at every single configuration step
@@ -189,10 +188,10 @@ void StallardOS::initMPU
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER0;
-  ret = StallardOSMPU::fix_config(&MPU_Init, FLASH_BASE, 0x80000); /* "G" model has 1MB flash TODO: make controller dependant */
-  if(ret < 0)
-    DEBUGGER_BREAK();
-  StallardOSMPU::write_config(&MPU_Init);  // do not overwrite base types
+  StallardOSMPU::write_config(&MPU_Init, FLASH_BASE, 0x80000);  // allow access to entire flash address region (same for all STM32s)
+  // "G" model has 1MB flash 
+  // TODO: make controller dependant ?
+  // TODO: revoke access to bootloader?
 
 
   /* configure SRAM .data region 
@@ -212,10 +211,7 @@ void StallardOS::initMPU
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER1;
-  ret = StallardOSMPU::fix_config(&MPU_Init, (stack_T)&_sdata, (stack_T)(&_edata - &_sdata));
-  if(ret < 0)
-    DEBUGGER_BREAK();
-  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sdata, (stack_T)(&_edata - &_sdata));
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sdata, ((stack_T)&_edata-(stack_T)&_sdata));
 
 
   /* configure .bss 
@@ -232,18 +228,12 @@ void StallardOS::initMPU
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER2;
-  ret = StallardOSMPU::fix_config(&MPU_Init, (stack_T)&_sbss, (stack_T)(&_ebss - &_sbss));
-  if(ret < 0)
-    DEBUGGER_BREAK();
-  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sbss, (stack_T)(&_ebss - &_sbss));
-
-
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sbss, ((stack_T)&_ebss - (stack_T)&_sbss));
 
   /* configure .shared 
    * same properties as .data settings
    * 
    */
-
   MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
   MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 
@@ -252,10 +242,7 @@ void StallardOS::initMPU
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER3;
-  ret = StallardOSMPU::fix_config(&MPU_Init, (stack_T)&_sshared, 64);
-  if(ret < 0)
-    DEBUGGER_BREAK();
-  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, 64);
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, 64); // requires update when changed, hardcoded in linker scripts
 
 
   /* configure Peripherals 
@@ -271,11 +258,7 @@ void StallardOS::initMPU
   MPU_Init.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER4;
-
-  ret = StallardOSMPU::fix_config(&MPU_Init, PERIPH_BASE, 0x20000000); /* 512MB */
-  if(ret < 0)
-    DEBUGGER_BREAK();
-  StallardOSMPU::write_config(&MPU_Init);
+  StallardOSMPU::write_config(&MPU_Init, PERIPH_BASE, 0x20000000);  /* 512MB for all STM32s*/
 
 
   /* configure EXT Ram */
@@ -290,20 +273,6 @@ void StallardOS::initMPU
   /* configure Vendior-specific memory */
   /* not avail */
 
-  // TODO: rm debug, allow access to entire RAM
-  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
-  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-
-  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
-  MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
-  MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-
-  MPU_Init.Number = MPU_REGION_NUMBER5;
-  ret = StallardOSMPU::fix_config(&MPU_Init, SRAM_BASE, 0x20000);
-  if(ret < 0)
-    DEBUGGER_BREAK();
-  StallardOSMPU::write_config(&MPU_Init, SRAM_BASE, 0x20000);
-
 
   /* configure Task stack 
    * sharable
@@ -315,7 +284,7 @@ void StallardOS::initMPU
    * to overlay all other regions
    */
 
-
+ 
 
   /* PRIVILEGED_DEFAULT will allow all access to privileged proceses
    * and to fault handlers

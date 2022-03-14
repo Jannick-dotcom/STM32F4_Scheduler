@@ -27,13 +27,13 @@ class StallardOSMPU{
          *        WARNING: will HardFault if called from user mode
          * 
          * @param config MPU configuration, holds affected region aswell
-         * @param start_address overwrite .BaseAddress of config struct, if != 0
-         * @param size overwrite .Size of config struct, if != 0
+         * @param start_address start addres of memory block, might get shiftet to front to match regions
+         * @param size desired size of section, must match subregion sizes
          * @param force_write try to set config, even when illegal alignment was detected, likely to cause Hardfault
          * @ref   fix_config
          * @return int - 0 on success, negative if alignment is wrong
          */
-        static int write_config(MPU_Region_InitTypeDef *config, stack_T start_address=0, stack_T size=0, bool force_write=0);
+        static int write_config(MPU_Region_InitTypeDef *config, stack_T start_address, stack_T size, bool force_write=0);
 
         /**
          * @brief wraps HAL enable method

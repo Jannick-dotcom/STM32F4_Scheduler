@@ -185,7 +185,7 @@ __attribute__((always_inline)) inline void switchTask(void)
 
 __attribute__((always_inline)) inline static void inline_set_mpu(){
     #ifdef useMPU
-        /* KEEP THIS ASSIGNMENTS!
+        /* KEEP THESE ASSIGNMENTS!
         * the "compiler" thinks the subregion struct attr is not used
         * and optimizes it away otherwise.
         * Do not directly assign the struct attrs for this reason.
