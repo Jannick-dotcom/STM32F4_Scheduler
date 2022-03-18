@@ -167,6 +167,9 @@ interruptNumber pinToInterruptNumber(uint8_t pin)
     case 15:
         return P15;
         break;
+    default:
+        return P15;
+        break;
     }
 }
 
