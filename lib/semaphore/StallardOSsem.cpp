@@ -21,8 +21,8 @@ void StallardOSSemaphore::give()
          * Restriction: val may NOT be written to using normal memory access
          */
         do{
-            tmp = __LDREXH(&val);
-        }while(__STREXH(tmp+1, &val) != 0);
+            tmp = 0x0000FFFF & __LDREXW(&val);
+        }while(__STREXW(tmp+1, &val) != 0);
         currentTask->semVal = nullptr;
 
         __DMB();  /* guarantees that semVal is nullptr when leaving method */
@@ -32,12 +32,11 @@ void StallardOSSemaphore::give()
 
 void StallardOSSemaphore::take()
 {
-    uint16_t tmp;
+    uint32_t tmp;
 
     if(currentTask != nullptr)
     {
         currentTask->semVal = &val;
-        currentTask->waitingForSemaphore = 1;
 
         /* ldrex and strex instructions use the internal exclusive monitor
          * do determin if another task has accessed the memory at that address
@@ -55,10 +54,9 @@ void StallardOSSemaphore::take()
         /* loop until the semaphore could get decremented */
         do{
             /* update the current val every iteration */
-            tmp = __LDREXH(&val);
-        }while(tmp < 1 || __STREXH(tmp-1, &val) != 0);  /* only try dec if not taken */
+            tmp = 0x0000FFFF & __LDREXW(&val);
+        }while(tmp < 1 || __STREXW((currentTask->id << 16) | (tmp-1), &val) != 0);  /* only try dec if not taken */
 
-        currentTask->waitingForSemaphore = 0;
         __DMB();  /* docs say we need this */
     }
 }
