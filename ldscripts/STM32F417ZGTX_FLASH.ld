@@ -50,6 +50,20 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Sections */
 SECTIONS
 {
+  /* Shared between loader and OS, must be identical config in both */
+  .shared (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _sshared = .;
+    __shared_start__ = _sshared;
+    *(.shared)
+    *(.shared.*)
+    KEEP(*(.shared))
+    . = ALIGN(4);
+    _eshared = .;
+    __shared_end__ = _eshared;
+  } >SHARED
+  
   /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
