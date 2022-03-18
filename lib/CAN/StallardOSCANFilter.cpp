@@ -29,7 +29,7 @@ void StallardOSCANFilter::setup(CANports can){
     n = countFilters;
     countFilters++;
     CAN_FilterTypeDef sFilterConfig;
-    CAN_HandleTypeDef *canhandle;
+    CAN_HandleTypeDef *canhandle = nullptr;
     if (can == StallardOSCAN1)
     {
         sFilterConfig.FilterBank = 0 + n;
