@@ -7,7 +7,7 @@
 // #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
 #include "StallardOSGPIO.hpp"
-#include <iostream>
+#include <string>
 
 extern "C" void StallardOSGeneralFaultHandler();
 
