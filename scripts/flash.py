@@ -63,9 +63,9 @@ def before_upload(source, target, env):
         print('CRITICAL: failed to find openoncd flag "-c program..."')
         return -1
 
-
+    # TODO: auto-detect flash offset
     # write the new upload command
-    cmd = 'program {$PROG_PATH} 0x800C000; reset; shutdown;'
+    cmd = 'program {$PROG_PATH} 0x8008000; reset; shutdown;'
     flags[c_idx+1] = cmd
     env['UPLOADERFLAGS'] = flags
 
