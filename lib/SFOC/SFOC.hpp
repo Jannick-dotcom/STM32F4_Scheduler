@@ -18,10 +18,7 @@
 #endif
 
 
-#define SFOC_VERSION (0x01) // 0.1
-
-#define SFOC_ECU_ID 0x123
-#define SFOC_HOST_ID 0x124
+#define SFOC_VERSION (0x10) // 1.0
 #define SFOC_DISCOVERY_ID 0x125
 
 
@@ -58,6 +55,7 @@ class SFOC{
             INVALID_CHECKSUM = 0x07,
             HASH_ERROR = 0x08,
             SECTOR_OCCUPIED = 0x09,
+            ENGINE_RUNNING = 0x0A,
         };
 
 
@@ -165,6 +163,10 @@ class SFOC{
             static uint8_t expected_frames;
 
             static void (*stream_callback)(); // member ptr, after full stream rcv
+        #elif defined(SFOC_OS_DOMAIN)
+            static StallardOSCANFilterDelayed ms4EngRPM;
+            static STOS_CAN_PDU_Ignition_Rev_Ath ms4Message;
+            static float RPM;
         #endif /* SFOC_FL_DOMAIN */
 
 
@@ -177,7 +179,6 @@ class SFOC{
         static uint32_t last_activity;  // timestamp of last activity
 
         static StallardOSCANFilterDelayed filter;
-        static StallardOSCANFilterDelayed ms4EngRPM;
         static enum stm_state state;
         static sfoc_status state_out;
         
@@ -186,8 +187,6 @@ class SFOC{
         static sfoc_message cmd;
         static sfoc_message response;
         static StallardOSCanMessage out_frame;
-        static STOS_CAN_PDU_Ignition_Rev_Ath ms4Message;
-        static float RPM;
         static SharedParams s_params;
 
 

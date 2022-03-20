@@ -22,6 +22,11 @@
     uint8_t SFOC::expected_frames;
 
     void (*SFOC::stream_callback)() = nullptr;
+#elif defined(SFOC_OS_DOMAIN)
+    StallardOSCANFilterDelayed SFOC::ms4EngRPM(STOS_CAN_ID_States_Temp_Press, 0, MS4_CAN_PORT);
+    STOS_CAN_PDU_Ignition_Rev_Ath SFOC::ms4Message;
+    float SFOC::RPM = 0;
+
 #endif /* SFOC_FL_DOMAIN */
 
 
@@ -40,13 +45,15 @@ SFOC::sfoc_message SFOC::response;
 StallardOSCanMessage SFOC::out_frame;
 
 SharedParams SFOC::s_params;
-
 StallardOSCANFilterDelayed SFOC::filter(SFOC_ECU_ID, SFOC_DISCOVERY_ID, AD_CAN_PORT);
-StallardOSCANFilterDelayed SFOC::ms4EngRPM(STOS_CAN_ID_States_Temp_Press, 0, MS4_CAN_PORT);
+
 
 
 void SFOC::setup(uint32_t timeout_ms){
     filter.setup();
+    #ifdef SFOC_OS_DOMAIN
+        ms4EngRPM.setup();
+    #endif
     SFOC::timeout_ms = timeout_ms;
     last_activity = HAL_GetTick();
 }
@@ -160,6 +167,8 @@ void SFOC::send_id(){
     // select chip id based on the used uC
     #if defined(STM32F417IG)
         response.data[1] = 1;
+    #elif defined(STM32F417ZG)
+        response.data[1] = 2;
     #else
         response.data[1] = 0;
     #endif
@@ -194,22 +203,21 @@ void SFOC::send_domain(){
  *        sends NACK otherwise
  */
 void SFOC::go_flashloader(){
-    if(SFOC::RPM == 0)
-    {
+    
     #ifdef SFOC_OS_DOMAIN
-        /* set arguments for Flashloader */
-        s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
-        // command is not ACKED, only FL_HELLO after reboot
-        CALL_SYSRESET();
+        if(SFOC::RPM == 0)
+        {
+            /* set arguments for Flashloader */
+            s_params.set_boot_type(SharedParams::boot_type::T_FLASH);
+            // command is not ACKED, only FL_HELLO after reboot
+            CALL_SYSRESET();
+        }
+        else{
+            nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
+        }
     #else
         nack_cmd(sfoc_nack_reason::WRONG_DOMAIN);
     #endif  // STOS_VERSION
-    // do nothing if in FL
-    }
-    else
-    {
-        nack_cmd(sfoc_nack_reason::INVALID_PARAMETERS);
-    }
 }
 
 
@@ -857,12 +865,15 @@ SFOC_Status SFOC::stm_iterate(){
         }
         return state_out;
     }
+    
+    #ifdef SFOC_OS_DOMAIN
+        ret = MS4_CAN.receiveMessage(&SFOC::ms4Message);
+        if(ret){
+            ms4Message.unbuild();
+            SFOC::RPM = ms4Message.rev;
+        }
+    #endif
 
-    ret = MS4_CAN.receiveMessage(&SFOC::ms4Message);
-    if(ret){
-        ms4Message.unbuild();
-        SFOC::RPM = ms4Message.rev;
-    }
     /* we've got a valid frame */
     STM_step();
     last_activity = HAL_GetTick();
