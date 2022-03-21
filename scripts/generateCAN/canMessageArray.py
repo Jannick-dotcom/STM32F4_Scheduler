@@ -1,7 +1,5 @@
 def readStructs():
     stringout = ""
-    # stringout += "#ifndef STALLARDOSCANARRAY_HPP\n"
-    # stringout += "#define STALLARDOSCANARRAY_HPP\n"
     stringout += "#include \"StallardOScanStructs.hpp\"\n"
     listPDUtype = []
     listPDUname = []
@@ -32,16 +30,17 @@ def readStructs():
     stringout += "\t\tif(idarray[i] == id) return i;\n"
     stringout += "\t}\n"
     stringout += "\treturn -1;\n"
-    stringout += "\t}\n"
+    stringout += "}\n"
 
     stringout += "void copyToBuffer(const StallardOSCanMessage *msg){\n"
     stringout += "\tif(msg == nullptr) return;\n"
     stringout += "\tuint16_t offset = idToOffset(msg->ID);\n"
-    stringout += "\t*(canarray[offset]) = *(msg);\n"
+    stringout += "\tif(offset < sizeof(canarray) / sizeof(StallardOSCanMessage*)) {\n"
+    stringout += "\t\t*(canarray[offset]) = *(msg);\n"
+    stringout += "\t}\n"
     stringout += "}\n"
 
 
-    # stringout += "#endif"
     with open("StallardOS_2021/lib/CAN/StallardOScanArray.cpp", "w") as outfile:
         outfile.write(stringout)
 
