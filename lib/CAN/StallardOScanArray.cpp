@@ -201,5 +201,8 @@ uint16_t idToOffset(uint16_t id) {
 void copyToBuffer(const StallardOSCanMessage *msg){
 	if(msg == nullptr) return;
 	uint16_t offset = idToOffset(msg->ID);
-	*(canarray[offset]) = *(msg);
+
+	if(offset < (sizeof(canarray)/sizeof(StallardOSCanMessage))){
+		*(canarray[offset]) = *(msg);	
+	}
 }
