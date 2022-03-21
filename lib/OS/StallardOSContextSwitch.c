@@ -194,23 +194,34 @@ __attribute__((always_inline)) inline static void inline_set_mpu(){
         mpu_size = currentTask->mpu_regionSize;
         mpu_baseAddress = currentTask->mpu_baseAddress;
         
-        // taken from HAL_MPU_ConfigRegion
-        rasr_content = ((uint32_t)MPU_INSTRUCTION_ACCESS_DISABLE       << MPU_RASR_XN_Pos)   |
-                    ((uint32_t)MPU_REGION_FULL_ACCESS               << MPU_RASR_AP_Pos)   |
-                    ((uint32_t)MPU_TEX_LEVEL0                       << MPU_RASR_TEX_Pos)  |
-                    ((uint32_t)MPU_ACCESS_SHAREABLE                 << MPU_RASR_S_Pos)    |
-                    ((uint32_t)MPU_ACCESS_CACHEABLE                 << MPU_RASR_C_Pos)    |
-                    ((uint32_t)MPU_ACCESS_NOT_BUFFERABLE            << MPU_RASR_B_Pos)    |
-                    ((uint32_t)mpu_subregion_disable                << MPU_RASR_SRD_Pos)  |
-                    ((uint32_t)mpu_size                             << MPU_RASR_SIZE_Pos) |
-                    ((uint32_t)MPU_REGION_ENABLE                    << MPU_RASR_ENABLE_Pos);
-
+        if(mpu_size > 0){
+            // taken from HAL_MPU_ConfigRegion
+            rasr_content = ((uint32_t)MPU_INSTRUCTION_ACCESS_DISABLE       << MPU_RASR_XN_Pos)   |
+                        ((uint32_t)MPU_REGION_FULL_ACCESS               << MPU_RASR_AP_Pos)   |
+                        ((uint32_t)MPU_TEX_LEVEL0                       << MPU_RASR_TEX_Pos)  |
+                        ((uint32_t)MPU_ACCESS_SHAREABLE                 << MPU_RASR_S_Pos)    |
+                        ((uint32_t)MPU_ACCESS_CACHEABLE                 << MPU_RASR_C_Pos)    |
+                        ((uint32_t)MPU_ACCESS_NOT_BUFFERABLE            << MPU_RASR_B_Pos)    |
+                        ((uint32_t)mpu_subregion_disable                << MPU_RASR_SRD_Pos)  |
+                        ((uint32_t)mpu_size                             << MPU_RASR_SIZE_Pos) |
+                        ((uint32_t)MPU_REGION_ENABLE                    << MPU_RASR_ENABLE_Pos);
+        }
+        else{
+            rasr_content = ((uint32_t)MPU_INSTRUCTION_ACCESS_DISABLE       << MPU_RASR_XN_Pos)   |
+                        ((uint32_t)MPU_REGION_FULL_ACCESS               << MPU_RASR_AP_Pos)   |
+                        ((uint32_t)MPU_TEX_LEVEL0                       << MPU_RASR_TEX_Pos)  |
+                        ((uint32_t)MPU_ACCESS_SHAREABLE                 << MPU_RASR_S_Pos)    |
+                        ((uint32_t)MPU_ACCESS_CACHEABLE                 << MPU_RASR_C_Pos)    |
+                        ((uint32_t)MPU_ACCESS_NOT_BUFFERABLE            << MPU_RASR_B_Pos)    |
+                        ((uint32_t)mpu_subregion_disable                << MPU_RASR_SRD_Pos)  |
+                        ((uint32_t)mpu_size                             << MPU_RASR_SIZE_Pos) |
+                        ((uint32_t)MPU_REGION_DISABLE                    << MPU_RASR_ENABLE_Pos);
+        }
 
         // disable the MPU before write
         __DMB();
         SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;  // disable fault exceptions
         MPU->CTRL = 0U;  // disable and clear CTRL register
-
 
         // configure the MPU, most values are static
         // only address, size and disableRegion are dynamic values
@@ -218,13 +229,13 @@ __attribute__((always_inline)) inline static void inline_set_mpu(){
         MPU->RBAR = mpu_baseAddress;
         MPU->RASR = rasr_content;
 
-
         // re-enable MPU after configuration is done
         MPU->CTRL = MPU_PRIVILEGED_DEFAULT | MPU_CTRL_ENABLE_Msk;  // enable mpu
         SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;  // re-enable fault exceptions
 
         __DSB();
         __ISB();
+        
     #endif
 }
 

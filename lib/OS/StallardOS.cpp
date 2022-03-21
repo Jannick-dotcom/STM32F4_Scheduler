@@ -344,30 +344,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
       break;
     }
   }
-  /////////////////////////////////////////////
-  #ifdef useMPU
-    // check if the given addresess can be used for a valid mpu configuartion
-    // then store them, to achieve fast reconfigure on context switch
-    int mpu_result;
-    MPU_Region_InitTypeDef mpu_cfg;
-    mpu_result = StallardOSMPU::fix_config(&mpu_cfg, (stack_T)stackPtr, stackSize);
-    
-    if(mpu_result < 0){
-      std_out.printf("MPU config is broken, ret: %d\n", mpu_result);
-      DEBUGGER_BREAK();
-      return nullptr;
-    }
-    else{
-      std_out.printf("Applied MPU config. Addr: %x, size: %d\n", stackPtr, stackSize);
-    }
 
-    function_struct_ptr->mpu_regionSize = mpu_cfg.Size;
-    function_struct_ptr->mpu_baseAddress = mpu_cfg.BaseAddress;
-    function_struct_ptr->mpu_subregions = mpu_cfg.SubRegionDisable;
-
-    // the remaining mpu config is thrown away, as it's not configured at this timepoint
-    // acutal config is applied in context switch
-  #endif // useMPU
 
   /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
@@ -375,7 +352,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->lastStart = 0;
   // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
-  function_struct_ptr->Stack = stackPtr + (stackSize - sizeof(stack_T)); //End of Stack
+  function_struct_ptr->Stack = (stack_T*)((stack_T)stackPtr + (stackSize - sizeof(stack_T))); //End of Stack
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
@@ -456,6 +433,33 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   }
   function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
   ptr->staticAlloc = 0;
+
+
+  /////////////////////////////////////////////
+  #ifdef useMPU
+    // check if the given addresess can be used for a valid mpu configuartion
+    // then store them, to achieve fast reconfigure on context switch
+    int mpu_result;
+    MPU_Region_InitTypeDef mpu_cfg;
+    mpu_result = StallardOSMPU::fix_config(&mpu_cfg, (stack_T)stackPtr, stackSize);
+    
+    if(mpu_result < 0){
+      std_out.printf("MPU config is broken, ret: %d\n", mpu_result);
+      DEBUGGER_BREAK();
+      return nullptr;
+    }
+    else{
+      std_out.printf("Applied MPU config. Addr: %x, size: %d\n", stackPtr, stackSize);
+    }
+
+    ptr->mpu_regionSize = mpu_cfg.Size;
+    ptr->mpu_baseAddress = mpu_cfg.BaseAddress;
+    ptr->mpu_subregions = mpu_cfg.SubRegionDisable;
+    // the remaining mpu config is thrown away, as it's not configured at this timepoint
+    // acutal config is applied in context switch
+  #endif // useMPU
+
+
   return ptr;
 }
 
