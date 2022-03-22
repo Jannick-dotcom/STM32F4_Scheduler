@@ -444,12 +444,8 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
     mpu_result = StallardOSMPU::fix_config(&mpu_cfg, (stack_T)stackPtr, stackSize);
     
     if(mpu_result < 0){
-      std_out.printf("MPU config is broken, ret: %d\n", mpu_result);
       DEBUGGER_BREAK();
       return nullptr;
-    }
-    else{
-      std_out.printf("Applied MPU config. Addr: %x, size: %d\n", stackPtr, stackSize);
     }
 
     ptr->mpu_regionSize = mpu_cfg.Size;
