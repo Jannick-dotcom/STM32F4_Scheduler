@@ -19,7 +19,7 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
     #endif
     if (taskMainStruct != 0)
     {
-        currentTask->Stack = currentTask->stackBase + currentTask->stackSize - sizeof(stack_T); //End of Stack
+        currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
         // currentTask->State = PAUSED; //Set Task state as new
         currentTask->continueInMS = HAL_GetTick() + 5000; //Restart Task in 5 s
         if(currentTask->semVal != NULL){
