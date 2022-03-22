@@ -1,16 +1,21 @@
 #include "StallardOS.hpp"
+#include "StallardOSMPU.hpp"
 #include "sharedParams.hpp"
+
+#include "StallardOSSerial.hpp"
 
 extern "C" stack_T _sdata;  // sizes of .data and .bss
 extern "C" stack_T _edata;  // used for MPU config
 extern "C" stack_T _sbss;
 extern "C" stack_T _ebss;
+extern "C" stack_T _sshared;
+extern "C" stack_T _eshared;
 
 //Kontext Switch
 volatile struct function_struct* volatile currentTask = nullptr;
 volatile struct function_struct* volatile nextTask = nullptr;
 volatile struct function_struct* volatile taskMainStruct = nullptr;
-stack_T taskmainStack[200];
+stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
@@ -83,7 +88,7 @@ StallardOS::StallardOS()
 
   initShared();
 
-  #ifdef useMPU
+  #if defined(useMPU)
   initMPU();
   #endif // useMPU
 
@@ -131,6 +136,7 @@ void StallardOS::createTCBs()
   }
 }
 
+
 void StallardOS::initShared(void){
 
   /* constructor will init the struct */
@@ -149,7 +155,13 @@ void StallardOS::initShared(void){
   #endif
 }
 
+
 void StallardOS::initMPU(void){
+
+  /* manually disable MPU here
+   * to not reenable it at every single configuration step
+   */
+  HAL_MPU_Disable();
 
   /* for correctly setting up the region attributes
    * for each type of memory, consider
@@ -157,12 +169,9 @@ void StallardOS::initMPU(void){
    */
   MPU_Region_InitTypeDef MPU_Init;
 
-  HAL_MPU_Disable();
-
   /* setup general settings, which are equal for all regions */
   MPU_Init.Enable = MPU_REGION_ENABLE;
   MPU_Init.TypeExtField = MPU_TEX_LEVEL0;
-  MPU_Init.SubRegionDisable = 0x00;
 
   /* configure FLASH/CODE region 
    * not shareable
@@ -171,17 +180,18 @@ void StallardOS::initMPU(void){
    * executable
    * RO for all permission levels
    */
-  MPU_Init.BaseAddress = FLASH_BASE;
-  MPU_Init.Size = MPU_REGION_SIZE_1MB;    // "G" model has 1MB flash
   MPU_Init.AccessPermission = MPU_REGION_PRIV_RO_URO;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
 
   MPU_Init.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
   MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER0;
-  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
-  HAL_MPU_ConfigRegion(&MPU_Init);
+  StallardOSMPU::write_config(&MPU_Init, FLASH_BASE, 0x80000);  // allow access to entire flash address region (same for all STM32s)
+  // "G" model has 1MB flash 
+  // TODO: make controller dependant ?
+  // TODO: revoke access to bootloader?
 
 
   /* configure SRAM .data region 
@@ -193,42 +203,46 @@ void StallardOS::initMPU(void){
    * 
    * linker script is forcing .data to be 4096 aligned
    */
-  MPU_Init.BaseAddress = (stack_T)&_sdata;
-  MPU_Init.Size = bytesToMPUSize((&_edata)-(&_sdata));  // size of .data region
   MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 
   MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
   MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER1;
-  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  HAL_MPU_ConfigRegion(&MPU_Init);
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sdata, ((stack_T)&_edata-(stack_T)&_sdata));
 
-  
+
   /* configure .bss 
    * same properties as .data settings
    * 
    * linker script is forcing .bss to be 4096 aligned
    */
 
-  MPU_Init.BaseAddress = (stack_T)&_sbss;
-  MPU_Init.Size = bytesToMPUSize((&_ebss)-(&_sbss));  // size of .data region
   MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 
   MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
   MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER2;
-  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  HAL_MPU_ConfigRegion(&MPU_Init);
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sbss, ((stack_T)&_ebss - (stack_T)&_sbss));
 
-
-  /* configure Task stack */
-  /* -> is configured at each contextSwitch
-   * Region 3 (NUMBER3) is used for stack
+  /* configure .shared 
+   * same properties as .data settings
+   * 
    */
+  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+
+  MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_Init.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  MPU_Init.Number = MPU_REGION_NUMBER3;
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, 64); // requires update when changed, hardcoded in linker scripts
 
 
   /* configure Peripherals 
@@ -236,102 +250,50 @@ void StallardOS::initMPU(void){
    * not cachable
    * bufferable
    */
-  MPU_Init.BaseAddress = PERIPH_BASE;
-  MPU_Init.Size = MPU_REGION_SIZE_512MB;
   MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 
   MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
   MPU_Init.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
   MPU_Init.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER4;
-  MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  HAL_MPU_ConfigRegion(&MPU_Init);
+  StallardOSMPU::write_config(&MPU_Init, PERIPH_BASE, 0x20000000);  /* 512MB for all STM32s*/
 
-  
+
   /* configure EXT Ram */
   /* EXT Ram not avail */
 
   /* configure EXT device */
   /* EXT device not avail */
-  
+
   /* configure private peripeheral bus */
   /* no access, only in privileged mode */
-  
 
   /* configure Vendior-specific memory */
   /* not avail */
 
 
+  /* configure Task stack 
+   * sharable
+   * cachable
+   * not bufferable
+   */
+  /* -> is configured at each contextSwitch
+   * Region 7 (NUMBER7) is used for stack
+   * to overlay all other regions
+   */
+
+ 
+
   /* PRIVILEGED_DEFAULT will allow all access to privileged proceses
    * and to fault handlers
    * only non-privileged tasks are affected by the MPU
+   * so nothing happens until first task switch
    */
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
-uint8_t StallardOS::bytesToMPUSize(stack_T bytes){
-  switch(bytes){
-    case 0x20:
-      return MPU_REGION_SIZE_32B;
-    case 0x40:
-      return MPU_REGION_SIZE_64B;
-    case 0x80:
-      return MPU_REGION_SIZE_128B;
-    case 0x100:
-      return MPU_REGION_SIZE_256B;
-    case 0x200:
-      return MPU_REGION_SIZE_512B;
-    case 0x400:
-      return MPU_REGION_SIZE_1KB;
-    case 0x800:
-      return MPU_REGION_SIZE_2KB;
-    case 0x1000:
-      return MPU_REGION_SIZE_4KB;
-    case 0x2000:
-      return MPU_REGION_SIZE_8KB;
-    case 0x4000:
-      return MPU_REGION_SIZE_16KB;
-    case 0x8000:
-      return MPU_REGION_SIZE_32KB;
-    case 0x1'0000:
-      return MPU_REGION_SIZE_64KB;
-    case 0x2'0000:
-      return MPU_REGION_SIZE_128KB;
-    case 0x4'0000:
-      return MPU_REGION_SIZE_256KB;
-    case 0x8'0000:
-      return MPU_REGION_SIZE_512KB;
-    case 0x10'0000:
-      return MPU_REGION_SIZE_1MB;
-    case 0x20'0000:
-      return MPU_REGION_SIZE_2MB;
-    case 0x40'0000:
-      return MPU_REGION_SIZE_4MB;
-    case 0x80'0000:
-      return MPU_REGION_SIZE_8MB;
-    case 0x100'0000:
-      return MPU_REGION_SIZE_16MB;
-    case 0x200'0000:
-      return MPU_REGION_SIZE_32MB;
-    case 0x400'0000:
-      return MPU_REGION_SIZE_64MB;
-    case 0x800'0000:
-      return MPU_REGION_SIZE_128MB;
-    case 0x1000'0000:
-      return MPU_REGION_SIZE_256MB;
-    case 0x2000'0000:
-      return MPU_REGION_SIZE_512MB;
-    case 0x4000'0000:
-      return MPU_REGION_SIZE_1GB;
-    case 0x8000'0000:
-      return MPU_REGION_SIZE_2GB;
-    case (uint32_t)0x1'0000'0000:
-      return MPU_REGION_SIZE_4GB;
-    default:
-      return 0x0;  // invalid reg value, will cause Hardfault
-  }
-}
 
 /**
  * Add a new Task to execute list.
@@ -382,15 +344,15 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
       break;
     }
   }
-  /////////////////////////////////////////////
 
+
+  /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
   // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
-  function_struct_ptr->Stack = stackPtr + (stackSize - sizeof(stack_T)); //End of Stack
-  function_struct_ptr->stackSize_MPU = bytesToMPUSize(stackSize);
+  function_struct_ptr->Stack = (stack_T*)((stack_T)stackPtr + (stackSize - sizeof(stack_T))); //End of Stack
   function_struct_ptr->stackSize = stackSize;
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
@@ -455,24 +417,12 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   }
 
   #ifdef useMPU
-  // MPU requires at least 32 Bytes
-  // and stack size to be a pwr of 2
-  if (stackSizeBytes < 32 ||\
-     (stackSizeBytes & (stackSizeBytes-1)) != 0)  // number is not pwr of 2, if more than 1 bit is !=0
-  {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
-    return nullptr;
-  }
-  #endif // useMPU
-
-  // get memory aligned (alignment, size)
-  #ifdef useMPU
+    // TODO: adjust to new restrictions
     stackPtr = (stack_T *)memalign(stackSize, stackSize);
   #else
     stackPtr = (stack_T *)malloc(stackSize);
   #endif // useMPU
+
 
   if(stackPtr == nullptr) //Wenn kein Stack gefunden
   {
@@ -483,6 +433,29 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   }
   function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
   ptr->staticAlloc = 0;
+
+
+  /////////////////////////////////////////////
+  #ifdef useMPU
+    // check if the given addresess can be used for a valid mpu configuartion
+    // then store them, to achieve fast reconfigure on context switch
+    int mpu_result;
+    MPU_Region_InitTypeDef mpu_cfg;
+    mpu_result = StallardOSMPU::fix_config(&mpu_cfg, (stack_T)stackPtr, stackSize);
+    
+    if(mpu_result < 0){
+      DEBUGGER_BREAK();
+      return nullptr;
+    }
+
+    ptr->mpu_regionSize = mpu_cfg.Size;
+    ptr->mpu_baseAddress = mpu_cfg.BaseAddress;
+    ptr->mpu_subregions = mpu_cfg.SubRegionDisable;
+    // the remaining mpu config is thrown away, as it's not configured at this timepoint
+    // acutal config is applied in context switch
+  #endif // useMPU
+
+
   return ptr;
 }
 
@@ -507,19 +480,16 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
     return nullptr;
   }
 
-  #ifdef useMPU
-  // MPU requires at least 32 Bytes
-  // and stack size to be a pwr of 2
-  if (stackSize < 32 ||\
-     (stackSize & (stackSize-1)) != 0)  // number is not pwr of 2, if more than 1 bit is !=0
-  {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
-    return nullptr;
-  }
-  #endif // useMPU
+
   function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  /////////////////////////////////////////////
+  #ifdef useMPU
+    // static tasks are already covered by .bss region
+    ptr->mpu_regionSize = 0;
+    ptr->mpu_baseAddress = 0;
+    ptr->mpu_subregions = 0;
+  #endif // useMPU
+ 
   ptr->staticAlloc = 1;
   return ptr;
 }
