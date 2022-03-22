@@ -11,7 +11,7 @@ class Mode(Enum):
     build=0
     test=1
 
-def read_files(dir) -> list[str]:
+def read_files(dir) -> 'list[str]':
     file_content = []
     for r, d, f in os.walk(dir):
         for file in f:
@@ -49,7 +49,7 @@ def tasks_in_file(file_content: str, mode:Mode) -> int:
     return cnt
 
 
-def tasks_created(files: list[str], mode:Mode) -> int:
+def tasks_created(files: 'list[str]', mode:Mode) -> int:
     cnt_lst = []
     
     for content in files:

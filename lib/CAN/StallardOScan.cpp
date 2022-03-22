@@ -11,6 +11,10 @@ StallardOSCAN AD_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),S
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
 #endif
+#ifdef STM32F446xx
+StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
+StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
+#endif
 
 bool StallardOSCAN::can1used = false;
 bool StallardOSCAN::can2used = false;
@@ -239,6 +243,12 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
                         fifoPtr[k].used = 1;                            //Indicate Message is occupied
                         fifoPtr[k].timestamp = StallardOSTime_getTimeUs(); //Save timestamp
                         fifoPtr[k].dlc = RxHeader.DLC;
+                        StallardOSCanMessage temp;
+                        temp.ID = RxHeader.StdId;
+                        temp.timestamp = StallardOSTime_getTimeUs();
+                        temp.Val = fifoPtr[k].Val;
+                        temp.used = true;
+                        copyToBuffer(&temp);
                     }
                     break; //If unused found go with next message
                 }
@@ -251,6 +261,12 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
                         fifoPtr[oldestMessage].used = 1;                            //Indicate still used
                         fifoPtr[oldestMessage].timestamp = StallardOSTime_getTimeUs(); //save new Timestamp
                         fifoPtr[oldestMessage].dlc = RxHeader.DLC;
+                        StallardOSCanMessage temp;
+                        temp.ID = RxHeader.StdId;
+                        temp.timestamp = StallardOSTime_getTimeUs();
+                        temp.Val = fifoPtr[k].Val;
+                        temp.used = true;
+                        copyToBuffer(&temp);
                     }
                     break; //If unused found go with next message
                 }
@@ -314,6 +330,24 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
     this->sem.give(); //release semaphore
 
     return false; //return false status
+}
+
+bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg)
+{
+    if (receiveMessage(msg, msg->ID))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool StallardOSCAN::receiveMessageOneMsgBuff(StallardOSCanMessage *msg)
+{
+    uint16_t tempoffset = idToOffset(msg->ID);
+    if(tempoffset == -1) return false;
+    msg = canarray[tempoffset];
+    if(msg->used == false) return false;
+    return true;
 }
 
 int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)

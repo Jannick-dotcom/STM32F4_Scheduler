@@ -6,20 +6,58 @@ extern struct function_struct *currentTask;
 extern struct function_struct *taskMainStruct;
 extern struct function_struct *nextTask;
 
+void prepareInitialStack()
+{
+    //Prepare initial stack trace
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)0x01000000;
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)currentTask->function & (~1);
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)taskOnEnd;
+
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)12;
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)3;
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)2;
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)1;
+  currentTask->Stack--;
+  *currentTask->Stack = (uint32_t)0;
+  
+  currentTask->Stack--;
+  *currentTask->Stack = 0xFFFFFFFD;
+
+  #ifndef unprotectedBuild
+  currentTask->Stack--;
+  *currentTask->Stack = (CONTROL_nPRIV_Msk << CONTROL_nPRIV_Pos); //Control register (unprivileged)
+  #endif
+
+  for(uint8_t i = 11; i > 3; i--)
+  {
+    currentTask->Stack--;
+    *currentTask->Stack = i;
+  }
+  //////////////////////////////
+}
+
 void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
 {
-    // asm("TST    LR, #4"); //firstly, find the PC
-    // asm("ITE    EQ");
-    // asm("MRSEQ	R0, MSP");
-    // asm("MRSNE	R0, PSP");
+    asm("TST    LR, #4"); //firstly, find the PC
+    asm("ITE    EQ");
+    asm("MRSEQ	R0, MSP");
+    asm("MRSNE	R0, PSP");
 
-    // asm("LDR	R0, [R0, #24]"); //PC is in R0
+    asm("LDR	R0, [R0, #24]"); //PC is in R0
     #ifndef UNIT_TEST
     asm("bkpt");  //Zeige debugger
     #endif
     if (taskMainStruct != 0)
     {
         currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
+        prepareInitialStack();
         // currentTask->State = PAUSED; //Set Task state as new
         currentTask->continueInMS = HAL_GetTick() + 5000; //Restart Task in 5 s
         if(currentTask->semVal != NULL){

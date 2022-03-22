@@ -9,8 +9,7 @@ env.Append(
         "-mcpu=cortex-m4", 
         "-mfloat-abi=hard",
         "-mfpu=fpv4-sp-d16", 
-        "-fsingle-precision-constant",
-        "-u_printf_float"
+        "-fsingle-precision-constant"
     ]
 )
 

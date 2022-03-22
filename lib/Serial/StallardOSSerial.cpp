@@ -1,4 +1,5 @@
 #include "StallardOSSerial.hpp"
+using namespace std;
 
 uint8_t StallardOSSerial::portToAlternateFunc(USART_TypeDef *serPort)
 {

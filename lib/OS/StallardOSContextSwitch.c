@@ -112,7 +112,7 @@ void findNextFunction()
         
         if (temp->executable && temp->continueInMS <= HAL_GetTick() && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
-            if(temp->waitingForSemaphore && temp->semVal != NULL && *(temp->semVal) == 0) //If this task is still waiting for the semaphore
+            if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is still waiting for the semaphore
             {
                 temp = temp->next;
                 continue;
@@ -367,13 +367,27 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
     HAL_IncTick();
     if(currentTask != NULL)
     {
-        if(currentTask->Stack > (currentTask->stackBase + currentTask->stackSize) || currentTask->Stack < currentTask->stackBase)
+        volatile struct function_struct *temp = currentTask;
+        do
         {
-            #ifndef UNIT_TEST
-            asm("bkpt");  //Zeige debugger
-            #endif
-            currentTask->executable = 0;
+            if(temp->Stack > (temp->stackBase + temp->stackSize) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
+            {
+                #ifndef UNIT_TEST
+                asm("bkpt");  //Zeige debugger STACK OVERFLOW!!!!
+                #endif
+                temp->executable = 0;
+            }
+
+            if(temp->refreshRate > 0 && (temp->lastYield - temp->lastStart) > (1000 / temp->refreshRate)) //Task timeout check
+            {
+                #ifndef UNIT_TEST
+                asm("bkpt");  //Zeige debugger Task too Slow!!!!
+                #endif
+                temp->executable = 0;
+            }
+            temp = temp->next;
         }
+        while (temp != currentTask); 
         findNextFunction();
         if(currentTask != nextTask && !(currentTask == taskMainStruct && nextTask == NULL))
         {

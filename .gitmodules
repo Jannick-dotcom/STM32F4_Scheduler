@@ -1,3 +1,6 @@
 [submodule "CAN_System_Design_2021"]
 	path = CAN_System_Design_2021
 	url = https://github.com/Rennstall/CAN_System_Design_2021.git
+[submodule "lib/SFOC"]
+	path = lib/SFOC
+	url = https://github.com/Rennstall/SFOC

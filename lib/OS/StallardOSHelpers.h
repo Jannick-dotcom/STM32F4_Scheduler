@@ -32,6 +32,7 @@ extern "C"
   void StallardOS_goBootloader();
   void enable_interrupts();
   void disable_interrupts();
+  void taskOnEnd(void);
 #ifdef __cplusplus
 }
 #endif
@@ -78,7 +79,8 @@ struct function_struct
   // volatile uint32_t stackUsage;
   // volatile taskState State;             //Status des Tasks
   volatile uint8_t waitingForSemaphore; //Is task waiting for a semaphore
-  volatile uint16_t *semVal;
+  volatile uint32_t *semVal; //First 16bit - ID-of-Task
+                             //Last  16bit - Semaphore Value
   volatile uint64_t continueInMS; //Delay amount
 
 };
