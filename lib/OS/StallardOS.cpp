@@ -482,6 +482,14 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
 
 
   function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  /////////////////////////////////////////////
+  #ifdef useMPU
+    // static tasks are already covered by .bss region
+    ptr->mpu_regionSize = 0;
+    ptr->mpu_baseAddress = 0;
+    ptr->mpu_subregions = 0;
+  #endif // useMPU
+ 
   ptr->staticAlloc = 1;
   return ptr;
 }
