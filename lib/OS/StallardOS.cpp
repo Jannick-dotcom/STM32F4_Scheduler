@@ -3,6 +3,7 @@
 #include "sharedParams.hpp"
 
 #include "StallardOSSerial.hpp"
+#include "FLASH_SECTOR_DEFINES.h"
 
 extern "C" stack_T _sdata;  // sizes of .data and .bss
 extern "C" stack_T _edata;  // used for MPU config
@@ -188,10 +189,10 @@ void StallardOS::initMPU(void){
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER0;
-  StallardOSMPU::write_config(&MPU_Init, FLASH_BASE, 0x80000);  // allow access to entire flash address region (same for all STM32s)
-  // "G" model has 1MB flash 
-  // TODO: make controller dependant ?
-  // TODO: revoke access to bootloader?
+  // allow access to entire flash address space (same for all STM32s)
+  // "Code" addres region ranges in [0x0..0x1FFF FFFF]
+  // only make 
+  StallardOSMPU::write_config(&MPU_Init, FLASH_BASE, FLASH_TOTAL_SIZE);  //  flash size defined in flashOps lib
 
 
   /* configure SRAM .data region 
@@ -242,7 +243,7 @@ void StallardOS::initMPU(void){
   MPU_Init.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   MPU_Init.Number = MPU_REGION_NUMBER3;
-  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, 64); // requires update when changed, hardcoded in linker scripts
+  StallardOSMPU::write_config(&MPU_Init, (stack_T)&_sshared, ((stack_T)&_eshared - (stack_T)&_sshared));
 
 
   /* configure Peripherals 

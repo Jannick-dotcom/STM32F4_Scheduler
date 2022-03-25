@@ -4,3 +4,6 @@
 [submodule "lib/SFOC"]
 	path = lib/SFOC
 	url = https://github.com/Rennstall/SFOC
+[submodule "lib/flashOps"]
+	path = lib/flashOps
+	url = https://github.com/Rennstall/flashOps
