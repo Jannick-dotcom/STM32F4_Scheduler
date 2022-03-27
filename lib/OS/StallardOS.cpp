@@ -138,6 +138,11 @@ void StallardOS::createTCBs()
 }
 
 
+/**
+ * @brief initialize shared memory for cooperation with Flashloader
+ *        MUST NOT be called from unprivileged task context, if the MPU is enabled
+ * 
+ */
 void StallardOS::initShared(void){
 
   /* constructor will init the struct */
@@ -149,10 +154,18 @@ void StallardOS::initShared(void){
    * boot back to the OS, in case a reset handler is hit
    * or in case someone hits the reset button of the controller
    */
+  #ifdef useMPU
+    //CALL_PRIVILEGED();
+  #endif
+
   params.set_boot_type(SharedParams::boot_type::T_REBOOT);
   params.set_os_version(STOS_VERSION);
   #ifdef SW_VERSION
     params.set_sw_version(SW_VERSION);
+  #endif
+
+  #ifdef useMPU
+    //CALL_UNPRIVILEGED();
   #endif
 }
 
@@ -233,9 +246,11 @@ void StallardOS::initMPU(void){
 
   /* configure .shared 
    * same properties as .data settings
+   * priv tasks are R/W
+   * unpriv tasks are RO
    * 
    */
-  MPU_Init.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_Init.AccessPermission = MPU_REGION_PRIV_RW_URO;
   MPU_Init.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
 
   MPU_Init.IsShareable = MPU_ACCESS_SHAREABLE;
