@@ -52,7 +52,17 @@ def get_defines(header_file):
     return defs
 
 
-def nextPow2(n):
+
+def nextPow2(n: int):
+    """ceil the given int to the next power of 2
+       if n is a power of 2, n is returned
+
+    Args:
+        n (int): input number
+
+    Returns:
+        int: n ceiled to next pow2, n if n is already pow2
+    """
     p = 1
     if (n and not(n & (n - 1))):
         return n
@@ -95,28 +105,63 @@ def after_build(source, target, env):
 
     ram_only = list(filter(lambda s: s.address >= 0x20000000, sections))  # filter for RAM adress range
     ram_only = list(filter(lambda s: s.name not in ignore_sections, ram_only))  # filter out ignored elements
-
-    invalid_segment_size = list(filter(lambda s: not math.log2(s.size).is_integer(), ram_only))  # invalid segment size overwrites align error
-    invalid_segment_align = list(filter(lambda s: s.address%s.size != 0, ram_only))  # easy check for aligment, using a%b==0
+    # for most configuration .data, .bss and .shared remain after this section, but could be more
 
 
     error = False
 
-    if invalid_segment_size:
-        error = True
-        print('ERROR: invalid segment size detected')
-        for segment in invalid_segment_size:
-            print(f'{segment.name}: size 0x{segment.size:x} is not power of 2, try ".=ALIGN({nextPow2(segment.size)})" in {segment.name}')
+    for seg in ram_only:
 
-    if invalid_segment_align:
-        error = True
-        print('ERROR: misaligned segments detected')
-        for segment in invalid_segment_align:
-            print(f'{segment.name}: start address 0x{segment.address:x} not aligned to its size 0x{segment.size:x}')
+        if seg.size < 32:
+            error = True
+            print(f'Size of {seg.name} is too small (min. 32 Byte)')
+            continue
 
+        
+        is_pow2 = math.log2(seg.size).is_integer()
+        next_pow2 = nextPow2(seg.size) # will be seg.size if already pow of 2
 
-    for seg in sections:
-        print(f'{seg.name} from {seg.address:x} to {(seg.address + seg.size):x}')
+        # cannot use subsections on small regions
+        if seg.size <= 256:
+            if not is_pow2:
+                error = True
+                print(f'Size of {seg.name} ({seg.size}) is not aligned to pow2')
+                # continue
+
+            if seg.address%next_pow2 != 0:
+                error = True
+                print(f'Addr 0x{seg.address:x} of {seg.name} is not aligned to its size')
+        else:
+            # pow2 is guaranteed to be divisible by 8
+            # as next_pow2 must be greater equals to 256
+            sub_size = next_pow2//8
+            misalign = seg.address%next_pow2
+            offset_section = 0
+
+            if misalign != 0 and misalign%sub_size != 0:
+                error = True
+                print(f'Addr 0x{seg.address:x} of {seg.name} not aligned. Subregion offset not possible')
+                continue
+            elif misalign != 0 and misalign%sub_size == 0:
+                # try to determin an subregion offset
+                # for the new start address
+                offset_section = misalign//sub_size
+                start_addr = seg.address - (offset_section*sub_size)
+
+                if start_addr%next_pow2 != 0:
+                    error = True
+                    print(f'Addr 0x{seg.address:x} failed to offset-align to {next_pow2}({seg.size}) for {seg.name}')
+                    continue
+
+            
+            # get the offset for the end address, based on a potenial start offset
+            if offset_section > 0:
+                end_section = offset_section + (seg.size/sub_size)-1
+                if end_section > 7:
+                    error = True
+                    print(f'Size of {seg.name} ({seg.size}) doesn\'t fit into a subsection of{next_pow2}')
+                    continue
+
 
     if error:
         return -1
