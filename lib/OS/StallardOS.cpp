@@ -627,15 +627,8 @@ void StallardOS::yield()
     if(currentTask != nullptr)
     {
       currentTask->continueInMS = StallardOSTime_getTimeMs() + (1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-      if(currentTask->continueInMS > (1000 / currentTask->refreshRate) + StallardOSTime_getTimeMs())
-      {
-        currentTask->continueInMS = StallardOSTime_getTimeMs();
-      }
-      else
-      {
-        findNextFunction();
-        CALL_PENDSV();
-      }
+      findNextFunction();
+      CALL_PENDSV();
     }
     currentTask->lastStart = StallardOSTime_getTimeMs();
   }
