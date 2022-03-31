@@ -1,6 +1,8 @@
 #ifndef StallardOScanTypes_hpp
 #define StallardOScanTypes_hpp
 
+#include "StallardOSHelpers.h"
+
 typedef enum CANports
 {
     StallardOSCAN1 = 0,
@@ -20,8 +22,9 @@ private:
 public:
     uint8_t used = 0;
     uint64_t timestamp = -1; //Set Timestamp to maximum
-    uint8_t dlc = 0;
     uint16_t ID = 0;         //Just 11 Bit !!!!
+    uint8_t persistent = 0;
+    uint8_t dlc = 0;
     volatile uint64_t Val = 0;            //Up to 8 Bytes
 };
 
@@ -52,7 +55,14 @@ public:
     }
     uint64_t build()
     {
-        rawValue = (physValue - offset) / factor;
+        if(factor != 0.0f)
+        {
+            rawValue = (physValue * factor) + offset;
+        }
+        else
+        {
+            DEBUGGER_BREAK();
+        }
         uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1));
         if(isMotorola && countOfBits > 8)
         {
@@ -84,15 +94,23 @@ public:
             }
             rawValue = tempOut;
         }
-        physValue = rawValue * factor + offset;
+        physValue = (rawValue - offset) / factor;
     }
     CAN_Signal operator=(float val)
     {
         physValue = val;
         return *this;
     }
-    operator int() const { return rawValue; }
+    operator int() const { return physValue; }
     operator float() const { return physValue; }
+    
+
+    bool operator!=(struct CAN_Signal &ref) { return this->rawValue != ref.rawValue;}; //Comparison
+    bool operator==(struct CAN_Signal &ref) { return this->rawValue == ref.rawValue;};
+    bool operator>=(struct CAN_Signal &ref) { return this->rawValue >= ref.rawValue;}; //Comparison
+    bool operator<=(struct CAN_Signal &ref) { return this->rawValue <= ref.rawValue;};
+    bool operator<(struct CAN_Signal &ref) { return this->rawValue < ref.rawValue;}; //Comparison
+    bool operator>(struct CAN_Signal &ref) { return this->rawValue > ref.rawValue;};
 };
 
 #endif
