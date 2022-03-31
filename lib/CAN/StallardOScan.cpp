@@ -48,9 +48,25 @@ void initFilters(CAN_HandleTypeDef *canHand)
     HAL_CAN_ConfigFilter(canHand, &sFilterConfig);
 }
 
+uint8_t portsToAF(CANports port)
+{
+    switch (port)
+    {
+    case CANports::StallardOSCAN1:
+        return GPIO_AF9_CAN1;
+        break;
+    case CANports::StallardOSCAN2:
+        return GPIO_AF9_CAN2;
+        break;
+    default:
+        return -1;
+        break;
+    }
+}
+
 StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, bool debug) :
-    CANT(tx.pin, tx.port, AFPP, nopull, GPIO_AF9_CAN1),
-    CANR(rx.pin, rx.port, AFPP, nopull, GPIO_AF9_CAN1)
+    CANT(tx.pin, tx.port, AFPP, nopull, portsToAF(port)),
+    CANR(rx.pin, rx.port, AFPP, nopull, portsToAF(port))
 {
 
     this->sem.take();
@@ -124,6 +140,8 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
         can2handle = canhandle;
     }
 
+    initFilters(&canhandle);
+
     if (HAL_CAN_Start(&canhandle) != HAL_OK)
     {
 
@@ -158,8 +176,6 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     NVIC_EnableIRQ(CAN1_RX1_IRQn);
     NVIC_EnableIRQ(CAN2_RX0_IRQn);
     NVIC_EnableIRQ(CAN2_RX1_IRQn);
-
-    initFilters(&canhandle);
 
     this->sem.give(); //release Semaphore
 
@@ -344,9 +360,8 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg)
 bool StallardOSCAN::receiveMessageOneMsgBuff(StallardOSCanMessage *msg)
 {
     uint16_t tempoffset = idToOffset(msg->ID);
-    if(tempoffset == -1) return false;
+    if(tempoffset == -1 || canarray[tempoffset]->used == false) return false;
     msg = canarray[tempoffset];
-    if(msg->used == false) return false;
     return true;
 }
 
@@ -369,7 +384,9 @@ int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
     TxHeader.DLC = size;         //Set Amount of Data bytes
 
     while (HAL_CAN_GetTxMailboxesFreeLevel(&canhandle) < 1)
-        ;
+    {
+        __NOP();
+    }
     // HAL_CAN_AbortTxRequest(&canhandle,-1);         //Wait until all TX Mailboxes are free
     HAL_CAN_AddTxMessage(&canhandle, &TxHeader, (uint8_t *)&msg->Val, &tempTransmMailb); //Add message to transmit mailbox
 
