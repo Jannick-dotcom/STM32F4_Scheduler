@@ -111,6 +111,7 @@ def after_build(source, target, env):
     error = False
 
     for seg in ram_only:
+        print(f'{seg.name} is at 0x{seg.address:x} for {seg.size}')
 
         if seg.size < 32:
             error = True

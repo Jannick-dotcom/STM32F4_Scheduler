@@ -272,7 +272,7 @@ __attribute__((always_inline)) inline void disable_privilege(){
  */
 __attribute__((always_inline)) inline void start_mainTask(){
 
-    // HAL_MPU_Disable(); // disable for first task? TODO: apply config for first task in init
+    // HAL_MPU_Disable(); // first task is always in .bss, therefore has stack access by default
 
     __ASM volatile("LDR r1, =currentTask\n"
     "LDR r2, [r1]\n"
