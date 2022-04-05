@@ -35,9 +35,7 @@ StallardOSExtAnalog::StallardOSExtAnalog(uint8_t channel, uint8_t adcNumber, Sta
 
     if(registerRead(0) != reg0Value || registerRead(1) != reg1Value)
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
     }
 
     for (uint8_t i = 0; i < 16; i++) //Fix start pin with only reading from all channels

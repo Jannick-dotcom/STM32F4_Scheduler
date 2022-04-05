@@ -34,7 +34,7 @@ StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio m
     if(toAlternateFunc(inst) == 0)
     {
         this->sem.give();
-        asm("bkpt");
+        DEBUGGER_BREAK();
         StallardOSGeneralFaultHandler();
     }
 
@@ -54,7 +54,7 @@ StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio m
     {
 
         this->sem.give();
-        asm("bkpt");
+        DEBUGGER_BREAK();
         StallardOSGeneralFaultHandler();
     }
 

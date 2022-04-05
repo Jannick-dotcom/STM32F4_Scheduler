@@ -1,5 +1,4 @@
 #include "StallardOSCANFilter.hpp"
-
 uint8_t StallardOSCANFilter::countFilters = 0;
 
 StallardOSCANFilter::StallardOSCANFilter(uint16_t id1, uint16_t id2, CANports can): id1(id1), id2(id2)
@@ -19,9 +18,7 @@ StallardOSCANFilter::~StallardOSCANFilter()
 void StallardOSCANFilter::setup(CANports can){
     if(id1 > 2047 || id2 > 2047 || this->countFilters > 27)
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
         StallardOSGeneralFaultHandler();
     }
     this->id1 = id1;
@@ -42,9 +39,7 @@ void StallardOSCANFilter::setup(CANports can){
     }
     else
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
         /* Filter configuration Error */
         StallardOSGeneralFaultHandler();
     }
@@ -67,9 +62,7 @@ void StallardOSCANFilter::setup(CANports can){
     sFilterConfig.SlaveStartFilterBank = 14;
     if (HAL_CAN_ConfigFilter(canhandle, &sFilterConfig) != HAL_OK)
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
         /* Filter configuration Error */
         StallardOSGeneralFaultHandler();
     }

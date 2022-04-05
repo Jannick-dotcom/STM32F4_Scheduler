@@ -51,9 +51,7 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
     asm("MRSNE	R0, PSP");
 
     asm("LDR	R0, [R0, #24]"); //PC is in R0
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
+    DEBUGGER_BREAK();
     if (taskMainStruct != 0)
     {
         currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
@@ -74,9 +72,7 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
                 // undefined state, task may or may not own the semaphore
                 // assume it didn't own it, as that's more likely?
                 // TODO: change this???
-                #ifndef UNIT_TEST
-                asm("bkpt");  //Zeige debugger
-                #endif
+                DEBUGGER_BREAK();
             }
         }
 
