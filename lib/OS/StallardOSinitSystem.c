@@ -46,10 +46,10 @@ void StallardOS_SetSysClock(uint8_t clockspeed, oscillatorType oscType)
     {
       #ifdef STM32F4xxxx
       /* Enable HSE oscillator and activate PLL with HSE as source */
-      RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-      RCC_OscInitStruct.HSEState = RCC_HSE_OFF; /* External xtal on OSC_IN/OSC_OUT */
+      RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+      RCC_OscInitStruct.HSEState = RCC_HSE_ON; /* External xtal on OSC_IN/OSC_OUT */
       RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-      RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+      RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
       RCC_OscInitStruct.PLL.PLLM = (HSE_VALUE / 1000000);             // VCO input clock = 1 MHz (8 MHz / 8)
       RCC_OscInitStruct.PLL.PLLN = clockspeed * 2;           // VCO output clock = 360 MHz (1 MHz * 360)
       RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2; // PLLCLK = 180 MHz (360 MHz / 2)
@@ -84,7 +84,7 @@ void StallardOS_SetSysClock(uint8_t clockspeed, oscillatorType oscType)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1; // 168 MHz
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV8;  //  21 MHz
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;  //  84 MHz
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     while(1);
   }

@@ -79,7 +79,11 @@ StallardOS::StallardOS()
   TCBsCreated = 0;
   //Für Context Switch
   createTCBs();
+  #ifdef internalClock
+  StallardOS_SetSysClock(runFreq, internal);
+  #else
   StallardOS_SetSysClock(runFreq, external);
+  #endif
   if(SystemCoreClock != (runFreq * 1000000))
   {
     DEBUGGER_BREAK();
