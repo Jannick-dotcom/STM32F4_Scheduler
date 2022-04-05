@@ -5,8 +5,7 @@
 // #include "StallardOSconfig.h"
 #include "StallardOSsem.hpp"
 
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
+#include "StallardOSHelpers.h"
 #include <stdint.h>
 
 extern "C" void StallardOSGeneralFaultHandler();
@@ -21,6 +20,7 @@ typedef enum PWMChannel
 
 typedef enum PWMalternateFunctions
 {
+    #ifdef STM32F4xxxx
     STOS_Tim1 = GPIO_AF1_TIM1,
     STOS_Tim2 = GPIO_AF1_TIM2,
     STOS_Tim3 = GPIO_AF2_TIM3,
@@ -35,6 +35,8 @@ typedef enum PWMalternateFunctions
     STOS_Tim12 = GPIO_AF9_TIM12,
     STOS_Tim13 = GPIO_AF9_TIM13,
     STOS_Tim14 = GPIO_AF9_TIM14
+    #elif defined(STM32F1xxxx)
+    #endif
 } PWMalternateFunctions;
 
 class StallardOSpwm

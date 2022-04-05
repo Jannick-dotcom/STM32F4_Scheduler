@@ -3,8 +3,7 @@
 
 // #include "StallardOSconfig.h"
 
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
+#include "StallardOSHelpers.h"
 #include <stdint.h>
 #include "StallardOSsem.hpp"
 extern "C" void StallardOSGeneralFaultHandler();

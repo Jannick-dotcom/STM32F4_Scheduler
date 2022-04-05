@@ -2,8 +2,7 @@
 #define StallardOSTIME_H
 
 #include "inttypes.h"
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
+#include "StallardOSHelpers.h"
 #include "StallardOSsyscalls.h"
 
 uint64_t StallardOSTime_getTimeMs();

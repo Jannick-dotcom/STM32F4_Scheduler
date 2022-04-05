@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 #include <malloc.h>
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
+#include "StallardOSHelpers.h"
 
 #include "StallardOSClass.hpp"
 #include "StallardOSsem.hpp"

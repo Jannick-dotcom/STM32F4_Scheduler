@@ -1,8 +1,7 @@
 #ifndef StallardOS_GPIO_h
 #define StallardOS_GPIO_h
 
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
+#include "StallardOSHelpers.h"
 #include <stdint.h>
 #include "StallardOSsem.hpp"
 #include "StallardOSClass.hpp"
@@ -88,8 +87,10 @@ private:
 public:
     #ifdef STM32F417xx
     const GPIO_TypeDef *portsToGPIOBase[9] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
-    #else
+    #elif defined(STM32F4xxxx)
     const GPIO_TypeDef *portsToGPIOBase[8] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH};
+    #elif defined(STM32F1xxxx)
+    const GPIO_TypeDef *portsToGPIOBase[8] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE};
     #endif
 
     StallardOSGPIO(
