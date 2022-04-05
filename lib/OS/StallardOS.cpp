@@ -79,12 +79,10 @@ StallardOS::StallardOS()
   TCBsCreated = 0;
   //Für Context Switch
   createTCBs();
-  StallardOS_SetSysClock(runFreq);
+  StallardOS_SetSysClock(runFreq, external);
   if(SystemCoreClock != (runFreq * 1000000))
   {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
+    DEBUGGER_BREAK();
   }
 
   initShared();
@@ -169,7 +167,7 @@ void StallardOS::initShared(void){
   #endif
 }
 
-
+#ifdef useMPU
 void StallardOS::initMPU(void){
 
   /* manually disable MPU here
@@ -309,7 +307,7 @@ void StallardOS::initMPU(void){
    */
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
-
+#endif
 
 /**
  * Add a new Task to execute list.
@@ -329,9 +327,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr = searchFreeFunction();
   if (function_struct_ptr == nullptr)
   {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
+    DEBUGGER_BREAK();
     return nullptr; //Aus der Funktion rausspringen
   }
 
@@ -426,9 +422,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   stack_T *stackPtr;
   if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
   {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
+    DEBUGGER_BREAK();
     return nullptr;
   }
 
@@ -442,9 +436,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
 
   if(stackPtr == nullptr) //Wenn kein Stack gefunden
   {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
+    DEBUGGER_BREAK();
     return nullptr;
   }
   function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
@@ -490,9 +482,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
 {
   if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
-    #ifndef UNIT_TEST
-    asm("bkpt");  //Zeige debugger
-    #endif
+    DEBUGGER_BREAK();
     return nullptr;
   }
 
@@ -621,23 +611,16 @@ void StallardOS::delay(uint32_t milliseconds)
 
 void StallardOS::yield()
 {
-  currentTask->lastYield = StallardOSTime_getTimeMs();
-  if (currentTask->refreshRate != 0)
+  if (currentTask != nullptr)
   {
-    if(currentTask != nullptr)
+    currentTask->lastYield = StallardOSTime_getTimeMs();
+    if(currentTask->refreshRate != 0)
     {
       currentTask->continueInMS = StallardOSTime_getTimeMs() + (1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-      if(currentTask->continueInMS > (1000 / currentTask->refreshRate) + StallardOSTime_getTimeMs())
-      {
-        currentTask->continueInMS = StallardOSTime_getTimeMs();
-      }
-      else
-      {
-        findNextFunction();
-        CALL_PENDSV();
-      }
+      findNextFunction();
+      CALL_PENDSV();
+      currentTask->lastStart = StallardOSTime_getTimeMs();
     }
-    currentTask->lastStart = StallardOSTime_getTimeMs();
   }
 }
 
@@ -670,7 +653,9 @@ void StallardOS::startOS(void)
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
+    #ifdef STM32F4xxxx
     FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
+    #endif
     // SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
     #ifdef useFPU
     #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
@@ -687,7 +672,7 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(PendSV_IRQn);
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(SVCall_IRQn);
-    #ifdef useFPU
+    #if defined(useFPU) && (__FPU_PRESENT == 1)
     NVIC_EnableIRQ(FPU_IRQn);
     #endif
     __ASM volatile("MRS R0, MSP\n"

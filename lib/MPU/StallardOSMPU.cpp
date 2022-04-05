@@ -144,8 +144,7 @@ int StallardOSMPU::write_config(MPU_Region_InitTypeDef *config, stack_T start_ad
         return config_result;
     }
 
-    //TODO: remove debug excemption
-    config->SubRegionDisable=0;
+
     HAL_MPU_ConfigRegion(config);
 
     if(was_enabled){

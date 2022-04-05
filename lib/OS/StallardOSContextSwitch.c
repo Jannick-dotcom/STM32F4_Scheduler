@@ -94,18 +94,14 @@ void findNextFunction()
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
     if(temp == NULL)
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();  //Zeige debugger
         return;
     }
     do
     {
         if(temp->used == 0) //If the TCB is unused, continue with the next one
         {
-            #ifndef UNIT_TEST
-            asm("bkpt");  //Zeige debugger
-            #endif
+            DEBUGGER_BREAK();  //Zeige debugger
             temp = temp->next;
             continue;
         }
@@ -276,7 +272,7 @@ __attribute__((always_inline)) inline void disable_privilege(){
  */
 __attribute__((always_inline)) inline void start_mainTask(){
 
-    // HAL_MPU_Disable(); // disable for first task? TODO: apply config for first task in init
+    // HAL_MPU_Disable(); // first task is always in .bss, therefore has stack access by default
 
     __ASM volatile("LDR r1, =currentTask\n"
     "LDR r2, [r1]\n"
@@ -372,17 +368,13 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         {
             if(temp->Stack > (temp->stackBase + temp->stackSize) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
             {
-                #ifndef UNIT_TEST
-                asm("bkpt");  //Zeige debugger STACK OVERFLOW!!!!
-                #endif
+                DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
                 temp->executable = 0;
             }
 
             if(temp->refreshRate > 0 && (temp->lastYield - temp->lastStart) > (1000 / temp->refreshRate)) //Task timeout check
             {
-                #ifndef UNIT_TEST
-                asm("bkpt");  //Zeige debugger Task too Slow!!!!
-                #endif
+                DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
                 temp->executable = 0;
             }
             temp = temp->next;
