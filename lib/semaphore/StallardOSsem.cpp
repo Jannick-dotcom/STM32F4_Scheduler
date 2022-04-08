@@ -1,5 +1,4 @@
 #include "StallardOSsem.hpp"
-#include <stm32f4xx_hal.h>
 
 extern volatile struct function_struct *currentTask;
 
