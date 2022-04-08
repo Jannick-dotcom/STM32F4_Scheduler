@@ -178,7 +178,7 @@ uint16_t StallardOSpwm::operator=(uint16_t duty)
  * @param duty duty cycle of the pwm signal
  * @return duty cycle set
  */
-uint16_t StallardOSpwm::operator=(float duty)
+float StallardOSpwm::operator=(float duty)
 {
 
     this->sem.take();
