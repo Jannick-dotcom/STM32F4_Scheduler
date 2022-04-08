@@ -63,7 +63,7 @@ public:
         /*Number of bits to use*/ uint8_t bitcount);
 
     uint16_t operator=(uint16_t duty); //Set new Duty cycle
-    uint16_t operator=(float duty); //Set new Duty cycle
+    float operator=(float duty); //Set new Duty cycle
 };
 
 #endif
