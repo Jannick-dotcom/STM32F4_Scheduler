@@ -154,7 +154,7 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
 }
 
 /**
- * create a pwm instance.
+ * set new PWM duty cycle.
  *
  * @param duty duty cycle of the pwm signal
  * @return duty cycle set
