@@ -171,3 +171,22 @@ uint16_t StallardOSpwm::operator=(uint16_t duty)
 
     return duty;
 }
+
+/**
+ * set new PWM duty cycle in Percent.
+ *
+ * @param duty duty cycle of the pwm signal
+ * @return duty cycle set
+ */
+uint16_t StallardOSpwm::operator=(float duty)
+{
+
+    this->sem.take();
+
+    this->duty = ((1 << bitcount) - 1) * duty;
+    __HAL_TIM_SET_COMPARE(&htim, this->channel, this->duty);
+
+    this->sem.give();
+
+    return duty;
+}
