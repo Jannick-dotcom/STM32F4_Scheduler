@@ -46,6 +46,7 @@ public:
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
   static void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
   static void yield();                      //RTOS sagen, dass jetzt der Code zuende ist
+  static void kickTheDog();
 };
 
 #endif

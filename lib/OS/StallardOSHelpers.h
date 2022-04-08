@@ -82,6 +82,7 @@ struct function_struct
   // nur für KontextSwitch
   volatile uint16_t refreshRate;
   volatile uint64_t lastYield;
+  volatile uint64_t lastWatchdogKick;
   volatile uint64_t lastStart;
   // volatile uint32_t stackUsage;
   // volatile taskState State;             //Status des Tasks

@@ -377,6 +377,13 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
                 DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
                 temp->executable = 0;
             }
+
+            if(temp->refreshRate > 0 && (HAL_GetTick() - temp->lastWatchdogKick) > (1000/temp->refreshRate)){
+                DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
+                temp->executable = 0;
+                //TODO: restart task?
+                // StallardOSGeneralFaultHandler();
+            }
             temp = temp->next;
         }
         while (temp != currentTask); 

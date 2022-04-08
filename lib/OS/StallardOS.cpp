@@ -365,6 +365,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
+  function_struct_ptr->lastWatchdogKick = 0;
   function_struct_ptr->lastStart = 0;
   // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
@@ -625,6 +626,20 @@ void StallardOS::yield()
       CALL_PENDSV();
       currentTask->lastStart = StallardOSTime_getTimeMs();
     }
+  }
+}
+
+/**
+ * @brief Reset the Software Watchdog
+ *        If Watchdog is not reset within the given window, the task is restarted
+ *        
+ */
+void StallardOS::kickTheDog(){
+  if(currentTask != nullptr){
+    // do not check if watchdog is enabled for this task or not
+    // getTimeMs is asignment of a single variable and shouldn't be much slower 
+    // then testing for enabled watchdog (+ asigning the var afterwards)
+    currentTask->lastWatchdogKick = StallardOSTime_getTimeMs();
   }
 }
 
