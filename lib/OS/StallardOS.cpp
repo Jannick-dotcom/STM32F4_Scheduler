@@ -324,7 +324,7 @@ void StallardOS::initMPU(void){
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
 
@@ -365,7 +365,9 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
-  function_struct_ptr->lastWatchdogKick = 0;
+  function_struct_ptr->calc_time_ms = 0;
+  function_struct_ptr->watchdog_limit = watchdogLimitMs;
+  function_struct_ptr->lastSwapIn = 0;
   function_struct_ptr->lastStart = 0;
   // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
@@ -422,7 +424,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   stack_T *stackPtr;
   if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
@@ -444,7 +446,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
     DEBUGGER_BREAK();
     return nullptr;
   }
-  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate, watchdogLimitMs);
   ptr->staticAlloc = 0;
 
 
@@ -483,7 +485,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
@@ -492,7 +494,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
   }
 
 
-  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate, watchdogLimitMs);
   /////////////////////////////////////////////
   #ifdef useMPU
     // static tasks are already covered by .bss region
@@ -618,6 +620,7 @@ void StallardOS::yield()
 {
   if (currentTask != nullptr)
   {
+    StallardOS::kickTheDog();
     currentTask->lastYield = StallardOSTime_getTimeMs();
     if(currentTask->refreshRate != 0)
     {
@@ -637,9 +640,7 @@ void StallardOS::yield()
 void StallardOS::kickTheDog(){
   if(currentTask != nullptr){
     // do not check if watchdog is enabled for this task or not
-    // getTimeMs is asignment of a single variable and shouldn't be much slower 
-    // then testing for enabled watchdog (+ asigning the var afterwards)
-    currentTask->lastWatchdogKick = StallardOSTime_getTimeMs();
+    currentTask->calc_time_ms = 0;
   }
 }
 

@@ -23,14 +23,14 @@ private:
   void initShared(void);
   void initMPU(void);                                               // setup the static part of the MPU configuration
 
-  struct function_struct *initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0);
+  struct function_struct *initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs = 0);
 
 
 public:
   //Constructor 
   StallardOS(); //Create a Task Scheduler
-  struct function_struct *addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0);
-  struct function_struct *addFunctionStatic(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0);
+  struct function_struct *addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs=0);
+  struct function_struct *addFunctionStatic(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs=0);
 
   //Setters
   void setFunctionEnabled(/*Funktion*/ uint16_t id, /*Aktivieren oder Deaktivieren*/ bool act);

@@ -377,16 +377,15 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
                 DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
                 temp->executable = 0;
             }
-
-            if(temp->refreshRate > 0 && (HAL_GetTick() - temp->lastWatchdogKick) > (1000/temp->refreshRate)){
-                DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
-                temp->executable = 0;
-                //TODO: restart task?
-                // StallardOSGeneralFaultHandler();
-            }
             temp = temp->next;
         }
         while (temp != currentTask); 
+
+        if(currentTask->watchdog_limit>0 && currentTask->calc_time_ms + (HAL_GetTick() - currentTask->lastSwapIn) > currentTask->watchdog_limit){
+            DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
+            temp->executable = 0;
+        }
+
         findNextFunction();
         if(currentTask != nextTask && !(currentTask == taskMainStruct && nextTask == NULL))
         {
@@ -406,6 +405,9 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
 __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize Attribute makes sure no frame pointer is used
 {
     disable_interrupts();
+
+    currentTask->calc_time_ms += (HAL_GetTick() - currentTask->lastSwapIn);
+    nextTask->lastSwapIn = HAL_GetTick();
 
     switchTask();
 
