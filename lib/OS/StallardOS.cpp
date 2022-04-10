@@ -620,7 +620,6 @@ void StallardOS::yield()
 {
   if (currentTask != nullptr)
   {
-    StallardOS::kickTheDog();
     currentTask->lastYield = StallardOSTime_getTimeMs();
     if(currentTask->refreshRate != 0)
     {
