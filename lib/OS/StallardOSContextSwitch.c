@@ -381,7 +381,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         }
         while (temp != currentTask); 
 
-        if(currentTask->watchdog_limit>0 && currentTask->calc_time_ms + (HAL_GetTick() - currentTask->lastSwapIn) > currentTask->watchdog_limit){
+        if(currentTask->watchdog_limit>0 && currentTask->watchdog_exec_time_ms + (HAL_GetTick() - currentTask->watchdog_swapin_ts) > currentTask->watchdog_limit){
             DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
             temp->executable = 0;
         }
@@ -406,8 +406,17 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
 {
     disable_interrupts();
 
-    currentTask->calc_time_ms += (HAL_GetTick() - currentTask->lastSwapIn);
-    nextTask->lastSwapIn = HAL_GetTick();
+     // TODO: read smaller resolution systick register
+     // TODO: var declaration in interrupt legal???
+    uint32_t systick = HAL_GetTick();
+
+    currentTask->watchdog_exec_time_ms += (systick - currentTask->watchdog_swapin_ts);
+    currentTask->perfmon_exec_time_ms += (systick - currentTask->perfmon_swapin_ts);
+
+    // watchdog can be reset independently of perfmon
+    // therefore 2 vars are required
+    nextTask->watchdog_swapin_ts = systick;
+    nextTask->perfmon_swapin_ts = systick;
 
     switchTask();
 

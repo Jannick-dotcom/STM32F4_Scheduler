@@ -82,10 +82,17 @@ struct function_struct
   // nur für KontextSwitch
   volatile uint16_t refreshRate;
   volatile uint64_t lastYield;
-  volatile uint64_t calc_time_ms;
-  volatile uint64_t watchdog_limit;
-  volatile uint64_t lastSwapIn;
-  volatile uint64_t lastStart;
+  volatile uint64_t lastStart;                  // used for yield/frequency violation detection
+
+  // SW watchdog
+  volatile uint64_t watchdog_limit;           // user defined limit
+  volatile uint64_t watchdog_exec_time_ms;    // exec time since last kick
+  volatile uint64_t watchdog_swapin_ts;       // last swapin OR time since last kick (whicever is later)
+
+  // cpu load estimation
+  volatile uint64_t perfmon_exec_time_ms;       // accumulated exec time of task
+  volatile uint64_t perfmon_swapin_ts;          // last swapIn, helper for exec time
+
   // volatile uint32_t stackUsage;
   // volatile taskState State;             //Status des Tasks
   volatile uint8_t waitingForSemaphore; // Is task waiting for a semaphore
