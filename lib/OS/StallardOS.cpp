@@ -17,6 +17,7 @@ volatile struct function_struct* volatile currentTask = nullptr;
 volatile struct function_struct* volatile nextTask = nullptr;
 volatile struct function_struct* volatile taskMainStruct = nullptr;
 stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
+stack_T taskPerfmonStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
@@ -36,6 +37,48 @@ void taskMain(void)
   {
   }
   
+}
+
+
+void taskPerfmon(void){
+
+  struct function_struct *task;
+  uint64_t total_calc_time_us;
+  uint64_t idle_calc_time_us;
+  uint8_t cpu_load;
+
+
+  while(1){
+
+    // get cpu load of the system
+    total_calc_time_us = 0;
+    idle_calc_time_us = 0;
+
+    // iterate over all tasks to get used cpu time since last scan
+    task = taskMainStruct;
+    do{
+      total_calc_time_us += task->perfmon_exec_time_us;
+      task->perfmon_exec_time_us = 0;
+      task = task->next;
+    }
+    while(task != taskMainStruct);
+
+    // get idle task cpu load and compare this to the total time
+    idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
+    cpu_load = 100 - (idle_calc_time_us*100/total_calc_time_us);
+
+
+    // get temperature values of the system
+    // TODO: temps
+
+    // get can fifo fill levels
+    // TODO: CAN fifos
+
+    // send all collected values to AD_CAN (if present)
+    // TODO: add can messages
+
+    StallardOS::yield();
+  }
 }
 
 /**
@@ -96,8 +139,9 @@ StallardOS::StallardOS()
   #endif // useMPU
 
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
-  if(taskMainStruct == nullptr) while(1);
+  addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
 
+  if(taskMainStruct == nullptr) while(1);
 }
 
 /**
