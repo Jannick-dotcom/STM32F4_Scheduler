@@ -381,7 +381,13 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         }
         while (temp != currentTask); 
 
-        if(currentTask->watchdog_limit>0 && currentTask->watchdog_exec_time_ms + (HAL_GetTick() - currentTask->watchdog_swapin_ts) > currentTask->watchdog_limit){
+        // test if the currently executing task is already exceeding the watchdog
+        // as watchdog calc time is only updated on task swapOut/swapIn, 
+        // a high prio task could slip through the detection if it never releases control
+        // 
+        // as the watchdog resolution is on ms base, this check is performed in ms aswell
+        // therefore only ms*1000 is used, instead of us readout
+        if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts) > currentTask->watchdog_limit){
             DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
             temp->executable = 0;
         }
@@ -406,17 +412,16 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
 {
     disable_interrupts();
 
-     // TODO: read smaller resolution systick register
-     // TODO: var declaration in interrupt legal???
-    uint32_t systick = HAL_GetTick();
-
-    currentTask->watchdog_exec_time_ms += (systick - currentTask->watchdog_swapin_ts);
-    currentTask->perfmon_exec_time_ms += (systick - currentTask->perfmon_swapin_ts);
+    uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
+    uint64_t us_ts = (HAL_GetTick() * 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
+    
+    currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
+    currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
 
     // watchdog can be reset independently of perfmon
     // therefore 2 vars are required
-    nextTask->watchdog_swapin_ts = systick;
-    nextTask->perfmon_swapin_ts = systick;
+    nextTask->watchdog_swapin_ts = us_ts;
+    nextTask->perfmon_swapin_ts = us_ts;
 
     switchTask();
 

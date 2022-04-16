@@ -367,9 +367,9 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
   function_struct_ptr->watchdog_limit = watchdogLimitMs;
-  function_struct_ptr->watchdog_exec_time_ms = 0;
+  function_struct_ptr->watchdog_exec_time_us = 0;
   function_struct_ptr->watchdog_swapin_ts = 0;
-  function_struct_ptr->perfmon_exec_time_ms = 0;
+  function_struct_ptr->perfmon_exec_time_us = 0;
   function_struct_ptr->perfmon_swapin_ts = 0;
   // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
@@ -641,8 +641,8 @@ void StallardOS::yield()
 void StallardOS::kickTheDog(){
   if(currentTask != nullptr){
     // do not check if watchdog is enabled for this task or not
-    currentTask->watchdog_exec_time_ms = 0;
-    currentTask->watchdog_swapin_ts = HAL_GetTick(); // simulate a "swapin" of the task
+    currentTask->watchdog_exec_time_us = 0;
+    currentTask->watchdog_swapin_ts = StallardOSTime_getTimeUs(); // fake a "swapin" of the task
   }
 }
 
