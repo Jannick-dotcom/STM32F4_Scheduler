@@ -5,6 +5,8 @@
 #include "StallardOSSerial.hpp"
 #include "FLASH_SECTOR_DEFINES.h"
 
+#include "StallardOSTasks.hpp"
+
 extern "C" stack_T _sdata;  // sizes of .data and .bss
 extern "C" stack_T _edata;  // used for MPU config
 extern "C" stack_T _sbss;
@@ -16,70 +18,14 @@ extern "C" stack_T _eshared;
 volatile struct function_struct* volatile currentTask = nullptr;
 volatile struct function_struct* volatile nextTask = nullptr;
 volatile struct function_struct* volatile taskMainStruct = nullptr;
-stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
-stack_T taskPerfmonStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
 extern "C" void findNextFunction();
 
-/**
- * Waste Time if all tasks are in delay.
- *
- * @param 
- * @return
- */
-void taskMain(void)
-{
-  
-  while (1)
-  {
-  }
-  
-}
 
 
-void taskPerfmon(void){
-
-  struct function_struct *task;
-  uint64_t total_calc_time_us;
-  uint64_t idle_calc_time_us;
-  uint8_t cpu_load;
-
-
-  while(1){
-
-    // get cpu load of the system
-    total_calc_time_us = 0;
-    idle_calc_time_us = 0;
-
-    // iterate over all tasks to get used cpu time since last scan
-    task = taskMainStruct;
-    do{
-      total_calc_time_us += task->perfmon_exec_time_us;
-      task->perfmon_exec_time_us = 0;
-      task = task->next;
-    }
-    while(task != taskMainStruct);
-
-    // get idle task cpu load and compare this to the total time
-    idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
-    cpu_load = 100 - (idle_calc_time_us*100/total_calc_time_us);
-
-
-    // get temperature values of the system
-    // TODO: temps
-
-    // get can fifo fill levels
-    // TODO: CAN fifos
-
-    // send all collected values to AD_CAN (if present)
-    // TODO: add can messages
-
-    StallardOS::yield();
-  }
-}
 
 /**
  * If a Task Returns, this function gets executed and calls the remove function of this task.
