@@ -387,7 +387,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         // 
         // as the watchdog resolution is on ms base, this check is performed in ms aswell
         // therefore only ms*1000 is used, instead of us readout
-        if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts) > currentTask->watchdog_limit){
+        if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit){
             DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
             temp->executable = 0;
         }
