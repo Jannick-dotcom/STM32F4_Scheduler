@@ -5,6 +5,8 @@
 #include "StallardOSSerial.hpp"
 #include "FLASH_SECTOR_DEFINES.h"
 
+#include "StallardOSTasks.hpp"
+
 extern "C" stack_T _sdata;  // sizes of .data and .bss
 extern "C" stack_T _edata;  // used for MPU config
 extern "C" stack_T _sbss;
@@ -16,27 +18,14 @@ extern "C" stack_T _eshared;
 volatile struct function_struct* volatile currentTask = nullptr;
 volatile struct function_struct* volatile nextTask = nullptr;
 volatile struct function_struct* volatile taskMainStruct = nullptr;
-stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
 extern "C" void findNextFunction();
 
-/**
- * Waste Time if all tasks are in delay.
- *
- * @param 
- * @return
- */
-void taskMain(void)
-{
-  
-  while (1)
-  {
-  }
-  
-}
+
+
 
 /**
  * If a Task Returns, this function gets executed and calls the remove function of this task.
@@ -96,8 +85,9 @@ StallardOS::StallardOS()
   #endif // useMPU
 
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
-  if(taskMainStruct == nullptr) while(1);
+  addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
 
+  if(taskMainStruct == nullptr) while(1);
 }
 
 /**
@@ -324,7 +314,7 @@ void StallardOS::initMPU(void){
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   struct function_struct *function_struct_ptr = nullptr; //Pointer to the function Struct
 
@@ -366,6 +356,11 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
   function_struct_ptr->lastStart = 0;
+  function_struct_ptr->watchdog_limit = watchdogLimitMs;
+  function_struct_ptr->watchdog_exec_time_us = 0;
+  function_struct_ptr->watchdog_swapin_ts = 0;
+  function_struct_ptr->perfmon_exec_time_us = 0;
+  function_struct_ptr->perfmon_swapin_ts = 0;
   // function_struct_ptr->State = PAUSED;                                       //New Task
   function_struct_ptr->stackBase = stackPtr;
   function_struct_ptr->Stack = (stack_T*)((stack_T)stackPtr + (stackSize - sizeof(stack_T))); //End of Stack
@@ -421,7 +416,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   stack_T *stackPtr;
   if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
@@ -443,7 +438,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
     DEBUGGER_BREAK();
     return nullptr;
   }
-  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate, watchdogLimitMs);
   ptr->staticAlloc = 0;
 
 
@@ -482,7 +477,7 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
-struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate)
+struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
@@ -491,7 +486,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
   }
 
 
-  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate);
+  function_struct *ptr = initTask(function, prio, stackPtr, stackSize, refreshRate, watchdogLimitMs);
   /////////////////////////////////////////////
   #ifdef useMPU
     // static tasks are already covered by .bss region
@@ -625,6 +620,19 @@ void StallardOS::yield()
       CALL_PENDSV();
       currentTask->lastStart = StallardOSTime_getTimeMs();
     }
+  }
+}
+
+/**
+ * @brief Reset the Software Watchdog
+ *        If Watchdog is not reset within the given window, the task is restarted
+ *        
+ */
+void StallardOS::kickTheDog(){
+  if(currentTask != nullptr){
+    // do not check if watchdog is enabled for this task or not
+    currentTask->watchdog_exec_time_us = 0;
+    currentTask->watchdog_swapin_ts = StallardOSTime_getTimeUs(); // fake a "swapin" of the task
   }
 }
 
