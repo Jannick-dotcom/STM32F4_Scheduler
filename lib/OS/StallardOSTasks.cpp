@@ -38,6 +38,7 @@ void taskPerfmon(void){
 
     // output can messages (defined per ECU)
     // ...using dummy messages, until dbc is updated
+    #if 0
     #if STOS_current_ECU_ID==ECU_ID_FCU
       STOS_CAN_PDU_Steering_Whl_Angle load;
       STOS_CAN_PDU_SWCU_ECU_Temp temp;
@@ -51,12 +52,13 @@ void taskPerfmon(void){
       STOS_CAN_PDU_SWCU_ECU_Temp temp;
       STOS_CAN_PDU_Whl_Speed_F fifoLvl;
     #endif
+    #endif
     
 
 
 
   while(1){
-
+    #if 0
     // get cpu load of the system
     total_calc_time_us = 0;
     idle_calc_time_us = 0;
@@ -96,7 +98,7 @@ void taskPerfmon(void){
     AD_CAN.sendMessage(&fifoLvl);
     AD_CAN.sendMessage(&temp);
     AD_CAN.sendMessage(&load);
-
+    #endif // 0
     StallardOS::yield();
   }
 }
