@@ -9,7 +9,7 @@ stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in B
 stack_T taskPerfmonStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 
 
-STOS_CAN_PDU_Whl_Speed_F wSpeed;
+
 
 
 /**
@@ -36,8 +36,23 @@ void taskPerfmon(void){
     uint64_t idle_calc_time_us;
     uint8_t cpu_load;
 
-    uint16_t adcan_fill_lvl;
-    uint16_t ms4can_fill_lvl;
+    // output can messages (defined per ECU)
+    // ...using dummy messages, until dbc is updated
+    #if STOS_current_ECU_ID==ECU_ID_FCU
+      STOS_CAN_PDU_Steering_Whl_Angle load;
+      STOS_CAN_PDU_SWCU_ECU_Temp temp;
+      STOS_CAN_PDU_Whl_Speed_F fifoLvl;
+    #elif STOS_current_ECU_ID==2
+      STOS_CAN_PDU_Steering_Whl_Angle load;
+      STOS_CAN_PDU_SWCU_ECU_Temp temp;
+      STOS_CAN_PDU_Whl_Speed_F fifoLvl;
+    #elif STOS_current_ECU_ID==3
+      STOS_CAN_PDU_Steering_Whl_Angle load;
+      STOS_CAN_PDU_SWCU_ECU_Temp temp;
+      STOS_CAN_PDU_Whl_Speed_F fifoLvl;
+    #endif
+    
+
 
 
   while(1){
@@ -58,22 +73,29 @@ void taskPerfmon(void){
     // get idle task cpu load and compare this to the total time
     idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
     cpu_load = 100 - (idle_calc_time_us*100/total_calc_time_us);
-
+    load.ADCAN_SP_Steering_Wheel_Angle = cpu_load;
 
     // get temperature values of the system
     // TODO: readout temps
+    temp.ADCAN_EL_ECU_Temp_SWCU = 42;
 
 
     // get can fifo fill levels
-    adcan_fill_lvl = AD_CAN.getSWFiFoFillLevel();
-    ms4can_fill_lvl = MS4_CAN.getSWFiFoFillLevel();
+    
+    fifoLvl.ADCAN_SP_Wheel_Speed_FL = AD_CAN.getSWFiFoFillLevel(); // AD_CAN always present
+    #ifdef MS4_CAN_PORT
+      fifoLvl.ADCAN_SP_Wheel_Speed_FR = MS4_CAN.getSWFiFoFillLevel(); // MS4 not on all devices
+    #endif
 
 
     // send all collected values to AD_CAN (if present)
-    wSpeed.build();
-    // AD_CAN.sendMessage(&wSpeed); // cpu load
-    // AD_CAN.sendMessage(&wSpeed); // temp
-    // AD_CAN.sendMessage(&wSpeed); // FIFO levels (AD/MS4)
+    fifoLvl.build();
+    temp.build();
+    load.build();
+    
+    AD_CAN.sendMessage(&fifoLvl);
+    AD_CAN.sendMessage(&temp);
+    AD_CAN.sendMessage(&load);
 
     StallardOS::yield();
   }
