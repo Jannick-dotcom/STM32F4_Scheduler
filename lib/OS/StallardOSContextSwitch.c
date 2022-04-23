@@ -1,9 +1,6 @@
 #include "StallardOSconfig.h"
 #include "StallardOSHelpers.h"
 #include <stdint.h>
-#include <stdlib.h>
-#include <stm32f4xx_hal.h>
-#include <system_stm32f4xx.h>
 
 extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
@@ -133,10 +130,12 @@ __attribute__((always_inline)) inline void switchTask(void)
     __ASM volatile("MRS r0, PSP\n"         //Get Process Stack Pointer
                     "ISB\n"
 
+                    #ifdef STM32F4xxxx
                     #ifdef useFPU
                     "TST r14, #0x10\n"  //store vfp registers, if task was using FPU
                     "IT eq\n"
                     "VSTMDBeq r0!, {s16-s31}\n"
+                    #endif
                     #endif
 
                     #ifndef unprotectedBuild
@@ -165,10 +164,12 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
                     #endif
 
+                    #ifdef STM32F4xxxx
                     #ifdef useFPU
                     "TST r14, #0x10\n"
                     "IT eq\n"
                     "VLDMIAeq r0!, {s16-s31}\n"
+                    #endif
                     #endif
                     "MSR PSP, r0\n"           //set PSP
                     "ISB\n"

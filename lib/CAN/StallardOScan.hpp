@@ -7,7 +7,7 @@
 #include "StallardOScanTypes.hpp"
 #include "StallardOScanStructs.hpp"
 #include "StallardOSCANFilter.hpp"
-
+#include "StallardOSHelpers.h"
 #include "StallardOSTime.h"
 
 extern StallardOSCanMessage *canarray[];
@@ -15,6 +15,8 @@ extern uint16_t idToOffset(uint16_t id);
 extern void copyToBuffer(const StallardOSCanMessage *msg);
 
 extern "C" void StallardOSGeneralFaultHandler();
+
+uint8_t portsToAF(CANports port);
 
 class StallardOSCAN
 {
@@ -128,5 +130,8 @@ extern StallardOSCAN AD_CAN;
 #define AD_CAN_PORT StallardOSCAN1
 #define MS4_CAN_PORT StallardOSCAN2
 #endif
-
+#ifdef STM32F1xxxx
+extern StallardOSCAN AD_CAN;
+#define AD_CAN_PORT StallardOSCAN1
+#endif
 #endif
