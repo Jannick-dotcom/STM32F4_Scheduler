@@ -38,6 +38,7 @@ public:
   void setFunctionFrequency(/*Funktion*/ uint16_t id, /*New execution Frequency*/ float exec_freq);
 
   //Getters
+  bool getPrivilegeLevel(); //returns true if privileged
   // taskState getFunctionState(/*Funktion*/ uint16_t id);
 
   //Control

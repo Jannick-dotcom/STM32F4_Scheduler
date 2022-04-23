@@ -648,6 +648,12 @@ void StallardOS::yield()
 //   }
 // }
 
+bool StallardOS::getPrivilegeLevel()
+{
+  if(__get_CONTROL() & CONTROL_nPRIV_Msk) return true;
+  else return false;
+}
+
 /**
  * Start the StallardOS operating system
  *
