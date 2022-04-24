@@ -5,7 +5,7 @@ from enum import Enum
 from SCons.Script import DefaultEnvironment
 
 env = DefaultEnvironment()
-
+OS_INTERNAL_TASK_CNT = 3
 
 class Mode(Enum):
     build=0
@@ -24,7 +24,7 @@ def read_files(dir) -> 'list[str]':
 
 
 def parse_build_file(file_content) -> int:
-    pattern = r'\.addFunction(Static)?\(.*\);'
+    pattern = r'(\.|->)addFunction(Static)?\(.*\);'
     match = re.compile(pattern)
     matches = match.findall(file_content)
     return len(matches)
@@ -57,10 +57,10 @@ def tasks_created(files: 'list[str]', mode:Mode) -> int:
         
     if mode==mode.build:
         # build mode requires to hold all functions
-        return sum(cnt_lst)
+        return sum(cnt_lst)+OS_INTERNAL_TASK_CNT
     elif mode==mode.test:
         # unit tests only require the highest used function count (not total)
-        return max(cnt_lst)
+        return max(cnt_lst)+OS_INTERNAL_TASK_CNT
     else:
         print(f'ERROR: unknown build mode {mode}')
         exit(-1)
