@@ -8,6 +8,10 @@ extern volatile struct function_struct* volatile taskMainStruct;
 stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 stack_T taskPerfmonStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
 
+#ifdef useSFOC
+  stack_T taskSFOCStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
+#endif
+
 
 
 
@@ -102,3 +106,11 @@ void taskPerfmon(void){
     StallardOS::yield();
   }
 }
+
+#ifdef useSFOC
+  void taskSFOC(void){
+    while(1){
+      StallardOS::yield();
+    }
+  }
+#endif

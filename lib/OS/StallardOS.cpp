@@ -86,6 +86,10 @@ StallardOS::StallardOS()
 
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
   addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
+  #ifdef useSFOC
+    addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
+  #endif
+
 
   if(taskMainStruct == nullptr) while(1);
 }
