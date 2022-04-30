@@ -416,14 +416,14 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
  *
  * @param function Task to execute.
  * @param prio priority of the task, lower means higher.
- * @param stackSize amount of Stack bytes to allocate, stackSize*address_len must be power of 2 in MPU mode.
+ * @param stackSize amount of Stack bytes to allocate, must at least be 130 Bytes (FPU ctx switch), for MPU stackSize*address_len must be power of 2 in MPU mode.
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
 struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   stack_T *stackPtr;
-  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
+  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 256 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
   {
     DEBUGGER_BREAK();
     return nullptr;
@@ -477,13 +477,13 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
  * @param function Task to execute.
  * @param prio priority of the task, lower means higher.
  * @param stackPtr pointer to the stack memory allocated by the user, must be aligned to stackSize in MPU mode
- * @param stackSize amount of Stack bytes to allocate, stackSize*word_len must be power of 2 in MPU mode.
+ * @param stackSize amount of Stack bytes to allocate, must at least be 130 Bytes (FPU ctx switch)
  * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
  * @return pointer to the created tcb.
  */
 struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_t prio, stack_T *stackPtr, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
-  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 0 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
+  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize < 256 || stackSize > 0x1'0000'0000 || stackPtr == nullptr) //Make sure the parameters are correct
   {
     DEBUGGER_BREAK();
     return nullptr;

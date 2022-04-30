@@ -367,7 +367,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         volatile struct function_struct *temp = currentTask;
         do
         {
-            if(temp->Stack > (temp->stackBase + temp->stackSize) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
+            if((stack_T)temp->Stack > (((stack_T)temp->stackBase + temp->stackSize)) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
             {
                 DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
                 temp->executable = 0;
