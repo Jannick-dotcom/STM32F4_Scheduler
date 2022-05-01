@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <malloc.h>
 #include "StallardOSHelpers.h"
+#include "StallardOSVersion.hpp"
 
 #include "StallardOSClass.hpp"
 #include "StallardOSsem.hpp"
@@ -17,7 +18,5 @@
 #include "StallardOSPID.hpp"
 #include "StallardOSSPI.hpp"
 #include "StallardOSDAC.hpp"
-
-#define STOS_VERSION 0x10
 
 #endif //StallardOS_h

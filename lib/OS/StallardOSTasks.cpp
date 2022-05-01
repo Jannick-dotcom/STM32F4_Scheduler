@@ -1,6 +1,10 @@
 #include "StallardOSTasks.hpp"
 #include "StallardOS.hpp"
 
+#ifdef useSFOC
+  #include "SFOC.hpp"
+#endif // useSFOC
+
 // private kernel variable
 extern volatile struct function_struct* volatile taskMainStruct;
 
@@ -109,7 +113,17 @@ void taskPerfmon(void){
 
 #ifdef useSFOC
   void taskSFOC(void){
+    SFOC_Status ret;
+    SFOC::setup(0);
+
     while(1){
+      ret = SFOC::stm_iterate();
+
+      if(ret != SFOC_CONTINUE){
+        // exit task
+        break;
+      }
+
       StallardOS::yield();
     }
   }

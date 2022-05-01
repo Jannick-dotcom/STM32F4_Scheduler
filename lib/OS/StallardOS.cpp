@@ -423,7 +423,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
 struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
 {
   stack_T *stackPtr;
-  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize == 256 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
+  if (function == nullptr || searchFreeFunction() == nullptr || refreshRate > 1000 || stackSize < 256 || stackSize > 0x1'0000'0000) //Make sure the parameters are correct
   {
     DEBUGGER_BREAK();
     return nullptr;
