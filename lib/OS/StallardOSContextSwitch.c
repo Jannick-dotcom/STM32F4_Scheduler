@@ -413,16 +413,16 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
 {
     disable_interrupts();
 
-    uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
-    uint64_t us_ts = (HAL_GetTick() * 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
+    // uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
+    // uint64_t us_ts = (HAL_GetTick() * 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
     
-    currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
-    currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
+    // currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
+    // currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
 
-    // watchdog can be reset independently of perfmon
-    // therefore 2 vars are required
-    nextTask->watchdog_swapin_ts = us_ts;
-    nextTask->perfmon_swapin_ts = us_ts;
+    // // watchdog can be reset independently of perfmon
+    // // therefore 2 vars are required
+    // nextTask->watchdog_swapin_ts = us_ts;
+    // nextTask->perfmon_swapin_ts = us_ts;
 
     switchTask();
 
