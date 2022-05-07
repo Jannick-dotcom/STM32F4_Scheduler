@@ -101,4 +101,27 @@ It must be a power of 2 (-> only 1 bit in the number is set)
 
 The `addFunction` method checks this constraints and aborts function allocation if not met.
 
+_________________________________________________________________________________________
+
+## Usage in StallardOS
+
+The MPU is initialized in a single place and updated on each context switch.
+
+### Initialization
+
+All static memory sections are configured within the constructor of `StallardOS` in `StallardOS::initMPU` in `lib/Os/StallardOS.cpp`.
+
+The MPU configures access to 
+
+* `.code` (RO)
+* `.data` (RW)
+* `.bss` (RW)
+* `.shared` (RO, privRW)
+* peripherals (RW)
+
+> Giving rw to `.data` and `.bss` will remove the ability to detect access violations for static functions.
+
+Dynamic functions, allocated to the heap are configured on each context switch.
+On task definition `*StallardOS::addFunction`, the `StallardOSMPU` class is used to determin the required configuration (address, Regions and disableRegions). These statically stored values are then applied in `inline_set_mpu` at `lib/OS/StallardOSContextSwitch.c`
+
 

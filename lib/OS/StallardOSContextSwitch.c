@@ -6,6 +6,10 @@ extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
 
+const stack_T watchdog_swapin_offset = offsetof(struct function_struct, watchdog_swapin_ts);
+const stack_T perfmon_swapin_offset = offsetof(struct function_struct, perfmon_swapin_ts);
+const stack_T watchdog_exec_offset = offsetof(struct function_struct, watchdog_exec_time_us);
+const stack_T perfmon_exec_offset = offsetof(struct function_struct, perfmon_exec_time_us);
 
 #ifdef useMPU
 volatile uint8_t mpu_subregion_disable;
@@ -367,7 +371,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         volatile struct function_struct *temp = currentTask;
         do
         {
-            if(temp->Stack > (temp->stackBase + temp->stackSize) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
+            if((stack_T)temp->Stack > (((stack_T)temp->stackBase + temp->stackSize)) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
             {
                 DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
                 temp->executable = 0;
@@ -413,16 +417,96 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
 {
     disable_interrupts();
 
-    uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
-    uint64_t us_ts = (HAL_GetTick() * 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
-    
-    currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
-    currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
+    // DO NOT USE C
+    // the compiler doesn't properly restore all registers
 
-    // watchdog can be reset independently of perfmon
-    // therefore 2 vars are required
-    nextTask->watchdog_swapin_ts = us_ts;
-    nextTask->perfmon_swapin_ts = us_ts;
+    // uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
+    // uint64_t us_ts = (uwTick* 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
+
+    // currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
+    // currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
+
+    // // watchdog can be reset independently of perfmon
+    // // therefore 2 vars are required
+    // nextTask->watchdog_swapin_ts = us_ts;
+    // nextTask->perfmon_swapin_ts = us_ts;
+
+
+    __ASM volatile(
+        "PUSH {r4-r6}\n"
+
+        "LDR r0, =#0xe000e018\n" // load &SysTick_VAL into r0
+        "LDR r0, [r0]\n" // load SysTick_VAL
+
+        // load the divisor for the systick counter (SystemCoreClock/1000000)
+        "LDR r1, =SystemCoreClock\n" // load address of SystemCoreCLok
+        "LDR r1, [r1]\n" // load value of SystemCoreClock
+        "LDR r2, =#1000000\n"
+        "UDIV r1, r2\n" // SystemCoreClock/1000000
+        "UDIV r2, r0, r1\n" // div Systick value with sysclock divisor
+        // r2 holds current ns of Systick register
+
+        // next get uwTick [ms] counter into r0
+        "LDR r0, =uwTick\n" // load address of HAL systick value
+        "LDR r0, [r0]\n" // load value of systick in ms
+
+        // and multiply with 1000 to convert to ns
+        "LDR r1, =#1000\n"
+        "UMULL r0, r1, r0, r1\n" // multiply uwTick*1000, result is r0=lowerH and r1=upperH
+        "ADDS r0, r2\n" // lowerH of 64bit + 32bit number
+        "ADC r1, #0\n" // take over carry bit
+        //===================================
+        // us_ts is now in r0 and r1
+
+        // update watchdog variables next
+        // first load required offsets
+        // currentTask into r2
+        // watchdog_exec_time_us into r3
+        // watchdog_swapin_ts into r4
+
+        "LDR r2, =currentTask\n" // **currentTask
+        "LDR r2, [r2]\n" // load pointer to currentTask
+
+        "LDR r3, =watchdog_exec_offset\n"
+        "LDR r3, [r3]\n" // offset of watchdog_exec_time_us
+        "ADD r3, r2\n" // load addr of exec_time_us
+
+        "LDR r4, =watchdog_swapin_offset\n"
+        "LDR r4, [r4]\n" // offset value of watchdog_swapin_ts
+        "ADD r4, r2\n" // load addr of swapin_ts
+
+        // // load the last swapin_ts and substract it from us_ts
+        // // then save it back to exec_offset
+        "LDM r4, {r5, r6}\n"
+
+        
+        // substraction of us_ts-sapin_ts into r5=low, r6=high
+        "SUBS r5, r0, r5\n" // 64bit sub of us_ts-watchdog_swapin
+        "SBC r6, r1, r6\n"
+        "STM r3, {r5, r6}\n" // write back to watchdog_exec_time_us
+
+        // load us_ts into watchdog_swapin_ts
+        // addr of swapin_ts is still stored in r4
+        "STM r4, {r0, r1}\n"
+
+        //==========================================
+        // repeat the same calculation for perfmon_* instead of watchdog_*
+        "LDR r3, =perfmon_exec_offset\n"
+        "LDR r3, [r3]\n"
+        "ADD r3, r2\n"
+        "LDR r4, =perfmon_swapin_offset\n"
+        "LDR r4, [r4]\n"
+        "ADD r4, r2\n"
+        "LDM r4, {r5, r6}\n"
+        "SUBS r5, r0, r5\n"
+        "SBC r6, r1, r6\n"
+        "STM r3, {r5, r6}\n"
+        "STM r4, {r0, r1}\n"
+
+        "POP {r4-r6}"
+    );
+    
+
 
     switchTask();
 
