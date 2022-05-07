@@ -640,6 +640,70 @@ void StallardOS::kickTheDog(){
   }
 }
 
+void StallardOS::restartTask(function_struct *task)
+{
+  if(task == nullptr || task->used == false) 
+  {
+    return;
+  }
+  disable_interrupts();
+  currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
+  //Prepare initial stack trace
+  task->Stack--;
+  *task->Stack = (uint32_t)0x01000000;
+  task->Stack--;
+  *task->Stack = (uint32_t)currentTask->function & (~1);
+  task->Stack--;
+  *task->Stack = (uint32_t)taskOnEnd;
+
+  task->Stack--;
+  *task->Stack = (uint32_t)12;
+  task->Stack--;
+  *task->Stack = (uint32_t)3;
+  task->Stack--;
+  *task->Stack = (uint32_t)2;
+  task->Stack--;
+  *task->Stack = (uint32_t)1;
+  task->Stack--;
+  *task->Stack = (uint32_t)0;
+  
+  task->Stack--;
+  *task->Stack = 0xFFFFFFFD;
+
+  #ifndef unprotectedBuild
+  task->Stack--;
+  *task->Stack = (CONTROL_nPRIV_Msk << CONTROL_nPRIV_Pos); //Control register (unprivileged)
+  #endif
+
+  for(uint8_t i = 11; i > 3; i--)
+  {
+    task->Stack--;
+    *task->Stack = i;
+  }
+  //////////////////////////////
+  if(currentTask->semVal != NULL){
+      if(currentTask->waitingForSemaphore == 0){
+          // only execute, if semaphore is actually owned by task (take finished)
+
+          /* normal write access to semaphore is ok in this context, 
+          * as no other task may execute during hardFault 
+          */
+          *(currentTask->semVal) = 1; //Semaphore freigeben
+          __CLREX();  // reset exclusive monitor
+      }
+      else{
+          // undefined state, task may or may not own the semaphore
+          // assume it didn't own it, as that's more likely?
+          // TODO: change this???
+          DEBUGGER_BREAK();
+      }
+  }
+  currentTask->waitingForSemaphore = 0;
+  currentTask->semVal = 0; //Semaphore von task lösen
+  task->continueInMS = HAL_GetTick();
+  task->executable = 1;
+  enable_interrupts();
+}
 
 /**
  * Check the state of a task
