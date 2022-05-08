@@ -45,7 +45,7 @@ void taskOnEnd(void)
     currentTask->executable = 0;
     currentTask = taskMainStruct;
     nextTask = taskMainStruct;
-    __ASM volatile("SVC #3");
+    CALL_PENDSV();
     while(1);
 }
 
