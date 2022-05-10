@@ -61,3 +61,12 @@
 #define STOS_CAN_ID_Water_Oil_Status_Control 0x246
 #define STOS_CAN_ID_Whl_Speed_F 0x180
 #define STOS_CAN_ID_Whl_Speed_R 0x181
+#define STOS_CAN_ID_Aero_ADC_1 0x191
+#define STOS_CAN_ID_Aero_ADC_2 0x192
+#define STOS_CAN_ID_Aero_ADC_3 0x193
+#define STOS_CAN_ID_Aero_ADC_4 0x194
+#define STOS_CAN_ID_Aero_ADC_5 0x195
+#define STOS_CAN_ID_Aero_ADC_6 0x196
+#define STOS_CAN_ID_Aero_ADC_7 0x197
+#define STOS_CAN_ID_Aero_ADC_8 0x198
+#define STOS_CAN_ID_Aero_ADC_9 0x199
