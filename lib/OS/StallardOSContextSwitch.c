@@ -380,7 +380,8 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
             if(temp->refreshRate > 0 && (temp->lastYield - temp->lastStart) > (1000 / temp->refreshRate)) //Task timeout check
             {
                 DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
-                temp->executable = 0;
+                // task is not prevented from further execution
+                // as it's not corrupting/influencing any higher prio tasks
             }
             temp = temp->next;
         }
