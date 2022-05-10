@@ -31,7 +31,7 @@ def parse_build_file(file_content) -> int:
 
 
 def parse_test_file(file_content) -> int:
-    # TODO: only return test case with most function calls
+    # this might allocate too many tasks, but doesn't really have any effects
     return parse_build_file(file_content)
 
 

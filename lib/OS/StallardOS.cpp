@@ -430,7 +430,6 @@ struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio
   }
 
   #ifdef useMPU
-    // TODO: adjust to new restrictions
     stackPtr = (stack_T *)memalign(stackSize, stackSize);
   #else
     stackPtr = (stack_T *)malloc(stackSize);
