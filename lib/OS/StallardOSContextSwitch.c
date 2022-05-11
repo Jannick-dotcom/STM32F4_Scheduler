@@ -122,6 +122,79 @@ void findNextFunction()
     while (temp != currentTask->next);   
 }
 
+
+/**
+ * @brief restarts the given task
+ *        sets executble bit to 1
+ *        the lastly held semaphore is freed (not all!!!!!)
+ *        sets executable to 1
+ * 
+ *        INFO: does NOT disable interrupts, only to be called in disabled interrupts context
+ */
+__attribute__((always_inline)) inline void restartTask(struct function_struct *task)
+{
+  if(task == NULL || task->used == 0) 
+  {
+    return;
+  }
+  currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
+  //Prepare initial stack trace
+  task->Stack--;
+  *task->Stack = (uint32_t)0x01000000;
+  task->Stack--;
+  *task->Stack = (uint32_t)currentTask->function & (~1);
+  task->Stack--;
+  *task->Stack = (uint32_t)taskOnEnd;
+
+  task->Stack--;
+  *task->Stack = (uint32_t)12;
+  task->Stack--;
+  *task->Stack = (uint32_t)3;
+  task->Stack--;
+  *task->Stack = (uint32_t)2;
+  task->Stack--;
+  *task->Stack = (uint32_t)1;
+  task->Stack--;
+  *task->Stack = (uint32_t)0;
+  
+  task->Stack--;
+  *task->Stack = 0xFFFFFFFD;
+
+  #ifndef unprotectedBuild
+  task->Stack--;
+  *task->Stack = (CONTROL_nPRIV_Msk << CONTROL_nPRIV_Pos); //Control register (unprivileged)
+  #endif
+
+  for(uint8_t i = 11; i > 3; i--)
+  {
+    task->Stack--;
+    *task->Stack = i;
+  }
+  //////////////////////////////
+  if(currentTask->semVal != NULL){
+      if(currentTask->waitingForSemaphore == 0){
+          // only execute, if semaphore is actually owned by task (take finished)
+
+          /* normal write access to semaphore is ok in this context, 
+          * as no other task may execute during hardFault 
+          */
+          *(currentTask->semVal) = 1; //Semaphore freigeben
+          __CLREX();  // reset exclusive monitor
+      }
+      else{
+          // undefined state, task may or may not own the semaphore
+          // assume it didn't own it, as that's more likely?
+          // TODO: change this???
+          DEBUGGER_BREAK();
+      }
+  }
+  currentTask->waitingForSemaphore = 0;
+  currentTask->semVal = 0; //Semaphore von task lösen
+  task->continueInMS = HAL_GetTick();
+  task->executable = 1;
+}
+
+
 /**
  * Switching of a Task happens here.
  *
@@ -395,7 +468,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         // therefore only ms*1000 is used, instead of us readout
         if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit){
             DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
-            temp->executable = 0;
+            restartTask(currentTask);
         }
 
         findNextFunction();
@@ -420,6 +493,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
 
     // DO NOT USE C
     // the compiler doesn't properly restore all registers
+    //
 
     // uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
     // uint64_t us_ts = (uwTick* 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
