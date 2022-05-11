@@ -3,7 +3,7 @@
 #include "stdint.h"
 #include "StallardOScanTypes.hpp"
 #include <math.h>
-
+#include "StallardOScanIDs.h"
 struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage 
 {
 public:

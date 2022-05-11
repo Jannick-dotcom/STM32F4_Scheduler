@@ -14,7 +14,7 @@ outfileDefs = open("StallardOS_2021/lib/CAN/StallardOScanIDs.h", "w") #the outpu
 outfileStructs = open("StallardOS_2021/lib/CAN/StallardOScanStructs.hpp", "w") #the output for structs
 
 outfileStructs.write("#ifndef StallardOScanStructs_hpp\n#define StallardOScanStructs_hpp\n")
-outfileStructs.write('#include "stdint.h"\n#include "StallardOScanTypes.hpp"\n#include <math.h>\n\n') #include the integer types to the struct file
+outfileStructs.write('#include "stdint.h"\n#include "StallardOScanTypes.hpp"\n#include <math.h>\n#include "StallardOScanIDs.h"\n') #include the integer types to the struct file
 
 def genConstructor(prevMSGName, bitcountInMsg):
     tempstr = ""
