@@ -1,4 +1,5 @@
 #pragma once
+#include "StallardoOSFaulhaberControllword.hpp"
 
 class StallardOSFaulhaberMotionController
 {
@@ -10,7 +11,10 @@ private:
         STOPPED,
         OPERATIONAL
     };
-    int Node_ID;
+
+    int node_ID;
+    State state;
+    StallardoOSFaulhaberControllword controllword;
 
     void StateTransitionInitialization();
     void StateTransitionPreOperational();
@@ -28,8 +32,8 @@ private:
 public:
     StallardOSFaulhaberMotionController(/* args */);
     ~StallardOSFaulhaberMotionController();
-    State getState();
-    int getNodeID();
+    State GetState();
+    int GetNodeID();
 };
 
 StallardOSFaulhaberMotionController::StallardOSFaulhaberMotionController(/* args */)

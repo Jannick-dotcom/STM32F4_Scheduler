@@ -45,6 +45,7 @@ public:
     StallardOSFaulhaberAntrieb(/* args */);
     ~StallardOSFaulhaberAntrieb();
     State GetState();
+    OperationMode GetOperationMode();
 };
 
 StallardOSFaulhaberAntrieb::StallardOSFaulhaberAntrieb(/* args */)
