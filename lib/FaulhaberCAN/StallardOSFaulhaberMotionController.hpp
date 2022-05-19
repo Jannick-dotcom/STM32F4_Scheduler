@@ -1,6 +1,7 @@
 #pragma once
-#include "StallardoOSFaulhaberControllword.hpp"
-
+#include "StallardOSFaulhaberControllword.hpp"
+#include "StallardOSFaulhaberMessages.hpp"
+//#include "StallardOSFaulhaberAntrieb.hpp"
 class StallardOSFaulhaberMotionController
 {
 private:
@@ -16,7 +17,7 @@ private:
     State state;
     StallardoOSFaulhaberControllword controllword;
 
-    void StateTransitionInitialization();
+        void StateTransitionInitialization();
     void StateTransitionPreOperational();
     void StateTransitionOperational();
     void StateTransitionStopped();
@@ -30,16 +31,8 @@ private:
     void ResetNodeIndication();
 
 public:
-    StallardOSFaulhaberMotionController(/* args */);
-    ~StallardOSFaulhaberMotionController();
-    State GetState();
-    int GetNodeID();
+    StallardOSFaulhaberMotionController(int node_ID);
+    State GetState() { return state; };
+    State SetState(State new_state) { state = new_state; }
+    int GetNodeID() { return node_ID; };
 };
-
-StallardOSFaulhaberMotionController::StallardOSFaulhaberMotionController(/* args */)
-{
-}
-
-StallardOSFaulhaberMotionController::~StallardOSFaulhaberMotionController()
-{
-}
