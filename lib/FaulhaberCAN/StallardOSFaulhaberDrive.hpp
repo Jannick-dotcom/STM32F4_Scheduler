@@ -1,6 +1,6 @@
 #pragma once
-
-class StallardOSFaulhaberAntrieb
+#include "StallardOSFaulhaberMotionController.hpp"
+class StallardOSFaulhaberDrive : StallardOSFaulhaberMotionController
 {
 private:
     enum class State
@@ -42,16 +42,18 @@ private:
     bool CheckIfTargetReached();
 
 public:
-    StallardOSFaulhaberAntrieb(/* args */);
-    ~StallardOSFaulhaberAntrieb();
-    State GetState();
-    OperationMode GetOperationMode();
+    StallardOSFaulhaberDrive(/* args */);
+    ~StallardOSFaulhaberDrive();
+    State GetState() { return state; }
+    void SetState(State new_state) { state = new_state; }
+    OperationMode GetOperationMode() { return operation_mode; }
+    OperationMode SetOperationMode(OperationMode new_operation_mode) { operation_mode = new_operation_mode; }
 };
 
-StallardOSFaulhaberAntrieb::StallardOSFaulhaberAntrieb(/* args */)
+StallardOSFaulhaberDrive::StallardOSFaulhaberDrive(/* args */)
 {
 }
 
-StallardOSFaulhaberAntrieb::~StallardOSFaulhaberAntrieb()
+StallardOSFaulhaberDrive::~StallardOSFaulhaberDrive()
 {
 }
