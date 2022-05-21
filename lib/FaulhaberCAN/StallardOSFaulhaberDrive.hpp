@@ -1,5 +1,6 @@
 #pragma once
 #include "StallardOSFaulhaberMotionController.hpp"
+#include "StallardOSFaulhaberMessages.hpp"
 class StallardOSFaulhaberDrive : StallardOSFaulhaberMotionController
 {
 private:
@@ -34,6 +35,12 @@ private:
     bool CheckIfReadytoSwitchOn();
     bool CheckIfSwitchedOn();
     bool CheckIfOperationEnable();
+
+    void OperationModeTransitionHoming();
+    void OperationModeTransitionProfilePositionMode();
+
+    void SetOperationModeHoming();
+    void SetOperationModeProfilePositionMode();
 
     bool CheckIfOperationModeIsHoming();
     bool CheckIfOperationModeIsProfilePositonMode();
