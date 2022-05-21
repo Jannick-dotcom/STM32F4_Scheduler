@@ -17,7 +17,7 @@ private:
     State state;
     StallardoOSFaulhaberControllword controllword;
 
-        void StateTransitionInitialization();
+    void StateTransitionInitialization();
     void StateTransitionPreOperational();
     void StateTransitionOperational();
     void StateTransitionStopped();
