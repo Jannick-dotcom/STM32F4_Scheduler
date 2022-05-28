@@ -29,6 +29,6 @@
     #define CALL_PRIVILEGED() {}
     #define CALL_UNPRIVILEGED() {}
 #else
-    #define CALL_PRIVILEGED() _SVC(SV_ACTIVATE_PRIV)
-    #define CALL_UNPRIVILEGED() _SVC(SV_DEACTIVATE_PRIV)
+    #define CALL_PRIVILEGED() if((__get_CONTROL() & CONTROL_nPRIV_Msk)) _SVC(SV_ACTIVATE_PRIV) //if not privileged request privilege
+    #define CALL_UNPRIVILEGED() if(!(__get_CONTROL() & CONTROL_nPRIV_Msk)) _SVC(SV_DEACTIVATE_PRIV) //if privileged request unprivilege
 #endif

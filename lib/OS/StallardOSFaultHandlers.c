@@ -50,7 +50,7 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
     asm("MRSNE	R0, PSP");
 
     asm("LDR	R0, [R0, #24]"); //PC is in R0
-    DEBUGGER_BREAK();
+    // DEBUGGER_BREAK();
     if (taskMainStruct != 0)
     {
         currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
@@ -79,13 +79,32 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
         currentTask->semVal = NULL; //Semaphore von task lösen
         currentTask = taskMainStruct;
         nextTask = taskMainStruct;
-        CALL_STARTMAIN();
     }
 }
 
-void HardFault_Handler()
+__attribute__((naked)) void HardFault_Handler()
 {
     StallardOSGeneralFaultHandler();
+    __ASM volatile("LDR r1, =taskMainStruct\n"
+    "LDR r2, [r1]\n"
+    "LDR r0, [r2]\n"
+
+    #ifndef unprotectedBuild
+    "LDMIA r0!, {r4-r12, r14}\n"   //load registers from memory
+    "MSR CONTROL, r12\n"
+    #else
+    "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
+    #endif
+    
+    "MSR PSP, r0\n"           //set PSP
+    "ISB\n"
+    
+    // "MOV %0, #1" //Set function state to running
+    "LDR r1, =nextTask\n"
+    "MOV r2, #0\n"
+    "STR r2, [r1]\n"
+    "MOV lr, #0xfffffffd\n"
+    "bx lr\n" /*: "=r"(currentTask->State)*/);
 }
 
 void NMI_Handler()
