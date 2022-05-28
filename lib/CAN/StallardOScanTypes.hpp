@@ -55,14 +55,7 @@ public:
     }
     uint64_t build()
     {
-        if(factor != 0.0f)
-        {
-            rawValue = (physValue * factor) + offset;
-        }
-        else
-        {
-            DEBUGGER_BREAK();
-        }
+        rawValue = (physValue * factor) + offset;
         uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1));
         if(isMotorola && countOfBits > 8)
         {
@@ -94,7 +87,14 @@ public:
             }
             rawValue = tempOut;
         }
-        physValue = (rawValue - offset) / factor;
+        if(factor != 0.0f)
+        {
+            physValue = (rawValue - offset) / factor;
+        }
+        else
+        {
+            DEBUGGER_BREAK();
+        }
     }
     CAN_Signal operator=(float val)
     {
