@@ -1,6 +1,5 @@
 #include "StallardOSHelpers.h"
 #include <stdint.h>
-#include <stm32f4xx_hal.h>
 
 extern struct function_struct *currentTask;
 extern struct function_struct *taskMainStruct;
@@ -77,10 +76,10 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
         }
 
         currentTask->waitingForSemaphore = 0;
-        currentTask->semVal = 0; //Semaphore von task lösen
+        currentTask->semVal = NULL; //Semaphore von task lösen
         currentTask = taskMainStruct;
         nextTask = taskMainStruct;
-        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+        CALL_STARTMAIN();
     }
 }
 
@@ -110,6 +109,7 @@ void UsageFault_Handler()
     StallardOSGeneralFaultHandler();
 }
 
+#ifdef STM32F4xxxx
 #ifdef useFPU
 // FPU IRQ Handler
 void FPU_IRQHandler()
@@ -142,4 +142,5 @@ void FPU_IRQHandler()
     asm("DMB");
     StallardOSGeneralFaultHandler();
 }
+#endif
 #endif
