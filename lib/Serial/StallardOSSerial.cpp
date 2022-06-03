@@ -60,9 +60,7 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uin
     
     if(portToAlternateFunc(serPort) == 0) //Not implemented
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
         this->sem.give();
         return;
     }

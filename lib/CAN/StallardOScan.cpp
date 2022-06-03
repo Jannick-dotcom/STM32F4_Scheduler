@@ -1,5 +1,7 @@
 #include "StallardOScan.hpp"
 
+
+
 #ifdef STM32F417xx
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
@@ -68,7 +70,6 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     CANT(tx.pin, tx.port, AFPP, nopull, portsToAF(port)),
     CANR(rx.pin, rx.port, AFPP, nopull, portsToAF(port))
 {
-
     this->sem.take();
 
 #ifndef STM32F415xx
@@ -123,6 +124,7 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     canhandle.Init.ReceiveFifoLocked = DISABLE;
     canhandle.Init.TransmitFifoPriority = DISABLE;
 
+    
     if (HAL_CAN_Init(&canhandle) != HAL_OK)
     {
 
@@ -144,7 +146,6 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
 
     if (HAL_CAN_Start(&canhandle) != HAL_OK)
     {
-
         this->sem.give(); //release Semaphore
 
         StallardOSGeneralFaultHandler();
@@ -157,16 +158,12 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO0_FULL) != HAL_OK)
     {
         /* Notification Error */
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
     }
     if (HAL_CAN_ActivateNotification(&canhandle, CAN_IT_RX_FIFO1_FULL) != HAL_OK)
     {
         /* Notification Error */
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
     }
     HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_ClearPendingIRQ(CAN1_RX1_IRQn);
@@ -178,6 +175,7 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     NVIC_EnableIRQ(CAN2_RX1_IRQn);
 
     this->sem.give(); //release Semaphore
+        
 
 }
 

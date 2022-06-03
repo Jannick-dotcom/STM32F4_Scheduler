@@ -15,7 +15,7 @@
 #endif
 
 #ifndef UNIT_TEST
-#define DEBUGGER_BREAK() asm("bkpt")
+#define DEBUGGER_BREAK() //asm("bkpt")
 #else
 #define DEBUGGER_BREAK()
 #endif
