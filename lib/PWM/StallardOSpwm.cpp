@@ -23,6 +23,7 @@ uint8_t mapToAlternateFunction(TIM_TypeDef *instance)
         __HAL_RCC_TIM4_CLK_ENABLE();
         return STOS_Tim4;
     }
+    #ifdef STM32F4xxxx
     else if (instance == TIM5)
     {
         __HAL_RCC_TIM5_CLK_ENABLE();
@@ -73,6 +74,7 @@ uint8_t mapToAlternateFunction(TIM_TypeDef *instance)
         __HAL_RCC_TIM14_CLK_ENABLE();
         return STOS_Tim14;
     }
+    #endif
     else
         return -1;
 }
@@ -99,6 +101,7 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
     this->bitcount = bitcount;
     TIM_OC_InitTypeDef sConfigOC;
     htim.Instance = instance;
+    #ifdef STM32F4xxxx
     if(instance == TIM1 || instance == TIM8 || instance == TIM9 || instance == TIM10 || instance == TIM11)
     {
         htim.Init.Prescaler = (168000000 / (freq)) / ((uint32_t)1 << bitcount);
@@ -107,6 +110,16 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
     {
         htim.Init.Prescaler = (168000000 / (4*freq)) / ((uint32_t)1 << bitcount);
     }
+    #elif defined(STM32F1xxxx)
+    if(instance == TIM1)
+    {
+        htim.Init.Prescaler = (168000000 / (freq)) / ((uint32_t)1 << bitcount);
+    }
+    else
+    {
+        htim.Init.Prescaler = (168000000 / (2*freq)) / ((uint32_t)1 << bitcount);
+    }
+    #endif
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim.Init.Period = ((uint32_t)1 << bitcount) - 1;
     htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
