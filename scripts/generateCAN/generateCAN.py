@@ -19,10 +19,7 @@ outfileStructs.write('#include "stdint.h"\n#include "StallardOScanTypes.hpp"\n#i
 def genConstructor(prevMSGName, bitcountInMsg):
     tempstr = ""
     tempstr += "\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n"
-    tempstr += "\t\tuint8_t temp = " + bitcountInMsg + ";\n"
-    tempstr += "\t\tif(temp % 8 != 0) temp = temp / 8 + 1;\n\t\telse temp = temp / 8;\n"
-    tempstr += "\t\tif(temp > 8) temp = 8;\n"
-    tempstr += "\t\t_size = dlc = temp;\n\t}\n"
+    tempstr += tab + "}" + endl
     return tempstr
 
 def roundBitcount(bitcountIn):
@@ -44,14 +41,20 @@ prevMSGName = "" #variable for saving the previous Message name
 prevSigName = "" #variable for saving the previous signal name
 bitcountInMsg = "" #number of bits in the message
 bitcountWholeMessage = 0 #number of resulting bits in message
-strFunc = "" #unbuild function
+unbuildFun = "" #unbuild function
 signamesInMessage = "" #variable for printing in the build function
 
+ctLoops = 0
+endLoopNextTime = False
+
+# for line in infileArray: #Go through every line
 for line in infileArray: #Go through every line
     if(line > ""): #if there is something in the line
         lineArray = line.split(",") #split the line into columns
         id = str(lineArray[6])  #get the id of the message
         msgname = str(lineArray[7]) #get the name of the message
+        if(" " in msgname):
+            msgname = msgname.replace(" ", "_")
         rowcounter = str(lineArray[8]) #rowcounter from ms4
         if("= 0x" in rowcounter):
             rowcounter = rowcounter.split("= ")[1]
@@ -62,6 +65,8 @@ for line in infileArray: #Go through every line
         if(" " in signame):
             signame = signame.replace(" ", "_")
         initVal = str(lineArray[14]) #get initial Value of the Signal
+        if(initVal == ""):
+            initVal = "0"
         signed = str(lineArray[13])  #is the signal signed or unsigned?
         startingAtBit = str(lineArray[10]) #get the Bit at which the signal starts
         byteOrder = str(lineArray[12])
@@ -83,11 +88,14 @@ for line in infileArray: #Go through every line
                     outfileStructs.write(genConstructor(prevMSGName, bitcountInMsg))
                     bitcountInMsg = ""
 
-                    outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n") #build function
-                    outfileStructs.write(strFunc + "\t}\n") 
+                    tempstr = "\t\tif(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;\n\t\telse temp_dlc = temp_dlc / 8;\n"
+                    tempstr += "\t\tif(temp_dlc > 8) temp_dlc = 8;\n"
+                    tempstr += "\t\t_size = dlc = temp_dlc;\n"
+                    outfileStructs.write("\tvoid build()\n\t{\n" + "\t\tuint8_t temp_dlc = 0;\n" + signamesInMessage + "\t\tID = _id;\n" + tempstr + "\t}\n") #build function
+                    outfileStructs.write(unbuildFun + "\t}\n") 
                     outfileStructs.write("\n};\n")
 
-                strFunc = "\tvoid unbuild()\n\t{\n" #unbuild function
+                unbuildFun = "\tvoid unbuild()\n\t{\n" #unbuild function
 
                 outfileStructs.write("struct STOS_CAN_PDU_" + msgname + " : public StallardOSCanMessage \n{\npublic:\n") #write the first struct
                 outfileStructs.write("\tstatic const uint16_t _id = STOS_CAN_ID_" + msgname + ";\n")
@@ -107,12 +115,19 @@ for line in infileArray: #Go through every line
                     print("Something is wrong with bit positions of PDU:" + msgname)
 
                 if(rowcounter != "0"):
-                    strFunc += "\t\tif((Val & 0xFF) == " + rowcounter + ") //If the rowcounter points to this row \n\t"
-                strFunc += "\t\t" + signame + ".unbuild(Val);\n"
+                    unbuildFun += "\t\tif((Val & 0xFF) == " + rowcounter + ") //If the rowcounter points to this row \n\t"
+                unbuildFun += "\t\t" + signame + ".unbuild(Val);\n"
 
-                if(signamesInMessage != ""):
-                    signamesInMessage = signamesInMessage + " | "
-                signamesInMessage = signamesInMessage + signame + ".build()"
+                if(rowcounter != "0"):
+                    signamesInMessage += "\t\tif(rowcounter_0x77A.physValue == " + signame + ".rowcount)\n"
+                    signamesInMessage += 2*tab + "{" + endl
+                    signamesInMessage += 3*tab + "Val |= " + signame + ".build();" + endl
+                    signamesInMessage += 3*tab + "temp_dlc += " + signame + ".countOfBits;" + endl
+                    signamesInMessage += 2*tab + "}" + endl
+                else:
+                    signamesInMessage += 2*tab
+                    signamesInMessage += "Val |= " + signame + ".build();\n"
+                    signamesInMessage += 2*tab + "temp_dlc += " + signame + ".countOfBits;" + endl
 
                 if(bitcountInMsg != ""):
                     bitcountInMsg = bitcountInMsg + " + "
@@ -127,16 +142,15 @@ for line in infileArray: #Go through every line
             else:
                 print("Something is wrong with Signal: " + signame + " of PDU:" + msgname + "!!! (Duplicate)")
 
-outfileStructs.write(strFunc + "\t}\n")
+outfileStructs.write(genConstructor(prevMSGName, bitcountInMsg))
+tempstr = "\t\tif(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;\n\t\telse temp_dlc = temp_dlc / 8;\n"
+tempstr += "\t\tif(temp_dlc > 8) temp_dlc = 8;\n"
+tempstr += "\t\t_size = dlc = temp_dlc;\n"
+outfileStructs.write("\tvoid build()\n\t{\n" + "\t\tuint8_t temp_dlc = 0;\n" + signamesInMessage + "\t\tID = _id;\n" + tempstr + "\t}\n") #build function
+outfileStructs.write(unbuildFun + "\t}\n") 
+outfileStructs.write("\n};\n")
 
-outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
-outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
-outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
-outfileStructs.write("\t\tif(temp > 8) temp = 8;\n")
-outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
-
-outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
-outfileStructs.write(";\n}; \n\n#endif")
+outfileStructs.write("\n\n#endif")
 
 infile.close() #close the files
 outfileDefs.close()

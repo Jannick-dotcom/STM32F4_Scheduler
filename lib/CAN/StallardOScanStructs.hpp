@@ -21,15 +21,33 @@ public:
 	STOS_CAN_PDU_AGS1_gearbox_control_unit() 
 	{
 		ID = _id;
-		uint8_t temp = activate_blip.countOfBits + activate_cut.countOfBits + blip_state.countOfBits + cut_level_gcu.countOfBits + engaged_gear.countOfBits + gearpot.countOfBits + shift_state.countOfBits + state_cut.countOfBits + target_engine_speed.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = activate_blip.build() | activate_cut.build() | blip_state.build() | cut_level_gcu.build() | engaged_gear.build() | gearpot.build() | shift_state.build() | state_cut.build() | target_engine_speed.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= activate_blip.build();
+		temp_dlc += activate_blip.countOfBits;
+		Val |= activate_cut.build();
+		temp_dlc += activate_cut.countOfBits;
+		Val |= blip_state.build();
+		temp_dlc += blip_state.countOfBits;
+		Val |= cut_level_gcu.build();
+		temp_dlc += cut_level_gcu.countOfBits;
+		Val |= engaged_gear.build();
+		temp_dlc += engaged_gear.countOfBits;
+		Val |= gearpot.build();
+		temp_dlc += gearpot.countOfBits;
+		Val |= shift_state.build();
+		temp_dlc += shift_state.countOfBits;
+		Val |= state_cut.build();
+		temp_dlc += state_cut.countOfBits;
+		Val |= target_engine_speed.build();
+		temp_dlc += target_engine_speed.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -57,15 +75,23 @@ public:
 	STOS_CAN_PDU_ABS_wheelspeeds() 
 	{
 		ID = _id;
-		uint8_t temp = speedABSfl.countOfBits + speedABSfr.countOfBits + speedABSrl.countOfBits + speedABSrr.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = speedABSfl.build() | speedABSfr.build() | speedABSrl.build() | speedABSrr.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= speedABSfl.build();
+		temp_dlc += speedABSfl.countOfBits;
+		Val |= speedABSfr.build();
+		temp_dlc += speedABSfr.countOfBits;
+		Val |= speedABSrl.build();
+		temp_dlc += speedABSrl.countOfBits;
+		Val |= speedABSrr.build();
+		temp_dlc += speedABSrr.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -89,15 +115,25 @@ public:
 	STOS_CAN_PDU_ABS_switch_state_slip_and_speed() 
 	{
 		ID = _id;
-		uint8_t temp = ax1_Bremse60ABS.countOfBits + ay1_Bremse60ABS.countOfBits + blsABS.countOfBits + p_HzABS.countOfBits + switchstateABS.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ax1_Bremse60ABS.build() | ay1_Bremse60ABS.build() | blsABS.build() | p_HzABS.build() | switchstateABS.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ax1_Bremse60ABS.build();
+		temp_dlc += ax1_Bremse60ABS.countOfBits;
+		Val |= ay1_Bremse60ABS.build();
+		temp_dlc += ay1_Bremse60ABS.countOfBits;
+		Val |= blsABS.build();
+		temp_dlc += blsABS.countOfBits;
+		Val |= p_HzABS.build();
+		temp_dlc += p_HzABS.countOfBits;
+		Val |= switchstateABS.build();
+		temp_dlc += switchstateABS.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -125,15 +161,31 @@ public:
 	STOS_CAN_PDU_Injection_1() 
 	{
 		ID = _id;
-		uint8_t temp = ti_1.countOfBits + ti_2.countOfBits + ti_3.countOfBits + ti_4.countOfBits + ti_5.countOfBits + ti_6.countOfBits + ti_7.countOfBits + ti_8.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ti_1.build() | ti_2.build() | ti_3.build() | ti_4.build() | ti_5.build() | ti_6.build() | ti_7.build() | ti_8.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ti_1.build();
+		temp_dlc += ti_1.countOfBits;
+		Val |= ti_2.build();
+		temp_dlc += ti_2.countOfBits;
+		Val |= ti_3.build();
+		temp_dlc += ti_3.countOfBits;
+		Val |= ti_4.build();
+		temp_dlc += ti_4.countOfBits;
+		Val |= ti_5.build();
+		temp_dlc += ti_5.countOfBits;
+		Val |= ti_6.build();
+		temp_dlc += ti_6.countOfBits;
+		Val |= ti_7.build();
+		temp_dlc += ti_7.countOfBits;
+		Val |= ti_8.build();
+		temp_dlc += ti_8.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -163,15 +215,29 @@ public:
 	STOS_CAN_PDU_Injection_2() 
 	{
 		ID = _id;
-		uint8_t temp = injang.countOfBits + injoff.countOfBits + lamctrl_2k.countOfBits + lamctrl_k.countOfBits + tibase.countOfBits + tibatt_o.countOfBits + timap.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = injang.build() | injoff.build() | lamctrl_2k.build() | lamctrl_k.build() | tibase.build() | tibatt_o.build() | timap.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= injang.build();
+		temp_dlc += injang.countOfBits;
+		Val |= injoff.build();
+		temp_dlc += injoff.countOfBits;
+		Val |= lamctrl_2k.build();
+		temp_dlc += lamctrl_2k.countOfBits;
+		Val |= lamctrl_k.build();
+		temp_dlc += lamctrl_k.countOfBits;
+		Val |= tibase.build();
+		temp_dlc += tibase.countOfBits;
+		Val |= tibatt_o.build();
+		temp_dlc += tibatt_o.countOfBits;
+		Val |= timap.build();
+		temp_dlc += timap.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -201,15 +267,31 @@ public:
 	STOS_CAN_PDU_Ignition() 
 	{
 		ID = _id;
-		uint8_t temp = ign_1.countOfBits + ign_2.countOfBits + ign_3.countOfBits + ign_4.countOfBits + ign_5.countOfBits + ign_6.countOfBits + ign_7.countOfBits + ign_8.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ign_1.build() | ign_2.build() | ign_3.build() | ign_4.build() | ign_5.build() | ign_6.build() | ign_7.build() | ign_8.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ign_1.build();
+		temp_dlc += ign_1.countOfBits;
+		Val |= ign_2.build();
+		temp_dlc += ign_2.countOfBits;
+		Val |= ign_3.build();
+		temp_dlc += ign_3.countOfBits;
+		Val |= ign_4.build();
+		temp_dlc += ign_4.countOfBits;
+		Val |= ign_5.build();
+		temp_dlc += ign_5.countOfBits;
+		Val |= ign_6.build();
+		temp_dlc += ign_6.countOfBits;
+		Val |= ign_7.build();
+		temp_dlc += ign_7.countOfBits;
+		Val |= ign_8.build();
+		temp_dlc += ign_8.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -238,15 +320,27 @@ public:
 	STOS_CAN_PDU_Ignition_Rev_Ath() 
 	{
 		ID = _id;
-		uint8_t temp = ath.countOfBits + dath.countOfBits + ignbase.countOfBits + ignmap.countOfBits + rev.countOfBits + tdwell.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ath.build() | dath.build() | ignbase.build() | ignmap.build() | rev.build() | tdwell.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ath.build();
+		temp_dlc += ath.countOfBits;
+		Val |= dath.build();
+		temp_dlc += dath.countOfBits;
+		Val |= ignbase.build();
+		temp_dlc += ignbase.countOfBits;
+		Val |= ignmap.build();
+		temp_dlc += ignmap.countOfBits;
+		Val |= rev.build();
+		temp_dlc += rev.countOfBits;
+		Val |= tdwell.build();
+		temp_dlc += tdwell.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -275,15 +369,31 @@ public:
 	STOS_CAN_PDU_Lambda() 
 	{
 		ID = _id;
-		uint8_t temp = lam.countOfBits + lam_2.countOfBits + lami.countOfBits + lami_2.countOfBits + lammap.countOfBits + lammap_2.countOfBits + lamp.countOfBits + lamp_2.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = lam.build() | lam_2.build() | lami.build() | lami_2.build() | lammap.build() | lammap_2.build() | lamp.build() | lamp_2.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= lam.build();
+		temp_dlc += lam.countOfBits;
+		Val |= lam_2.build();
+		temp_dlc += lam_2.countOfBits;
+		Val |= lami.build();
+		temp_dlc += lami.countOfBits;
+		Val |= lami_2.build();
+		temp_dlc += lami_2.countOfBits;
+		Val |= lammap.build();
+		temp_dlc += lammap.countOfBits;
+		Val |= lammap_2.build();
+		temp_dlc += lammap_2.countOfBits;
+		Val |= lamp.build();
+		temp_dlc += lamp.countOfBits;
+		Val |= lamp_2.build();
+		temp_dlc += lamp_2.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -311,15 +421,25 @@ public:
 	STOS_CAN_PDU_Speed() 
 	{
 		ID = _id;
-		uint8_t temp = speed.countOfBits + speedfl.countOfBits + speedfr.countOfBits + speedrl.countOfBits + speedrr.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = speed.build() | speedfl.build() | speedfr.build() | speedrl.build() | speedrr.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= speed.build();
+		temp_dlc += speed.countOfBits;
+		Val |= speedfl.build();
+		temp_dlc += speedfl.countOfBits;
+		Val |= speedfr.build();
+		temp_dlc += speedfr.countOfBits;
+		Val |= speedrl.build();
+		temp_dlc += speedrl.countOfBits;
+		Val |= speedrr.build();
+		temp_dlc += speedrr.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -343,15 +463,23 @@ public:
 	STOS_CAN_PDU_Lapfunc() 
 	{
 		ID = _id;
-		uint8_t temp = lapdist.countOfBits + laptime.countOfBits + laptimediff.countOfBits + laptimefast.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = lapdist.build() | laptime.build() | laptimediff.build() | laptimefast.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= lapdist.build();
+		temp_dlc += lapdist.countOfBits;
+		Val |= laptime.build();
+		temp_dlc += laptime.countOfBits;
+		Val |= laptimediff.build();
+		temp_dlc += laptimediff.countOfBits;
+		Val |= laptimefast.build();
+		temp_dlc += laptimefast.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -378,15 +506,31 @@ public:
 	STOS_CAN_PDU_Gear_Dashboard_Acceleration() 
 	{
 		ID = _id;
-		uint8_t temp = accx.countOfBits + accy.countOfBits + accz.countOfBits + ddugear.countOfBits + gcstate.countOfBits + gear.countOfBits + gearcut_u.countOfBits + gearratio.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = accx.build() | accy.build() | accz.build() | ddugear.build() | gcstate.build() | gear.build() | gearcut_u.build() | gearratio.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= accx.build();
+		temp_dlc += accx.countOfBits;
+		Val |= accy.build();
+		temp_dlc += accy.countOfBits;
+		Val |= accz.build();
+		temp_dlc += accz.countOfBits;
+		Val |= ddugear.build();
+		temp_dlc += ddugear.countOfBits;
+		Val |= gcstate.build();
+		temp_dlc += gcstate.countOfBits;
+		Val |= gear.build();
+		temp_dlc += gear.countOfBits;
+		Val |= gearcut_u.build();
+		temp_dlc += gearcut_u.countOfBits;
+		Val |= gearratio.build();
+		temp_dlc += gearratio.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -415,15 +559,27 @@ public:
 	STOS_CAN_PDU_Traction_Control() 
 	{
 		ID = _id;
-		uint8_t temp = slipsp.countOfBits + slra.countOfBits + tcpfac.countOfBits + tcsw.countOfBits + vdraxle.countOfBits + vref.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = slipsp.build() | slra.build() | tcpfac.build() | tcsw.build() | vdraxle.build() | vref.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= slipsp.build();
+		temp_dlc += slipsp.countOfBits;
+		Val |= slra.build();
+		temp_dlc += slra.countOfBits;
+		Val |= tcpfac.build();
+		temp_dlc += tcpfac.countOfBits;
+		Val |= tcsw.build();
+		temp_dlc += tcsw.countOfBits;
+		Val |= vdraxle.build();
+		temp_dlc += vdraxle.countOfBits;
+		Val |= vref.build();
+		temp_dlc += vref.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -451,15 +607,29 @@ public:
 	STOS_CAN_PDU_Electronic_Throttle_Control() 
 	{
 		ID = _id;
-		uint8_t temp = aps.countOfBits + batt_u.countOfBits + camshaftpos.countOfBits + etb.countOfBits + etb_sp.countOfBits + lap_c.countOfBits + p1.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = aps.build() | batt_u.build() | camshaftpos.build() | etb.build() | etb_sp.build() | lap_c.build() | p1.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= aps.build();
+		temp_dlc += aps.countOfBits;
+		Val |= batt_u.build();
+		temp_dlc += batt_u.countOfBits;
+		Val |= camshaftpos.build();
+		temp_dlc += camshaftpos.countOfBits;
+		Val |= etb.build();
+		temp_dlc += etb.countOfBits;
+		Val |= etb_sp.build();
+		temp_dlc += etb_sp.countOfBits;
+		Val |= lap_c.build();
+		temp_dlc += lap_c.countOfBits;
+		Val |= p1.build();
+		temp_dlc += p1.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -528,15 +698,175 @@ public:
 	STOS_CAN_PDU_States_Temp_Press() 
 	{
 		ID = _id;
-		uint8_t temp = battlow_b.countOfBits + etbsys_e.countOfBits + fuellap.countOfBits + fueltank.countOfBits + gearcut_b.countOfBits + idle_b.countOfBits + ignoff_b.countOfBits + injcut_b.countOfBits + injcutin_b.countOfBits + injenrich_b.countOfBits + injstartphase_b.countOfBits + knockadaptenable_b.countOfBits + knockenable_b.countOfBits + lamctrl_2b.countOfBits + lamctrl_b.countOfBits + lap_b.countOfBits + laptrig_b.countOfBits + mappos.countOfBits + mil_b.countOfBits + oillamp_b.countOfBits + pamb.countOfBits + pcrank.countOfBits + pfuel.countOfBits + phsok_b.countOfBits + phsokset_b.countOfBits + poil.countOfBits + pwat.countOfBits + rev_b.countOfBits + revlimit_b.countOfBits + rowcounter_0x77A.countOfBits + shled1_b.countOfBits + shled2_b.countOfBits + shled3_b.countOfBits + shled4_b.countOfBits + shled5_b.countOfBits + speedlimit_b.countOfBits + speedlimitreq_b.countOfBits + startend_b.countOfBits + tair.countOfBits + tc_b.countOfBits + tex.countOfBits + tex_2.countOfBits + tfuel.countOfBits + tlam.countOfBits + tlam_2.countOfBits + tmot.countOfBits + toil.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = battlow_b.build() | etbsys_e.build() | fuellap.build() | fueltank.build() | gearcut_b.build() | idle_b.build() | ignoff_b.build() | injcut_b.build() | injcutin_b.build() | injenrich_b.build() | injstartphase_b.build() | knockadaptenable_b.build() | knockenable_b.build() | lamctrl_2b.build() | lamctrl_b.build() | lap_b.build() | laptrig_b.build() | mappos.build() | mil_b.build() | oillamp_b.build() | pamb.build() | pcrank.build() | pfuel.build() | phsok_b.build() | phsokset_b.build() | poil.build() | pwat.build() | rev_b.build() | revlimit_b.build() | rowcounter_0x77A.build() | shled1_b.build() | shled2_b.build() | shled3_b.build() | shled4_b.build() | shled5_b.build() | speedlimit_b.build() | speedlimitreq_b.build() | startend_b.build() | tair.build() | tc_b.build() | tex.build() | tex_2.build() | tfuel.build() | tlam.build() | tlam_2.build() | tmot.build() | toil.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		if(rowcounter_0x77A.physValue == battlow_b.rowcount)
+		{
+			Val |= battlow_b.build();
+			temp_dlc += battlow_b.countOfBits;
+		}
+		Val |= etbsys_e.build();
+		temp_dlc += etbsys_e.countOfBits;
+		if(rowcounter_0x77A.physValue == fuellap.rowcount)
+		{
+			Val |= fuellap.build();
+			temp_dlc += fuellap.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == fueltank.rowcount)
+		{
+			Val |= fueltank.build();
+			temp_dlc += fueltank.countOfBits;
+		}
+		Val |= gearcut_b.build();
+		temp_dlc += gearcut_b.countOfBits;
+		Val |= idle_b.build();
+		temp_dlc += idle_b.countOfBits;
+		Val |= ignoff_b.build();
+		temp_dlc += ignoff_b.countOfBits;
+		Val |= injcut_b.build();
+		temp_dlc += injcut_b.countOfBits;
+		Val |= injcutin_b.build();
+		temp_dlc += injcutin_b.countOfBits;
+		Val |= injenrich_b.build();
+		temp_dlc += injenrich_b.countOfBits;
+		Val |= injstartphase_b.build();
+		temp_dlc += injstartphase_b.countOfBits;
+		Val |= knockadaptenable_b.build();
+		temp_dlc += knockadaptenable_b.countOfBits;
+		Val |= knockenable_b.build();
+		temp_dlc += knockenable_b.countOfBits;
+		Val |= lamctrl_2b.build();
+		temp_dlc += lamctrl_2b.countOfBits;
+		Val |= lamctrl_b.build();
+		temp_dlc += lamctrl_b.countOfBits;
+		Val |= lap_b.build();
+		temp_dlc += lap_b.countOfBits;
+		Val |= laptrig_b.build();
+		temp_dlc += laptrig_b.countOfBits;
+		if(rowcounter_0x77A.physValue == mappos.rowcount)
+		{
+			Val |= mappos.build();
+			temp_dlc += mappos.countOfBits;
+		}
+		Val |= mil_b.build();
+		temp_dlc += mil_b.countOfBits;
+		Val |= oillamp_b.build();
+		temp_dlc += oillamp_b.countOfBits;
+		if(rowcounter_0x77A.physValue == pamb.rowcount)
+		{
+			Val |= pamb.build();
+			temp_dlc += pamb.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == pcrank.rowcount)
+		{
+			Val |= pcrank.build();
+			temp_dlc += pcrank.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == pfuel.rowcount)
+		{
+			Val |= pfuel.build();
+			temp_dlc += pfuel.countOfBits;
+		}
+		Val |= phsok_b.build();
+		temp_dlc += phsok_b.countOfBits;
+		Val |= phsokset_b.build();
+		temp_dlc += phsokset_b.countOfBits;
+		if(rowcounter_0x77A.physValue == poil.rowcount)
+		{
+			Val |= poil.build();
+			temp_dlc += poil.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == pwat.rowcount)
+		{
+			Val |= pwat.build();
+			temp_dlc += pwat.countOfBits;
+		}
+		Val |= rev_b.build();
+		temp_dlc += rev_b.countOfBits;
+		Val |= revlimit_b.build();
+		temp_dlc += revlimit_b.countOfBits;
+		Val |= rowcounter_0x77A.build();
+		temp_dlc += rowcounter_0x77A.countOfBits;
+		if(rowcounter_0x77A.physValue == shled1_b.rowcount)
+		{
+			Val |= shled1_b.build();
+			temp_dlc += shled1_b.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == shled2_b.rowcount)
+		{
+			Val |= shled2_b.build();
+			temp_dlc += shled2_b.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == shled3_b.rowcount)
+		{
+			Val |= shled3_b.build();
+			temp_dlc += shled3_b.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == shled4_b.rowcount)
+		{
+			Val |= shled4_b.build();
+			temp_dlc += shled4_b.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == shled5_b.rowcount)
+		{
+			Val |= shled5_b.build();
+			temp_dlc += shled5_b.countOfBits;
+		}
+		Val |= speedlimit_b.build();
+		temp_dlc += speedlimit_b.countOfBits;
+		Val |= speedlimitreq_b.build();
+		temp_dlc += speedlimitreq_b.countOfBits;
+		Val |= startend_b.build();
+		temp_dlc += startend_b.countOfBits;
+		if(rowcounter_0x77A.physValue == tair.rowcount)
+		{
+			Val |= tair.build();
+			temp_dlc += tair.countOfBits;
+		}
+		Val |= tc_b.build();
+		temp_dlc += tc_b.countOfBits;
+		if(rowcounter_0x77A.physValue == tex.rowcount)
+		{
+			Val |= tex.build();
+			temp_dlc += tex.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == tex_2.rowcount)
+		{
+			Val |= tex_2.build();
+			temp_dlc += tex_2.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == tfuel.rowcount)
+		{
+			Val |= tfuel.build();
+			temp_dlc += tfuel.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == tlam.rowcount)
+		{
+			Val |= tlam.build();
+			temp_dlc += tlam.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == tlam_2.rowcount)
+		{
+			Val |= tlam_2.build();
+			temp_dlc += tlam_2.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == tmot.rowcount)
+		{
+			Val |= tmot.build();
+			temp_dlc += tmot.countOfBits;
+		}
+		if(rowcounter_0x77A.physValue == toil.rowcount)
+		{
+			Val |= toil.build();
+			temp_dlc += toil.countOfBits;
+		}
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -626,15 +956,27 @@ public:
 	STOS_CAN_PDU_Boost_Pressures_Wastegate() 
 	{
 		ID = _id;
-		uint8_t temp = p22_2m_pwg_m.countOfBits + p22_m.countOfBits + p22_sp.countOfBits + pwg_sp.countOfBits + wgdc_2_wgdchold.countOfBits + wgdc_wgdcvent.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = p22_2m_pwg_m.build() | p22_m.build() | p22_sp.build() | pwg_sp.build() | wgdc_2_wgdchold.build() | wgdc_wgdcvent.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= p22_2m_pwg_m.build();
+		temp_dlc += p22_2m_pwg_m.countOfBits;
+		Val |= p22_m.build();
+		temp_dlc += p22_m.countOfBits;
+		Val |= p22_sp.build();
+		temp_dlc += p22_sp.countOfBits;
+		Val |= pwg_sp.build();
+		temp_dlc += pwg_sp.countOfBits;
+		Val |= wgdc_2_wgdchold.build();
+		temp_dlc += wgdc_2_wgdchold.countOfBits;
+		Val |= wgdc_wgdcvent.build();
+		temp_dlc += wgdc_wgdcvent.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -658,15 +1000,21 @@ public:
 	STOS_CAN_PDU_Acceleration_1() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Accel_1_X.countOfBits + ADCAN_SP_Accel_1_Y.countOfBits + ADCAN_SP_Accel_1_Z.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Accel_1_X.build() | ADCAN_SP_Accel_1_Y.build() | ADCAN_SP_Accel_1_Z.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Accel_1_X.build();
+		temp_dlc += ADCAN_SP_Accel_1_X.countOfBits;
+		Val |= ADCAN_SP_Accel_1_Y.build();
+		temp_dlc += ADCAN_SP_Accel_1_Y.countOfBits;
+		Val |= ADCAN_SP_Accel_1_Z.build();
+		temp_dlc += ADCAN_SP_Accel_1_Z.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -687,15 +1035,21 @@ public:
 	STOS_CAN_PDU_Acceleration_2() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Accel_2_X.countOfBits + ADCAN_SP_Accel_2_Y.countOfBits + ADCAN_SP_Accel_2_Z.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Accel_2_X.build() | ADCAN_SP_Accel_2_Y.build() | ADCAN_SP_Accel_2_Z.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Accel_2_X.build();
+		temp_dlc += ADCAN_SP_Accel_2_X.countOfBits;
+		Val |= ADCAN_SP_Accel_2_Y.build();
+		temp_dlc += ADCAN_SP_Accel_2_Y.countOfBits;
+		Val |= ADCAN_SP_Accel_2_Z.build();
+		temp_dlc += ADCAN_SP_Accel_2_Z.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -715,15 +1069,19 @@ public:
 	STOS_CAN_PDU_Aero_Fan_PWM() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_Fan_L_PWM.countOfBits + ADCAN_AE_Fan_R_PWM.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_Fan_L_PWM.build() | ADCAN_AE_Fan_R_PWM.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_Fan_L_PWM.build();
+		temp_dlc += ADCAN_AE_Fan_L_PWM.countOfBits;
+		Val |= ADCAN_AE_Fan_R_PWM.build();
+		temp_dlc += ADCAN_AE_Fan_R_PWM.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -742,15 +1100,19 @@ public:
 	STOS_CAN_PDU_Aero_Fan_Telemetry() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_Fan_Telemetry_1.countOfBits + ADCAN_AE_Fan_Telemetry_2.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_Fan_Telemetry_1.build() | ADCAN_AE_Fan_Telemetry_2.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_Fan_Telemetry_1.build();
+		temp_dlc += ADCAN_AE_Fan_Telemetry_1.countOfBits;
+		Val |= ADCAN_AE_Fan_Telemetry_2.build();
+		temp_dlc += ADCAN_AE_Fan_Telemetry_2.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -768,15 +1130,17 @@ public:
 	STOS_CAN_PDU_Aero_Fan_Warnings() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_Warnings.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_Warnings.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_Warnings.build();
+		temp_dlc += ADCAN_AE_Warnings.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -793,15 +1157,17 @@ public:
 	STOS_CAN_PDU_Airbox_Position() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_PT_Airbox_Pos.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_PT_Airbox_Pos.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Airbox_Pos.build();
+		temp_dlc += ADCAN_PT_Airbox_Pos.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -819,15 +1185,19 @@ public:
 	STOS_CAN_PDU_ARH_Homing() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_ARH_1_Homing.countOfBits + ADCAN_SP_ARH_2_Homing.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_ARH_1_Homing.build() | ADCAN_SP_ARH_2_Homing.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_ARH_1_Homing.build();
+		temp_dlc += ADCAN_SP_ARH_1_Homing.countOfBits;
+		Val |= ADCAN_SP_ARH_2_Homing.build();
+		temp_dlc += ADCAN_SP_ARH_2_Homing.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -846,15 +1216,19 @@ public:
 	STOS_CAN_PDU_ARH_PWM() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_ARH_1_PWM.countOfBits + ADCAN_SP_ARH_2_PWM.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_ARH_1_PWM.build() | ADCAN_SP_ARH_2_PWM.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_ARH_1_PWM.build();
+		temp_dlc += ADCAN_SP_ARH_1_PWM.countOfBits;
+		Val |= ADCAN_SP_ARH_2_PWM.build();
+		temp_dlc += ADCAN_SP_ARH_2_PWM.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -874,15 +1248,21 @@ public:
 	STOS_CAN_PDU_Battery_Temp_48V() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_Battery_48V_Temp_1.countOfBits + ADCAN_EL_Battery_48V_Temp_2.countOfBits + ADCAN_EL_Battery_48V_Temp_3.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_Battery_48V_Temp_1.build() | ADCAN_EL_Battery_48V_Temp_2.build() | ADCAN_EL_Battery_48V_Temp_3.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_Battery_48V_Temp_1.build();
+		temp_dlc += ADCAN_EL_Battery_48V_Temp_1.countOfBits;
+		Val |= ADCAN_EL_Battery_48V_Temp_2.build();
+		temp_dlc += ADCAN_EL_Battery_48V_Temp_2.countOfBits;
+		Val |= ADCAN_EL_Battery_48V_Temp_3.build();
+		temp_dlc += ADCAN_EL_Battery_48V_Temp_3.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -902,15 +1282,19 @@ public:
 	STOS_CAN_PDU_Brake_Disc_F() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Brake_Disc_Temp_FL.countOfBits + ADCAN_SP_Brake_Disc_Temp_FR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Brake_Disc_Temp_FL.build() | ADCAN_SP_Brake_Disc_Temp_FR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Brake_Disc_Temp_FL.build();
+		temp_dlc += ADCAN_SP_Brake_Disc_Temp_FL.countOfBits;
+		Val |= ADCAN_SP_Brake_Disc_Temp_FR.build();
+		temp_dlc += ADCAN_SP_Brake_Disc_Temp_FR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -929,15 +1313,19 @@ public:
 	STOS_CAN_PDU_Brake_Disc_R() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Brake_Disc_Temp_RL.countOfBits + ADCAN_SP_Brake_Disc_Temp_RR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Brake_Disc_Temp_RL.build() | ADCAN_SP_Brake_Disc_Temp_RR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Brake_Disc_Temp_RL.build();
+		temp_dlc += ADCAN_SP_Brake_Disc_Temp_RL.countOfBits;
+		Val |= ADCAN_SP_Brake_Disc_Temp_RR.build();
+		temp_dlc += ADCAN_SP_Brake_Disc_Temp_RR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -957,15 +1345,21 @@ public:
 	STOS_CAN_PDU_Brake_Pressure() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Brake_Pressure_Front.countOfBits + ADCAN_SP_Brake_Pressure_Rear.countOfBits + ADCAN_SP_Brake_Bias.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Brake_Pressure_Front.build() | ADCAN_SP_Brake_Pressure_Rear.build() | ADCAN_SP_Brake_Bias.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Brake_Pressure_Front.build();
+		temp_dlc += ADCAN_SP_Brake_Pressure_Front.countOfBits;
+		Val |= ADCAN_SP_Brake_Pressure_Rear.build();
+		temp_dlc += ADCAN_SP_Brake_Pressure_Rear.countOfBits;
+		Val |= ADCAN_SP_Brake_Bias.build();
+		temp_dlc += ADCAN_SP_Brake_Bias.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -991,15 +1385,31 @@ public:
 	STOS_CAN_PDU_Current_Sensors() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_Current_Sensor_1.countOfBits + ADCAN_EL_Current_Sensor_2.countOfBits + ADCAN_EL_Current_Sensor_3.countOfBits + ADCAN_EL_Current_Sensor_4.countOfBits + ADCAN_EL_Current_Sensor_5.countOfBits + ADCAN_EL_Current_Sensor_6.countOfBits + ADCAN_EL_Current_Sensor_7.countOfBits + ADCAN_EL_Current_Sensor_8.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_Current_Sensor_1.build() | ADCAN_EL_Current_Sensor_2.build() | ADCAN_EL_Current_Sensor_3.build() | ADCAN_EL_Current_Sensor_4.build() | ADCAN_EL_Current_Sensor_5.build() | ADCAN_EL_Current_Sensor_6.build() | ADCAN_EL_Current_Sensor_7.build() | ADCAN_EL_Current_Sensor_8.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_Current_Sensor_1.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_1.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_2.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_2.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_3.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_3.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_4.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_4.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_5.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_5.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_6.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_6.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_7.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_7.countOfBits;
+		Val |= ADCAN_EL_Current_Sensor_8.build();
+		temp_dlc += ADCAN_EL_Current_Sensor_8.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1025,15 +1435,21 @@ public:
 	STOS_CAN_PDU_FCU_ECU_Bat_Temp() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_Battery_24V_Temp.countOfBits + ADCAN_EL_ECU_Temp_FCU_1.countOfBits + ADCAN_EL_ECU_Temp_FCU_2.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_Battery_24V_Temp.build() | ADCAN_EL_ECU_Temp_FCU_1.build() | ADCAN_EL_ECU_Temp_FCU_2.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_Battery_24V_Temp.build();
+		temp_dlc += ADCAN_EL_Battery_24V_Temp.countOfBits;
+		Val |= ADCAN_EL_ECU_Temp_FCU_1.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_FCU_1.countOfBits;
+		Val |= ADCAN_EL_ECU_Temp_FCU_2.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_FCU_2.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1055,15 +1471,23 @@ public:
 	STOS_CAN_PDU_FCU_Switches() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_ARB_Switch.countOfBits + ADCAN_SP_LaunchC_Activated.countOfBits + ADCAN_SP_LaunchC_Switch.countOfBits + ADCAN_SP_RAS_Switch.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_ARB_Switch.build() | ADCAN_SP_LaunchC_Activated.build() | ADCAN_SP_LaunchC_Switch.build() | ADCAN_SP_RAS_Switch.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_ARB_Switch.build();
+		temp_dlc += ADCAN_SP_ARB_Switch.countOfBits;
+		Val |= ADCAN_SP_LaunchC_Activated.build();
+		temp_dlc += ADCAN_SP_LaunchC_Activated.countOfBits;
+		Val |= ADCAN_SP_LaunchC_Switch.build();
+		temp_dlc += ADCAN_SP_LaunchC_Switch.countOfBits;
+		Val |= ADCAN_SP_RAS_Switch.build();
+		temp_dlc += ADCAN_SP_RAS_Switch.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1089,15 +1513,29 @@ public:
 	STOS_CAN_PDU_FDS_Parameters() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_FDS_Friction_LC.countOfBits + ADCAN_SP_FDS_Slip_mue_max.countOfBits + ADCAN_SP_FDS_Swim_VDE.countOfBits + ADCAN_SP_FDS_Velo_VDE.countOfBits + ADCAN_SP_FDS_Wheel_Slip_RL.countOfBits + ADCAN_SP_FDS_Wheel_Slip_RR.countOfBits + ADCAN_SP_FDS_Yaw_VDE.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_FDS_Friction_LC.build() | ADCAN_SP_FDS_Slip_mue_max.build() | ADCAN_SP_FDS_Swim_VDE.build() | ADCAN_SP_FDS_Velo_VDE.build() | ADCAN_SP_FDS_Wheel_Slip_RL.build() | ADCAN_SP_FDS_Wheel_Slip_RR.build() | ADCAN_SP_FDS_Yaw_VDE.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_FDS_Friction_LC.build();
+		temp_dlc += ADCAN_SP_FDS_Friction_LC.countOfBits;
+		Val |= ADCAN_SP_FDS_Slip_mue_max.build();
+		temp_dlc += ADCAN_SP_FDS_Slip_mue_max.countOfBits;
+		Val |= ADCAN_SP_FDS_Swim_VDE.build();
+		temp_dlc += ADCAN_SP_FDS_Swim_VDE.countOfBits;
+		Val |= ADCAN_SP_FDS_Velo_VDE.build();
+		temp_dlc += ADCAN_SP_FDS_Velo_VDE.countOfBits;
+		Val |= ADCAN_SP_FDS_Wheel_Slip_RL.build();
+		temp_dlc += ADCAN_SP_FDS_Wheel_Slip_RL.countOfBits;
+		Val |= ADCAN_SP_FDS_Wheel_Slip_RR.build();
+		temp_dlc += ADCAN_SP_FDS_Wheel_Slip_RR.countOfBits;
+		Val |= ADCAN_SP_FDS_Yaw_VDE.build();
+		temp_dlc += ADCAN_SP_FDS_Yaw_VDE.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1127,15 +1565,31 @@ public:
 	STOS_CAN_PDU_FDS_Wheel_Signals() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_FDS_Slip_Angle_FL.countOfBits + ADCAN_SP_FDS_Slip_Angle_FR.countOfBits + ADCAN_SP_FDS_Slip_Angle_RL.countOfBits + ADCAN_SP_FDS_Slip_Angle_RR.countOfBits + ADCAN_SP_FDS_Whl_Load_FL.countOfBits + ADCAN_SP_FDS_Whl_Load_FR.countOfBits + ADCAN_SP_FDS_Whl_Load_RL.countOfBits + ADCAN_SP_FDS_Whl_Load_RR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_FDS_Slip_Angle_FL.build() | ADCAN_SP_FDS_Slip_Angle_FR.build() | ADCAN_SP_FDS_Slip_Angle_RL.build() | ADCAN_SP_FDS_Slip_Angle_RR.build() | ADCAN_SP_FDS_Whl_Load_FL.build() | ADCAN_SP_FDS_Whl_Load_FR.build() | ADCAN_SP_FDS_Whl_Load_RL.build() | ADCAN_SP_FDS_Whl_Load_RR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_FDS_Slip_Angle_FL.build();
+		temp_dlc += ADCAN_SP_FDS_Slip_Angle_FL.countOfBits;
+		Val |= ADCAN_SP_FDS_Slip_Angle_FR.build();
+		temp_dlc += ADCAN_SP_FDS_Slip_Angle_FR.countOfBits;
+		Val |= ADCAN_SP_FDS_Slip_Angle_RL.build();
+		temp_dlc += ADCAN_SP_FDS_Slip_Angle_RL.countOfBits;
+		Val |= ADCAN_SP_FDS_Slip_Angle_RR.build();
+		temp_dlc += ADCAN_SP_FDS_Slip_Angle_RR.countOfBits;
+		Val |= ADCAN_SP_FDS_Whl_Load_FL.build();
+		temp_dlc += ADCAN_SP_FDS_Whl_Load_FL.countOfBits;
+		Val |= ADCAN_SP_FDS_Whl_Load_FR.build();
+		temp_dlc += ADCAN_SP_FDS_Whl_Load_FR.countOfBits;
+		Val |= ADCAN_SP_FDS_Whl_Load_RL.build();
+		temp_dlc += ADCAN_SP_FDS_Whl_Load_RL.countOfBits;
+		Val |= ADCAN_SP_FDS_Whl_Load_RR.build();
+		temp_dlc += ADCAN_SP_FDS_Whl_Load_RR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1160,15 +1614,19 @@ public:
 	STOS_CAN_PDU_Flash_Over_Can() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_FoC_1.countOfBits + ADCAN_EL_FoC_2.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_FoC_1.build() | ADCAN_EL_FoC_2.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_FoC_1.build();
+		temp_dlc += ADCAN_EL_FoC_1.countOfBits;
+		Val |= ADCAN_EL_FoC_2.build();
+		temp_dlc += ADCAN_EL_FoC_2.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1186,15 +1644,17 @@ public:
 	STOS_CAN_PDU_Frame_Pressure() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_CH_Frame_Pressure.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_CH_Frame_Pressure.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_CH_Frame_Pressure.build();
+		temp_dlc += ADCAN_CH_Frame_Pressure.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1213,15 +1673,21 @@ public:
 	STOS_CAN_PDU_Gyroscope_1() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Gyro_1_X.countOfBits + ADCAN_SP_Gyro_1_Y.countOfBits + ADCAN_SP_Gyro_1_Z.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Gyro_1_X.build() | ADCAN_SP_Gyro_1_Y.build() | ADCAN_SP_Gyro_1_Z.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Gyro_1_X.build();
+		temp_dlc += ADCAN_SP_Gyro_1_X.countOfBits;
+		Val |= ADCAN_SP_Gyro_1_Y.build();
+		temp_dlc += ADCAN_SP_Gyro_1_Y.countOfBits;
+		Val |= ADCAN_SP_Gyro_1_Z.build();
+		temp_dlc += ADCAN_SP_Gyro_1_Z.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1242,15 +1708,21 @@ public:
 	STOS_CAN_PDU_Gyroscope_2() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Gyro_2_X.countOfBits + ADCAN_SP_Gyro_2_Y.countOfBits + ADCAN_SP_Gyro_2_Z.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Gyro_2_X.build() | ADCAN_SP_Gyro_2_Y.build() | ADCAN_SP_Gyro_2_Z.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Gyro_2_X.build();
+		temp_dlc += ADCAN_SP_Gyro_2_X.countOfBits;
+		Val |= ADCAN_SP_Gyro_2_Y.build();
+		temp_dlc += ADCAN_SP_Gyro_2_Y.countOfBits;
+		Val |= ADCAN_SP_Gyro_2_Z.build();
+		temp_dlc += ADCAN_SP_Gyro_2_Z.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1270,15 +1742,19 @@ public:
 	STOS_CAN_PDU_Niveau_F() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Niveau_FL_Niveau.countOfBits + ADCAN_SP_Niveau_FR_Niveau.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Niveau_FL_Niveau.build() | ADCAN_SP_Niveau_FR_Niveau.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Niveau_FL_Niveau.build();
+		temp_dlc += ADCAN_SP_Niveau_FL_Niveau.countOfBits;
+		Val |= ADCAN_SP_Niveau_FR_Niveau.build();
+		temp_dlc += ADCAN_SP_Niveau_FR_Niveau.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1301,15 +1777,27 @@ public:
 	STOS_CAN_PDU_Niveau_Front_Status() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Niveau_FL_Error.countOfBits + ADCAN_SP_Niveau_FL_Function.countOfBits + ADCAN_SP_Niveau_FL_on_off.countOfBits + ADCAN_SP_Niveau_FR_Error.countOfBits + ADCAN_SP_Niveau_FR_Function.countOfBits + ADCAN_SP_Niveau_FR_on_off.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Niveau_FL_Error.build() | ADCAN_SP_Niveau_FL_Function.build() | ADCAN_SP_Niveau_FL_on_off.build() | ADCAN_SP_Niveau_FR_Error.build() | ADCAN_SP_Niveau_FR_Function.build() | ADCAN_SP_Niveau_FR_on_off.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Niveau_FL_Error.build();
+		temp_dlc += ADCAN_SP_Niveau_FL_Error.countOfBits;
+		Val |= ADCAN_SP_Niveau_FL_Function.build();
+		temp_dlc += ADCAN_SP_Niveau_FL_Function.countOfBits;
+		Val |= ADCAN_SP_Niveau_FL_on_off.build();
+		temp_dlc += ADCAN_SP_Niveau_FL_on_off.countOfBits;
+		Val |= ADCAN_SP_Niveau_FR_Error.build();
+		temp_dlc += ADCAN_SP_Niveau_FR_Error.countOfBits;
+		Val |= ADCAN_SP_Niveau_FR_Function.build();
+		temp_dlc += ADCAN_SP_Niveau_FR_Function.countOfBits;
+		Val |= ADCAN_SP_Niveau_FR_on_off.build();
+		temp_dlc += ADCAN_SP_Niveau_FR_on_off.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1331,15 +1819,17 @@ public:
 	STOS_CAN_PDU_Niveau_R() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Niveau_R_Niveau.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Niveau_R_Niveau.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Niveau_R_Niveau.build();
+		temp_dlc += ADCAN_SP_Niveau_R_Niveau.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1357,15 +1847,19 @@ public:
 	STOS_CAN_PDU_Niveau_Rear_Status() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Niveau_R_Error.countOfBits + ADCAN_SP_Niveau_R_Function.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Niveau_R_Error.build() | ADCAN_SP_Niveau_R_Function.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Niveau_R_Error.build();
+		temp_dlc += ADCAN_SP_Niveau_R_Error.countOfBits;
+		Val |= ADCAN_SP_Niveau_R_Function.build();
+		temp_dlc += ADCAN_SP_Niveau_R_Function.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1383,15 +1877,17 @@ public:
 	STOS_CAN_PDU_Oil_Pressure() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_PT_Oil_Pressure.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_PT_Oil_Pressure.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Oil_Pressure.build();
+		temp_dlc += ADCAN_PT_Oil_Pressure.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1410,15 +1906,21 @@ public:
 	STOS_CAN_PDU_Oil_Pressure_Status() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_PT_Oil_Level.countOfBits + ADCAN_PT_Oil_Level_RS232.countOfBits + ADCAN_PT_Oil_Temp.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_PT_Oil_Level.build() | ADCAN_PT_Oil_Level_RS232.build() | ADCAN_PT_Oil_Temp.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Oil_Level.build();
+		temp_dlc += ADCAN_PT_Oil_Level.countOfBits;
+		Val |= ADCAN_PT_Oil_Level_RS232.build();
+		temp_dlc += ADCAN_PT_Oil_Level_RS232.countOfBits;
+		Val |= ADCAN_PT_Oil_Temp.build();
+		temp_dlc += ADCAN_PT_Oil_Temp.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1440,15 +1942,23 @@ public:
 	STOS_CAN_PDU_PDU_ECU_Temp() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_ECU_Temp_PDU_1.countOfBits + ADCAN_EL_ECU_Temp_PDU_2.countOfBits + ADCAN_EL_ECU_Temp_PDU_3.countOfBits + ADCAN_EL_ECU_Temp_PDU_4.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_ECU_Temp_PDU_1.build() | ADCAN_EL_ECU_Temp_PDU_2.build() | ADCAN_EL_ECU_Temp_PDU_3.build() | ADCAN_EL_ECU_Temp_PDU_4.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_ECU_Temp_PDU_1.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_PDU_1.countOfBits;
+		Val |= ADCAN_EL_ECU_Temp_PDU_2.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_PDU_2.countOfBits;
+		Val |= ADCAN_EL_ECU_Temp_PDU_3.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_PDU_3.countOfBits;
+		Val |= ADCAN_EL_ECU_Temp_PDU_4.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_PDU_4.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1499,15 +2009,79 @@ public:
 	STOS_CAN_PDU_PDU_Status() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_CH_Mainhoop_Diag_L_1.countOfBits + ADCAN_CH_Mainhoop_Diag_R_1.countOfBits + ADCAN_EL_BOTS_Diag_1.countOfBits + ADCAN_EL_BSPD_Shutdown_Out.countOfBits + ADCAN_EL_Cockpit_Diag_1.countOfBits + ADCAN_EL_Crash_Diag.countOfBits + ADCAN_EL_Fuse_Status_1.countOfBits + ADCAN_EL_Fuse_Status_10.countOfBits + ADCAN_EL_Fuse_Status_11.countOfBits + ADCAN_EL_Fuse_Status_12.countOfBits + ADCAN_EL_Fuse_Status_13.countOfBits + ADCAN_EL_Fuse_Status_14.countOfBits + ADCAN_EL_Fuse_Status_15.countOfBits + ADCAN_EL_Fuse_Status_16.countOfBits + ADCAN_EL_Fuse_Status_17.countOfBits + ADCAN_EL_Fuse_Status_18.countOfBits + ADCAN_EL_Fuse_Status_19.countOfBits + ADCAN_EL_Fuse_Status_2.countOfBits + ADCAN_EL_Fuse_Status_3.countOfBits + ADCAN_EL_Fuse_Status_4.countOfBits + ADCAN_EL_Fuse_Status_5.countOfBits + ADCAN_EL_Fuse_Status_6.countOfBits + ADCAN_EL_Fuse_Status_7.countOfBits + ADCAN_EL_Fuse_Status_8.countOfBits + ADCAN_EL_Fuse_Status_9.countOfBits + ADCAN_EL_Relais_Status_1.countOfBits + ADCAN_EL_Relais_Status_2.countOfBits + ADCAN_EL_Shutdown_Cockpit.countOfBits + ADCAN_PT_Fuel_Pump_Signal.countOfBits + ADCAN_PT_Reserve_Signal_L.countOfBits + ADCAN_PT_Reserve_Signal_R.countOfBits + ADCAN_PT_Water_Pump_Signal.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_CH_Mainhoop_Diag_L_1.build() | ADCAN_CH_Mainhoop_Diag_R_1.build() | ADCAN_EL_BOTS_Diag_1.build() | ADCAN_EL_BSPD_Shutdown_Out.build() | ADCAN_EL_Cockpit_Diag_1.build() | ADCAN_EL_Crash_Diag.build() | ADCAN_EL_Fuse_Status_1.build() | ADCAN_EL_Fuse_Status_10.build() | ADCAN_EL_Fuse_Status_11.build() | ADCAN_EL_Fuse_Status_12.build() | ADCAN_EL_Fuse_Status_13.build() | ADCAN_EL_Fuse_Status_14.build() | ADCAN_EL_Fuse_Status_15.build() | ADCAN_EL_Fuse_Status_16.build() | ADCAN_EL_Fuse_Status_17.build() | ADCAN_EL_Fuse_Status_18.build() | ADCAN_EL_Fuse_Status_19.build() | ADCAN_EL_Fuse_Status_2.build() | ADCAN_EL_Fuse_Status_3.build() | ADCAN_EL_Fuse_Status_4.build() | ADCAN_EL_Fuse_Status_5.build() | ADCAN_EL_Fuse_Status_6.build() | ADCAN_EL_Fuse_Status_7.build() | ADCAN_EL_Fuse_Status_8.build() | ADCAN_EL_Fuse_Status_9.build() | ADCAN_EL_Relais_Status_1.build() | ADCAN_EL_Relais_Status_2.build() | ADCAN_EL_Shutdown_Cockpit.build() | ADCAN_PT_Fuel_Pump_Signal.build() | ADCAN_PT_Reserve_Signal_L.build() | ADCAN_PT_Reserve_Signal_R.build() | ADCAN_PT_Water_Pump_Signal.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_CH_Mainhoop_Diag_L_1.build();
+		temp_dlc += ADCAN_CH_Mainhoop_Diag_L_1.countOfBits;
+		Val |= ADCAN_CH_Mainhoop_Diag_R_1.build();
+		temp_dlc += ADCAN_CH_Mainhoop_Diag_R_1.countOfBits;
+		Val |= ADCAN_EL_BOTS_Diag_1.build();
+		temp_dlc += ADCAN_EL_BOTS_Diag_1.countOfBits;
+		Val |= ADCAN_EL_BSPD_Shutdown_Out.build();
+		temp_dlc += ADCAN_EL_BSPD_Shutdown_Out.countOfBits;
+		Val |= ADCAN_EL_Cockpit_Diag_1.build();
+		temp_dlc += ADCAN_EL_Cockpit_Diag_1.countOfBits;
+		Val |= ADCAN_EL_Crash_Diag.build();
+		temp_dlc += ADCAN_EL_Crash_Diag.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_1.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_1.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_10.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_10.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_11.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_11.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_12.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_12.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_13.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_13.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_14.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_14.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_15.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_15.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_16.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_16.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_17.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_17.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_18.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_18.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_19.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_19.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_2.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_2.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_3.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_3.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_4.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_4.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_5.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_5.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_6.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_6.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_7.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_7.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_8.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_8.countOfBits;
+		Val |= ADCAN_EL_Fuse_Status_9.build();
+		temp_dlc += ADCAN_EL_Fuse_Status_9.countOfBits;
+		Val |= ADCAN_EL_Relais_Status_1.build();
+		temp_dlc += ADCAN_EL_Relais_Status_1.countOfBits;
+		Val |= ADCAN_EL_Relais_Status_2.build();
+		temp_dlc += ADCAN_EL_Relais_Status_2.countOfBits;
+		Val |= ADCAN_EL_Shutdown_Cockpit.build();
+		temp_dlc += ADCAN_EL_Shutdown_Cockpit.countOfBits;
+		Val |= ADCAN_PT_Fuel_Pump_Signal.build();
+		temp_dlc += ADCAN_PT_Fuel_Pump_Signal.countOfBits;
+		Val |= ADCAN_PT_Reserve_Signal_L.build();
+		temp_dlc += ADCAN_PT_Reserve_Signal_L.countOfBits;
+		Val |= ADCAN_PT_Reserve_Signal_R.build();
+		temp_dlc += ADCAN_PT_Reserve_Signal_R.countOfBits;
+		Val |= ADCAN_PT_Water_Pump_Signal.build();
+		temp_dlc += ADCAN_PT_Water_Pump_Signal.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1557,15 +2131,21 @@ public:
 	STOS_CAN_PDU_Pitot() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_Pitot_1.countOfBits + ADCAN_AE_Pitot_2.countOfBits + ADCAN_AE_Pitot_3.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_Pitot_1.build() | ADCAN_AE_Pitot_2.build() | ADCAN_AE_Pitot_3.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_Pitot_1.build();
+		temp_dlc += ADCAN_AE_Pitot_1.countOfBits;
+		Val |= ADCAN_AE_Pitot_2.build();
+		temp_dlc += ADCAN_AE_Pitot_2.countOfBits;
+		Val |= ADCAN_AE_Pitot_3.build();
+		temp_dlc += ADCAN_AE_Pitot_3.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1585,15 +2165,19 @@ public:
 	STOS_CAN_PDU_RAS_PWM() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_RAS_PWM_L.countOfBits + ADCAN_SP_RAS_PWM_R.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_RAS_PWM_L.build() | ADCAN_SP_RAS_PWM_R.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_RAS_PWM_L.build();
+		temp_dlc += ADCAN_SP_RAS_PWM_L.countOfBits;
+		Val |= ADCAN_SP_RAS_PWM_R.build();
+		temp_dlc += ADCAN_SP_RAS_PWM_R.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1613,15 +2197,21 @@ public:
 	STOS_CAN_PDU_RAS_Status_Control() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_RAS_Angle.countOfBits + ADCAN_SP_RAS_Homing_L.countOfBits + ADCAN_SP_RAS_Homing_R.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_RAS_Angle.build() | ADCAN_SP_RAS_Homing_L.build() | ADCAN_SP_RAS_Homing_R.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_RAS_Angle.build();
+		temp_dlc += ADCAN_SP_RAS_Angle.countOfBits;
+		Val |= ADCAN_SP_RAS_Homing_L.build();
+		temp_dlc += ADCAN_SP_RAS_Homing_L.countOfBits;
+		Val |= ADCAN_SP_RAS_Homing_R.build();
+		temp_dlc += ADCAN_SP_RAS_Homing_R.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1641,15 +2231,19 @@ public:
 	STOS_CAN_PDU_RCU_ECU_Temp() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_ECU_Temp_RCU_1.countOfBits + ADCAN_EL_ECU_Temp_RCU_2.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_ECU_Temp_RCU_1.build() | ADCAN_EL_ECU_Temp_RCU_2.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_ECU_Temp_RCU_1.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_RCU_1.countOfBits;
+		Val |= ADCAN_EL_ECU_Temp_RCU_2.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_RCU_2.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1670,15 +2264,23 @@ public:
 	STOS_CAN_PDU_RCU_Test_A() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_ZZ_Test_RCU_1.countOfBits + ADCAN_ZZ_Test_RCU_2.countOfBits + ADCAN_ZZ_Test_RCU_3.countOfBits + ADCAN_ZZ_Test_RCU_4.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_ZZ_Test_RCU_1.build() | ADCAN_ZZ_Test_RCU_2.build() | ADCAN_ZZ_Test_RCU_3.build() | ADCAN_ZZ_Test_RCU_4.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_ZZ_Test_RCU_1.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_1.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_2.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_2.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_3.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_3.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_4.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_4.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1701,15 +2303,23 @@ public:
 	STOS_CAN_PDU_RCU_Test_B() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_ZZ_Test_RCU_5.countOfBits + ADCAN_ZZ_Test_RCU_6.countOfBits + ADCAN_ZZ_Test_RCU_7.countOfBits + ADCAN_ZZ_Test_RCU_8.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_ZZ_Test_RCU_5.build() | ADCAN_ZZ_Test_RCU_6.build() | ADCAN_ZZ_Test_RCU_7.build() | ADCAN_ZZ_Test_RCU_8.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_ZZ_Test_RCU_5.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_5.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_6.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_6.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_7.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_7.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_8.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_8.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1730,15 +2340,19 @@ public:
 	STOS_CAN_PDU_RCU_Test_C() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_ZZ_Test_RCU_10.countOfBits + ADCAN_ZZ_Test_RCU_9.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_ZZ_Test_RCU_10.build() | ADCAN_ZZ_Test_RCU_9.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_ZZ_Test_RCU_10.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_10.countOfBits;
+		Val |= ADCAN_ZZ_Test_RCU_9.build();
+		temp_dlc += ADCAN_ZZ_Test_RCU_9.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1757,15 +2371,19 @@ public:
 	STOS_CAN_PDU_Rocker_F() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Rocker_FL.countOfBits + ADCAN_SP_Rocker_FR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Rocker_FL.build() | ADCAN_SP_Rocker_FR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Rocker_FL.build();
+		temp_dlc += ADCAN_SP_Rocker_FL.countOfBits;
+		Val |= ADCAN_SP_Rocker_FR.build();
+		temp_dlc += ADCAN_SP_Rocker_FR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1784,15 +2402,19 @@ public:
 	STOS_CAN_PDU_Rocker_R() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Rocker_RL.countOfBits + ADCAN_SP_Rocker_RR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Rocker_RL.build() | ADCAN_SP_Rocker_RR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Rocker_RL.build();
+		temp_dlc += ADCAN_SP_Rocker_RL.countOfBits;
+		Val |= ADCAN_SP_Rocker_RR.build();
+		temp_dlc += ADCAN_SP_Rocker_RR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1815,15 +2437,27 @@ public:
 	STOS_CAN_PDU_Shift_Clutch() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_PT_Gearshift_DigIn.countOfBits + ADCAN_PT_Gearshift_LaunchC.countOfBits + ADCAN_PT_Shift_Force_Sensor.countOfBits + ADCAN_SP_Clutch_DigIn.countOfBits + ADCAN_SP_Clutch_LaunchC.countOfBits + ADCAN_PT_Shift_Force_on_off.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_PT_Gearshift_DigIn.build() | ADCAN_PT_Gearshift_LaunchC.build() | ADCAN_PT_Shift_Force_Sensor.build() | ADCAN_SP_Clutch_DigIn.build() | ADCAN_SP_Clutch_LaunchC.build() | ADCAN_PT_Shift_Force_on_off.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Gearshift_DigIn.build();
+		temp_dlc += ADCAN_PT_Gearshift_DigIn.countOfBits;
+		Val |= ADCAN_PT_Gearshift_LaunchC.build();
+		temp_dlc += ADCAN_PT_Gearshift_LaunchC.countOfBits;
+		Val |= ADCAN_PT_Shift_Force_Sensor.build();
+		temp_dlc += ADCAN_PT_Shift_Force_Sensor.countOfBits;
+		Val |= ADCAN_SP_Clutch_DigIn.build();
+		temp_dlc += ADCAN_SP_Clutch_DigIn.countOfBits;
+		Val |= ADCAN_SP_Clutch_LaunchC.build();
+		temp_dlc += ADCAN_SP_Clutch_LaunchC.countOfBits;
+		Val |= ADCAN_PT_Shift_Force_on_off.build();
+		temp_dlc += ADCAN_PT_Shift_Force_on_off.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1845,15 +2479,17 @@ public:
 	STOS_CAN_PDU_Steering_Whl_Angle() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Steering_Wheel_Angle.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Steering_Wheel_Angle.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Steering_Wheel_Angle.build();
+		temp_dlc += ADCAN_SP_Steering_Wheel_Angle.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1870,15 +2506,17 @@ public:
 	STOS_CAN_PDU_SWCU_ECU_Temp() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_ECU_Temp_SWCU.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_ECU_Temp_SWCU.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_ECU_Temp_SWCU.build();
+		temp_dlc += ADCAN_EL_ECU_Temp_SWCU.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1897,15 +2535,21 @@ public:
 	STOS_CAN_PDU_SWCU_Oh_Shit() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_EL_INCR_1.countOfBits + ADCAN_EL_INCR_2.countOfBits + ADCAN_EL_Oh_Shit.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_EL_INCR_1.build() | ADCAN_EL_INCR_2.build() | ADCAN_EL_Oh_Shit.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_EL_INCR_1.build();
+		temp_dlc += ADCAN_EL_INCR_1.countOfBits;
+		Val |= ADCAN_EL_INCR_2.build();
+		temp_dlc += ADCAN_EL_INCR_2.countOfBits;
+		Val |= ADCAN_EL_Oh_Shit.build();
+		temp_dlc += ADCAN_EL_Oh_Shit.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1929,15 +2573,27 @@ public:
 	STOS_CAN_PDU_SWCU_Switches() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_Switch_1.countOfBits + ADCAN_EL_Radio_Switch.countOfBits + ADCAN_PT_Shift_Down.countOfBits + ADCAN_PT_Shift_Up.countOfBits + ADCAN_SP_ARH_switch_1.countOfBits + ADCAN_SP_Clutch_Signal.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_Switch_1.build() | ADCAN_EL_Radio_Switch.build() | ADCAN_PT_Shift_Down.build() | ADCAN_PT_Shift_Up.build() | ADCAN_SP_ARH_switch_1.build() | ADCAN_SP_Clutch_Signal.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_Switch_1.build();
+		temp_dlc += ADCAN_AE_Switch_1.countOfBits;
+		Val |= ADCAN_EL_Radio_Switch.build();
+		temp_dlc += ADCAN_EL_Radio_Switch.countOfBits;
+		Val |= ADCAN_PT_Shift_Down.build();
+		temp_dlc += ADCAN_PT_Shift_Down.countOfBits;
+		Val |= ADCAN_PT_Shift_Up.build();
+		temp_dlc += ADCAN_PT_Shift_Up.countOfBits;
+		Val |= ADCAN_SP_ARH_switch_1.build();
+		temp_dlc += ADCAN_SP_ARH_switch_1.countOfBits;
+		Val |= ADCAN_SP_Clutch_Signal.build();
+		temp_dlc += ADCAN_SP_Clutch_Signal.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1961,15 +2617,21 @@ public:
 	STOS_CAN_PDU_Test_FCU_A() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_ZZ_Test_FCU_1.countOfBits + ADCAN_ZZ_Test_FCU_2.countOfBits + ADCAN_ZZ_Test_FCU_3.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_ZZ_Test_FCU_1.build() | ADCAN_ZZ_Test_FCU_2.build() | ADCAN_ZZ_Test_FCU_3.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_ZZ_Test_FCU_1.build();
+		temp_dlc += ADCAN_ZZ_Test_FCU_1.countOfBits;
+		Val |= ADCAN_ZZ_Test_FCU_2.build();
+		temp_dlc += ADCAN_ZZ_Test_FCU_2.countOfBits;
+		Val |= ADCAN_ZZ_Test_FCU_3.build();
+		temp_dlc += ADCAN_ZZ_Test_FCU_3.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -1990,15 +2652,21 @@ public:
 	STOS_CAN_PDU_Test_FCU_B() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_ZZ_Test_FCU_4.countOfBits + ADCAN_ZZ_Test_FCU_5.countOfBits + ADCAN_ZZ_Test_FCU_6.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_ZZ_Test_FCU_4.build() | ADCAN_ZZ_Test_FCU_5.build() | ADCAN_ZZ_Test_FCU_6.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_ZZ_Test_FCU_4.build();
+		temp_dlc += ADCAN_ZZ_Test_FCU_4.countOfBits;
+		Val |= ADCAN_ZZ_Test_FCU_5.build();
+		temp_dlc += ADCAN_ZZ_Test_FCU_5.countOfBits;
+		Val |= ADCAN_ZZ_Test_FCU_6.build();
+		temp_dlc += ADCAN_ZZ_Test_FCU_6.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2023,15 +2691,29 @@ public:
 	STOS_CAN_PDU_Water_Oil_Status_Control() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_PT_Oil_Fan_Percent.countOfBits + ADCAN_PT_Oil_PWM.countOfBits + ADCAN_PT_Water_1_PWM.countOfBits + ADCAN_PT_Water_2_PWM.countOfBits + ADCAN_PT_Water_Fan_1_Percent.countOfBits + ADCAN_PT_Water_Fan_2_Percent.countOfBits + ADCAN_PT_Water_Pump_Percent.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_PT_Oil_Fan_Percent.build() | ADCAN_PT_Oil_PWM.build() | ADCAN_PT_Water_1_PWM.build() | ADCAN_PT_Water_2_PWM.build() | ADCAN_PT_Water_Fan_1_Percent.build() | ADCAN_PT_Water_Fan_2_Percent.build() | ADCAN_PT_Water_Pump_Percent.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Oil_Fan_Percent.build();
+		temp_dlc += ADCAN_PT_Oil_Fan_Percent.countOfBits;
+		Val |= ADCAN_PT_Oil_PWM.build();
+		temp_dlc += ADCAN_PT_Oil_PWM.countOfBits;
+		Val |= ADCAN_PT_Water_1_PWM.build();
+		temp_dlc += ADCAN_PT_Water_1_PWM.countOfBits;
+		Val |= ADCAN_PT_Water_2_PWM.build();
+		temp_dlc += ADCAN_PT_Water_2_PWM.countOfBits;
+		Val |= ADCAN_PT_Water_Fan_1_Percent.build();
+		temp_dlc += ADCAN_PT_Water_Fan_1_Percent.countOfBits;
+		Val |= ADCAN_PT_Water_Fan_2_Percent.build();
+		temp_dlc += ADCAN_PT_Water_Fan_2_Percent.countOfBits;
+		Val |= ADCAN_PT_Water_Pump_Percent.build();
+		temp_dlc += ADCAN_PT_Water_Pump_Percent.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2055,15 +2737,19 @@ public:
 	STOS_CAN_PDU_Whl_Speed_F() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Wheel_Speed_FL.countOfBits + ADCAN_SP_Wheel_Speed_FR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Wheel_Speed_FL.build() | ADCAN_SP_Wheel_Speed_FR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Wheel_Speed_FL.build();
+		temp_dlc += ADCAN_SP_Wheel_Speed_FL.countOfBits;
+		Val |= ADCAN_SP_Wheel_Speed_FR.build();
+		temp_dlc += ADCAN_SP_Wheel_Speed_FR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2082,15 +2768,19 @@ public:
 	STOS_CAN_PDU_Whl_Speed_R() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_SP_Wheel_Speed_RL.countOfBits + ADCAN_SP_Wheel_Speed_RR.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_SP_Wheel_Speed_RL.build() | ADCAN_SP_Wheel_Speed_RR.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Wheel_Speed_RL.build();
+		temp_dlc += ADCAN_SP_Wheel_Speed_RL.countOfBits;
+		Val |= ADCAN_SP_Wheel_Speed_RR.build();
+		temp_dlc += ADCAN_SP_Wheel_Speed_RR.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2111,15 +2801,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_1() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_1.countOfBits + ADCAN_AE_PT_2.countOfBits + ADCAN_AE_PT_3.countOfBits + ADCAN_AE_PT_4.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_1.build() | ADCAN_AE_PT_2.build() | ADCAN_AE_PT_3.build() | ADCAN_AE_PT_4.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_1.build();
+		temp_dlc += ADCAN_AE_PT_1.countOfBits;
+		Val |= ADCAN_AE_PT_2.build();
+		temp_dlc += ADCAN_AE_PT_2.countOfBits;
+		Val |= ADCAN_AE_PT_3.build();
+		temp_dlc += ADCAN_AE_PT_3.countOfBits;
+		Val |= ADCAN_AE_PT_4.build();
+		temp_dlc += ADCAN_AE_PT_4.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2142,15 +2840,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_2() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_5.countOfBits + ADCAN_AE_PT_6.countOfBits + ADCAN_AE_PT_7.countOfBits + ADCAN_AE_PT_8.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_5.build() | ADCAN_AE_PT_6.build() | ADCAN_AE_PT_7.build() | ADCAN_AE_PT_8.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_5.build();
+		temp_dlc += ADCAN_AE_PT_5.countOfBits;
+		Val |= ADCAN_AE_PT_6.build();
+		temp_dlc += ADCAN_AE_PT_6.countOfBits;
+		Val |= ADCAN_AE_PT_7.build();
+		temp_dlc += ADCAN_AE_PT_7.countOfBits;
+		Val |= ADCAN_AE_PT_8.build();
+		temp_dlc += ADCAN_AE_PT_8.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2173,15 +2879,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_3() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_9.countOfBits + ADCAN_AE_PT_10.countOfBits + ADCAN_AE_PT_11.countOfBits + ADCAN_AE_PT_12.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_9.build() | ADCAN_AE_PT_10.build() | ADCAN_AE_PT_11.build() | ADCAN_AE_PT_12.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_9.build();
+		temp_dlc += ADCAN_AE_PT_9.countOfBits;
+		Val |= ADCAN_AE_PT_10.build();
+		temp_dlc += ADCAN_AE_PT_10.countOfBits;
+		Val |= ADCAN_AE_PT_11.build();
+		temp_dlc += ADCAN_AE_PT_11.countOfBits;
+		Val |= ADCAN_AE_PT_12.build();
+		temp_dlc += ADCAN_AE_PT_12.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2204,15 +2918,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_4() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_13.countOfBits + ADCAN_AE_PT_14.countOfBits + ADCAN_AE_PT_15.countOfBits + ADCAN_AE_PT_16.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_13.build() | ADCAN_AE_PT_14.build() | ADCAN_AE_PT_15.build() | ADCAN_AE_PT_16.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_13.build();
+		temp_dlc += ADCAN_AE_PT_13.countOfBits;
+		Val |= ADCAN_AE_PT_14.build();
+		temp_dlc += ADCAN_AE_PT_14.countOfBits;
+		Val |= ADCAN_AE_PT_15.build();
+		temp_dlc += ADCAN_AE_PT_15.countOfBits;
+		Val |= ADCAN_AE_PT_16.build();
+		temp_dlc += ADCAN_AE_PT_16.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2235,15 +2957,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_5() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_17.countOfBits + ADCAN_AE_PT_18.countOfBits + ADCAN_AE_PT_19.countOfBits + ADCAN_AE_PT_20.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_17.build() | ADCAN_AE_PT_18.build() | ADCAN_AE_PT_19.build() | ADCAN_AE_PT_20.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_17.build();
+		temp_dlc += ADCAN_AE_PT_17.countOfBits;
+		Val |= ADCAN_AE_PT_18.build();
+		temp_dlc += ADCAN_AE_PT_18.countOfBits;
+		Val |= ADCAN_AE_PT_19.build();
+		temp_dlc += ADCAN_AE_PT_19.countOfBits;
+		Val |= ADCAN_AE_PT_20.build();
+		temp_dlc += ADCAN_AE_PT_20.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2266,15 +2996,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_6() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_21.countOfBits + ADCAN_AE_PT_22.countOfBits + ADCAN_AE_PT_23.countOfBits + ADCAN_AE_PT_24.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_21.build() | ADCAN_AE_PT_22.build() | ADCAN_AE_PT_23.build() | ADCAN_AE_PT_24.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_21.build();
+		temp_dlc += ADCAN_AE_PT_21.countOfBits;
+		Val |= ADCAN_AE_PT_22.build();
+		temp_dlc += ADCAN_AE_PT_22.countOfBits;
+		Val |= ADCAN_AE_PT_23.build();
+		temp_dlc += ADCAN_AE_PT_23.countOfBits;
+		Val |= ADCAN_AE_PT_24.build();
+		temp_dlc += ADCAN_AE_PT_24.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2297,15 +3035,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_7() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_25.countOfBits + ADCAN_AE_PT_26.countOfBits + ADCAN_AE_PT_27.countOfBits + ADCAN_AE_PT_28.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_25.build() | ADCAN_AE_PT_26.build() | ADCAN_AE_PT_27.build() | ADCAN_AE_PT_28.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_25.build();
+		temp_dlc += ADCAN_AE_PT_25.countOfBits;
+		Val |= ADCAN_AE_PT_26.build();
+		temp_dlc += ADCAN_AE_PT_26.countOfBits;
+		Val |= ADCAN_AE_PT_27.build();
+		temp_dlc += ADCAN_AE_PT_27.countOfBits;
+		Val |= ADCAN_AE_PT_28.build();
+		temp_dlc += ADCAN_AE_PT_28.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2328,15 +3074,23 @@ public:
 	STOS_CAN_PDU_Aero_ADC_8() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_29.countOfBits + ADCAN_AE_PT_30.countOfBits + ADCAN_SP_Rocker_1.countOfBits + ADCAN_SP_Rocker_2.countOfBits;
-		if(temp % 8 != 0) temp = temp / 8 + 1;
-		else temp = temp / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_29.build() | ADCAN_AE_PT_30.build() | ADCAN_SP_Rocker_1.build() | ADCAN_SP_Rocker_2.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_29.build();
+		temp_dlc += ADCAN_AE_PT_29.countOfBits;
+		Val |= ADCAN_AE_PT_30.build();
+		temp_dlc += ADCAN_AE_PT_30.countOfBits;
+		Val |= ADCAN_SP_Rocker_1.build();
+		temp_dlc += ADCAN_SP_Rocker_1.countOfBits;
+		Val |= ADCAN_SP_Rocker_2.build();
+		temp_dlc += ADCAN_SP_Rocker_2.countOfBits;
 		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
 	}
 	void unbuild()
 	{
@@ -2356,6 +3110,27 @@ public:
 	CAN_Signal<uint16_t> ADCAN_AE_PT_34 = {0, 16, 16, 0, 0, 0.32646562500000004, -831.88};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	CAN_Signal<uint16_t> ADCAN_AE_PT_35 = {0, 16, 32, 0, 0, 0.326529375, -792.27};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
 	CAN_Signal<uint16_t> ADCAN_SP_Rocker_3 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_Aero_ADC_9() 
+	{
+		ID = _id;
+	}
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_AE_PT_33.build();
+		temp_dlc += ADCAN_AE_PT_33.countOfBits;
+		Val |= ADCAN_AE_PT_34.build();
+		temp_dlc += ADCAN_AE_PT_34.countOfBits;
+		Val |= ADCAN_AE_PT_35.build();
+		temp_dlc += ADCAN_AE_PT_35.countOfBits;
+		Val |= ADCAN_SP_Rocker_3.build();
+		temp_dlc += ADCAN_SP_Rocker_3.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
 	void unbuild()
 	{
 		ADCAN_AE_PT_33.unbuild(Val);
@@ -2363,19 +3138,242 @@ public:
 		ADCAN_AE_PT_35.unbuild(Val);
 		ADCAN_SP_Rocker_3.unbuild(Val);
 	}
-	STOS_CAN_PDU_Aero_ADC_9() 
+
+};
+struct STOS_CAN_PDU_SP_RW : public StallardOSCanMessage 
+{
+public:
+	static const uint16_t _id = STOS_CAN_ID_SP_RW;
+	uint16_t _size;
+	CAN_Signal<int16_t> ADCAN_SP_RW1 = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int16_t> ADCAN_SP_RW2 = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int16_t> ADCAN_SP_RW3 = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<int16_t> ADCAN_SP_RW4 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_SP_RW() 
 	{
 		ID = _id;
-		uint8_t temp = ADCAN_AE_PT_33.countOfBits + ADCAN_AE_PT_34.countOfBits + ADCAN_AE_PT_35.countOfBits + ADCAN_SP_Rocker_3.countOfBits;
-		temp = (temp + 8 - (temp % 8)) / 8;
-		if(temp > 8) temp = 8;
-		_size = dlc = temp;
 	}
-	void build() {
-		Val = ADCAN_AE_PT_33.build() | ADCAN_AE_PT_34.build() | ADCAN_AE_PT_35.build() | ADCAN_SP_Rocker_3.build();
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_RW1.build();
+		temp_dlc += ADCAN_SP_RW1.countOfBits;
+		Val |= ADCAN_SP_RW2.build();
+		temp_dlc += ADCAN_SP_RW2.countOfBits;
+		Val |= ADCAN_SP_RW3.build();
+		temp_dlc += ADCAN_SP_RW3.countOfBits;
+		Val |= ADCAN_SP_RW4.build();
+		temp_dlc += ADCAN_SP_RW4.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
+	void unbuild()
+	{
+		ADCAN_SP_RW1.unbuild(Val);
+		ADCAN_SP_RW2.unbuild(Val);
+		ADCAN_SP_RW3.unbuild(Val);
+		ADCAN_SP_RW4.unbuild(Val);
+	}
+
+};
+struct STOS_CAN_PDU_UCU_ADC_1 : public StallardOSCanMessage 
+{
+public:
+	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_1;
+	uint16_t _size;
+	CAN_Signal<uint16_t> ADCAN_PT_Temp_1 = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_PT_Temp_2 = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_PT_Temp_3 = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_PT_Temp_4 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_UCU_ADC_1() 
+	{
 		ID = _id;
 	}
-;
-}; 
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Temp_1.build();
+		temp_dlc += ADCAN_PT_Temp_1.countOfBits;
+		Val |= ADCAN_PT_Temp_2.build();
+		temp_dlc += ADCAN_PT_Temp_2.countOfBits;
+		Val |= ADCAN_PT_Temp_3.build();
+		temp_dlc += ADCAN_PT_Temp_3.countOfBits;
+		Val |= ADCAN_PT_Temp_4.build();
+		temp_dlc += ADCAN_PT_Temp_4.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
+	void unbuild()
+	{
+		ADCAN_PT_Temp_1.unbuild(Val);
+		ADCAN_PT_Temp_2.unbuild(Val);
+		ADCAN_PT_Temp_3.unbuild(Val);
+		ADCAN_PT_Temp_4.unbuild(Val);
+	}
+
+};
+struct STOS_CAN_PDU_UCU_ADC_2 : public StallardOSCanMessage 
+{
+public:
+	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_2;
+	uint16_t _size;
+	CAN_Signal<uint16_t> ADCAN_PT_Temp_5 = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_PT_Temp_6 = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_X = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_Y = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_UCU_ADC_2() 
+	{
+		ID = _id;
+	}
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_PT_Temp_5.build();
+		temp_dlc += ADCAN_PT_Temp_5.countOfBits;
+		Val |= ADCAN_PT_Temp_6.build();
+		temp_dlc += ADCAN_PT_Temp_6.countOfBits;
+		Val |= ADCAN_SP_Accel_X.build();
+		temp_dlc += ADCAN_SP_Accel_X.countOfBits;
+		Val |= ADCAN_SP_Accel_Y.build();
+		temp_dlc += ADCAN_SP_Accel_Y.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
+	void unbuild()
+	{
+		ADCAN_PT_Temp_5.unbuild(Val);
+		ADCAN_PT_Temp_6.unbuild(Val);
+		ADCAN_SP_Accel_X.unbuild(Val);
+		ADCAN_SP_Accel_Y.unbuild(Val);
+	}
+
+};
+struct STOS_CAN_PDU_UCU_ADC_3 : public StallardOSCanMessage 
+{
+public:
+	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_3;
+	uint16_t _size;
+	CAN_Signal<uint16_t> ADCAN_SP_Accel_Z = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Rot_X = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Rot_Y = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_Rot_Z = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_UCU_ADC_3() 
+	{
+		ID = _id;
+	}
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_Accel_Z.build();
+		temp_dlc += ADCAN_SP_Accel_Z.countOfBits;
+		Val |= ADCAN_SP_Rot_X.build();
+		temp_dlc += ADCAN_SP_Rot_X.countOfBits;
+		Val |= ADCAN_SP_Rot_Y.build();
+		temp_dlc += ADCAN_SP_Rot_Y.countOfBits;
+		Val |= ADCAN_SP_Rot_Z.build();
+		temp_dlc += ADCAN_SP_Rot_Z.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
+	void unbuild()
+	{
+		ADCAN_SP_Accel_Z.unbuild(Val);
+		ADCAN_SP_Rot_X.unbuild(Val);
+		ADCAN_SP_Rot_Y.unbuild(Val);
+		ADCAN_SP_Rot_Z.unbuild(Val);
+	}
+
+};
+struct STOS_CAN_PDU_UCU_ADC_4 : public StallardOSCanMessage 
+{
+public:
+	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_4;
+	uint16_t _size;
+	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_VL = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_VR = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_HL = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_HR = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_UCU_ADC_4() 
+	{
+		ID = _id;
+	}
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_TBRAKE_VL.build();
+		temp_dlc += ADCAN_SP_TBRAKE_VL.countOfBits;
+		Val |= ADCAN_SP_TBRAKE_VR.build();
+		temp_dlc += ADCAN_SP_TBRAKE_VR.countOfBits;
+		Val |= ADCAN_SP_TBRAKE_HL.build();
+		temp_dlc += ADCAN_SP_TBRAKE_HL.countOfBits;
+		Val |= ADCAN_SP_TBRAKE_HR.build();
+		temp_dlc += ADCAN_SP_TBRAKE_HR.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
+	void unbuild()
+	{
+		ADCAN_SP_TBRAKE_VL.unbuild(Val);
+		ADCAN_SP_TBRAKE_VR.unbuild(Val);
+		ADCAN_SP_TBRAKE_HL.unbuild(Val);
+		ADCAN_SP_TBRAKE_HR.unbuild(Val);
+	}
+
+};
+struct STOS_CAN_PDU_UCU_ADC_5 : public StallardOSCanMessage 
+{
+public:
+	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_5;
+	uint16_t _size;
+	CAN_Signal<uint16_t> ADCAN_SP_PBRAKE_HA = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> ADCAN_SP_PBRAKE_VA = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> Typ_K_1 = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	CAN_Signal<uint16_t> Typ_K_2 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
+	STOS_CAN_PDU_UCU_ADC_5() 
+	{
+		ID = _id;
+	}
+	void build()
+	{
+		uint8_t temp_dlc = 0;
+		Val |= ADCAN_SP_PBRAKE_HA.build();
+		temp_dlc += ADCAN_SP_PBRAKE_HA.countOfBits;
+		Val |= ADCAN_SP_PBRAKE_VA.build();
+		temp_dlc += ADCAN_SP_PBRAKE_VA.countOfBits;
+		Val |= Typ_K_1.build();
+		temp_dlc += Typ_K_1.countOfBits;
+		Val |= Typ_K_2.build();
+		temp_dlc += Typ_K_2.countOfBits;
+		ID = _id;
+		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
+		else temp_dlc = temp_dlc / 8;
+		if(temp_dlc > 8) temp_dlc = 8;
+		_size = dlc = temp_dlc;
+	}
+	void unbuild()
+	{
+		ADCAN_SP_PBRAKE_HA.unbuild(Val);
+		ADCAN_SP_PBRAKE_VA.unbuild(Val);
+		Typ_K_1.unbuild(Val);
+		Typ_K_2.unbuild(Val);
+	}
+
+};
+
 
 #endif

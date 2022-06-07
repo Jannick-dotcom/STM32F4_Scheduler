@@ -34,7 +34,9 @@ struct CAN_Signal
     const uint8_t countOfBits;
 private:
     const uint16_t startbit;
+public:
     const uint8_t rowcount;
+private:
     const uint8_t isMotorola;
     const float factor;
     const float offset;
