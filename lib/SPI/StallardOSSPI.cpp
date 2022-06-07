@@ -1,5 +1,6 @@
 #include "StallardOSSPI.hpp"
 
+#ifdef STM32F4xxxx
 uint8_t StallardOSSPI::toAlternateFunc(SPI_TypeDef *inst)
 {
     if(inst == SPI1)
@@ -22,6 +23,25 @@ uint8_t StallardOSSPI::toAlternateFunc(SPI_TypeDef *inst)
         return 0;
     }
 }
+#elif defined(STM32F1xxxx)
+uint8_t StallardOSSPI::toAlternateFunc(SPI_TypeDef *inst)
+{
+    if(inst == SPI1)
+    {
+        __HAL_RCC_SPI1_CLK_ENABLE();
+        return GPIO_MODE_AF_PP;
+    }
+    else if(inst == SPI2)
+    {
+        __HAL_RCC_SPI2_CLK_ENABLE();
+        return GPIO_MODE_AF_PP;
+    }
+    else
+    {
+        return 0;
+    }
+}
+#endif
 
 StallardOSSPI::StallardOSSPI(SPI_TypeDef *inst, SPIBauds baud, gpio mosi, gpio miso, gpio sck) :
     mosi(mosi.pin, mosi.port, AFPP, nopull, toAlternateFunc(inst)),
