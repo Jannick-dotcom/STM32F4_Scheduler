@@ -1,3 +1,4 @@
+#ifdef STM32F4xxxx
 #include "StallardOSMPU.hpp"
 
 #include "StallardOSSerial.hpp"
@@ -252,3 +253,4 @@ uint32_t StallardOSMPU::ceilPow2(uint32_t n){
     n++;
     return n;
 }
+#endif

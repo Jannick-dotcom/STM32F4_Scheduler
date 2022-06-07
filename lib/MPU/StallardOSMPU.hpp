@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STM32F4xxxx
 
 #include <stdint.h>
 #include "StallardOSHelpers.h"
@@ -85,3 +86,5 @@ class StallardOSMPU{
         static uint32_t ceilPow2(uint32_t n);
 
 };
+
+#endif
