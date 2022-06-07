@@ -88,7 +88,6 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     CANR(rx.pin, rx.port, AFPP, pullup, portsToAF(port))
 #endif
 {
-
     this->sem.take();
 
 #ifndef STM32F415xx
@@ -167,6 +166,7 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     canhandle.Init.ReceiveFifoLocked = DISABLE;
     canhandle.Init.TransmitFifoPriority = DISABLE;
 
+    
     if (HAL_CAN_Init(&canhandle) != HAL_OK)
     {
 
@@ -222,6 +222,7 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     #endif
     initFilters(&canhandle);
     this->sem.give(); //release Semaphore
+        
 
 }
 

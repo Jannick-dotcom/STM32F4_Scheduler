@@ -62,34 +62,33 @@ StallardOS::StallardOS()
   NVIC_EnableIRQ(NonMaskableInt_IRQn);
   NVIC_EnableIRQ(MemoryManagement_IRQn);
   
-  //Basiswerte Initialisieren
+  // Basiswerte Initialisieren
   first_function_struct = nullptr;
   currentTask = nullptr;
   TCBsCreated = 0;
-  //Für Context Switch
+  // //Für Context Switch
   createTCBs();
-  #ifdef internalClock
-  StallardOS_SetSysClock(runFreq, internal);
-  #else
-  StallardOS_SetSysClock(runFreq, external);
-  #endif
-  if(SystemCoreClock != (runFreq * 1000000))
-  {
-    DEBUGGER_BREAK();
-  }
-
+  // #ifdef internalClock
+  //   //StallardOS_SetSysClock(runFreq, internal);
+  // #else
+  //   StallardOS_SetSysClock(runFreq, external);
+  // #endif
+  // if(SystemCoreClock != (runFreq * 1000000))
+  // {
+  //   DEBUGGER_BREAK();
+  // }
+  //clutch_do_2 = false;
   initShared();
 
   #if defined(useMPU)
-  initMPU();
+    initMPU();
   #endif // useMPU
 
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
   addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
   #ifdef useSFOC
-    addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
+     addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
   #endif
-
 
   if(taskMainStruct == nullptr) while(1);
 }
@@ -735,6 +734,13 @@ bool StallardOS::getPrivilegeLevel()
  */
 void StallardOS::startOS(void)
 {
+  StallardOS_SetSysClock(runFreq, external);
+  if(SystemCoreClock != (runFreq * 1000000))
+  {
+      DEBUGGER_BREAK();
+  }
+  SysTick_Config(SystemCoreClock / (uint32_t)1000); //Counting every processor clock
+
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
