@@ -57,7 +57,7 @@ public:
     }
     uint64_t build()
     {
-        rawValue = (physValue * factor) + offset;
+        rawValue = (physValue - offset) / factor;
         uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1));
         if(isMotorola && countOfBits > 8)
         {
@@ -91,7 +91,7 @@ public:
         }
         if(factor != 0.0f)
         {
-            physValue = (rawValue - offset) / factor;
+            physValue = (rawValue * factor) + offset;
         }
         else
         {
