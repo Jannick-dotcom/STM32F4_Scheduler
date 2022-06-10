@@ -25,6 +25,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= activate_blip.build();
 		temp_dlc += activate_blip.countOfBits;
 		Val |= activate_cut.build();
@@ -79,6 +80,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= speedABSfl.build();
 		temp_dlc += speedABSfl.countOfBits;
 		Val |= speedABSfr.build();
@@ -119,6 +121,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ax1_Bremse60ABS.build();
 		temp_dlc += ax1_Bremse60ABS.countOfBits;
 		Val |= ay1_Bremse60ABS.build();
@@ -165,6 +168,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ti_1.build();
 		temp_dlc += ti_1.countOfBits;
 		Val |= ti_2.build();
@@ -219,6 +223,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= injang.build();
 		temp_dlc += injang.countOfBits;
 		Val |= injoff.build();
@@ -271,6 +276,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ign_1.build();
 		temp_dlc += ign_1.countOfBits;
 		Val |= ign_2.build();
@@ -324,6 +330,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ath.build();
 		temp_dlc += ath.countOfBits;
 		Val |= dath.build();
@@ -373,6 +380,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= lam.build();
 		temp_dlc += lam.countOfBits;
 		Val |= lam_2.build();
@@ -425,6 +433,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= speed.build();
 		temp_dlc += speed.countOfBits;
 		Val |= speedfl.build();
@@ -467,6 +476,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= lapdist.build();
 		temp_dlc += lapdist.countOfBits;
 		Val |= laptime.build();
@@ -510,6 +520,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= accx.build();
 		temp_dlc += accx.countOfBits;
 		Val |= accy.build();
@@ -563,6 +574,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= slipsp.build();
 		temp_dlc += slipsp.countOfBits;
 		Val |= slra.build();
@@ -611,6 +623,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= aps.build();
 		temp_dlc += aps.countOfBits;
 		Val |= batt_u.build();
@@ -702,6 +715,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		if(rowcounter_0x77A.physValue == battlow_b.rowcount)
 		{
 			Val |= battlow_b.build();
@@ -960,6 +974,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= p22_2m_pwg_m.build();
 		temp_dlc += p22_2m_pwg_m.countOfBits;
 		Val |= p22_m.build();
@@ -1004,6 +1019,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Accel_1_X.build();
 		temp_dlc += ADCAN_SP_Accel_1_X.countOfBits;
 		Val |= ADCAN_SP_Accel_1_Y.build();
@@ -1039,6 +1055,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Accel_2_X.build();
 		temp_dlc += ADCAN_SP_Accel_2_X.countOfBits;
 		Val |= ADCAN_SP_Accel_2_Y.build();
@@ -1073,6 +1090,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_Fan_L_PWM.build();
 		temp_dlc += ADCAN_AE_Fan_L_PWM.countOfBits;
 		Val |= ADCAN_AE_Fan_R_PWM.build();
@@ -1104,6 +1122,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_Fan_Telemetry_1.build();
 		temp_dlc += ADCAN_AE_Fan_Telemetry_1.countOfBits;
 		Val |= ADCAN_AE_Fan_Telemetry_2.build();
@@ -1134,6 +1153,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_Warnings.build();
 		temp_dlc += ADCAN_AE_Warnings.countOfBits;
 		ID = _id;
@@ -1161,6 +1181,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_PT_Airbox_Pos.build();
 		temp_dlc += ADCAN_PT_Airbox_Pos.countOfBits;
 		ID = _id;
@@ -1189,6 +1210,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_ARH_1_Homing.build();
 		temp_dlc += ADCAN_SP_ARH_1_Homing.countOfBits;
 		Val |= ADCAN_SP_ARH_2_Homing.build();
@@ -1220,6 +1242,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_ARH_1_PWM.build();
 		temp_dlc += ADCAN_SP_ARH_1_PWM.countOfBits;
 		Val |= ADCAN_SP_ARH_2_PWM.build();
@@ -1252,6 +1275,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_Battery_48V_Temp_1.build();
 		temp_dlc += ADCAN_EL_Battery_48V_Temp_1.countOfBits;
 		Val |= ADCAN_EL_Battery_48V_Temp_2.build();
@@ -1286,6 +1310,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Brake_Disc_Temp_FL.build();
 		temp_dlc += ADCAN_SP_Brake_Disc_Temp_FL.countOfBits;
 		Val |= ADCAN_SP_Brake_Disc_Temp_FR.build();
@@ -1317,6 +1342,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Brake_Disc_Temp_RL.build();
 		temp_dlc += ADCAN_SP_Brake_Disc_Temp_RL.countOfBits;
 		Val |= ADCAN_SP_Brake_Disc_Temp_RR.build();
@@ -1349,6 +1375,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Brake_Pressure_Front.build();
 		temp_dlc += ADCAN_SP_Brake_Pressure_Front.countOfBits;
 		Val |= ADCAN_SP_Brake_Pressure_Rear.build();
@@ -1389,6 +1416,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_Current_Sensor_1.build();
 		temp_dlc += ADCAN_EL_Current_Sensor_1.countOfBits;
 		Val |= ADCAN_EL_Current_Sensor_2.build();
@@ -1439,6 +1467,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_Battery_24V_Temp.build();
 		temp_dlc += ADCAN_EL_Battery_24V_Temp.countOfBits;
 		Val |= ADCAN_EL_ECU_Temp_FCU_1.build();
@@ -1475,6 +1504,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_ARB_Switch.build();
 		temp_dlc += ADCAN_SP_ARB_Switch.countOfBits;
 		Val |= ADCAN_SP_LaunchC_Activated.build();
@@ -1517,6 +1547,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_FDS_Friction_LC.build();
 		temp_dlc += ADCAN_SP_FDS_Friction_LC.countOfBits;
 		Val |= ADCAN_SP_FDS_Slip_mue_max.build();
@@ -1569,6 +1600,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_FDS_Slip_Angle_FL.build();
 		temp_dlc += ADCAN_SP_FDS_Slip_Angle_FL.countOfBits;
 		Val |= ADCAN_SP_FDS_Slip_Angle_FR.build();
@@ -1618,6 +1650,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_FoC_1.build();
 		temp_dlc += ADCAN_EL_FoC_1.countOfBits;
 		Val |= ADCAN_EL_FoC_2.build();
@@ -1648,6 +1681,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_CH_Frame_Pressure.build();
 		temp_dlc += ADCAN_CH_Frame_Pressure.countOfBits;
 		ID = _id;
@@ -1677,6 +1711,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Gyro_1_X.build();
 		temp_dlc += ADCAN_SP_Gyro_1_X.countOfBits;
 		Val |= ADCAN_SP_Gyro_1_Y.build();
@@ -1712,6 +1747,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Gyro_2_X.build();
 		temp_dlc += ADCAN_SP_Gyro_2_X.countOfBits;
 		Val |= ADCAN_SP_Gyro_2_Y.build();
@@ -1746,6 +1782,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Niveau_FL_Niveau.build();
 		temp_dlc += ADCAN_SP_Niveau_FL_Niveau.countOfBits;
 		Val |= ADCAN_SP_Niveau_FR_Niveau.build();
@@ -1781,6 +1818,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Niveau_FL_Error.build();
 		temp_dlc += ADCAN_SP_Niveau_FL_Error.countOfBits;
 		Val |= ADCAN_SP_Niveau_FL_Function.build();
@@ -1823,6 +1861,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Niveau_R_Niveau.build();
 		temp_dlc += ADCAN_SP_Niveau_R_Niveau.countOfBits;
 		ID = _id;
@@ -1851,6 +1890,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Niveau_R_Error.build();
 		temp_dlc += ADCAN_SP_Niveau_R_Error.countOfBits;
 		Val |= ADCAN_SP_Niveau_R_Function.build();
@@ -1881,6 +1921,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_PT_Oil_Pressure.build();
 		temp_dlc += ADCAN_PT_Oil_Pressure.countOfBits;
 		ID = _id;
@@ -1910,6 +1951,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_PT_Oil_Level.build();
 		temp_dlc += ADCAN_PT_Oil_Level.countOfBits;
 		Val |= ADCAN_PT_Oil_Level_RS232.build();
@@ -1946,6 +1988,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_ECU_Temp_PDU_1.build();
 		temp_dlc += ADCAN_EL_ECU_Temp_PDU_1.countOfBits;
 		Val |= ADCAN_EL_ECU_Temp_PDU_2.build();
@@ -2013,6 +2056,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_CH_Mainhoop_Diag_L_1.build();
 		temp_dlc += ADCAN_CH_Mainhoop_Diag_L_1.countOfBits;
 		Val |= ADCAN_CH_Mainhoop_Diag_R_1.build();
@@ -2135,6 +2179,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_Pitot_1.build();
 		temp_dlc += ADCAN_AE_Pitot_1.countOfBits;
 		Val |= ADCAN_AE_Pitot_2.build();
@@ -2169,6 +2214,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_RAS_PWM_L.build();
 		temp_dlc += ADCAN_SP_RAS_PWM_L.countOfBits;
 		Val |= ADCAN_SP_RAS_PWM_R.build();
@@ -2201,6 +2247,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_RAS_Angle.build();
 		temp_dlc += ADCAN_SP_RAS_Angle.countOfBits;
 		Val |= ADCAN_SP_RAS_Homing_L.build();
@@ -2235,6 +2282,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_ECU_Temp_RCU_1.build();
 		temp_dlc += ADCAN_EL_ECU_Temp_RCU_1.countOfBits;
 		Val |= ADCAN_EL_ECU_Temp_RCU_2.build();
@@ -2268,6 +2316,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_ZZ_Test_RCU_1.build();
 		temp_dlc += ADCAN_ZZ_Test_RCU_1.countOfBits;
 		Val |= ADCAN_ZZ_Test_RCU_2.build();
@@ -2307,6 +2356,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_ZZ_Test_RCU_5.build();
 		temp_dlc += ADCAN_ZZ_Test_RCU_5.countOfBits;
 		Val |= ADCAN_ZZ_Test_RCU_6.build();
@@ -2344,6 +2394,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_ZZ_Test_RCU_10.build();
 		temp_dlc += ADCAN_ZZ_Test_RCU_10.countOfBits;
 		Val |= ADCAN_ZZ_Test_RCU_9.build();
@@ -2375,6 +2426,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Rocker_FL.build();
 		temp_dlc += ADCAN_SP_Rocker_FL.countOfBits;
 		Val |= ADCAN_SP_Rocker_FR.build();
@@ -2406,6 +2458,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Rocker_RL.build();
 		temp_dlc += ADCAN_SP_Rocker_RL.countOfBits;
 		Val |= ADCAN_SP_Rocker_RR.build();
@@ -2441,6 +2494,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_PT_Gearshift_DigIn.build();
 		temp_dlc += ADCAN_PT_Gearshift_DigIn.countOfBits;
 		Val |= ADCAN_PT_Gearshift_LaunchC.build();
@@ -2483,6 +2537,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Steering_Wheel_Angle.build();
 		temp_dlc += ADCAN_SP_Steering_Wheel_Angle.countOfBits;
 		ID = _id;
@@ -2510,6 +2565,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_ECU_Temp_SWCU.build();
 		temp_dlc += ADCAN_EL_ECU_Temp_SWCU.countOfBits;
 		ID = _id;
@@ -2539,6 +2595,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_EL_INCR_1.build();
 		temp_dlc += ADCAN_EL_INCR_1.countOfBits;
 		Val |= ADCAN_EL_INCR_2.build();
@@ -2577,6 +2634,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_Switch_1.build();
 		temp_dlc += ADCAN_AE_Switch_1.countOfBits;
 		Val |= ADCAN_EL_Radio_Switch.build();
@@ -2621,6 +2679,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_ZZ_Test_FCU_1.build();
 		temp_dlc += ADCAN_ZZ_Test_FCU_1.countOfBits;
 		Val |= ADCAN_ZZ_Test_FCU_2.build();
@@ -2656,6 +2715,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_ZZ_Test_FCU_4.build();
 		temp_dlc += ADCAN_ZZ_Test_FCU_4.countOfBits;
 		Val |= ADCAN_ZZ_Test_FCU_5.build();
@@ -2695,6 +2755,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_PT_Oil_Fan_Percent.build();
 		temp_dlc += ADCAN_PT_Oil_Fan_Percent.countOfBits;
 		Val |= ADCAN_PT_Oil_PWM.build();
@@ -2741,6 +2802,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Wheel_Speed_FL.build();
 		temp_dlc += ADCAN_SP_Wheel_Speed_FL.countOfBits;
 		Val |= ADCAN_SP_Wheel_Speed_FR.build();
@@ -2772,6 +2834,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_SP_Wheel_Speed_RL.build();
 		temp_dlc += ADCAN_SP_Wheel_Speed_RL.countOfBits;
 		Val |= ADCAN_SP_Wheel_Speed_RR.build();
@@ -2805,6 +2868,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_1.build();
 		temp_dlc += ADCAN_AE_PT_1.countOfBits;
 		Val |= ADCAN_AE_PT_2.build();
@@ -2844,6 +2908,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_5.build();
 		temp_dlc += ADCAN_AE_PT_5.countOfBits;
 		Val |= ADCAN_AE_PT_6.build();
@@ -2883,6 +2948,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_9.build();
 		temp_dlc += ADCAN_AE_PT_9.countOfBits;
 		Val |= ADCAN_AE_PT_10.build();
@@ -2922,6 +2988,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_13.build();
 		temp_dlc += ADCAN_AE_PT_13.countOfBits;
 		Val |= ADCAN_AE_PT_14.build();
@@ -2961,6 +3028,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_17.build();
 		temp_dlc += ADCAN_AE_PT_17.countOfBits;
 		Val |= ADCAN_AE_PT_18.build();
@@ -3000,6 +3068,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_21.build();
 		temp_dlc += ADCAN_AE_PT_21.countOfBits;
 		Val |= ADCAN_AE_PT_22.build();
@@ -3039,6 +3108,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_25.build();
 		temp_dlc += ADCAN_AE_PT_25.countOfBits;
 		Val |= ADCAN_AE_PT_26.build();
@@ -3078,6 +3148,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_29.build();
 		temp_dlc += ADCAN_AE_PT_29.countOfBits;
 		Val |= ADCAN_AE_PT_30.build();
@@ -3117,6 +3188,7 @@ public:
 	void build()
 	{
 		uint8_t temp_dlc = 0;
+		Val = 0;
 		Val |= ADCAN_AE_PT_33.build();
 		temp_dlc += ADCAN_AE_PT_33.countOfBits;
 		Val |= ADCAN_AE_PT_34.build();
@@ -3137,240 +3209,6 @@ public:
 		ADCAN_AE_PT_34.unbuild(Val);
 		ADCAN_AE_PT_35.unbuild(Val);
 		ADCAN_SP_Rocker_3.unbuild(Val);
-	}
-
-};
-struct STOS_CAN_PDU_SP_RW : public StallardOSCanMessage 
-{
-public:
-	static const uint16_t _id = STOS_CAN_ID_SP_RW;
-	uint16_t _size;
-	CAN_Signal<int16_t> ADCAN_SP_RW1 = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<int16_t> ADCAN_SP_RW2 = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<int16_t> ADCAN_SP_RW3 = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<int16_t> ADCAN_SP_RW4 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	STOS_CAN_PDU_SP_RW() 
-	{
-		ID = _id;
-	}
-	void build()
-	{
-		uint8_t temp_dlc = 0;
-		Val |= ADCAN_SP_RW1.build();
-		temp_dlc += ADCAN_SP_RW1.countOfBits;
-		Val |= ADCAN_SP_RW2.build();
-		temp_dlc += ADCAN_SP_RW2.countOfBits;
-		Val |= ADCAN_SP_RW3.build();
-		temp_dlc += ADCAN_SP_RW3.countOfBits;
-		Val |= ADCAN_SP_RW4.build();
-		temp_dlc += ADCAN_SP_RW4.countOfBits;
-		ID = _id;
-		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
-		else temp_dlc = temp_dlc / 8;
-		if(temp_dlc > 8) temp_dlc = 8;
-		_size = dlc = temp_dlc;
-	}
-	void unbuild()
-	{
-		ADCAN_SP_RW1.unbuild(Val);
-		ADCAN_SP_RW2.unbuild(Val);
-		ADCAN_SP_RW3.unbuild(Val);
-		ADCAN_SP_RW4.unbuild(Val);
-	}
-
-};
-struct STOS_CAN_PDU_UCU_ADC_1 : public StallardOSCanMessage 
-{
-public:
-	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_1;
-	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_PT_Temp_1 = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_PT_Temp_2 = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_PT_Temp_3 = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_PT_Temp_4 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	STOS_CAN_PDU_UCU_ADC_1() 
-	{
-		ID = _id;
-	}
-	void build()
-	{
-		uint8_t temp_dlc = 0;
-		Val |= ADCAN_PT_Temp_1.build();
-		temp_dlc += ADCAN_PT_Temp_1.countOfBits;
-		Val |= ADCAN_PT_Temp_2.build();
-		temp_dlc += ADCAN_PT_Temp_2.countOfBits;
-		Val |= ADCAN_PT_Temp_3.build();
-		temp_dlc += ADCAN_PT_Temp_3.countOfBits;
-		Val |= ADCAN_PT_Temp_4.build();
-		temp_dlc += ADCAN_PT_Temp_4.countOfBits;
-		ID = _id;
-		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
-		else temp_dlc = temp_dlc / 8;
-		if(temp_dlc > 8) temp_dlc = 8;
-		_size = dlc = temp_dlc;
-	}
-	void unbuild()
-	{
-		ADCAN_PT_Temp_1.unbuild(Val);
-		ADCAN_PT_Temp_2.unbuild(Val);
-		ADCAN_PT_Temp_3.unbuild(Val);
-		ADCAN_PT_Temp_4.unbuild(Val);
-	}
-
-};
-struct STOS_CAN_PDU_UCU_ADC_2 : public StallardOSCanMessage 
-{
-public:
-	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_2;
-	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_PT_Temp_5 = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_PT_Temp_6 = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_X = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_Y = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	STOS_CAN_PDU_UCU_ADC_2() 
-	{
-		ID = _id;
-	}
-	void build()
-	{
-		uint8_t temp_dlc = 0;
-		Val |= ADCAN_PT_Temp_5.build();
-		temp_dlc += ADCAN_PT_Temp_5.countOfBits;
-		Val |= ADCAN_PT_Temp_6.build();
-		temp_dlc += ADCAN_PT_Temp_6.countOfBits;
-		Val |= ADCAN_SP_Accel_X.build();
-		temp_dlc += ADCAN_SP_Accel_X.countOfBits;
-		Val |= ADCAN_SP_Accel_Y.build();
-		temp_dlc += ADCAN_SP_Accel_Y.countOfBits;
-		ID = _id;
-		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
-		else temp_dlc = temp_dlc / 8;
-		if(temp_dlc > 8) temp_dlc = 8;
-		_size = dlc = temp_dlc;
-	}
-	void unbuild()
-	{
-		ADCAN_PT_Temp_5.unbuild(Val);
-		ADCAN_PT_Temp_6.unbuild(Val);
-		ADCAN_SP_Accel_X.unbuild(Val);
-		ADCAN_SP_Accel_Y.unbuild(Val);
-	}
-
-};
-struct STOS_CAN_PDU_UCU_ADC_3 : public StallardOSCanMessage 
-{
-public:
-	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_3;
-	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_Accel_Z = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_Rot_X = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_Rot_Y = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_Rot_Z = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	STOS_CAN_PDU_UCU_ADC_3() 
-	{
-		ID = _id;
-	}
-	void build()
-	{
-		uint8_t temp_dlc = 0;
-		Val |= ADCAN_SP_Accel_Z.build();
-		temp_dlc += ADCAN_SP_Accel_Z.countOfBits;
-		Val |= ADCAN_SP_Rot_X.build();
-		temp_dlc += ADCAN_SP_Rot_X.countOfBits;
-		Val |= ADCAN_SP_Rot_Y.build();
-		temp_dlc += ADCAN_SP_Rot_Y.countOfBits;
-		Val |= ADCAN_SP_Rot_Z.build();
-		temp_dlc += ADCAN_SP_Rot_Z.countOfBits;
-		ID = _id;
-		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
-		else temp_dlc = temp_dlc / 8;
-		if(temp_dlc > 8) temp_dlc = 8;
-		_size = dlc = temp_dlc;
-	}
-	void unbuild()
-	{
-		ADCAN_SP_Accel_Z.unbuild(Val);
-		ADCAN_SP_Rot_X.unbuild(Val);
-		ADCAN_SP_Rot_Y.unbuild(Val);
-		ADCAN_SP_Rot_Z.unbuild(Val);
-	}
-
-};
-struct STOS_CAN_PDU_UCU_ADC_4 : public StallardOSCanMessage 
-{
-public:
-	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_4;
-	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_VL = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_VR = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_HL = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_TBRAKE_HR = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	STOS_CAN_PDU_UCU_ADC_4() 
-	{
-		ID = _id;
-	}
-	void build()
-	{
-		uint8_t temp_dlc = 0;
-		Val |= ADCAN_SP_TBRAKE_VL.build();
-		temp_dlc += ADCAN_SP_TBRAKE_VL.countOfBits;
-		Val |= ADCAN_SP_TBRAKE_VR.build();
-		temp_dlc += ADCAN_SP_TBRAKE_VR.countOfBits;
-		Val |= ADCAN_SP_TBRAKE_HL.build();
-		temp_dlc += ADCAN_SP_TBRAKE_HL.countOfBits;
-		Val |= ADCAN_SP_TBRAKE_HR.build();
-		temp_dlc += ADCAN_SP_TBRAKE_HR.countOfBits;
-		ID = _id;
-		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
-		else temp_dlc = temp_dlc / 8;
-		if(temp_dlc > 8) temp_dlc = 8;
-		_size = dlc = temp_dlc;
-	}
-	void unbuild()
-	{
-		ADCAN_SP_TBRAKE_VL.unbuild(Val);
-		ADCAN_SP_TBRAKE_VR.unbuild(Val);
-		ADCAN_SP_TBRAKE_HL.unbuild(Val);
-		ADCAN_SP_TBRAKE_HR.unbuild(Val);
-	}
-
-};
-struct STOS_CAN_PDU_UCU_ADC_5 : public StallardOSCanMessage 
-{
-public:
-	static const uint16_t _id = STOS_CAN_ID_UCU_ADC_5;
-	uint16_t _size;
-	CAN_Signal<uint16_t> ADCAN_SP_PBRAKE_HA = {0, 16, 0, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> ADCAN_SP_PBRAKE_VA = {0, 16, 16, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> Typ_K_1 = {0, 16, 32, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	CAN_Signal<uint16_t> Typ_K_2 = {0, 16, 48, 0, 0, 1, 0};//init,bitcount,startbit,rowcount,isMotorola,factor,offset 
-	STOS_CAN_PDU_UCU_ADC_5() 
-	{
-		ID = _id;
-	}
-	void build()
-	{
-		uint8_t temp_dlc = 0;
-		Val |= ADCAN_SP_PBRAKE_HA.build();
-		temp_dlc += ADCAN_SP_PBRAKE_HA.countOfBits;
-		Val |= ADCAN_SP_PBRAKE_VA.build();
-		temp_dlc += ADCAN_SP_PBRAKE_VA.countOfBits;
-		Val |= Typ_K_1.build();
-		temp_dlc += Typ_K_1.countOfBits;
-		Val |= Typ_K_2.build();
-		temp_dlc += Typ_K_2.countOfBits;
-		ID = _id;
-		if(temp_dlc % 8 != 0) temp_dlc = temp_dlc / 8 + 1;
-		else temp_dlc = temp_dlc / 8;
-		if(temp_dlc > 8) temp_dlc = 8;
-		_size = dlc = temp_dlc;
-	}
-	void unbuild()
-	{
-		ADCAN_SP_PBRAKE_HA.unbuild(Val);
-		ADCAN_SP_PBRAKE_VA.unbuild(Val);
-		Typ_K_1.unbuild(Val);
-		Typ_K_2.unbuild(Val);
 	}
 
 };
