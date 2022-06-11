@@ -49,7 +49,7 @@ def main():
         unbuild_str = f"{tab}void unbuild(){endl}{tab}{{{endl}"
 
         if msg.signals:
-            build_str += f'{endl}{tab}{tab}Val = '
+            build_str += f'{endl}{tab}{tab}Val = 0;{endl}'
 
         for signal in msg.signals:
             signame = signal.name.replace(' ', '_')
@@ -60,20 +60,27 @@ def main():
             init = signal.initial or 0
             bcnt = signal.length
             sbit = signal.start
-            rCnt = f'0x{signal.multiplexer_ids[0]:X}' if signal.multiplexer_ids else 0
+            rCnt = f'0x{signal.multiplexer_ids[0]:X}' if signal.multiplexer_ids else 0 # int=0 will evaluate to False later on
             isMotorola = 1 if (signal.byte_order=='big_endian') else 0
             factor = signal.scale
             offset = signal.offset
 
             # declaration
-            outfileStructs.write(f"{tab}CAN_Signal<{dtype}> {signame} = {{{init}, {bcnt}, {sbit}, {rCnt}, {isMotorola}, {factor}, {offset}}};  //init,bitcount,startbit,rowcount,isMotorola,factor,offset{endl}")
+            outfileStructs.write(f"{tab}CAN_Signal<{dtype}> {signame} = {{{init}, {bcnt}, {sbit}, {rCnt}, {isMotorola}, {factor}, {offset}}};  // {{init,bitcount,startbit,rowcount,isMotorola,factor,offset}}  [{signal.minimum or 0}|{signal.maximum or 0}]{endl}")
             # build
-            build_str += f'{signame}.build() | '
+            if rCnt:
+                build_str += f'{tab}{tab}if({signal.multiplexer_signal}.physValue=={rCnt}){{{endl}'
+                build_str += f'{tab}{tab}{tab}Val |= {signame}.build();'
+                build_str += f'{endl}{tab}{tab}}}{endl}'
+            else:
+                build_str += f'{tab}{tab}Val |= {signame}.build();{endl}'
             # unbuild
-            unbuild_str += f'{tab}{tab}{signame}.unbuild(Val);{endl}'
-
-        if msg.signals:
-            build_str = f'{build_str[:-3]};'
+            if rCnt:
+                unbuild_str += f'{tab}{tab}if({signal.multiplexer_signal}.physValue=={rCnt}){{{endl}'
+                unbuild_str += f'{tab}{tab}{tab}{signame}.unbuild(Val);{endl}'
+                unbuild_str += f'{tab}{tab}}}{endl}'
+            else:
+                unbuild_str += f'{tab}{tab}{signame}.unbuild(Val);{endl}'
 
         outfileStructs.write(genConstructor(msgname, msg.length))
 
