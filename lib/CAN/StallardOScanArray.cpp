@@ -1,6 +1,7 @@
 #include "StallardOScanStructs.hpp"
 
-struct STOS_CAN_PDU_PDU_Relais_Status PDU_Relais_Status;
+struct STOS_CAN_PDU_MS4_Relay MS4_Relay;
+struct STOS_CAN_PDU_PDU_Status PDU_Status;
 struct STOS_CAN_PDU_Current_Sensors Current_Sensors;
 struct STOS_CAN_PDU_BMS_HYB_Status BMS_HYB_Status;
 struct STOS_CAN_PDU_BMS_HOMO_Status BMS_HOMO_Status;
@@ -76,8 +77,7 @@ struct STOS_CAN_PDU_CanOPEN_Error_HAL_2 CanOPEN_Error_HAL_2;
 struct STOS_CAN_PDU_CanOPEN_Error_Airbox CanOPEN_Error_Airbox;
 struct STOS_CAN_PDU_CanOPEN_Error_ARH_1 CanOPEN_Error_ARH_1;
 struct STOS_CAN_PDU_CanOPEN_Error_ARH_2 CanOPEN_Error_ARH_2;
-struct STOS_CAN_PDU_ARH_PWM ARH_PWM;
-struct STOS_CAN_PDU_ARH_Homing ARH_Homing;
+struct STOS_CAN_PDU_ARH_Status ARH_Status;
 struct STOS_CAN_PDU_Gear_Sensor Gear_Sensor;
 struct STOS_CAN_PDU_Flash_Over_Can_Discovery Flash_Over_Can_Discovery;
 struct STOS_CAN_PDU_Flash_Over_Can_FCU_Host Flash_Over_Can_FCU_Host;
@@ -104,18 +104,14 @@ struct STOS_CAN_PDU_Brake_Disc_F Brake_Disc_F;
 struct STOS_CAN_PDU_Brake_Pressure Brake_Pressure;
 struct STOS_CAN_PDU_FDS_Wheel_Signals FDS_Wheel_Signals;
 struct STOS_CAN_PDU_FDS_Parameters FDS_Parameters;
-struct STOS_CAN_PDU_Oil_Pressure_Status Oil_Pressure_Status;
-struct STOS_CAN_PDU_HAL_Status_Control HAL_Status_Control;
-struct STOS_CAN_PDU_HAL_PWM HAL_PWM;
+struct STOS_CAN_PDU_HAL_Status HAL_Status;
 struct STOS_CAN_PDU_Rocker_R Rocker_R;
 struct STOS_CAN_PDU_Rocker_F Rocker_F;
 struct STOS_CAN_PDU_Steering_Whl_Angle Steering_Whl_Angle;
 struct STOS_CAN_PDU_Whl_Speed_R Whl_Speed_R;
 struct STOS_CAN_PDU_Whl_Speed_F Whl_Speed_F;
 struct STOS_CAN_PDU_Pitot Pitot;
-struct STOS_CAN_PDU_Mode_Selector Mode_Selector;
 struct STOS_CAN_PDU_Water_Oil_Status Water_Oil_Status;
-struct STOS_CAN_PDU_PDU_Status PDU_Status;
 struct STOS_CAN_PDU_SWCU_Status SWCU_Status;
 struct STOS_CAN_PDU_FCU_Status FCU_Status;
 struct STOS_CAN_PDU_RCU_Status RCU_Status;
@@ -148,7 +144,8 @@ struct STOS_CAN_PDU_Injection_2 Injection_2;
 struct STOS_CAN_PDU_Injection_1 Injection_1;
 
 struct StallardOSCanMessage *canarray[] = {
-	&PDU_Relais_Status,
+	&MS4_Relay,
+	&PDU_Status,
 	&Current_Sensors,
 	&BMS_HYB_Status,
 	&BMS_HOMO_Status,
@@ -224,8 +221,7 @@ struct StallardOSCanMessage *canarray[] = {
 	&CanOPEN_Error_Airbox,
 	&CanOPEN_Error_ARH_1,
 	&CanOPEN_Error_ARH_2,
-	&ARH_PWM,
-	&ARH_Homing,
+	&ARH_Status,
 	&Gear_Sensor,
 	&Flash_Over_Can_Discovery,
 	&Flash_Over_Can_FCU_Host,
@@ -252,18 +248,14 @@ struct StallardOSCanMessage *canarray[] = {
 	&Brake_Pressure,
 	&FDS_Wheel_Signals,
 	&FDS_Parameters,
-	&Oil_Pressure_Status,
-	&HAL_Status_Control,
-	&HAL_PWM,
+	&HAL_Status,
 	&Rocker_R,
 	&Rocker_F,
 	&Steering_Whl_Angle,
 	&Whl_Speed_R,
 	&Whl_Speed_F,
 	&Pitot,
-	&Mode_Selector,
 	&Water_Oil_Status,
-	&PDU_Status,
 	&SWCU_Status,
 	&FCU_Status,
 	&RCU_Status,
@@ -297,7 +289,8 @@ struct StallardOSCanMessage *canarray[] = {
 };
 
 uint16_t idarray[] = {
-	PDU_Relais_Status.ID,
+	MS4_Relay.ID,
+	PDU_Status.ID,
 	Current_Sensors.ID,
 	BMS_HYB_Status.ID,
 	BMS_HOMO_Status.ID,
@@ -373,8 +366,7 @@ uint16_t idarray[] = {
 	CanOPEN_Error_Airbox.ID,
 	CanOPEN_Error_ARH_1.ID,
 	CanOPEN_Error_ARH_2.ID,
-	ARH_PWM.ID,
-	ARH_Homing.ID,
+	ARH_Status.ID,
 	Gear_Sensor.ID,
 	Flash_Over_Can_Discovery.ID,
 	Flash_Over_Can_FCU_Host.ID,
@@ -401,18 +393,14 @@ uint16_t idarray[] = {
 	Brake_Pressure.ID,
 	FDS_Wheel_Signals.ID,
 	FDS_Parameters.ID,
-	Oil_Pressure_Status.ID,
-	HAL_Status_Control.ID,
-	HAL_PWM.ID,
+	HAL_Status.ID,
 	Rocker_R.ID,
 	Rocker_F.ID,
 	Steering_Whl_Angle.ID,
 	Whl_Speed_R.ID,
 	Whl_Speed_F.ID,
 	Pitot.ID,
-	Mode_Selector.ID,
 	Water_Oil_Status.ID,
-	PDU_Status.ID,
 	SWCU_Status.ID,
 	FCU_Status.ID,
 	RCU_Status.ID,
