@@ -21,6 +21,7 @@ public:
         Val = 0;
         Val |= MS4_Engine_RPM_Relay.build();
         Val |= MS4_ATH_Relay.build();
+        dlc = 3;
 
     }
     void unbuild()
@@ -97,6 +98,7 @@ public:
         Val |= SHUTDOWN_CRASH.build();
         Val |= SHUTDOWN_BSPD.build();
         Val |= COOLING_OVERRIDE.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -159,6 +161,7 @@ public:
         Val |= Current_Sensor_6.build();
         Val |= Current_Sensor_7.build();
         Val |= Current_Sensor_8.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -187,6 +190,7 @@ public:
     {
         Val = 0;
         Val |= SHUTDOWN_BMS_HYB.build();
+        dlc = 1;
 
     }
     void unbuild()
@@ -208,6 +212,7 @@ public:
     {
         Val = 0;
         Val |= SHUTDOWN_BMS_HOMO.build();
+        dlc = 1;
 
     }
     void unbuild()
@@ -225,7 +230,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -241,7 +247,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -257,7 +264,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -273,7 +281,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -289,7 +298,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -305,7 +315,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -321,7 +332,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -337,7 +349,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -353,7 +366,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -369,7 +383,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -385,7 +400,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -401,7 +417,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -417,7 +434,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -433,7 +451,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -453,6 +472,7 @@ public:
     {
         Val = 0;
         Val |= Rx_Shift_TargetPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -474,6 +494,7 @@ public:
     {
         Val = 0;
         Val |= Rx_Clutch_TargetPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -491,7 +512,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -507,7 +529,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -523,7 +546,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -539,7 +563,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -555,7 +580,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -575,6 +601,7 @@ public:
     {
         Val = 0;
         Val |= Tx_Shift_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -596,6 +623,7 @@ public:
     {
         Val = 0;
         Val |= Tx_Clutch_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -617,6 +645,7 @@ public:
     {
         Val = 0;
         Val |= Tx_HAL_1_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -638,6 +667,7 @@ public:
     {
         Val = 0;
         Val |= Tx_HAL_2_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -659,6 +689,7 @@ public:
     {
         Val = 0;
         Val |= Tx_Airbox_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -680,6 +711,7 @@ public:
     {
         Val = 0;
         Val |= Tx_ARH_1_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -701,6 +733,7 @@ public:
     {
         Val = 0;
         Val |= Tx_ARH_2_ActualPosition.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -718,7 +751,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -734,7 +768,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -750,7 +785,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -766,7 +802,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -782,7 +819,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -798,7 +836,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -814,7 +853,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -834,6 +874,7 @@ public:
     {
         Val = 0;
         Val |= Tx_Shift_ActualVelocity.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -855,6 +896,7 @@ public:
     {
         Val = 0;
         Val |= Tx_Clutch_ActualVelocity.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -872,7 +914,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -888,7 +931,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -904,7 +948,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -920,7 +965,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -936,7 +982,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 6;
+
     }
     void unbuild()
     {
@@ -952,7 +999,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -968,7 +1016,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -984,7 +1033,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1000,7 +1050,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1016,7 +1067,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1032,7 +1084,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1048,7 +1101,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1064,7 +1118,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1080,7 +1135,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1096,7 +1152,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1112,7 +1169,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1128,7 +1186,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1144,7 +1203,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1160,7 +1220,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1176,7 +1237,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 0;
+
     }
     void unbuild()
     {
@@ -1192,7 +1254,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 2;
+
     }
     void unbuild()
     {
@@ -1208,7 +1271,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1224,7 +1288,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1240,7 +1305,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1256,7 +1322,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1272,7 +1339,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1288,7 +1356,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1304,7 +1373,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 1;
+
     }
     void unbuild()
     {
@@ -1320,7 +1390,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1336,7 +1407,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1352,7 +1424,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1368,7 +1441,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1384,7 +1458,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1400,7 +1475,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1416,7 +1492,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1442,6 +1519,7 @@ public:
         Val |= ARH_2_PWM.build();
         Val |= ARH_2_Homing.build();
         Val |= ARH_1_Homing.build();
+        dlc = 3;
 
     }
     void unbuild()
@@ -1472,6 +1550,7 @@ public:
         Val |= Gear_Signal_Real.build();
         Val |= Gear_Voltage_Fake.build();
         Val |= Gear_Voltage_Real.build();
+        dlc = 3;
 
     }
     void unbuild()
@@ -1492,7 +1571,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1508,7 +1588,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1524,7 +1605,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1540,7 +1622,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1556,7 +1639,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1572,7 +1656,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1588,7 +1673,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1604,7 +1690,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1620,7 +1707,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1636,7 +1724,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1652,7 +1741,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1668,7 +1758,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1684,7 +1775,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -1710,6 +1802,7 @@ public:
         Val |= FCU_CAN2_Tx_Fifo_Lvl.build();
         Val |= FCU_CAN1_Tx_Fifo_Lvl.build();
         Val |= FCU_Temp.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1740,6 +1833,7 @@ public:
         Val |= RCU_CAN2_Tx_Fifo_Lvl.build();
         Val |= RCU_CAN1_Tx_Fifo_Lvl.build();
         Val |= RCU_Temp.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1770,6 +1864,7 @@ public:
         Val |= PDU_CAN2_Tx_Fifo_Lvl.build();
         Val |= PDU_CAN1_Tx_Fifo_Lvl.build();
         Val |= PDU_Temps.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1800,6 +1895,7 @@ public:
         Val |= SWCU_CAN1_Tx_Fifo_Lvl.build();
         Val |= SWCU_CAN2_Tx_Fifo_Lvl.build();
         Val |= SWCU_Temp.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1830,6 +1926,7 @@ public:
         Val |= BMS_HOMO_CAN2_Tx_Fifo_Lvl.build();
         Val |= BMS_HOMO_CAN1_Tx_Fifo_Lvl.build();
         Val |= BMS_HOMO_Temp.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1860,6 +1957,7 @@ public:
         Val |= BMS_HYB_CAN2_Tx_Fifo_Lvl.build();
         Val |= BMS_HYB_CAN1_Tx_Fifo_Lvl.build();
         Val |= BMS_HYB_Temp.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1886,6 +1984,7 @@ public:
         Val = 0;
         Val |= Airbox_Pos.build();
         Val |= Airbox_PWM.build();
+        dlc = 2;
 
     }
     void unbuild()
@@ -1910,6 +2009,7 @@ public:
         Val = 0;
         Val |= Brake_Disc_Temp_RL.build();
         Val |= Brake_Disc_Temp_RR.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1934,6 +2034,7 @@ public:
         Val = 0;
         Val |= Brake_Disc_Temp_FL.build();
         Val |= Brake_Disc_Temp_FR.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -1960,6 +2061,7 @@ public:
         Val |= Brake_Pressure_Front.build();
         Val |= Brake_Pressure_Rear.build();
         Val |= Brake_Bias.build();
+        dlc = 5;
 
     }
     void unbuild()
@@ -1997,6 +2099,7 @@ public:
         Val |= FDS_Whl_Load_FR.build();
         Val |= FDS_Whl_Load_RL.build();
         Val |= FDS_Whl_Load_RR.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2037,6 +2140,7 @@ public:
         Val |= FDS_Wheel_Slip_RL.build();
         Val |= FDS_Wheel_Slip_RR.build();
         Val |= FDS_Velo_VDE.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2072,6 +2176,7 @@ public:
         Val |= HAL_PWM_L.build();
         Val |= HAL_PWM_R.build();
         Val |= HAL_Angle.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -2099,6 +2204,7 @@ public:
         Val = 0;
         Val |= Rocker_RL.build();
         Val |= Rocker_RR.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -2123,6 +2229,7 @@ public:
         Val = 0;
         Val |= Rocker_FL.build();
         Val |= Rocker_FR.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -2145,6 +2252,7 @@ public:
     {
         Val = 0;
         Val |= Steering_Wheel_Angle.build();
+        dlc = 2;
 
     }
     void unbuild()
@@ -2168,6 +2276,7 @@ public:
         Val = 0;
         Val |= Wheel_Speed_RL.build();
         Val |= Wheel_Speed_RR.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -2192,6 +2301,7 @@ public:
         Val = 0;
         Val |= Wheel_Speed_FL.build();
         Val |= Wheel_Speed_FR.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -2218,6 +2328,7 @@ public:
         Val |= Pitot_1.build();
         Val |= Pitot_2.build();
         Val |= Pitot_3.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -2253,6 +2364,7 @@ public:
         Val |= Water_Fan_2_Percent.build();
         Val |= Water_Fan_2_PWM.build();
         Val |= Water_Pump_Percent.build();
+        dlc = 7;
 
     }
     void unbuild()
@@ -2284,6 +2396,7 @@ public:
         Val |= Anti_Stall_Active.build();
         Val |= Auto_Shift_Active.build();
         Val |= Neutral_Guard_Active.build();
+        dlc = 1;
 
     }
     void unbuild()
@@ -2303,7 +2416,8 @@ public:
         ID = _id;
     }
     void build()
-    {
+    {        dlc = 8;
+
     }
     void unbuild()
     {
@@ -2335,6 +2449,7 @@ public:
         Val |= Clutch_Homing.build();
         Val |= LaunchControl_State.build();
         Val |= LaunchControl_UI_State.build();
+        dlc = 4;
 
     }
     void unbuild()
@@ -2374,6 +2489,7 @@ public:
         Val |= Bat_Hybrid_U_13.build();
         Val |= Bat_Hybrid_U_14.build();
         Val |= Bat_Hybrid_I.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2415,6 +2531,7 @@ public:
         Val |= Bat_Hybrid_U_6.build();
         Val |= Bat_Hybrid_U_7.build();
         Val |= Bat_Hybrid_U_8.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2455,6 +2572,7 @@ public:
         Val |= Bat_Hybrid_T_5.build();
         Val |= Bat_Hybrid_T_6.build();
         Val |= Bat_Hybrid_T_7.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2494,6 +2612,7 @@ public:
         Val |= Bat_Hybrid_T_12.build();
         Val |= Bat_Hybrid_T_13.build();
         Val |= Bat_Hybrid_T_14.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2531,6 +2650,7 @@ public:
         Val |= Bat_Aero_U_9.build();
         Val |= Bat_Aero_U_10.build();
         Val |= Bat_Aero_I.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2565,6 +2685,7 @@ public:
         Val |= Bat_Aero_U_3.build();
         Val |= Bat_Aero_U_4.build();
         Val |= Bat_Aero_U_5.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -2608,6 +2729,7 @@ public:
         Val |= Bat_Aero_T_8.build();
         Val |= Bat_Aero_T_9.build();
         Val |= Bat_Aero_T_10.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2656,6 +2778,7 @@ public:
         Val |= Bat_Aero_T_18.build();
         Val |= Bat_Aero_T_19.build();
         Val |= Bat_Aero_T_20.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2690,6 +2813,7 @@ public:
         Val |= IMU_1_GX.build();
         Val |= IMU_1_GY.build();
         Val |= IMU_1_GZ.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -2717,6 +2841,7 @@ public:
         Val |= IMU_1_AX.build();
         Val |= IMU_1_AY.build();
         Val |= IMU_1_AZ.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -2742,6 +2867,7 @@ public:
         Val = 0;
         Val |= Fan_PWM_L.build();
         Val |= Fan_PWM_R.build();
+        dlc = 2;
 
     }
     void unbuild()
@@ -2780,6 +2906,7 @@ public:
         Val |= Switch_Radio.build();
         Val |= Switch_Shift_Up.build();
         Val |= Switch_Shift_Down.build();
+        dlc = 2;
 
     }
     void unbuild()
@@ -2825,6 +2952,7 @@ public:
         Val |= state_cut.build();
         Val |= activate_blip.build();
         Val |= activate_cut.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2862,6 +2990,7 @@ public:
         Val |= blsABS.build();
         Val |= ax1_Bremse60ABS.build();
         Val |= ay1_Bremse60ABS.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2893,6 +3022,7 @@ public:
         Val |= speedABSfr.build();
         Val |= speedABSrl.build();
         Val |= speedABSrr.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -2927,6 +3057,7 @@ public:
         Val |= pwg_sp.build();
         Val |= wgdc_wgdcvent.build();
         Val |= wgdc_2_wgdchold.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3093,6 +3224,7 @@ public:
         if(rowcounter_0x77A.physValue==0x5){
             Val |= oillamp_b_2.build();
         }
+        dlc = 8;
 
     }
     void unbuild()
@@ -3219,6 +3351,7 @@ public:
         Val |= camshaftpos.build();
         Val |= batt_u.build();
         Val |= lap_c.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3256,6 +3389,7 @@ public:
         Val |= slra.build();
         Val |= vdraxle.build();
         Val |= vref.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3296,6 +3430,7 @@ public:
         Val |= accx.build();
         Val |= accy.build();
         Val |= accz.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3330,6 +3465,7 @@ public:
         Val |= laptime.build();
         Val |= laptimediff.build();
         Val |= laptimefast.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3362,6 +3498,7 @@ public:
         Val |= speedfr.build();
         Val |= speedrl.build();
         Val |= speedrr.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3401,6 +3538,7 @@ public:
         Val |= lam_2.build();
         Val |= lammap.build();
         Val |= lammap_2.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3439,6 +3577,7 @@ public:
         Val |= rev.build();
         Val |= ath.build();
         Val |= dath.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3479,6 +3618,7 @@ public:
         Val |= ign_6.build();
         Val |= ign_7.build();
         Val |= ign_8.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3519,6 +3659,7 @@ public:
         Val |= injoff.build();
         Val |= lamctrl_k.build();
         Val |= lamctrl_2k.build();
+        dlc = 8;
 
     }
     void unbuild()
@@ -3560,6 +3701,7 @@ public:
         Val |= ti_6.build();
         Val |= ti_7.build();
         Val |= ti_8.build();
+        dlc = 8;
 
     }
     void unbuild()

@@ -84,6 +84,7 @@ def main():
 
         outfileStructs.write(genConstructor(msgname, msg.length))
 
+        build_str += f'{tab}{tab}dlc = {msg.length};{endl}'
         build_str += f'{endl}{tab}}}{endl}'
         unbuild_str += f'{tab}}}{endl}'
 
