@@ -3,8 +3,6 @@
 struct STOS_CAN_PDU_MS4_Relay MS4_Relay;
 struct STOS_CAN_PDU_PDU_Status PDU_Status;
 struct STOS_CAN_PDU_Current_Sensors Current_Sensors;
-struct STOS_CAN_PDU_BMS_HYB_Status BMS_HYB_Status;
-struct STOS_CAN_PDU_BMS_HOMO_Status BMS_HOMO_Status;
 struct STOS_CAN_PDU_CanOPEN_RxPDO1_Shift CanOPEN_RxPDO1_Shift;
 struct STOS_CAN_PDU_CanOPEN_RxPDO1_Clutch CanOPEN_RxPDO1_Clutch;
 struct STOS_CAN_PDU_CanOPEN_RxPDO1_HAL_1 CanOPEN_RxPDO1_HAL_1;
@@ -112,7 +110,6 @@ struct STOS_CAN_PDU_Whl_Speed_R Whl_Speed_R;
 struct STOS_CAN_PDU_Whl_Speed_F Whl_Speed_F;
 struct STOS_CAN_PDU_Pitot Pitot;
 struct STOS_CAN_PDU_Water_Oil_Status Water_Oil_Status;
-struct STOS_CAN_PDU_SWCU_Status SWCU_Status;
 struct STOS_CAN_PDU_FCU_Status FCU_Status;
 struct STOS_CAN_PDU_RCU_Status RCU_Status;
 struct STOS_CAN_PDU_Bat_Hybrid_Electr_2 Bat_Hybrid_Electr_2;
@@ -147,8 +144,6 @@ struct StallardOSCanMessage *canarray[] = {
 	&MS4_Relay,
 	&PDU_Status,
 	&Current_Sensors,
-	&BMS_HYB_Status,
-	&BMS_HOMO_Status,
 	&CanOPEN_RxPDO1_Shift,
 	&CanOPEN_RxPDO1_Clutch,
 	&CanOPEN_RxPDO1_HAL_1,
@@ -256,7 +251,6 @@ struct StallardOSCanMessage *canarray[] = {
 	&Whl_Speed_F,
 	&Pitot,
 	&Water_Oil_Status,
-	&SWCU_Status,
 	&FCU_Status,
 	&RCU_Status,
 	&Bat_Hybrid_Electr_2,
@@ -292,8 +286,6 @@ uint16_t idarray[] = {
 	MS4_Relay.ID,
 	PDU_Status.ID,
 	Current_Sensors.ID,
-	BMS_HYB_Status.ID,
-	BMS_HOMO_Status.ID,
 	CanOPEN_RxPDO1_Shift.ID,
 	CanOPEN_RxPDO1_Clutch.ID,
 	CanOPEN_RxPDO1_HAL_1.ID,
@@ -401,7 +393,6 @@ uint16_t idarray[] = {
 	Whl_Speed_F.ID,
 	Pitot.ID,
 	Water_Oil_Status.ID,
-	SWCU_Status.ID,
 	FCU_Status.ID,
 	RCU_Status.ID,
 	Bat_Hybrid_Electr_2.ID,

@@ -1,8 +1,6 @@
 #define STOS_CAN_ID_MS4_Relay 0x111
 #define STOS_CAN_ID_PDU_Status 0x10B
 #define STOS_CAN_ID_Current_Sensors 0x106
-#define STOS_CAN_ID_BMS_HYB_Status 0x104
-#define STOS_CAN_ID_BMS_HOMO_Status 0x103
 #define STOS_CAN_ID_CanOPEN_RxPDO1_Shift 0x201
 #define STOS_CAN_ID_CanOPEN_RxPDO1_Clutch 0x202
 #define STOS_CAN_ID_CanOPEN_RxPDO1_HAL_1 0x203
@@ -110,7 +108,6 @@
 #define STOS_CAN_ID_Whl_Speed_F 0x5C
 #define STOS_CAN_ID_Pitot 0x25E
 #define STOS_CAN_ID_Water_Oil_Status 0x110
-#define STOS_CAN_ID_SWCU_Status 0x10F
 #define STOS_CAN_ID_FCU_Status 0x107
 #define STOS_CAN_ID_RCU_Status 0x10D
 #define STOS_CAN_ID_Bat_Hybrid_Electr_2 0x56

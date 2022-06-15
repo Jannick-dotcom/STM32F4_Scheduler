@@ -176,50 +176,6 @@ public:
         Current_Sensor_8.unbuild(Val);
     }
 };
-struct STOS_CAN_PDU_BMS_HYB_Status : public StallardOSCanMessage 
-{
-public:
-    static constexpr uint16_t _id = STOS_CAN_ID_BMS_HYB_Status;
-    const uint16_t _size = 1;
-    CAN_Signal<uint8_t> SHUTDOWN_BMS_HYB = {0, 1, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
-    STOS_CAN_PDU_BMS_HYB_Status() 
-    {
-        ID = _id;
-    }
-    void build()
-    {
-        Val = 0;
-        Val |= SHUTDOWN_BMS_HYB.build();
-        dlc = 1;
-
-    }
-    void unbuild()
-    {
-        SHUTDOWN_BMS_HYB.unbuild(Val);
-    }
-};
-struct STOS_CAN_PDU_BMS_HOMO_Status : public StallardOSCanMessage 
-{
-public:
-    static constexpr uint16_t _id = STOS_CAN_ID_BMS_HOMO_Status;
-    const uint16_t _size = 1;
-    CAN_Signal<uint8_t> SHUTDOWN_BMS_HOMO = {0, 1, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
-    STOS_CAN_PDU_BMS_HOMO_Status() 
-    {
-        ID = _id;
-    }
-    void build()
-    {
-        Val = 0;
-        Val |= SHUTDOWN_BMS_HOMO.build();
-        dlc = 1;
-
-    }
-    void unbuild()
-    {
-        SHUTDOWN_BMS_HOMO.unbuild(Val);
-    }
-};
 struct STOS_CAN_PDU_CanOPEN_RxPDO1_Shift : public StallardOSCanMessage 
 {
 public:
@@ -2265,8 +2221,8 @@ struct STOS_CAN_PDU_Whl_Speed_R : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Whl_Speed_R;
     const uint16_t _size = 4;
-    CAN_Signal<uint16_t> Wheel_Speed_RL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
-    CAN_Signal<uint16_t> Wheel_Speed_RR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_Rev_RL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_Rev_RR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
     STOS_CAN_PDU_Whl_Speed_R() 
     {
         ID = _id;
@@ -2274,15 +2230,15 @@ public:
     void build()
     {
         Val = 0;
-        Val |= Wheel_Speed_RL.build();
-        Val |= Wheel_Speed_RR.build();
+        Val |= Wheel_Speed_Rev_RL.build();
+        Val |= Wheel_Speed_Rev_RR.build();
         dlc = 4;
 
     }
     void unbuild()
     {
-        Wheel_Speed_RL.unbuild(Val);
-        Wheel_Speed_RR.unbuild(Val);
+        Wheel_Speed_Rev_RL.unbuild(Val);
+        Wheel_Speed_Rev_RR.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage 
@@ -2290,8 +2246,8 @@ struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Whl_Speed_F;
     const uint16_t _size = 4;
-    CAN_Signal<uint16_t> Wheel_Speed_FL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
-    CAN_Signal<uint16_t> Wheel_Speed_FR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_Rev_FL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_Rev_FR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
     STOS_CAN_PDU_Whl_Speed_F() 
     {
         ID = _id;
@@ -2299,15 +2255,15 @@ public:
     void build()
     {
         Val = 0;
-        Val |= Wheel_Speed_FL.build();
-        Val |= Wheel_Speed_FR.build();
+        Val |= Wheel_Speed_Rev_FL.build();
+        Val |= Wheel_Speed_Rev_FR.build();
         dlc = 4;
 
     }
     void unbuild()
     {
-        Wheel_Speed_FL.unbuild(Val);
-        Wheel_Speed_FR.unbuild(Val);
+        Wheel_Speed_Rev_FL.unbuild(Val);
+        Wheel_Speed_Rev_FR.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Pitot : public StallardOSCanMessage 
@@ -2376,34 +2332,6 @@ public:
         Water_Fan_2_Percent.unbuild(Val);
         Water_Fan_2_PWM.unbuild(Val);
         Water_Pump_Percent.unbuild(Val);
-    }
-};
-struct STOS_CAN_PDU_SWCU_Status : public StallardOSCanMessage 
-{
-public:
-    static constexpr uint16_t _id = STOS_CAN_ID_SWCU_Status;
-    const uint16_t _size = 1;
-    CAN_Signal<uint8_t> Anti_Stall_Active = {0, 1, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
-    CAN_Signal<uint8_t> Auto_Shift_Active = {0, 1, 1, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
-    CAN_Signal<uint8_t> Neutral_Guard_Active = {0, 1, 2, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
-    STOS_CAN_PDU_SWCU_Status() 
-    {
-        ID = _id;
-    }
-    void build()
-    {
-        Val = 0;
-        Val |= Anti_Stall_Active.build();
-        Val |= Auto_Shift_Active.build();
-        Val |= Neutral_Guard_Active.build();
-        dlc = 1;
-
-    }
-    void unbuild()
-    {
-        Anti_Stall_Active.unbuild(Val);
-        Auto_Shift_Active.unbuild(Val);
-        Neutral_Guard_Active.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_FCU_Status : public StallardOSCanMessage 
@@ -2550,7 +2478,7 @@ struct STOS_CAN_PDU_Bat_Hybrid_Temp_1 : public StallardOSCanMessage
 {
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Bat_Hybrid_Temp_1;
-    const uint16_t _size = 8;
+    const uint16_t _size = 6;
     CAN_Signal<uint8_t> Bat_Hybrid_T_1 = {0, 6, 0, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Hybrid_T_2 = {0, 6, 6, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Hybrid_T_3 = {0, 6, 12, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
@@ -2572,7 +2500,7 @@ public:
         Val |= Bat_Hybrid_T_5.build();
         Val |= Bat_Hybrid_T_6.build();
         Val |= Bat_Hybrid_T_7.build();
-        dlc = 8;
+        dlc = 6;
 
     }
     void unbuild()
@@ -2590,7 +2518,7 @@ struct STOS_CAN_PDU_Bat_Hybrid_Temp_2 : public StallardOSCanMessage
 {
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Bat_Hybrid_Temp_2;
-    const uint16_t _size = 8;
+    const uint16_t _size = 6;
     CAN_Signal<uint8_t> Bat_Hybrid_T_8 = {0, 6, 0, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Hybrid_T_9 = {0, 6, 6, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Hybrid_T_10 = {0, 6, 12, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
@@ -2598,6 +2526,7 @@ public:
     CAN_Signal<uint8_t> Bat_Hybrid_T_12 = {0, 6, 24, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Hybrid_T_13 = {0, 6, 30, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Hybrid_T_14 = {0, 6, 36, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
+    CAN_Signal<uint8_t> SHUTDOWN_BMS_HYB = {0, 1, 42, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     STOS_CAN_PDU_Bat_Hybrid_Temp_2() 
     {
         ID = _id;
@@ -2612,7 +2541,8 @@ public:
         Val |= Bat_Hybrid_T_12.build();
         Val |= Bat_Hybrid_T_13.build();
         Val |= Bat_Hybrid_T_14.build();
-        dlc = 8;
+        Val |= SHUTDOWN_BMS_HYB.build();
+        dlc = 6;
 
     }
     void unbuild()
@@ -2624,6 +2554,7 @@ public:
         Bat_Hybrid_T_12.unbuild(Val);
         Bat_Hybrid_T_13.unbuild(Val);
         Bat_Hybrid_T_14.unbuild(Val);
+        SHUTDOWN_BMS_HYB.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Bat_Aero_Electr_2 : public StallardOSCanMessage 
@@ -2761,6 +2692,7 @@ public:
     CAN_Signal<uint8_t> Bat_Aero_T_18 = {0, 6, 42, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Aero_T_19 = {0, 6, 48, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
     CAN_Signal<uint8_t> Bat_Aero_T_20 = {0, 6, 54, 0, 0, 1, 10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [10|73]
+    CAN_Signal<uint8_t> SHUTDOWN_BMS_HOMO = {0, 1, 60, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     STOS_CAN_PDU_Bat_Aero_Temp_2() 
     {
         ID = _id;
@@ -2778,6 +2710,7 @@ public:
         Val |= Bat_Aero_T_18.build();
         Val |= Bat_Aero_T_19.build();
         Val |= Bat_Aero_T_20.build();
+        Val |= SHUTDOWN_BMS_HOMO.build();
         dlc = 8;
 
     }
@@ -2793,6 +2726,7 @@ public:
         Bat_Aero_T_18.unbuild(Val);
         Bat_Aero_T_19.unbuild(Val);
         Bat_Aero_T_20.unbuild(Val);
+        SHUTDOWN_BMS_HOMO.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_IMU_Gyro : public StallardOSCanMessage 
@@ -2880,7 +2814,7 @@ struct STOS_CAN_PDU_SWCU_Switches : public StallardOSCanMessage
 {
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_SWCU_Switches;
-    const uint16_t _size = 2;
+    const uint16_t _size = 3;
     CAN_Signal<uint8_t> Switch_Mode_A = {0, 4, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|15]
     CAN_Signal<uint8_t> Switch_Mode_B = {0, 4, 4, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|15]
     CAN_Signal<uint8_t> Switch_1 = {0, 1, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
@@ -2890,6 +2824,9 @@ public:
     CAN_Signal<uint8_t> Switch_Radio = {0, 1, 12, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     CAN_Signal<uint8_t> Switch_Shift_Up = {0, 1, 13, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     CAN_Signal<uint8_t> Switch_Shift_Down = {0, 1, 14, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
+    CAN_Signal<uint8_t> Neutral_Guard_Active = {0, 1, 15, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
+    CAN_Signal<uint8_t> Anti_Stall_Active = {0, 1, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
+    CAN_Signal<uint8_t> Auto_Shift_Active = {0, 1, 17, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     STOS_CAN_PDU_SWCU_Switches() 
     {
         ID = _id;
@@ -2906,7 +2843,10 @@ public:
         Val |= Switch_Radio.build();
         Val |= Switch_Shift_Up.build();
         Val |= Switch_Shift_Down.build();
-        dlc = 2;
+        Val |= Neutral_Guard_Active.build();
+        Val |= Anti_Stall_Active.build();
+        Val |= Auto_Shift_Active.build();
+        dlc = 3;
 
     }
     void unbuild()
@@ -2920,6 +2860,9 @@ public:
         Switch_Radio.unbuild(Val);
         Switch_Shift_Up.unbuild(Val);
         Switch_Shift_Down.unbuild(Val);
+        Neutral_Guard_Active.unbuild(Val);
+        Anti_Stall_Active.unbuild(Val);
+        Auto_Shift_Active.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage 
