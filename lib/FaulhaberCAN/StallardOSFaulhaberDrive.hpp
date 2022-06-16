@@ -28,13 +28,15 @@ private:
     void StateTransitionOperationEnable();
     void StateTransitionStartHoming();
 
+    void StateUpdate();
+
     void ShutDown();
     void SwitchOn();
     void EnableOperation();
 
-    bool CheckIfReadytoSwitchOn();
-    bool CheckIfSwitchedOn();
-    bool CheckIfOperationEnable();
+    // bool CheckIfReadytoSwitchOn();
+    // bool CheckIfSwitchedOn();
+    // bool CheckIfOperationEnable();
 
     void OperationModeTransitionHoming();
     void OperationModeTransitionProfilePositionMode();
@@ -42,9 +44,11 @@ private:
     void SetOperationModeHoming();
     void SetOperationModeProfilePositionMode();
 
-    bool CheckIfOperationModeIsHoming();
-    bool CheckIfOperationModeIsProfilePositonMode();
-    bool CheckIfOperationModeIsProfileVelocityMode();
+    // bool CheckIfOperationModeIsHoming();
+    // bool CheckIfOperationModeIsProfilePositonMode();
+    // bool CheckIfOperationModeIsProfileVelocityMode();
+
+    // void OperationModeUpdate();
 
     bool CheckIfTargetReached();
 

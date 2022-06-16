@@ -20,6 +20,18 @@ void StallardOSFaulhaberMotionController::StateTransitionStopped()
 {
     state = State::STOPPED;
 }
+void StallardOSFaulhaberMotionController::StateUpdate()
+{
+    if (state == State::INITIALIZATION && /*Boot Up*/) // ID Node_id + 1792, data = x00
+    {
+        StateTransitionPreOperational();
+    }
+    if (state == (State::PRE_OPERATIONAL || State::STOPPED) && /*statusword 0x00 */)
+    {
+        StateTransitionOperational();
+    }
+}
+void StallardOSFaulhaberMotionController::statuswordUpdate() {}
 void StallardOSFaulhaberMotionController::InitializationFinished() {}
 void StallardOSFaulhaberMotionController::StartRemoteNodeIndication()
 {

@@ -1,7 +1,7 @@
 #pragma once
-#include "StallardOSFaulhaberControllword.hpp"
-#include "StallardOSFaulhaberMessages.hpp"
-//#include "StallardOSFaulhaberAntrieb.hpp"
+//#include "StallardOSFaulhaberControllword.hpp"
+//#include "StallardOSFaulhaberMessages.hpp"
+#include "StallardOSFaulhaberDrive.hpp"
 class StallardOSFaulhaberMotionController
 {
 private:
@@ -15,12 +15,17 @@ private:
 
     int node_ID;
     State state;
-    StallardoOSFaulhaberControllword controllword;
+    StallardOSFaulhaberDrive driver;
+    int statusword;
+    int controllword;
 
     void StateTransitionInitialization();
     void StateTransitionPreOperational();
     void StateTransitionOperational();
     void StateTransitionStopped();
+
+    void StateUpdate();
+    void statuswordUpdate();
 
     void InitializationFinished();
     void StartRemoteNodeIndication();
