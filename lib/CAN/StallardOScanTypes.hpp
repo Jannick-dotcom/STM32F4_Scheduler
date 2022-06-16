@@ -57,46 +57,51 @@ public:
     }
     uint64_t build()
     {
+        const uint64_t mask = (((uint64_t)1 << (uint64_t)countOfBits) - 1);
         rawValue = (physValue - offset) / factor;
-        uint64_t val = (uint64_t)((uint64_t)rawValue & (((uint64_t)1 << (uint64_t)countOfBits) - 1));
-        if(isMotorola && countOfBits > 8)
-        {
-            uint64_t tempVal = val;
-            uint64_t tempOut = 0;
-            for(uint8_t i = 0; i < countOfBits/8; i++)
-            {
-                tempOut |= (tempVal & (0xFF)) << (((countOfBits/8)-i-1) * 8);
-                tempVal = tempVal >> 8;
+
+        if(isMotorola){
+            if(countOfBits > 8 && countOfBits <= 16){
+                rawValue = __builtin_bswap16(rawValue);    
             }
-            return tempOut << (uint64_t)startbit;
+            else if(countOfBits > 8 && countOfBits <= 32){
+                rawValue = __builtin_bswap32(rawValue);
+            }
+            else if(countOfBits > 8){
+                rawValue = __builtin_bswap64(rawValue);
+            }
+
+            uint64_t val = (uint64_t)rawValue & mask;  // required in case of overflow
+            return val << (uint64_t)(startbit-7);
         }
-        else
-        {
+        else{
+            uint64_t val = (uint64_t)rawValue & mask;  // required in case of overflow
             return val << (uint64_t)startbit;
         }
     }
     void unbuild(const uint64_t Val)
     {
-        rawValue = ((Val & (~(((uint64_t)1 << startbit)-1))) & ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit)) >> (uint64_t)startbit;
-        if(isMotorola && countOfBits > 8)
-        {
-            uint64_t tempVal = rawValue;
-            uint64_t tempOut = 0;
-            for(uint8_t i = 0; i < countOfBits/8; i++)
-            {
-                tempOut |= (tempVal & (0xFF)) << (((countOfBits/8)-i-1) * 8);
-                tempVal = tempVal >> 8;
+        if(isMotorola)
+        {   
+            const uint64_t signal_mask = (((uint64_t)1 << countOfBits)-1) << (startbit-7);
+            rawValue = (Val&signal_mask) >> (startbit-7);
+
+            if(countOfBits > 8 && countOfBits <= 16){
+                rawValue = __builtin_bswap16(rawValue);    
             }
-            rawValue = tempOut;
+            else if(countOfBits > 8 && countOfBits <= 32){
+                rawValue = __builtin_bswap32(rawValue);
+            }
+            else if(countOfBits > 8){
+                rawValue = __builtin_bswap64(rawValue);
+            }
         }
-        if(factor != 0.0f)
-        {
-            physValue = (rawValue * factor) + offset;
+        else{
+            const uint64_t signal_mask = ((((uint64_t)1 << countOfBits)-1) << (uint64_t)startbit);
+            rawValue = (Val&signal_mask) >> startbit;
         }
-        else
-        {
-            DEBUGGER_BREAK();
-        }
+
+        physValue = (rawValue * factor) + offset;
     }
     CAN_Signal operator=(float val)
     {
