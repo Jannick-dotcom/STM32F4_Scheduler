@@ -22,7 +22,7 @@ uint8_t StallardOSSPI::toAlternateFunc(SPI_TypeDef *inst)
     else if(inst == SPI4)
     {
         __HAL_RCC_SPI4_CLK_ENABLE();
-        return GPIO_AF6_SPI4;
+        return GPIO_AF5_SPI4;
     }
     #endif
     else
