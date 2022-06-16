@@ -76,6 +76,12 @@ void taskPerfmon(void){
       can1_tx = &health.SWCU_CAN1_Tx_Fifo_Lvl;
       can2_tx = &health.SWCU_CAN2_Tx_Fifo_Lvl;
       ecu_tmp = &health.SWCU_Temp;
+    #elif STOS_current_ECU_ID==ECU_ID_BMS_HYB
+      STOS_CAN_PDU_BMS_HYB_Health health;
+      load = &health.BMS_HYB_CPU_Load;
+      can1_tx = &health.BMS_HYB_CAN1_Tx_Fifo_Lvl;
+      can2_tx = &health.BMS_HYB_CAN2_Tx_Fifo_Lvl;
+      ecu_tmp = &health.BMS_HYB_Temp;
     #endif
     
 
