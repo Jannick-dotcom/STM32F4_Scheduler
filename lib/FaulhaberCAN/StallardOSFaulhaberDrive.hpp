@@ -21,7 +21,10 @@ private:
 
     State state;
     OperationMode operation_mode;
+    int statusword;
+    // int controllword;
 
+    void StateTransitionNotReadyToSwitchOn();
     void StateTransitionSwitchOnDisabled();
     void StateTransitionReadyToSwitchOn();
     void StateTransitionSwitchedOn();
@@ -29,6 +32,7 @@ private:
     void StateTransitionStartHoming();
 
     void StateUpdate();
+    void StatuswordUpdate();
 
     void ShutDown();
     void SwitchOn();
@@ -40,6 +44,9 @@ private:
 
     void OperationModeTransitionHoming();
     void OperationModeTransitionProfilePositionMode();
+    void OperationModeTransitionProfileVelocityMode();
+
+    void OperationModeUpdate();
 
     void SetOperationModeHoming();
     void SetOperationModeProfilePositionMode();
@@ -49,22 +56,15 @@ private:
     // bool CheckIfOperationModeIsProfileVelocityMode();
 
     // void OperationModeUpdate();
-
+    void StartHomingMode();
+    void SetTargetPosition(int pos);
     bool CheckIfTargetReached();
 
 public:
-    StallardOSFaulhaberDrive(/* args */);
-    ~StallardOSFaulhaberDrive();
+    StallardOSFaulhaberDrive();
     State GetState() { return state; }
     void SetState(State new_state) { state = new_state; }
     OperationMode GetOperationMode() { return operation_mode; }
+    void GetStatusword() { return statusword; }
     OperationMode SetOperationMode(OperationMode new_operation_mode) { operation_mode = new_operation_mode; }
 };
-
-StallardOSFaulhaberDrive::StallardOSFaulhaberDrive(/* args */)
-{
-}
-
-StallardOSFaulhaberDrive::~StallardOSFaulhaberDrive()
-{
-}

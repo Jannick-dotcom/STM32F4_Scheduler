@@ -16,8 +16,6 @@ private:
     int node_ID;
     State state;
     StallardOSFaulhaberDrive driver;
-    int statusword;
-    int controllword;
 
     void StateTransitionInitialization();
     void StateTransitionPreOperational();
@@ -40,4 +38,5 @@ public:
     State GetState() { return state; };
     State SetState(State new_state) { state = new_state; }
     int GetNodeID() { return node_ID; };
+    void UpdateAllDriverStates();
 };

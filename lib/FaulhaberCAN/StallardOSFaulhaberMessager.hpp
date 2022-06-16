@@ -8,7 +8,7 @@ private:
 
 public:
     static void RecivePDO1Message(int node_ID, int controllword);
-    static void RecivePDO2Message(int node_ID, int pos);
+    static void RecivePDO2Message(int node_ID, int controllword, int pos);
     static void RecivePDO3Message(int node_ID, int vel);
     static void RecivePDO4Message(int node_ID, int tork);
     static void ReciveSDOMessage(int node_ID, int cs, int index, int subindex, int data);
