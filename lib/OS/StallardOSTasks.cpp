@@ -9,11 +9,11 @@
 extern volatile struct function_struct* volatile taskMainStruct;
 
 // public variables (declared in header)
-stack_T taskmainStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
-stack_T taskPerfmonStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
+stack_T taskmainStack[256];
+stack_T taskPerfmonStack[2048];
 
 #ifdef useSFOC
-  stack_T taskSFOCStack[256] __attribute__((aligned(1024))); /* align to size in Byte */
+  stack_T taskSFOCStack[256]; /* align to size in Byte */
 #endif
 
 
@@ -44,29 +44,42 @@ void taskPerfmon(void){
     uint64_t idle_calc_time_us;
     uint8_t cpu_load;
 
+    // pointers to status messages
+    CAN_Signal<uint8_t>* load;
+    CAN_Signal<uint8_t>* can1_tx;
+    CAN_Signal<uint8_t>* can2_tx;
+    CAN_Signal<uint8_t>* ecu_tmp;
+
+
     // output can messages (defined per ECU)
-    // ...using dummy messages, until dbc is updated
-    #if 0
     #if STOS_current_ECU_ID==ECU_ID_FCU
-      STOS_CAN_PDU_Steering_Whl_Angle load;
-      STOS_CAN_PDU_SWCU_ECU_Temp temp;
-      STOS_CAN_PDU_Whl_Speed_F fifoLvl;
-    #elif STOS_current_ECU_ID==2
-      STOS_CAN_PDU_Steering_Whl_Angle load;
-      STOS_CAN_PDU_SWCU_ECU_Temp temp;
-      STOS_CAN_PDU_Whl_Speed_F fifoLvl;
-    #elif STOS_current_ECU_ID==3
-      STOS_CAN_PDU_Steering_Whl_Angle load;
-      STOS_CAN_PDU_SWCU_ECU_Temp temp;
-      STOS_CAN_PDU_Whl_Speed_F fifoLvl;
-    #endif
+      STOS_CAN_PDU_FCU_Health health;
+      load = &health.FCU_CPU_Load;
+      can1_tx = &health.FCU_CAN1_Tx_Fifo_Lvl;
+      can2_tx = &health.FCU_CAN2_Tx_Fifo_Lvl;
+      ecu_tmp = &health.FCU_Temp;
+    #elif STOS_current_ECU_ID==ECU_ID_RCU
+      STOS_CAN_PDU_RCU_Health health;
+      load = &health.RCU_CPU_Load;
+      can1_tx = &health.RCU_CAN1_Tx_Fifo_Lvl;
+      can2_tx = &health.RCU_CAN2_Tx_Fifo_Lvl;
+      ecu_tmp = &health.RCU_Temp;
+    #elif STOS_current_ECU_ID==ECU_ID_PDU
+      STOS_CAN_PDU_PDU_Health health;
+      load = &health.PDU_CPU_Load;
+      can1_tx = &health.PDU_CAN1_Tx_Fifo_Lvl;
+      can2_tx = &health.PDU_CAN2_Tx_Fifo_Lvl;
+      ecu_tmp = &health.PDU_Temp;
+    #elif STOS_current_ECU_ID==ECU_ID_SWCU
+      STOS_CAN_PDU_SWCU_Health health;
+      load = &health.SWCU_CPU_Load;
+      can1_tx = &health.SWCU_CAN1_Tx_Fifo_Lvl;
+      can2_tx = &health.SWCU_CAN2_Tx_Fifo_Lvl;
+      ecu_tmp = &health.SWCU_Temp;
     #endif
     
 
-
-
   while(1){
-    #if 0
     // get cpu load of the system
     total_calc_time_us = 0;
     idle_calc_time_us = 0;
@@ -83,30 +96,25 @@ void taskPerfmon(void){
     // get idle task cpu load and compare this to the total time
     idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
     cpu_load = 100 - (idle_calc_time_us*100/total_calc_time_us);
-    load.ADCAN_SP_Steering_Wheel_Angle = cpu_load;
+    *load = cpu_load;
+    
 
     // get temperature values of the system
     // TODO: readout temps
-    temp.ADCAN_EL_ECU_Temp_SWCU = 42;
+    *ecu_tmp = 42;
 
 
     // get can fifo fill levels
-    
-    fifoLvl.ADCAN_SP_Wheel_Speed_FL = AD_CAN.getSWFiFoFillLevel(); // AD_CAN always present
+    *can1_tx = AD_CAN.getSWFiFoFillLevel(); // AD_CAN always present
     #ifdef MS4_CAN_PORT
-      fifoLvl.ADCAN_SP_Wheel_Speed_FR = MS4_CAN.getSWFiFoFillLevel(); // MS4 not on all devices
+      *can2_tx = MS4_CAN.getSWFiFoFillLevel(); // MS4 not on all devices
     #endif
 
 
     // send all collected values to AD_CAN (if present)
-    fifoLvl.build();
-    temp.build();
-    load.build();
+    health.build();
     
-    AD_CAN.sendMessage(&fifoLvl);
-    AD_CAN.sendMessage(&temp);
-    AD_CAN.sendMessage(&load);
-    #endif // 0
+    AD_CAN.sendMessage(&health);
     StallardOS::yield();
   }
 }
@@ -114,7 +122,7 @@ void taskPerfmon(void){
 #ifdef useSFOC
   void taskSFOC(void){
     SFOC_Status ret;
-    SFOC::setup(0);
+    SFOC::setup(0); // no time-out in OS context
 
     while(1){
       ret = SFOC::stm_iterate();

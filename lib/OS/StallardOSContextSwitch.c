@@ -65,29 +65,6 @@ __attribute__((always_inline)) inline void pendPendSV()
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-void jumpToBootloader(void) 
-{
-    void (*SysMemBootJump)(void);
-    volatile uint32_t addr = 0x1FFF0000;
-#if defined(USE_HAL_DRIVER)
-    HAL_RCC_DeInit();
-#endif /* defined(USE_HAL_DRIVER) */
-#if defined(USE_STDPERIPH_DRIVER)
-    RCC_DeInit();
-#endif /* defined(USE_STDPERIPH_DRIVER) */
-    SysTick->CTRL = 0;
-    SysTick->LOAD = 0;
-    SysTick->VAL = 0;
-    //__disable_irq();
-    SYSCFG->MEMRMP = 0x01;
-    SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
-    __set_PRIMASK(1);      // Disable interrupts
-    __set_PRIMASK(0x20001000);      // Set the main stack pointer to its default value
-    __set_MSP(0x20001000);
-    SysMemBootJump();
-    while(1);
-}
-
 void findNextFunction()
 {
     nextTask = taskMainStruct;
@@ -388,7 +365,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
     switch( svc_number )
     {
     case SV_BOOTLOADER:  /* EnablePrivilegedMode */
-        jumpToBootloader();
+        // jumpToBootloader();
         break;
     case SV_PENDSV:
         pendPendSV();

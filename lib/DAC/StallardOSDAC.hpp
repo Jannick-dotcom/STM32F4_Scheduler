@@ -6,7 +6,7 @@
 #include "StallardOSsem.hpp"
 
 extern "C" inline void StallardOSGeneralFaultHandler();
-
+#ifdef STM32F4xxxx
 typedef enum StallardOSDACChannel
 {
     channel1 = DAC_CHANNEL_1,
@@ -26,5 +26,5 @@ public:
     StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number);
     void setValue(uint16_t value); //12 Bit
 };
-
+#endif
 #endif

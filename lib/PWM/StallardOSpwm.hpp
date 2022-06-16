@@ -36,6 +36,10 @@ typedef enum PWMalternateFunctions
     STOS_Tim13 = GPIO_AF9_TIM13,
     STOS_Tim14 = GPIO_AF9_TIM14
     #elif defined(STM32F1xxxx)
+    STOS_Tim1 = GPIO_MODE_AF_PP,
+    STOS_Tim2 = GPIO_MODE_AF_PP,
+    STOS_Tim3 = GPIO_MODE_AF_PP,
+    STOS_Tim4 = GPIO_MODE_AF_PP,
     #endif
 } PWMalternateFunctions;
 

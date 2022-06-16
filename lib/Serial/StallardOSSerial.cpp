@@ -4,6 +4,7 @@ using namespace std;
 uint8_t StallardOSSerial::portToAlternateFunc(USART_TypeDef *serPort)
 {
     uint8_t alternateFunction = 0;
+    #ifdef STM32F4xxxx
     if(serPort == USART1)
     {
         __HAL_RCC_USART1_CLK_ENABLE();
@@ -34,6 +35,7 @@ uint8_t StallardOSSerial::portToAlternateFunc(USART_TypeDef *serPort)
         __HAL_RCC_USART6_CLK_ENABLE();
         alternateFunction = GPIO_AF8_USART6;
     }
+    #endif
     return alternateFunction;
 }
 
@@ -60,9 +62,7 @@ StallardOSSerial::StallardOSSerial(USART_TypeDef *serPort, gpio tx, gpio rx, uin
     
     if(portToAlternateFunc(serPort) == 0) //Not implemented
     {
-        #ifndef UNIT_TEST
-        asm("bkpt");  //Zeige debugger
-        #endif
+        DEBUGGER_BREAK();
         this->sem.give();
         return;
     }

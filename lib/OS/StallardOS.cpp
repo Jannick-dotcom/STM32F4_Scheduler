@@ -62,34 +62,33 @@ StallardOS::StallardOS()
   NVIC_EnableIRQ(NonMaskableInt_IRQn);
   NVIC_EnableIRQ(MemoryManagement_IRQn);
   
-  //Basiswerte Initialisieren
+  // Basiswerte Initialisieren
   first_function_struct = nullptr;
   currentTask = nullptr;
   TCBsCreated = 0;
-  //Für Context Switch
+  // //Für Context Switch
   createTCBs();
-  #ifdef internalClock
-  StallardOS_SetSysClock(runFreq, internal);
-  #else
-  StallardOS_SetSysClock(runFreq, external);
-  #endif
-  if(SystemCoreClock != (runFreq * 1000000))
-  {
-    DEBUGGER_BREAK();
-  }
-
+  // #ifdef internalClock
+  //   //StallardOS_SetSysClock(runFreq, internal);
+  // #else
+  //   StallardOS_SetSysClock(runFreq, external);
+  // #endif
+  // if(SystemCoreClock != (runFreq * 1000000))
+  // {
+  //   DEBUGGER_BREAK();
+  // }
+  //clutch_do_2 = false;
   initShared();
 
   #if defined(useMPU)
-  initMPU();
+    initMPU();
   #endif // useMPU
 
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
   addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
   #ifdef useSFOC
-    addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
+     addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
   #endif
-
 
   if(taskMainStruct == nullptr) while(1);
 }
@@ -735,13 +734,20 @@ bool StallardOS::getPrivilegeLevel()
  */
 void StallardOS::startOS(void)
 {
+  StallardOS_SetSysClock(runFreq, external);
+  if(SystemCoreClock != (runFreq * 1000000))
+  {
+      DEBUGGER_BREAK();
+  }
+  SysTick_Config(SystemCoreClock / (uint32_t)1000); //Counting every processor clock
+
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
     #ifdef STM32F4xxxx
     FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
     #endif
-    // SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
+    SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
     #ifdef useFPU
     #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
     SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
@@ -758,7 +764,7 @@ void StallardOS::startOS(void)
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(SVCall_IRQn);
     #if defined(useFPU) && (__FPU_PRESENT == 1)
-    NVIC_EnableIRQ(FPU_IRQn);
+    // NVIC_EnableIRQ(FPU_IRQn);
     #endif
     __ASM volatile("MRS R0, MSP\n"
                    "SUB R0, #200\n" //Reserve some space for Handlers (200 Byte)

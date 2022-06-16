@@ -1,5 +1,5 @@
 #include "StallardOSDAC.hpp"
-
+#ifdef STM32F4xxxx
 StallardOSDAC::StallardOSDAC(DAC_TypeDef *dac, StallardOSDACChannel channel, ports port, uint8_t number) :
     gpio(number, port, Analog)
 {
@@ -19,3 +19,4 @@ void StallardOSDAC::setValue(uint16_t value)
     HAL_DAC_SetValue(&handle, channel, DAC_ALIGN_12B_R, value);
     // HAL_DAC_Start(&handle, DAC_CHANNEL_1);
 }
+#endif

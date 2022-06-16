@@ -1,29 +1,18 @@
 import math
 import os
+from webbrowser import UnixBrowser
 import pandas as pd
 import glob
+import cantools
 
 endl = "\n"
-tab = "\t"
-
-read_file = pd.read_excel (glob.glob('StallardOS_2021/CAN_System_Design_2021/*.xlsx')[0])
-read_file.to_csv (r'StallardOS_2021/CAN_System_Design_2021/Masterlist.csv', index = None, header=True)
-
-infile = open("StallardOS_2021/CAN_System_Design_2021/Masterlist.csv", "r") #the excel exported as csv with the Information
-outfileDefs = open("StallardOS_2021/lib/CAN/StallardOScanIDs.h", "w") #the output for IDs
-outfileStructs = open("StallardOS_2021/lib/CAN/StallardOScanStructs.hpp", "w") #the output for structs
-
-outfileStructs.write("#ifndef StallardOScanStructs_hpp\n#define StallardOScanStructs_hpp\n")
-outfileStructs.write('#include "stdint.h"\n#include "StallardOScanTypes.hpp"\n#include <math.h>\n#include "StallardOScanIDs.h"\n') #include the integer types to the struct file
+tab = "    "
 
 def genConstructor(prevMSGName, bitcountInMsg):
-    tempstr = ""
-    tempstr += "\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n"
-    tempstr += "\t\tuint8_t temp = " + bitcountInMsg + ";\n"
-    tempstr += "\t\tif(temp % 8 != 0) temp = temp / 8 + 1;\n\t\telse temp = temp / 8;\n"
-    tempstr += "\t\tif(temp > 8) temp = 8;\n"
-    tempstr += "\t\t_size = dlc = temp;\n\t}\n"
-    return tempstr
+        tempstr = ""
+        tempstr += f"{tab}STOS_CAN_PDU_{prevMSGName}() {endl}{tab}{{{endl}{tab}{tab}ID = _id;{endl}"
+        tempstr += tab + "}" + endl
+        return tempstr
 
 def roundBitcount(bitcountIn):
     if(bitcountIn <= 8):
@@ -34,112 +23,80 @@ def roundBitcount(bitcountIn):
         bitcount = 32
     elif(bitcountIn <= 64):
         bitcount = 64
-    else:
-        print("Wrong bit count in " + msgname +" !\n")
     return bitcount
 
-infileText = infile.read(-1) #read all stuff from the csv
-infileArray = infileText.split(endl) #split the text into an array containing the lines
-prevMSGName = "" #variable for saving the previous Message name
-prevSigName = "" #variable for saving the previous signal name
-bitcountInMsg = "" #number of bits in the message
-bitcountWholeMessage = 0 #number of resulting bits in message
-strFunc = "" #unbuild function
-signamesInMessage = "" #variable for printing in the build function
+def main():
+    db1 = cantools.database.load_file('StallardOS_2021/CAN_System_Design_2021/Masterlist_ADCAN1.dbc')
+    db2 = cantools.database.load_file('StallardOS_2021/CAN_System_Design_2021/MS4Sport_CAN2.dbc')
 
-for line in infileArray: #Go through every line
-    if(line > ""): #if there is something in the line
-        lineArray = line.split(",") #split the line into columns
-        id = str(lineArray[6])  #get the id of the message
-        msgname = str(lineArray[7]) #get the name of the message
-        rowcounter = str(lineArray[8]) #rowcounter from ms4
-        if("= 0x" in rowcounter):
-            rowcounter = rowcounter.split("= ")[1]
-        else:
-            rowcounter = "0"
+    messages = db1.messages+db2.messages
 
-        signame = str(lineArray[9]) #get the name of the signal in the message
-        if(" " in signame):
-            signame = signame.replace(" ", "_")
-        initVal = str(lineArray[14]) #get initial Value of the Signal
-        signed = str(lineArray[13])  #is the signal signed or unsigned?
-        startingAtBit = str(lineArray[10]) #get the Bit at which the signal starts
-        byteOrder = str(lineArray[12])
-        factor = str(lineArray[15])
-        offset = str(lineArray[16])
-        byteOrderBool = 0
+    outfileDefs = open("StallardOS_2021/lib/CAN/StallardOScanIDs.h", "w") #the output for IDs
+    outfileStructs = open("StallardOS_2021/lib/CAN/StallardOScanStructs.hpp", "w") #the output for structs
 
-        if(msgname > "" and id > "" and id.startswith("0x")): #if valid message with valid id?
-            bitcountIn = int(str(lineArray[11]))
-            bitcount = roundBitcount(bitcountIn)
+    outfileStructs.write(f"#ifndef StallardOScanStructs_hpp{endl}#define StallardOScanStructs_hpp{endl}")
+    outfileStructs.write(f'#include "stdint.h"{endl}#include "StallardOScanTypes.hpp"{endl}#include <math.h>{endl}#include "StallardOScanIDs.h"{endl}{endl}') #include the integer types to the struct file
 
-            if(prevMSGName != msgname): #New Message?
-                outfileDefs.write("#define STOS_CAN_ID_" + msgname + " " + id + endl) #write a new define for the id
-                if(bitcountWholeMessage > 64):
-                    print("Something is wrong with size of PDU:" + prevMSGName)
-                bitcountWholeMessage = 0
+    for msg in messages: #Go through every message
+        msgname = msg.name.replace(' ', '_')
+        outfileDefs.write(f"#define STOS_CAN_ID_{msgname} 0x{msg.frame_id:X}{endl}") #write a new define for the id
 
-                if(prevMSGName != ""): #if this is not the first message name?
-                    outfileStructs.write(genConstructor(prevMSGName, bitcountInMsg))
-                    bitcountInMsg = ""
+        outfileStructs.write(f"struct STOS_CAN_PDU_{msgname} : public StallardOSCanMessage {endl}{{{endl}public:{endl}") #write the first struct
+        outfileStructs.write(f"{tab}static constexpr uint16_t _id = STOS_CAN_ID_{msgname};{endl}")
+        outfileStructs.write(f"{tab}const uint16_t _size = {msg.length};{endl}")
 
-                    outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n") #build function
-                    outfileStructs.write(strFunc + "\t}\n") 
-                    outfileStructs.write("\n};\n")
+        build_str = f"{tab}void build(){endl}{tab}{{"
+        unbuild_str = f"{tab}void unbuild(){endl}{tab}{{{endl}"
 
-                strFunc = "\tvoid unbuild()\n\t{\n" #unbuild function
+        if msg.signals:
+            build_str += f'{endl}{tab}{tab}Val = 0;{endl}'
 
-                outfileStructs.write("struct STOS_CAN_PDU_" + msgname + " : public StallardOSCanMessage \n{\npublic:\n") #write the first struct
-                outfileStructs.write("\tstatic const uint16_t _id = STOS_CAN_ID_" + msgname + ";\n")
-                outfileStructs.write("\tuint16_t _size;\n")
+        for signal in msg.signals:
+            signame = signal.name.replace(' ', '_')
 
-                prevMSGName = msgname #set new previous name
-                signamesInMessage = ""
+            sign = 'u' if not signal.is_signed else ''
+            dtype = f'{sign}int{roundBitcount(signal.length)}_t'
 
-            if(prevSigName != signame): #if new signal
+            init = signal.initial or 0
+            bcnt = signal.length
+            sbit = signal.start
+            rCnt = f'0x{signal.multiplexer_ids[0]:X}' if signal.multiplexer_ids else 0 # int=0 will evaluate to False later on
+            isMotorola = 1 if (signal.byte_order=='big_endian') else 0
+            factor = signal.scale
+            offset = signal.offset
 
-                bitcountWholeMessage += bitcountIn
-                if(byteOrder == "Motorola" and bitcountIn % 8 == 0 and bitcountIn > 8):
-                    startingAtBit = int(startingAtBit) - int(bitcountIn - 8)
-                    byteOrderBool = 1
-
-                if(int(startingAtBit) + bitcountIn > 64):
-                    print("Something is wrong with bit positions of PDU:" + msgname)
-
-                if(rowcounter != "0"):
-                    strFunc += "\t\tif((Val & 0xFF) == " + rowcounter + ") //If the rowcounter points to this row \n\t"
-                strFunc += "\t\t" + signame + ".unbuild(Val);\n"
-
-                if(signamesInMessage != ""):
-                    signamesInMessage = signamesInMessage + " | "
-                signamesInMessage = signamesInMessage + signame + ".build()"
-
-                if(bitcountInMsg != ""):
-                    bitcountInMsg = bitcountInMsg + " + "
-                bitcountInMsg = bitcountInMsg + str(signame) + ".countOfBits"
-
-                outfileStructs.write("\tCAN_Signal<")
-                if(signed == "Unsigned"):      #is unsigned?
-                    outfileStructs.write("u")
-                outfileStructs.write("int"+ str(bitcount) + "_t> ")
-                outfileStructs.write(signame + " = {" + initVal + ", " + str(bitcountIn) + ", " + str(startingAtBit) + ", " + str(rowcounter) + ", " + str(byteOrderBool) + ", " + str(factor) + ", " + str(offset) + "};//init,bitcount,startbit,rowcount,isMotorola,factor,offset \n") #write a signal
-                prevSigName = signame
+            # declaration
+            outfileStructs.write(f"{tab}CAN_Signal<{dtype}> {signame} = {{{init}, {bcnt}, {sbit}, {rCnt}, {isMotorola}, {factor}, {offset}}};  // {{init,bitcount,startbit,rowcount,isMotorola,factor,offset}}  [{signal.minimum or 0}|{signal.maximum or 0}]{endl}")
+            # build
+            if rCnt:
+                build_str += f'{tab}{tab}if({signal.multiplexer_signal}.physValue=={rCnt}){{{endl}'
+                build_str += f'{tab}{tab}{tab}Val |= {signame}.build();'
+                build_str += f'{endl}{tab}{tab}}}{endl}'
             else:
-                print("Something is wrong with Signal: " + signame + " of PDU:" + msgname + "!!! (Duplicate)")
+                build_str += f'{tab}{tab}Val |= {signame}.build();{endl}'
+            # unbuild
+            if rCnt:
+                unbuild_str += f'{tab}{tab}if({signal.multiplexer_signal}.physValue=={rCnt}){{{endl}'
+                unbuild_str += f'{tab}{tab}{tab}{signame}.unbuild(Val);{endl}'
+                unbuild_str += f'{tab}{tab}}}{endl}'
+            else:
+                unbuild_str += f'{tab}{tab}{signame}.unbuild(Val);{endl}'
 
-outfileStructs.write(strFunc + "\t}\n")
+        outfileStructs.write(genConstructor(msgname, msg.length))
 
-outfileStructs.write("\tSTOS_CAN_PDU_" + prevMSGName + "() \n\t{\n\t\tID = _id;\n")
-outfileStructs.write("\t\tuint8_t temp = " + bitcountInMsg + ";\n")
-outfileStructs.write("\t\ttemp = (temp + 8 - (temp % 8)) / 8;\n")
-outfileStructs.write("\t\tif(temp > 8) temp = 8;\n")
-outfileStructs.write("\t\t_size = dlc = temp;\n\t}\n")
+        build_str += f'{tab}{tab}dlc = {msg.length};{endl}'
+        build_str += f'{endl}{tab}}}{endl}'
+        unbuild_str += f'{tab}}}{endl}'
 
-outfileStructs.write("\tvoid build() {\n\t\tVal = " + signamesInMessage + ";\n\t\tID = _id;\n\t}\n")
-outfileStructs.write(";\n}; \n\n#endif")
+        outfileStructs.write(build_str)
+        outfileStructs.write(unbuild_str)
 
-infile.close() #close the files
-outfileDefs.close()
-outfileStructs.close()
+        outfileStructs.write(f'}};{endl}')
 
-os.remove('StallardOS_2021/CAN_System_Design_2021/Masterlist.csv')
+    outfileStructs.write('#endif  // StallardOScanStructs_hpp')
+
+    outfileDefs.close()
+    outfileStructs.close()
+
+if __name__ == '__main__':
+    main()

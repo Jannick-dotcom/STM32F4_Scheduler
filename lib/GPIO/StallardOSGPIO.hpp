@@ -15,11 +15,14 @@ typedef enum ports
     PORTB,
     PORTC,
     PORTD,
-    PORTE,
+    PORTE
+    #ifdef STM32F4xxxx
+    ,
     PORTF,
     PORTG,
     PORTH,
     PORTI
+    #endif
 } ports;
 
 typedef enum interruptNumber

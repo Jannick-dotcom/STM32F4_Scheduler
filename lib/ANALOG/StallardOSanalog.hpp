@@ -34,8 +34,11 @@ typedef enum StallardOSADCChannel
     ch14 = ADC_CHANNEL_14,
     ch15 = ADC_CHANNEL_15,
     ch16 = ADC_CHANNEL_16,
-    ch17 = ADC_CHANNEL_17,
+    ch17 = ADC_CHANNEL_17
+    #ifndef STM32F1xxxx
+    ,
     ch18 = ADC_CHANNEL_18
+    #endif
 } StallardOSADCChannel;
 
 class StallardOSAnalog

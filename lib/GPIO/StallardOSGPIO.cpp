@@ -2,6 +2,42 @@
 
 volatile void *functions[16];
 
+void enableClockPort(ports port)
+{
+    switch(port)
+    {
+        case PORTA:
+            __GPIOA_CLK_ENABLE();
+            break;
+        case PORTB:
+            __GPIOB_CLK_ENABLE();
+            break;
+        case PORTC:
+            __GPIOC_CLK_ENABLE();
+            break;
+        case PORTD:
+            __GPIOD_CLK_ENABLE();
+            break;
+        case PORTE:
+            __GPIOE_CLK_ENABLE();
+            break;
+        #ifdef STM32F4xxxx
+        case PORTF:
+            __GPIOF_CLK_ENABLE();
+            break;
+        case PORTG:
+            __GPIOG_CLK_ENABLE();
+            break;
+        case PORTH:
+            __GPIOH_CLK_ENABLE();
+            break;
+        case PORTI:
+            //__GPIOI_CLK_ENABLE();
+            break;
+        #endif
+    }
+}
+
 // StallardOSGPIO::StallardOSGPIO() {}
 
 /**
@@ -32,22 +68,16 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
 
     this->state = initialState;
 
-    __GPIOA_CLK_ENABLE();
-    __GPIOB_CLK_ENABLE();
-    __GPIOC_CLK_ENABLE();
-    __GPIOD_CLK_ENABLE();
-    __GPIOE_CLK_ENABLE();
-    __GPIOF_CLK_ENABLE();
-    __GPIOG_CLK_ENABLE();
-    __GPIOH_CLK_ENABLE();
-    #ifdef STM32F417xx
-    __GPIOI_CLK_ENABLE();
-    #endif
+    enableClockPort(this->port);
 
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.Pin = 1 << this->pin;
     GPIO_InitStruct.Mode = this->dir;
+    #ifdef STM32F4xxxx
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    #elif defined(STM32F1xxxx)
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    #endif
     GPIO_InitStruct.Pull = this->pull;
 
     HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(initialState));
@@ -86,25 +116,16 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
 
     this->state = 0;
 
-    __GPIOA_CLK_ENABLE();
-    __GPIOB_CLK_ENABLE();
-    __GPIOC_CLK_ENABLE();
-    __GPIOD_CLK_ENABLE();
-    __GPIOE_CLK_ENABLE();
-    __GPIOF_CLK_ENABLE();
-    __GPIOG_CLK_ENABLE();
-    __GPIOH_CLK_ENABLE();
-    #ifdef STM32F417xx
-    __GPIOI_CLK_ENABLE();
-    #endif
+    enableClockPort(this->port);
     
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.Pin = 1 << this->pin;
     GPIO_InitStruct.Mode = this->dir;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Pull = this->pull;
+    #ifdef STM32F4xxxx
     GPIO_InitStruct.Alternate = alternate;
-
+    #endif
     HAL_GPIO_Init((GPIO_TypeDef *)portsToGPIOBase[this->port], &GPIO_InitStruct);
 
     this->sem.give();
@@ -247,25 +268,12 @@ bool StallardOSGPIO::read()
 
     this->sem.take();
 
-    if (this->dir == Input)
-    {
-        returnVal = HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
-
-        this->sem.give();
-
-        return returnVal;
-    }
-    else if (this->dir == Output)
-    {
-
-        this->sem.give();
-
-        return this->state;
-    }
+    // returnVal = HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
+    returnVal = ((GPIO_TypeDef *)portsToGPIOBase[this->port])->IDR & (1 << this->pin);
 
     this->sem.give();
 
-    return 0;
+    return returnVal;
 }
 
 bool StallardOSGPIO::write(bool state)

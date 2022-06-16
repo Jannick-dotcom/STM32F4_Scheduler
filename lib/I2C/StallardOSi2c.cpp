@@ -1,18 +1,24 @@
 #include "StallardOSi2c.hpp"
+
+// GPIO/AFIO Regs
+constexpr static uint32_t afioBase = 0x40010000UL;
+constexpr static uint32_t mapr = afioBase + 0x004; // alternate pin function mapping
+
 /**
  * Create a i2c insance.
  *
  * @param instance i2c to use
  * @param freq frequency of the transmission
  */
-StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
-{
-    
+StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq):
+scl(6, PORTB, AFOD, false, pullup),
+sda(7, PORTB, AFOD, false, pullup)
+{   
     this->sem.take();
-    
     __HAL_RCC_I2C1_CLK_ENABLE();
-    __HAL_RCC_I2C2_CLK_ENABLE();
+    #ifdef STM32F4xxxx
     __HAL_RCC_I2C3_CLK_ENABLE();
+    #endif
     hi2c.Instance = instance;
     hi2c.Init.ClockSpeed = freq;
     hi2c.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -22,6 +28,7 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
     hi2c.Init.OwnAddress2 = 0;
     hi2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    hi2c.State = HAL_I2C_STATE_RESET;
     if (HAL_I2C_Init(&hi2c) != HAL_OK)
     {
         this->sem.give();
@@ -39,9 +46,9 @@ StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq)
  * @param data  data to send
  * @param bytes size of the data container
  */
-void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
+uint8_t StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
-
+    bool retVal = false;
     this->sem.take();
 
     if (data == nullptr)
@@ -49,12 +56,12 @@ void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
 
         this->sem.give();
 
-        return;
+        return 0;
     }
-    HAL_I2C_Master_Transmit(&hi2c, addr, data, bytes, 0);
+    retVal = HAL_I2C_Master_Transmit(&hi2c, addr, data, bytes, 100);
 
     this->sem.give();
-
+    return retVal;
 }
 
 /**
@@ -67,7 +74,7 @@ void StallardOSi2c::write(uint16_t addr, uint8_t *data, uint16_t bytes)
  */
 uint8_t StallardOSi2c::read(uint16_t addr, uint8_t *data, uint16_t bytes)
 {
-
+    bool retVal = false;
     this->sem.take();
 
     if (data == nullptr)
@@ -77,9 +84,9 @@ uint8_t StallardOSi2c::read(uint16_t addr, uint8_t *data, uint16_t bytes)
 
         return 0;
     }
-    HAL_I2C_Master_Receive(&hi2c, addr, data, bytes, 0);
+    retVal = HAL_I2C_Master_Receive(&hi2c, addr, data, bytes, 1000);
 
     this->sem.give();
 
-    return 1;
+    return retVal;
 }
