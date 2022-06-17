@@ -1,3 +1,4 @@
+#define STOS_CAN_ID_GPS 0x112
 #define STOS_CAN_ID_MS4_Relay 0x111
 #define STOS_CAN_ID_PDU_Status 0x10B
 #define STOS_CAN_ID_Current_Sensors 0x106

@@ -5,13 +5,38 @@
 #include <math.h>
 #include "StallardOScanIDs.h"
 
+struct STOS_CAN_PDU_GPS : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_GPS;
+    const uint16_t _size = 4;
+    CAN_Signal<uint16_t> GPS_Head = {0, 16, 0, 0, 0, 0.01, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|655.35]
+    CAN_Signal<uint16_t> GPS_Speed = {0, 16, 16, 0, 0, 0.1852, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|12137.082]
+    STOS_CAN_PDU_GPS() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= GPS_Head.build();
+        Val |= GPS_Speed.build();
+        dlc = 4;
+
+    }
+    void unbuild()
+    {
+        GPS_Head.unbuild(Val);
+        GPS_Speed.unbuild(Val);
+    }
+};
 struct STOS_CAN_PDU_MS4_Relay : public StallardOSCanMessage 
 {
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_MS4_Relay;
     const uint16_t _size = 3;
-    CAN_Signal<uint16_t> MS4_Engine_RPM_Relay = {0, 16, 7, 0, 1, 0.5, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|0]
-    CAN_Signal<uint8_t> MS4_ATH_Relay = {0, 8, 23, 0, 1, 0.390625, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|99.609375]
+    CAN_Signal<uint16_t> MS4_Engine_RPM_Relay = {0, 16, 0, 0, 0, 0.5, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|0]
+    CAN_Signal<uint8_t> MS4_ATH_Relay = {0, 8, 16, 0, 0, 0.390625, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|99.609375]
     STOS_CAN_PDU_MS4_Relay() 
     {
         ID = _id;

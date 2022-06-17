@@ -1,5 +1,6 @@
 #include "StallardOScanStructs.hpp"
 
+struct STOS_CAN_PDU_GPS GPS;
 struct STOS_CAN_PDU_MS4_Relay MS4_Relay;
 struct STOS_CAN_PDU_PDU_Status PDU_Status;
 struct STOS_CAN_PDU_Current_Sensors Current_Sensors;
@@ -141,6 +142,7 @@ struct STOS_CAN_PDU_Injection_2 Injection_2;
 struct STOS_CAN_PDU_Injection_1 Injection_1;
 
 struct StallardOSCanMessage *canarray[] = {
+	&GPS,
 	&MS4_Relay,
 	&PDU_Status,
 	&Current_Sensors,
@@ -283,6 +285,7 @@ struct StallardOSCanMessage *canarray[] = {
 };
 
 uint16_t idarray[] = {
+	GPS.ID,
 	MS4_Relay.ID,
 	PDU_Status.ID,
 	Current_Sensors.ID,
