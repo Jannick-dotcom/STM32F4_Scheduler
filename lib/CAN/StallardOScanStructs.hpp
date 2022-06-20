@@ -1769,8 +1769,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_FCU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> FCU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> FCU_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> FCU_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> FCU_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> FCU_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> FCU_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_FCU_Health() 
     {
@@ -1780,8 +1780,8 @@ public:
     {
         Val = 0;
         Val |= FCU_CPU_Load.build();
-        Val |= FCU_CAN2_Tx_Fifo_Lvl.build();
-        Val |= FCU_CAN1_Tx_Fifo_Lvl.build();
+        Val |= FCU_CAN2_Rx_Fifo_Lvl.build();
+        Val |= FCU_CAN1_Rx_Fifo_Lvl.build();
         Val |= FCU_Temp.build();
         dlc = 4;
 
@@ -1789,8 +1789,8 @@ public:
     void unbuild()
     {
         FCU_CPU_Load.unbuild(Val);
-        FCU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        FCU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        FCU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        FCU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         FCU_Temp.unbuild(Val);
     }
 };
@@ -1800,8 +1800,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_RCU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> RCU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> RCU_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> RCU_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> RCU_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> RCU_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> RCU_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_RCU_Health() 
     {
@@ -1811,8 +1811,8 @@ public:
     {
         Val = 0;
         Val |= RCU_CPU_Load.build();
-        Val |= RCU_CAN2_Tx_Fifo_Lvl.build();
-        Val |= RCU_CAN1_Tx_Fifo_Lvl.build();
+        Val |= RCU_CAN2_Rx_Fifo_Lvl.build();
+        Val |= RCU_CAN1_Rx_Fifo_Lvl.build();
         Val |= RCU_Temp.build();
         dlc = 4;
 
@@ -1820,8 +1820,8 @@ public:
     void unbuild()
     {
         RCU_CPU_Load.unbuild(Val);
-        RCU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        RCU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        RCU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        RCU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         RCU_Temp.unbuild(Val);
     }
 };
@@ -1831,8 +1831,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_PDU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> PDU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> PDU_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> PDU_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> PDU_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> PDU_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> PDU_Temps = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_PDU_Health() 
     {
@@ -1842,8 +1842,8 @@ public:
     {
         Val = 0;
         Val |= PDU_CPU_Load.build();
-        Val |= PDU_CAN2_Tx_Fifo_Lvl.build();
-        Val |= PDU_CAN1_Tx_Fifo_Lvl.build();
+        Val |= PDU_CAN2_Rx_Fifo_Lvl.build();
+        Val |= PDU_CAN1_Rx_Fifo_Lvl.build();
         Val |= PDU_Temps.build();
         dlc = 4;
 
@@ -1851,8 +1851,8 @@ public:
     void unbuild()
     {
         PDU_CPU_Load.unbuild(Val);
-        PDU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        PDU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        PDU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        PDU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         PDU_Temps.unbuild(Val);
     }
 };
@@ -1862,8 +1862,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_SWCU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> SWCU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> SWCU_CAN1_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> SWCU_CAN2_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> SWCU_CAN1_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> SWCU_CAN2_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> SWCU_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_SWCU_Health() 
     {
@@ -1873,8 +1873,8 @@ public:
     {
         Val = 0;
         Val |= SWCU_CPU_Load.build();
-        Val |= SWCU_CAN1_Tx_Fifo_Lvl.build();
-        Val |= SWCU_CAN2_Tx_Fifo_Lvl.build();
+        Val |= SWCU_CAN1_Rx_Fifo_Lvl.build();
+        Val |= SWCU_CAN2_Rx_Fifo_Lvl.build();
         Val |= SWCU_Temp.build();
         dlc = 4;
 
@@ -1882,8 +1882,8 @@ public:
     void unbuild()
     {
         SWCU_CPU_Load.unbuild(Val);
-        SWCU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
-        SWCU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
+        SWCU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
+        SWCU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
         SWCU_Temp.unbuild(Val);
     }
 };
@@ -1893,8 +1893,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_BMS_HOMO_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> BMS_HOMO_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> BMS_HOMO_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> BMS_HOMO_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> BMS_HOMO_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> BMS_HOMO_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> BMS_HOMO_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_BMS_HOMO_Health() 
     {
@@ -1904,8 +1904,8 @@ public:
     {
         Val = 0;
         Val |= BMS_HOMO_CPU_Load.build();
-        Val |= BMS_HOMO_CAN2_Tx_Fifo_Lvl.build();
-        Val |= BMS_HOMO_CAN1_Tx_Fifo_Lvl.build();
+        Val |= BMS_HOMO_CAN2_Rx_Fifo_Lvl.build();
+        Val |= BMS_HOMO_CAN1_Rx_Fifo_Lvl.build();
         Val |= BMS_HOMO_Temp.build();
         dlc = 4;
 
@@ -1913,8 +1913,8 @@ public:
     void unbuild()
     {
         BMS_HOMO_CPU_Load.unbuild(Val);
-        BMS_HOMO_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        BMS_HOMO_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        BMS_HOMO_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        BMS_HOMO_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         BMS_HOMO_Temp.unbuild(Val);
     }
 };
@@ -1924,8 +1924,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_BMS_HYB_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> BMS_HYB_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> BMS_HYB_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> BMS_HYB_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> BMS_HYB_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> BMS_HYB_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> BMS_HYB_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_BMS_HYB_Health() 
     {
@@ -1935,8 +1935,8 @@ public:
     {
         Val = 0;
         Val |= BMS_HYB_CPU_Load.build();
-        Val |= BMS_HYB_CAN2_Tx_Fifo_Lvl.build();
-        Val |= BMS_HYB_CAN1_Tx_Fifo_Lvl.build();
+        Val |= BMS_HYB_CAN2_Rx_Fifo_Lvl.build();
+        Val |= BMS_HYB_CAN1_Rx_Fifo_Lvl.build();
         Val |= BMS_HYB_Temp.build();
         dlc = 4;
 
@@ -1944,8 +1944,8 @@ public:
     void unbuild()
     {
         BMS_HYB_CPU_Load.unbuild(Val);
-        BMS_HYB_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        BMS_HYB_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        BMS_HYB_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        BMS_HYB_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         BMS_HYB_Temp.unbuild(Val);
     }
 };

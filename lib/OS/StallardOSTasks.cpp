@@ -55,32 +55,32 @@ void taskPerfmon(void){
     #if STOS_current_ECU_ID==ECU_ID_FCU
       STOS_CAN_PDU_FCU_Health health;
       load = &health.FCU_CPU_Load;
-      can1_tx = &health.FCU_CAN1_Tx_Fifo_Lvl;
-      can2_tx = &health.FCU_CAN2_Tx_Fifo_Lvl;
+      can1_tx = &health.FCU_CAN1_Rx_Fifo_Lvl;
+      can2_tx = &health.FCU_CAN2_Rx_Fifo_Lvl;
       ecu_tmp = &health.FCU_Temp;
     #elif STOS_current_ECU_ID==ECU_ID_RCU
       STOS_CAN_PDU_RCU_Health health;
       load = &health.RCU_CPU_Load;
-      can1_tx = &health.RCU_CAN1_Tx_Fifo_Lvl;
-      can2_tx = &health.RCU_CAN2_Tx_Fifo_Lvl;
+      can1_tx = &health.RCU_CAN1_Rx_Fifo_Lvl;
+      can2_tx = &health.RCU_CAN2_Rx_Fifo_Lvl;
       ecu_tmp = &health.RCU_Temp;
     #elif STOS_current_ECU_ID==ECU_ID_PDU
       STOS_CAN_PDU_PDU_Health health;
       load = &health.PDU_CPU_Load;
-      can1_tx = &health.PDU_CAN1_Tx_Fifo_Lvl;
-      can2_tx = &health.PDU_CAN2_Tx_Fifo_Lvl;
+      can1_tx = &health.PDU_CAN1_Rx_Fifo_Lvl;
+      can2_tx = &health.PDU_CAN2_Rx_Fifo_Lvl;
       ecu_tmp = &health.PDU_Temp;
     #elif STOS_current_ECU_ID==ECU_ID_SWCU
       STOS_CAN_PDU_SWCU_Health health;
       load = &health.SWCU_CPU_Load;
-      can1_tx = &health.SWCU_CAN1_Tx_Fifo_Lvl;
-      can2_tx = &health.SWCU_CAN2_Tx_Fifo_Lvl;
+      can1_tx = &health.SWCU_CAN1_Rx_Fifo_Lvl;
+      can2_tx = &health.SWCU_CAN2_Rx_Fifo_Lvl;
       ecu_tmp = &health.SWCU_Temp;
     #elif STOS_current_ECU_ID==ECU_ID_BMS_HYB
       STOS_CAN_PDU_BMS_HYB_Health health;
       load = &health.BMS_HYB_CPU_Load;
-      can1_tx = &health.BMS_HYB_CAN1_Tx_Fifo_Lvl;
-      can2_tx = &health.BMS_HYB_CAN2_Tx_Fifo_Lvl;
+      can1_tx = &health.BMS_HYB_CAN1_Rx_Fifo_Lvl;
+      can2_tx = &health.BMS_HYB_CAN2_Rx_Fifo_Lvl;
       ecu_tmp = &health.BMS_HYB_Temp;
     #endif
     
@@ -111,9 +111,9 @@ void taskPerfmon(void){
 
 
     // get can fifo fill levels
-    *can1_tx = AD_CAN.getSWFiFoFillLevel(); // AD_CAN always present
+    *can1_tx = AD_CAN.getSWFiFoFillLevel()/(float)CAN_FIFO_size; // AD_CAN always present
     #ifdef MS4_CAN_PORT
-      *can2_tx = MS4_CAN.getSWFiFoFillLevel(); // MS4 not on all devices
+      *can2_tx = MS4_CAN.getSWFiFoFillLevel()/(float)CAN_FIFO_size; // MS4 not on all devices
     #endif
 
 
