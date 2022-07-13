@@ -1,3 +1,4 @@
+#define STOS_CAN_ID_Debug_Msg 0x25F
 #define STOS_CAN_ID_GPS 0x112
 #define STOS_CAN_ID_MS4_Relay 0x111
 #define STOS_CAN_ID_PDU_Status 0x10B
@@ -123,6 +124,15 @@
 #define STOS_CAN_ID_IMU_Accel 0x5A
 #define STOS_CAN_ID_Aero_Fan 0x100
 #define STOS_CAN_ID_SWCU_Switches 0x50
+#define STOS_CAN_ID_Aero_ADC_1 0x191
+#define STOS_CAN_ID_Aero_ADC_2 0x192
+#define STOS_CAN_ID_Aero_ADC_3 0x193
+#define STOS_CAN_ID_Aero_ADC_4 0x194
+#define STOS_CAN_ID_Aero_ADC_5 0x195
+#define STOS_CAN_ID_Aero_ADC_6 0x196
+#define STOS_CAN_ID_Aero_ADC_7 0x197
+#define STOS_CAN_ID_Aero_ADC_8 0x198
+#define STOS_CAN_ID_Aero_ADC_9 0x199
 #define STOS_CAN_ID_AGS1_gearbox_control_unit 0x100
 #define STOS_CAN_ID_ABS_switch_state_slip_and_speed 0x5C0
 #define STOS_CAN_ID_ABS_wheelspeeds 0x24A
