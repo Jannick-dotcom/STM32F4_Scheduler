@@ -2277,8 +2277,8 @@ struct STOS_CAN_PDU_Whl_Speed_R : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Whl_Speed_R;
     const uint16_t _size = 4;
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_RL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_RR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_RL = {0, 16, 0, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
+    CAN_Signal<uint16_t> Wheel_Speed_RR = {0, 16, 16, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
     STOS_CAN_PDU_Whl_Speed_R() 
     {
         ID = _id;
@@ -2286,15 +2286,15 @@ public:
     void build()
     {
         Val = 0;
-        Val |= Wheel_Speed_Rev_RL.build();
-        Val |= Wheel_Speed_Rev_RR.build();
+        Val |= Wheel_Speed_RL.build();
+        Val |= Wheel_Speed_RR.build();
         dlc = 4;
 
     }
     void unbuild()
     {
-        Wheel_Speed_Rev_RL.unbuild(Val);
-        Wheel_Speed_Rev_RR.unbuild(Val);
+        Wheel_Speed_RL.unbuild(Val);
+        Wheel_Speed_RR.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage 
@@ -2302,8 +2302,8 @@ struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Whl_Speed_F;
     const uint16_t _size = 4;
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_FL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_FR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_FL = {0, 16, 0, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
+    CAN_Signal<uint16_t> Wheel_Speed_FR = {0, 16, 16, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
     STOS_CAN_PDU_Whl_Speed_F() 
     {
         ID = _id;
@@ -2311,15 +2311,15 @@ public:
     void build()
     {
         Val = 0;
-        Val |= Wheel_Speed_Rev_FL.build();
-        Val |= Wheel_Speed_Rev_FR.build();
+        Val |= Wheel_Speed_FL.build();
+        Val |= Wheel_Speed_FR.build();
         dlc = 4;
 
     }
     void unbuild()
     {
-        Wheel_Speed_Rev_FL.unbuild(Val);
-        Wheel_Speed_Rev_FR.unbuild(Val);
+        Wheel_Speed_FL.unbuild(Val);
+        Wheel_Speed_FR.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Pitot : public StallardOSCanMessage 
