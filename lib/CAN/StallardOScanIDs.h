@@ -1,3 +1,5 @@
+#define STOS_CAN_ID_Bat_Hybrid_Status 0x60
+#define STOS_CAN_ID_Bat_Aero_Status 0x5F
 #define STOS_CAN_ID_Debug_Msg 0x25F
 #define STOS_CAN_ID_GPS 0x112
 #define STOS_CAN_ID_MS4_Relay 0x111

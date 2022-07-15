@@ -5,6 +5,50 @@
 #include <math.h>
 #include "StallardOScanIDs.h"
 
+struct STOS_CAN_PDU_Bat_Hybrid_Status : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Bat_Hybrid_Status;
+    const uint16_t _size = 2;
+    CAN_Signal<uint16_t> Bat_Hybrid_SoC = {0, 10, 0, 0, 0, 0.0977517107, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100.0000000461]
+    STOS_CAN_PDU_Bat_Hybrid_Status() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= Bat_Hybrid_SoC.build();
+        dlc = 2;
+
+    }
+    void unbuild()
+    {
+        Bat_Hybrid_SoC.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Bat_Aero_Status : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Bat_Aero_Status;
+    const uint16_t _size = 2;
+    CAN_Signal<uint16_t> Bat_Aero_SoC = {0, 10, 0, 0, 0, 0.0977517107, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100.0000000461]
+    STOS_CAN_PDU_Bat_Aero_Status() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= Bat_Aero_SoC.build();
+        dlc = 2;
+
+    }
+    void unbuild()
+    {
+        Bat_Aero_SoC.unbuild(Val);
+    }
+};
 struct STOS_CAN_PDU_Debug_Msg : public StallardOSCanMessage 
 {
 public:
