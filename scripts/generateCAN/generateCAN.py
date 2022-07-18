@@ -1,8 +1,4 @@
-import math
-import os
-from webbrowser import UnixBrowser
-import pandas as pd
-import glob
+import enum
 import cantools
 
 endl = "\n"
@@ -37,6 +33,9 @@ def main():
     outfileStructs.write(f"#ifndef StallardOScanStructs_hpp{endl}#define StallardOScanStructs_hpp{endl}")
     outfileStructs.write(f'#include "stdint.h"{endl}#include "StallardOScanTypes.hpp"{endl}#include <math.h>{endl}#include "StallardOScanIDs.h"{endl}{endl}') #include the integer types to the struct file
 
+
+    enum_str = ''
+
     for msg in messages: #Go through every message
         msgname = msg.name.replace(' ', '_')
         outfileDefs.write(f"#define STOS_CAN_ID_{msgname} 0x{msg.frame_id:X}{endl}") #write a new define for the id
@@ -47,6 +46,7 @@ def main():
 
         build_str = f"{tab}void build(){endl}{tab}{{"
         unbuild_str = f"{tab}void unbuild(){endl}{tab}{{{endl}"
+
 
         if msg.signals:
             build_str += f'{endl}{tab}{tab}Val = 0;{endl}'
@@ -82,6 +82,15 @@ def main():
             else:
                 unbuild_str += f'{tab}{tab}{signame}.unbuild(Val);{endl}'
 
+            # enums, if present
+            if signal.choices:
+                enum_str += f'enum class VT_{signame}{{\n'
+                for key in signal.choices:
+                    vt_name = signal.choices[key].name
+                    vt_name = vt_name.replace(' ', '_')
+                    enum_str += f'{tab}{vt_name}={key},\n'
+                enum_str += '};\n'
+
         outfileStructs.write(genConstructor(msgname, msg.length))
 
         build_str += f'{tab}{tab}dlc = {msg.length};{endl}'
@@ -93,6 +102,7 @@ def main():
 
         outfileStructs.write(f'}};{endl}')
 
+    outfileStructs.write(enum_str)
     outfileStructs.write('#endif  // StallardOScanStructs_hpp')
 
     outfileDefs.close()
