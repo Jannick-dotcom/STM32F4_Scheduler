@@ -4031,7 +4031,8 @@ public:
 };
 enum class VT_Car_Mode{
     Scruti=7,
-    Survival=6,
+    Show=6,
+    Survival=5,
     Endurance=4,
     AutoX=3,
     Skidpad=2,
