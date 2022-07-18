@@ -2456,7 +2456,7 @@ struct STOS_CAN_PDU_RCU_Status : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_RCU_Status;
     const uint16_t _size = 4;
-    CAN_Signal<uint8_t> Car_Mode = {0, 4, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|15]
+    CAN_Signal<uint8_t> Car_Mode = {0, 4, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|7]
     CAN_Signal<uint8_t> Backup_Mode = {0, 4, 4, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|15]
     CAN_Signal<uint8_t> Auto_Shift_Request = {0, 1, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     CAN_Signal<uint8_t> Shift_Clutch_Fallback_Mode = {0, 1, 9, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
@@ -4028,5 +4028,38 @@ public:
         ti_7.unbuild(Val);
         ti_8.unbuild(Val);
     }
+};
+enum class VT_Car_Mode{
+    Scruti=7,
+    Survival=6,
+    Endurance=4,
+    AutoX=3,
+    Skidpad=2,
+    Accel=1,
+    Error=0,
+};
+enum class VT_LaunchControl_State{
+    LAUNCHING=8,
+    COOLDOWN=7,
+    LAUNCH_RDY=6,
+    TENSION_DT=5,
+    PRELAUNCH=4,
+    BITEPOINT=3,
+    ENGAGED=2,
+    PREENGAGE=1,
+    INACTIVE=0,
+};
+enum class VT_LaunchControl_UI_State{
+    OPERATING=10,
+    CLUTCH_COOLDOWN=9,
+    READY_TO_GO=8,
+    WAITING=7,
+    HIGH_PRESSURE=6,
+    LOW_PRESSURE=5,
+    HIGH_THROTTLE=4,
+    LOW_THROTTLE=3,
+    WRONG_GEAR=2,
+    CAR_MOVING=1,
+    INACTIVE=0,
 };
 #endif  // StallardOScanStructs_hpp
