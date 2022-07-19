@@ -20,6 +20,8 @@ class StallardOSAvg{
         void add_sample(valueTemplate sample){
 
             history[idx] = sample;
+
+            idx++;
             if(idx >= size){
                 idx = 0;
             }
