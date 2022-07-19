@@ -5,6 +5,31 @@
 #include <math.h>
 #include "StallardOScanIDs.h"
 
+struct STOS_CAN_PDU_ARH_Offset : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_ARH_Offset;
+    const uint16_t _size = 2;
+    CAN_Signal<uint8_t> ARH_Offset_F = {0, 8, 0, 0, 0, 0.1176470589, -10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [-10|20.0000000195]
+    CAN_Signal<uint8_t> ARH_Offset_R = {0, 8, 8, 0, 0, 0.1176470589, -10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [-10|20.0000000195]
+    STOS_CAN_PDU_ARH_Offset() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ARH_Offset_F.build();
+        Val |= ARH_Offset_R.build();
+        dlc = 2;
+
+    }
+    void unbuild()
+    {
+        ARH_Offset_F.unbuild(Val);
+        ARH_Offset_R.unbuild(Val);
+    }
+};
 struct STOS_CAN_PDU_Bat_Hybrid_Status : public StallardOSCanMessage 
 {
 public:
@@ -78,31 +103,6 @@ public:
         Debug_2.unbuild(Val);
         Debug_3.unbuild(Val);
         Debug_4.unbuild(Val);
-    }
-};
-struct STOS_CAN_PDU_GPS : public StallardOSCanMessage 
-{
-public:
-    static constexpr uint16_t _id = STOS_CAN_ID_GPS;
-    const uint16_t _size = 4;
-    CAN_Signal<uint16_t> GPS_Head = {0, 16, 0, 0, 0, 0.01, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|655.35]
-    CAN_Signal<uint16_t> GPS_Speed = {0, 16, 16, 0, 0, 0.1852, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|12137.082]
-    STOS_CAN_PDU_GPS() 
-    {
-        ID = _id;
-    }
-    void build()
-    {
-        Val = 0;
-        Val |= GPS_Head.build();
-        Val |= GPS_Speed.build();
-        dlc = 4;
-
-    }
-    void unbuild()
-    {
-        GPS_Head.unbuild(Val);
-        GPS_Speed.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_MS4_Relay : public StallardOSCanMessage 
