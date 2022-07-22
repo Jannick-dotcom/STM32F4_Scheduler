@@ -1,7 +1,7 @@
+#define STOS_CAN_ID_ARH_Offset 0x61
 #define STOS_CAN_ID_Bat_Hybrid_Status 0x60
 #define STOS_CAN_ID_Bat_Aero_Status 0x5F
 #define STOS_CAN_ID_Debug_Msg 0x25F
-#define STOS_CAN_ID_GPS 0x112
 #define STOS_CAN_ID_MS4_Relay 0x111
 #define STOS_CAN_ID_PDU_Status 0x10B
 #define STOS_CAN_ID_Current_Sensors 0x106

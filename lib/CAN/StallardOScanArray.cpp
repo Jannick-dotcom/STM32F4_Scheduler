@@ -1,9 +1,9 @@
 #include "StallardOScanStructs.hpp"
 
+struct STOS_CAN_PDU_ARH_Offset ARH_Offset;
 struct STOS_CAN_PDU_Bat_Hybrid_Status Bat_Hybrid_Status;
 struct STOS_CAN_PDU_Bat_Aero_Status Bat_Aero_Status;
 struct STOS_CAN_PDU_Debug_Msg Debug_Msg;
-struct STOS_CAN_PDU_GPS GPS;
 struct STOS_CAN_PDU_MS4_Relay MS4_Relay;
 struct STOS_CAN_PDU_PDU_Status PDU_Status;
 struct STOS_CAN_PDU_Current_Sensors Current_Sensors;
@@ -154,10 +154,10 @@ struct STOS_CAN_PDU_Injection_2 Injection_2;
 struct STOS_CAN_PDU_Injection_1 Injection_1;
 
 struct StallardOSCanMessage *canarray[] = {
+	&ARH_Offset,
 	&Bat_Hybrid_Status,
 	&Bat_Aero_Status,
 	&Debug_Msg,
-	&GPS,
 	&MS4_Relay,
 	&PDU_Status,
 	&Current_Sensors,
@@ -309,10 +309,10 @@ struct StallardOSCanMessage *canarray[] = {
 };
 
 uint16_t idarray[] = {
+	ARH_Offset.ID,
 	Bat_Hybrid_Status.ID,
 	Bat_Aero_Status.ID,
 	Debug_Msg.ID,
-	GPS.ID,
 	MS4_Relay.ID,
 	PDU_Status.ID,
 	Current_Sensors.ID,
