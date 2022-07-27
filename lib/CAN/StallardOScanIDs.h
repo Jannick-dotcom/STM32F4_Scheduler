@@ -1,3 +1,4 @@
+#define STOS_CAN_ID_Aero_Status_Message 0x65
 #define STOS_CAN_ID_ARH_Offset 0x61
 #define STOS_CAN_ID_Bat_Hybrid_Status 0x60
 #define STOS_CAN_ID_Bat_Aero_Status 0x5F

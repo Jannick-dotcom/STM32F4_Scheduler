@@ -1,5 +1,6 @@
 #include "StallardOScanStructs.hpp"
 
+struct STOS_CAN_PDU_Aero_Status_Message Aero_Status_Message;
 struct STOS_CAN_PDU_ARH_Offset ARH_Offset;
 struct STOS_CAN_PDU_Bat_Hybrid_Status Bat_Hybrid_Status;
 struct STOS_CAN_PDU_Bat_Aero_Status Bat_Aero_Status;
@@ -154,6 +155,7 @@ struct STOS_CAN_PDU_Injection_2 Injection_2;
 struct STOS_CAN_PDU_Injection_1 Injection_1;
 
 struct StallardOSCanMessage *canarray[] = {
+	&Aero_Status_Message,
 	&ARH_Offset,
 	&Bat_Hybrid_Status,
 	&Bat_Aero_Status,
@@ -309,6 +311,7 @@ struct StallardOSCanMessage *canarray[] = {
 };
 
 uint16_t idarray[] = {
+	Aero_Status_Message.ID,
 	ARH_Offset.ID,
 	Bat_Hybrid_Status.ID,
 	Bat_Aero_Status.ID,

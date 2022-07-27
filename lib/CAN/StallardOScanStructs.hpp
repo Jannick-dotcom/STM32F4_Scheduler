@@ -5,6 +5,28 @@
 #include <math.h>
 #include "StallardOScanIDs.h"
 
+struct STOS_CAN_PDU_Aero_Status_Message : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_Status_Message;
+    const uint16_t _size = 1;
+    CAN_Signal<uint8_t> Aero_Switch = {0, 1, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
+    STOS_CAN_PDU_Aero_Status_Message() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= Aero_Switch.build();
+        dlc = 1;
+
+    }
+    void unbuild()
+    {
+        Aero_Switch.unbuild(Val);
+    }
+};
 struct STOS_CAN_PDU_ARH_Offset : public StallardOSCanMessage 
 {
 public:
