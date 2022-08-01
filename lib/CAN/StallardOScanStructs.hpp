@@ -5,29 +5,126 @@
 #include <math.h>
 #include "StallardOScanIDs.h"
 
-struct STOS_CAN_PDU_GPS : public StallardOSCanMessage 
+struct STOS_CAN_PDU_Aero_Status_Message : public StallardOSCanMessage 
 {
 public:
-    static constexpr uint16_t _id = STOS_CAN_ID_GPS;
-    const uint16_t _size = 4;
-    CAN_Signal<uint16_t> GPS_Head = {0, 16, 0, 0, 0, 0.01, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|655.35]
-    CAN_Signal<uint16_t> GPS_Speed = {0, 16, 16, 0, 0, 0.1852, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|12137.082]
-    STOS_CAN_PDU_GPS() 
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_Status_Message;
+    const uint16_t _size = 1;
+    CAN_Signal<uint8_t> Aero_Switch = {0, 1, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
+    STOS_CAN_PDU_Aero_Status_Message() 
     {
         ID = _id;
     }
     void build()
     {
         Val = 0;
-        Val |= GPS_Head.build();
-        Val |= GPS_Speed.build();
-        dlc = 4;
+        Val |= Aero_Switch.build();
+        dlc = 1;
 
     }
     void unbuild()
     {
-        GPS_Head.unbuild(Val);
-        GPS_Speed.unbuild(Val);
+        Aero_Switch.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_ARH_Offset : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_ARH_Offset;
+    const uint16_t _size = 2;
+    CAN_Signal<uint8_t> ARH_Offset_F = {0, 8, 0, 0, 0, 0.1176470589, -10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [-10|20.0000000195]
+    CAN_Signal<uint8_t> ARH_Offset_R = {0, 8, 8, 0, 0, 0.1176470589, -10};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [-10|20.0000000195]
+    STOS_CAN_PDU_ARH_Offset() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ARH_Offset_F.build();
+        Val |= ARH_Offset_R.build();
+        dlc = 2;
+
+    }
+    void unbuild()
+    {
+        ARH_Offset_F.unbuild(Val);
+        ARH_Offset_R.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Bat_Hybrid_Status : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Bat_Hybrid_Status;
+    const uint16_t _size = 2;
+    CAN_Signal<uint16_t> Bat_Hybrid_SoC = {0, 10, 0, 0, 0, 0.0977517107, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100.0000000461]
+    STOS_CAN_PDU_Bat_Hybrid_Status() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= Bat_Hybrid_SoC.build();
+        dlc = 2;
+
+    }
+    void unbuild()
+    {
+        Bat_Hybrid_SoC.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Bat_Aero_Status : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Bat_Aero_Status;
+    const uint16_t _size = 2;
+    CAN_Signal<uint16_t> Bat_Aero_SoC = {0, 10, 0, 0, 0, 0.0977517107, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100.0000000461]
+    STOS_CAN_PDU_Bat_Aero_Status() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= Bat_Aero_SoC.build();
+        dlc = 2;
+
+    }
+    void unbuild()
+    {
+        Bat_Aero_SoC.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Debug_Msg : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Debug_Msg;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> Debug_1 = {0, 16, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|65535]
+    CAN_Signal<uint16_t> Debug_2 = {0, 16, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|65535]
+    CAN_Signal<uint16_t> Debug_3 = {0, 16, 32, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|65535]
+    CAN_Signal<uint16_t> Debug_4 = {0, 16, 48, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|65535]
+    STOS_CAN_PDU_Debug_Msg() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= Debug_1.build();
+        Val |= Debug_2.build();
+        Val |= Debug_3.build();
+        Val |= Debug_4.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        Debug_1.unbuild(Val);
+        Debug_2.unbuild(Val);
+        Debug_3.unbuild(Val);
+        Debug_4.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_MS4_Relay : public StallardOSCanMessage 
@@ -1769,8 +1866,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_FCU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> FCU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> FCU_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> FCU_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> FCU_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> FCU_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> FCU_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_FCU_Health() 
     {
@@ -1780,8 +1877,8 @@ public:
     {
         Val = 0;
         Val |= FCU_CPU_Load.build();
-        Val |= FCU_CAN2_Tx_Fifo_Lvl.build();
-        Val |= FCU_CAN1_Tx_Fifo_Lvl.build();
+        Val |= FCU_CAN2_Rx_Fifo_Lvl.build();
+        Val |= FCU_CAN1_Rx_Fifo_Lvl.build();
         Val |= FCU_Temp.build();
         dlc = 4;
 
@@ -1789,8 +1886,8 @@ public:
     void unbuild()
     {
         FCU_CPU_Load.unbuild(Val);
-        FCU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        FCU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        FCU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        FCU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         FCU_Temp.unbuild(Val);
     }
 };
@@ -1800,8 +1897,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_RCU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> RCU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> RCU_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> RCU_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> RCU_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> RCU_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> RCU_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_RCU_Health() 
     {
@@ -1811,8 +1908,8 @@ public:
     {
         Val = 0;
         Val |= RCU_CPU_Load.build();
-        Val |= RCU_CAN2_Tx_Fifo_Lvl.build();
-        Val |= RCU_CAN1_Tx_Fifo_Lvl.build();
+        Val |= RCU_CAN2_Rx_Fifo_Lvl.build();
+        Val |= RCU_CAN1_Rx_Fifo_Lvl.build();
         Val |= RCU_Temp.build();
         dlc = 4;
 
@@ -1820,8 +1917,8 @@ public:
     void unbuild()
     {
         RCU_CPU_Load.unbuild(Val);
-        RCU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        RCU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        RCU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        RCU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         RCU_Temp.unbuild(Val);
     }
 };
@@ -1831,8 +1928,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_PDU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> PDU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> PDU_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> PDU_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> PDU_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> PDU_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> PDU_Temps = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_PDU_Health() 
     {
@@ -1842,8 +1939,8 @@ public:
     {
         Val = 0;
         Val |= PDU_CPU_Load.build();
-        Val |= PDU_CAN2_Tx_Fifo_Lvl.build();
-        Val |= PDU_CAN1_Tx_Fifo_Lvl.build();
+        Val |= PDU_CAN2_Rx_Fifo_Lvl.build();
+        Val |= PDU_CAN1_Rx_Fifo_Lvl.build();
         Val |= PDU_Temps.build();
         dlc = 4;
 
@@ -1851,8 +1948,8 @@ public:
     void unbuild()
     {
         PDU_CPU_Load.unbuild(Val);
-        PDU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        PDU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        PDU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        PDU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         PDU_Temps.unbuild(Val);
     }
 };
@@ -1862,8 +1959,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_SWCU_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> SWCU_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> SWCU_CAN1_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> SWCU_CAN2_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> SWCU_CAN1_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> SWCU_CAN2_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> SWCU_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_SWCU_Health() 
     {
@@ -1873,8 +1970,8 @@ public:
     {
         Val = 0;
         Val |= SWCU_CPU_Load.build();
-        Val |= SWCU_CAN1_Tx_Fifo_Lvl.build();
-        Val |= SWCU_CAN2_Tx_Fifo_Lvl.build();
+        Val |= SWCU_CAN1_Rx_Fifo_Lvl.build();
+        Val |= SWCU_CAN2_Rx_Fifo_Lvl.build();
         Val |= SWCU_Temp.build();
         dlc = 4;
 
@@ -1882,8 +1979,8 @@ public:
     void unbuild()
     {
         SWCU_CPU_Load.unbuild(Val);
-        SWCU_CAN1_Tx_Fifo_Lvl.unbuild(Val);
-        SWCU_CAN2_Tx_Fifo_Lvl.unbuild(Val);
+        SWCU_CAN1_Rx_Fifo_Lvl.unbuild(Val);
+        SWCU_CAN2_Rx_Fifo_Lvl.unbuild(Val);
         SWCU_Temp.unbuild(Val);
     }
 };
@@ -1893,8 +1990,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_BMS_HOMO_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> BMS_HOMO_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> BMS_HOMO_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> BMS_HOMO_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> BMS_HOMO_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> BMS_HOMO_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> BMS_HOMO_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_BMS_HOMO_Health() 
     {
@@ -1904,8 +2001,8 @@ public:
     {
         Val = 0;
         Val |= BMS_HOMO_CPU_Load.build();
-        Val |= BMS_HOMO_CAN2_Tx_Fifo_Lvl.build();
-        Val |= BMS_HOMO_CAN1_Tx_Fifo_Lvl.build();
+        Val |= BMS_HOMO_CAN2_Rx_Fifo_Lvl.build();
+        Val |= BMS_HOMO_CAN1_Rx_Fifo_Lvl.build();
         Val |= BMS_HOMO_Temp.build();
         dlc = 4;
 
@@ -1913,8 +2010,8 @@ public:
     void unbuild()
     {
         BMS_HOMO_CPU_Load.unbuild(Val);
-        BMS_HOMO_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        BMS_HOMO_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        BMS_HOMO_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        BMS_HOMO_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         BMS_HOMO_Temp.unbuild(Val);
     }
 };
@@ -1924,8 +2021,8 @@ public:
     static constexpr uint16_t _id = STOS_CAN_ID_BMS_HYB_Health;
     const uint16_t _size = 4;
     CAN_Signal<uint8_t> BMS_HYB_CPU_Load = {0, 7, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
-    CAN_Signal<uint8_t> BMS_HYB_CAN2_Tx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
-    CAN_Signal<uint8_t> BMS_HYB_CAN1_Tx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|255]
+    CAN_Signal<uint8_t> BMS_HYB_CAN2_Rx_Fifo_Lvl = {0, 8, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
+    CAN_Signal<uint8_t> BMS_HYB_CAN1_Rx_Fifo_Lvl = {0, 8, 16, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|100]
     CAN_Signal<uint8_t> BMS_HYB_Temp = {0, 8, 24, 0, 0, 0.5490196078, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|139.999999989]
     STOS_CAN_PDU_BMS_HYB_Health() 
     {
@@ -1935,8 +2032,8 @@ public:
     {
         Val = 0;
         Val |= BMS_HYB_CPU_Load.build();
-        Val |= BMS_HYB_CAN2_Tx_Fifo_Lvl.build();
-        Val |= BMS_HYB_CAN1_Tx_Fifo_Lvl.build();
+        Val |= BMS_HYB_CAN2_Rx_Fifo_Lvl.build();
+        Val |= BMS_HYB_CAN1_Rx_Fifo_Lvl.build();
         Val |= BMS_HYB_Temp.build();
         dlc = 4;
 
@@ -1944,8 +2041,8 @@ public:
     void unbuild()
     {
         BMS_HYB_CPU_Load.unbuild(Val);
-        BMS_HYB_CAN2_Tx_Fifo_Lvl.unbuild(Val);
-        BMS_HYB_CAN1_Tx_Fifo_Lvl.unbuild(Val);
+        BMS_HYB_CAN2_Rx_Fifo_Lvl.unbuild(Val);
+        BMS_HYB_CAN1_Rx_Fifo_Lvl.unbuild(Val);
         BMS_HYB_Temp.unbuild(Val);
     }
 };
@@ -2246,8 +2343,8 @@ struct STOS_CAN_PDU_Whl_Speed_R : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Whl_Speed_R;
     const uint16_t _size = 4;
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_RL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_RR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_RL = {0, 16, 0, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
+    CAN_Signal<uint16_t> Wheel_Speed_RR = {0, 16, 16, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
     STOS_CAN_PDU_Whl_Speed_R() 
     {
         ID = _id;
@@ -2255,15 +2352,15 @@ public:
     void build()
     {
         Val = 0;
-        Val |= Wheel_Speed_Rev_RL.build();
-        Val |= Wheel_Speed_Rev_RR.build();
+        Val |= Wheel_Speed_RL.build();
+        Val |= Wheel_Speed_RR.build();
         dlc = 4;
 
     }
     void unbuild()
     {
-        Wheel_Speed_Rev_RL.unbuild(Val);
-        Wheel_Speed_Rev_RR.unbuild(Val);
+        Wheel_Speed_RL.unbuild(Val);
+        Wheel_Speed_RR.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage 
@@ -2271,8 +2368,8 @@ struct STOS_CAN_PDU_Whl_Speed_F : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_Whl_Speed_F;
     const uint16_t _size = 4;
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_FL = {0, 16, 0, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
-    CAN_Signal<uint16_t> Wheel_Speed_Rev_FR = {0, 16, 16, 0, 0, 0.0477912566, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|3132.000001281]
+    CAN_Signal<uint16_t> Wheel_Speed_FL = {0, 16, 0, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
+    CAN_Signal<uint16_t> Wheel_Speed_FR = {0, 16, 16, 0, 0, 0.0038147555, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|250.0000016925]
     STOS_CAN_PDU_Whl_Speed_F() 
     {
         ID = _id;
@@ -2280,15 +2377,15 @@ public:
     void build()
     {
         Val = 0;
-        Val |= Wheel_Speed_Rev_FL.build();
-        Val |= Wheel_Speed_Rev_FR.build();
+        Val |= Wheel_Speed_FL.build();
+        Val |= Wheel_Speed_FR.build();
         dlc = 4;
 
     }
     void unbuild()
     {
-        Wheel_Speed_Rev_FL.unbuild(Val);
-        Wheel_Speed_Rev_FR.unbuild(Val);
+        Wheel_Speed_FL.unbuild(Val);
+        Wheel_Speed_FR.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_Pitot : public StallardOSCanMessage 
@@ -2381,7 +2478,7 @@ struct STOS_CAN_PDU_RCU_Status : public StallardOSCanMessage
 public:
     static constexpr uint16_t _id = STOS_CAN_ID_RCU_Status;
     const uint16_t _size = 4;
-    CAN_Signal<uint8_t> Car_Mode = {0, 4, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|15]
+    CAN_Signal<uint8_t> Car_Mode = {0, 4, 0, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|7]
     CAN_Signal<uint8_t> Backup_Mode = {0, 4, 4, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|15]
     CAN_Signal<uint8_t> Auto_Shift_Request = {0, 1, 8, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
     CAN_Signal<uint8_t> Shift_Clutch_Fallback_Mode = {0, 1, 9, 0, 0, 1, 0};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [0|1]
@@ -2888,6 +2985,276 @@ public:
         Neutral_Guard_Active.unbuild(Val);
         Anti_Stall_Active.unbuild(Val);
         Auto_Shift_Active.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_1 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_1;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_1 = {0, 16, 0, 0, 0, 1.12968, 79153};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_2 = {0, 16, 16, 0, 0, 1.21917, 79084};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_3 = {0, 16, 32, 0, 0, 1.219, 78919};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_4 = {0, 16, 48, 0, 0, 1.21808, 78999};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_1() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_1.build();
+        Val |= ADCAN_AE_PT_2.build();
+        Val |= ADCAN_AE_PT_3.build();
+        Val |= ADCAN_AE_PT_4.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_1.unbuild(Val);
+        ADCAN_AE_PT_2.unbuild(Val);
+        ADCAN_AE_PT_3.unbuild(Val);
+        ADCAN_AE_PT_4.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_2 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_2;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_5 = {0, 16, 0, 0, 0, 1.21832, 78875};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_6 = {0, 16, 16, 0, 0, 1.21947, 79318};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_7 = {0, 16, 32, 0, 0, 1.2198, 79186};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_8 = {0, 16, 48, 0, 0, 1.21963, 79075};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_2() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_5.build();
+        Val |= ADCAN_AE_PT_6.build();
+        Val |= ADCAN_AE_PT_7.build();
+        Val |= ADCAN_AE_PT_8.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_5.unbuild(Val);
+        ADCAN_AE_PT_6.unbuild(Val);
+        ADCAN_AE_PT_7.unbuild(Val);
+        ADCAN_AE_PT_8.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_3 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_3;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_9 = {0, 16, 0, 0, 0, 1.22256, 79231};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_10 = {0, 16, 16, 0, 0, 1.219, 79008};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_11 = {0, 16, 32, 0, 0, 1.21909, 78882};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_12 = {0, 16, 48, 0, 0, 1.21881, 78981};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_3() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_9.build();
+        Val |= ADCAN_AE_PT_10.build();
+        Val |= ADCAN_AE_PT_11.build();
+        Val |= ADCAN_AE_PT_12.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_9.unbuild(Val);
+        ADCAN_AE_PT_10.unbuild(Val);
+        ADCAN_AE_PT_11.unbuild(Val);
+        ADCAN_AE_PT_12.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_4 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_4;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_13 = {0, 16, 0, 0, 0, 1.21168, 79298};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_14 = {0, 16, 16, 0, 0, 1.22408, 79301};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_15 = {0, 16, 32, 0, 0, 1.22296, 79278};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_16 = {0, 16, 48, 0, 0, 1.22302, 79293};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_4() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_13.build();
+        Val |= ADCAN_AE_PT_14.build();
+        Val |= ADCAN_AE_PT_15.build();
+        Val |= ADCAN_AE_PT_16.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_13.unbuild(Val);
+        ADCAN_AE_PT_14.unbuild(Val);
+        ADCAN_AE_PT_15.unbuild(Val);
+        ADCAN_AE_PT_16.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_5 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_5;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_17 = {0, 16, 0, 0, 0, 1.21944, 78928};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_18 = {0, 16, 16, 0, 0, 1.21788, 78991};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_19 = {0, 16, 32, 0, 0, 1.21508, 78824};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_20 = {0, 16, 48, 0, 0, 1.22156, 79133};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_5() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_17.build();
+        Val |= ADCAN_AE_PT_18.build();
+        Val |= ADCAN_AE_PT_19.build();
+        Val |= ADCAN_AE_PT_20.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_17.unbuild(Val);
+        ADCAN_AE_PT_18.unbuild(Val);
+        ADCAN_AE_PT_19.unbuild(Val);
+        ADCAN_AE_PT_20.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_6 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_6;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_21 = {0, 16, 0, 0, 0, 1.21973, 79013};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_22 = {0, 16, 16, 0, 0, 1.21835, 79045};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_23 = {0, 16, 32, 0, 0, 1.21814, 78891};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_24 = {0, 16, 48, 0, 0, 1.21911, 79087};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_6() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_21.build();
+        Val |= ADCAN_AE_PT_22.build();
+        Val |= ADCAN_AE_PT_23.build();
+        Val |= ADCAN_AE_PT_24.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_21.unbuild(Val);
+        ADCAN_AE_PT_22.unbuild(Val);
+        ADCAN_AE_PT_23.unbuild(Val);
+        ADCAN_AE_PT_24.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_7 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_7;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_25 = {0, 16, 0, 0, 0, 1.22199, 79239};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_26 = {0, 16, 16, 0, 0, 1.2241, 79297};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_27 = {0, 16, 32, 0, 0, 1.22309, 79293};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_28 = {0, 16, 48, 0, 0, 1.22106, 79190};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_7() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_25.build();
+        Val |= ADCAN_AE_PT_26.build();
+        Val |= ADCAN_AE_PT_27.build();
+        Val |= ADCAN_AE_PT_28.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_25.unbuild(Val);
+        ADCAN_AE_PT_26.unbuild(Val);
+        ADCAN_AE_PT_27.unbuild(Val);
+        ADCAN_AE_PT_28.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_8 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_8;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_29 = {0, 16, 0, 0, 0, 1.21801, 78937};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_30 = {0, 16, 16, 0, 0, 1.21786, 78877};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_8() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_29.build();
+        Val |= ADCAN_AE_PT_30.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_29.unbuild(Val);
+        ADCAN_AE_PT_30.unbuild(Val);
+    }
+};
+struct STOS_CAN_PDU_Aero_ADC_9 : public StallardOSCanMessage 
+{
+public:
+    static constexpr uint16_t _id = STOS_CAN_ID_Aero_ADC_9;
+    const uint16_t _size = 8;
+    CAN_Signal<uint16_t> ADCAN_AE_PT_33 = {0, 16, 0, 0, 0, 0.32609, -834};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_34 = {0, 16, 16, 0, 0, 0.32647, -832};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    CAN_Signal<uint16_t> ADCAN_AE_PT_35 = {0, 16, 32, 0, 0, 0.32653, -792};  // {init,bitcount,startbit,rowcount,isMotorola,factor,offset}  [79153|153186.5788]
+    STOS_CAN_PDU_Aero_ADC_9() 
+    {
+        ID = _id;
+    }
+    void build()
+    {
+        Val = 0;
+        Val |= ADCAN_AE_PT_33.build();
+        Val |= ADCAN_AE_PT_34.build();
+        Val |= ADCAN_AE_PT_35.build();
+        dlc = 8;
+
+    }
+    void unbuild()
+    {
+        ADCAN_AE_PT_33.unbuild(Val);
+        ADCAN_AE_PT_34.unbuild(Val);
+        ADCAN_AE_PT_35.unbuild(Val);
     }
 };
 struct STOS_CAN_PDU_AGS1_gearbox_control_unit : public StallardOSCanMessage 
@@ -3683,5 +4050,39 @@ public:
         ti_7.unbuild(Val);
         ti_8.unbuild(Val);
     }
+};
+enum class VT_Car_Mode{
+    Scruti=7,
+    Show=6,
+    Survival=5,
+    Endurance=4,
+    AutoX=3,
+    Skidpad=2,
+    Accel=1,
+    Error=0,
+};
+enum class VT_LaunchControl_State{
+    LAUNCHING=8,
+    COOLDOWN=7,
+    LAUNCH_RDY=6,
+    TENSION_DT=5,
+    PRELAUNCH=4,
+    BITEPOINT=3,
+    ENGAGED=2,
+    PREENGAGE=1,
+    INACTIVE=0,
+};
+enum class VT_LaunchControl_UI_State{
+    OPERATING=10,
+    CLUTCH_COOLDOWN=9,
+    READY_TO_GO=8,
+    WAITING=7,
+    HIGH_PRESSURE=6,
+    LOW_PRESSURE=5,
+    HIGH_THROTTLE=4,
+    LOW_THROTTLE=3,
+    WRONG_GEAR=2,
+    CAR_MOVING=1,
+    INACTIVE=0,
 };
 #endif  // StallardOScanStructs_hpp

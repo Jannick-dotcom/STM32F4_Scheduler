@@ -49,6 +49,13 @@ private:
     uint8_t channel;
     StallardOSGPIO gpio;
     StallardOSSemaphore sem;
+    ADC_ChannelConfTypeDef sConfig;
+
+    #ifdef STM32F4xxxx
+        static bool is_adc_init[3];
+    #elif defined(STM32F1xxxx)
+        static bool is_adc_init[2];
+    #endif
 
 public:
 

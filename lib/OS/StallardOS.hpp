@@ -18,5 +18,6 @@
 #include "StallardOSPID.hpp"
 #include "StallardOSSPI.hpp"
 #include "StallardOSDAC.hpp"
-
+#include "StallardOSAvg.hpp"
+#include "AlphaBeta.hpp"
 #endif //StallardOS_h

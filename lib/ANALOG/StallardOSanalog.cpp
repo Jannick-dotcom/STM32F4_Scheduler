@@ -1,8 +1,15 @@
 #include "StallardOSanalog.hpp"
 
+
+#ifdef STM32F4xxxx
+    bool StallardOSAnalog::is_adc_init[3] = {false, false, false};
+#elif defined(STM32F1xxxx)
+    bool StallardOSAnalog::is_adc_init[2] = {false, false};
+#endif
+
+
 StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel channel, ports port, uint8_t pin) : gpio(pin,port,Analog)
 {
-
     this->sem.take();
 
     __HAL_RCC_ADC1_CLK_ENABLE();
@@ -32,15 +39,17 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel ch
     hadc1.Init.DMAContinuousRequests = DISABLE;
     hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
     #endif
-    if (HAL_ADC_Init(&hadc1) != HAL_OK)
-    {
 
-        this->sem.give();
-
-        StallardOSGeneralFaultHandler();
+    if(!is_adc_init[number]){
+        if (HAL_ADC_Init(&hadc1) != HAL_OK)
+        {
+            this->sem.give();
+            StallardOSGeneralFaultHandler();
+        }
+        is_adc_init[number] = true;
     }
+
     // Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-    ADC_ChannelConfTypeDef sConfig;
     sConfig.Channel = channel;
     sConfig.Rank = 1;
     #ifdef STM32F4xxxx
@@ -49,19 +58,11 @@ StallardOSAnalog::StallardOSAnalog(StallardOSADC number, StallardOSADCChannel ch
     #elif defined(STM32F1xxxx)
     sConfig.SamplingTime = ADC_SAMPLETIME_13CYCLES_5;
     #endif
-    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-    {
-
-        this->sem.give();
-
-        StallardOSGeneralFaultHandler();
-    }
 
     this->number = number;
     this->channel = channel;
 
     this->sem.give();
-
 }
 
 
@@ -71,7 +72,14 @@ uint32_t StallardOSAnalog::getValue()
 
     this->sem.take();
 
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+    {
+        this->sem.give();
+        StallardOSGeneralFaultHandler();
+    }
+
     HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, 1000);
     retVal = HAL_ADC_GetValue(&hadc1);
 
     this->sem.give();

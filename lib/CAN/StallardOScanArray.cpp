@@ -1,6 +1,10 @@
 #include "StallardOScanStructs.hpp"
 
-struct STOS_CAN_PDU_GPS GPS;
+struct STOS_CAN_PDU_Aero_Status_Message Aero_Status_Message;
+struct STOS_CAN_PDU_ARH_Offset ARH_Offset;
+struct STOS_CAN_PDU_Bat_Hybrid_Status Bat_Hybrid_Status;
+struct STOS_CAN_PDU_Bat_Aero_Status Bat_Aero_Status;
+struct STOS_CAN_PDU_Debug_Msg Debug_Msg;
 struct STOS_CAN_PDU_MS4_Relay MS4_Relay;
 struct STOS_CAN_PDU_PDU_Status PDU_Status;
 struct STOS_CAN_PDU_Current_Sensors Current_Sensors;
@@ -125,6 +129,15 @@ struct STOS_CAN_PDU_IMU_Gyro IMU_Gyro;
 struct STOS_CAN_PDU_IMU_Accel IMU_Accel;
 struct STOS_CAN_PDU_Aero_Fan Aero_Fan;
 struct STOS_CAN_PDU_SWCU_Switches SWCU_Switches;
+struct STOS_CAN_PDU_Aero_ADC_1 Aero_ADC_1;
+struct STOS_CAN_PDU_Aero_ADC_2 Aero_ADC_2;
+struct STOS_CAN_PDU_Aero_ADC_3 Aero_ADC_3;
+struct STOS_CAN_PDU_Aero_ADC_4 Aero_ADC_4;
+struct STOS_CAN_PDU_Aero_ADC_5 Aero_ADC_5;
+struct STOS_CAN_PDU_Aero_ADC_6 Aero_ADC_6;
+struct STOS_CAN_PDU_Aero_ADC_7 Aero_ADC_7;
+struct STOS_CAN_PDU_Aero_ADC_8 Aero_ADC_8;
+struct STOS_CAN_PDU_Aero_ADC_9 Aero_ADC_9;
 struct STOS_CAN_PDU_AGS1_gearbox_control_unit AGS1_gearbox_control_unit;
 struct STOS_CAN_PDU_ABS_switch_state_slip_and_speed ABS_switch_state_slip_and_speed;
 struct STOS_CAN_PDU_ABS_wheelspeeds ABS_wheelspeeds;
@@ -142,7 +155,11 @@ struct STOS_CAN_PDU_Injection_2 Injection_2;
 struct STOS_CAN_PDU_Injection_1 Injection_1;
 
 struct StallardOSCanMessage *canarray[] = {
-	&GPS,
+	&Aero_Status_Message,
+	&ARH_Offset,
+	&Bat_Hybrid_Status,
+	&Bat_Aero_Status,
+	&Debug_Msg,
 	&MS4_Relay,
 	&PDU_Status,
 	&Current_Sensors,
@@ -267,6 +284,15 @@ struct StallardOSCanMessage *canarray[] = {
 	&IMU_Accel,
 	&Aero_Fan,
 	&SWCU_Switches,
+	&Aero_ADC_1,
+	&Aero_ADC_2,
+	&Aero_ADC_3,
+	&Aero_ADC_4,
+	&Aero_ADC_5,
+	&Aero_ADC_6,
+	&Aero_ADC_7,
+	&Aero_ADC_8,
+	&Aero_ADC_9,
 	&AGS1_gearbox_control_unit,
 	&ABS_switch_state_slip_and_speed,
 	&ABS_wheelspeeds,
@@ -285,7 +311,11 @@ struct StallardOSCanMessage *canarray[] = {
 };
 
 uint16_t idarray[] = {
-	GPS.ID,
+	Aero_Status_Message.ID,
+	ARH_Offset.ID,
+	Bat_Hybrid_Status.ID,
+	Bat_Aero_Status.ID,
+	Debug_Msg.ID,
 	MS4_Relay.ID,
 	PDU_Status.ID,
 	Current_Sensors.ID,
@@ -410,6 +440,15 @@ uint16_t idarray[] = {
 	IMU_Accel.ID,
 	Aero_Fan.ID,
 	SWCU_Switches.ID,
+	Aero_ADC_1.ID,
+	Aero_ADC_2.ID,
+	Aero_ADC_3.ID,
+	Aero_ADC_4.ID,
+	Aero_ADC_5.ID,
+	Aero_ADC_6.ID,
+	Aero_ADC_7.ID,
+	Aero_ADC_8.ID,
+	Aero_ADC_9.ID,
 	AGS1_gearbox_control_unit.ID,
 	ABS_switch_state_slip_and_speed.ID,
 	ABS_wheelspeeds.ID,
