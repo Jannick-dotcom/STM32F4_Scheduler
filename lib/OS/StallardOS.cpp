@@ -603,6 +603,26 @@ void StallardOS::delay(uint32_t milliseconds)
 }
 
 /**
+ * delay for an amount of microseconds
+ *
+ * @param microseconds the amount of usec to wait.
+ */
+void StallardOS::delay_us(uint16_t microseconds)
+{
+  uint64_t continueTimeStamp;
+  if(microseconds >= 1000)
+  {
+    delay(microseconds / 1000);
+    continueTimeStamp = microseconds - ((microseconds / 1000) * 1000);
+  }
+  else
+  {
+    continueTimeStamp = StallardOSTime_getTimeUs() + microseconds;
+  }
+  while (StallardOSTime_getTimeUs() < continueTimeStamp);
+}
+
+/**
  * Make sure the Task has a predefined refresh rate that must be held
  * The Task gets executed every (1 / refreshRate) seconds
  *
