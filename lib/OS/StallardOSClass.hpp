@@ -46,6 +46,7 @@ public:
   static void goFlashloader();
   void startOS(void);                //RTOS Starten (preemtive Multitasking)
   static void delay(uint32_t milliseconds); //RTOS führt solange einen anderen Task aus bevor er zum jetzigen zurückspringt
+  static void delay_us(uint16_t microseconds); //RTOS wartet bis zu 1000us
   static void yield();                      //RTOS sagen, dass jetzt der Code zuende ist
   static void kickTheDog();
   static void restartTask(function_struct *task);                //RTOS sagen dass 
