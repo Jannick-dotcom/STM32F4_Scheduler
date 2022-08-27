@@ -91,7 +91,7 @@ void taskPerfmon(void){
     idle_calc_time_us = 0;
 
     // iterate over all tasks to get used cpu time since last scan
-    task = taskMainStruct;
+    task = taskMainStruct->next->next;
     do{
       total_calc_time_us += task->perfmon_exec_time_us;
       task->perfmon_exec_time_us = 0;
@@ -101,7 +101,7 @@ void taskPerfmon(void){
 
     // get idle task cpu load and compare this to the total time
     idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
-    cpu_load = 100 - (idle_calc_time_us*100/total_calc_time_us);
+    cpu_load = ((100000000/total_calc_time_us)-100);
     *load = cpu_load;
     
 

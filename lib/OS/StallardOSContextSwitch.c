@@ -498,6 +498,10 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
         "UDIV r2, r0, r1\n" // div Systick value with sysclock divisor
         // r2 holds current ns of Systick register
 
+        "LDR r0, =#0xe000e014\n" // load &SysTick_LOAD into r0
+        "LDR r0, [r0]\n" // load SysTick_LOAD
+        "SUB r2, r0, r2\n"
+
         // next get uwTick [ms] counter into r0
         "LDR r0, =uwTick\n" // load address of HAL systick value
         "LDR r0, [r0]\n" // load value of systick in ms
