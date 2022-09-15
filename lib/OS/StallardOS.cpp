@@ -498,6 +498,17 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
 
 
 /**
+ * remove all tasks from the scheduler
+ */
+void StallardOS::remove_all_functions()
+{
+  for (uint8_t i = 0; i < sizeof(taskArray) / sizeof(function_struct); i++)
+  {
+    taskArray[i].used = false;
+  }
+}
+
+/**
  * Here we en/disable a Task from the List.
  *
  * @param id unique id of the task.
