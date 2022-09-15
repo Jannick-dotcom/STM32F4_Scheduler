@@ -269,7 +269,18 @@ bool StallardOSGPIO::read()
     this->sem.take();
 
     // returnVal = HAL_GPIO_ReadPin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin);
-    returnVal = ((GPIO_TypeDef *)portsToGPIOBase[this->port])->IDR & (1 << this->pin);
+    if(this->dir == pinDir::Input || dir == InputITChange || dir == InputITFalling || dir == InputITRising)
+    {
+        returnVal = ((GPIO_TypeDef *)portsToGPIOBase[this->port])->IDR & (1 << this->pin); //Read the input data register
+    }
+    else if(this->dir == pinDir::Output || dir == OutputOD || dir == AFOD || dir == AFPP)
+    {
+        returnVal = ((GPIO_TypeDef *)portsToGPIOBase[this->port])->ODR & (1 << this->pin); //Read the output data register
+    }
+    else
+    {
+        StallardOSGeneralFaultHandler();
+    }
 
     this->sem.give();
 
