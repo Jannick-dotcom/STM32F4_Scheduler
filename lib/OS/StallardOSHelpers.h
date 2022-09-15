@@ -25,7 +25,7 @@
   StallardOSGeneralFaultHandler()
 
 #define functionModifier (uint32_t)0xFFFFFFFE // Use the function pointer with lowest bit zero
-// #define sysTickTicks (uint32_t)(SystemCoreClock / 1000)
+
 typedef enum oscillatorType
   {
     internal = RCC_OSCILLATORTYPE_HSI,
@@ -93,8 +93,6 @@ struct function_struct
   volatile uint64_t perfmon_exec_time_us;       // accumulated exec time of task since last reset
   volatile uint64_t perfmon_swapin_ts;          // last swapIn, helper for exec time, ts in us
 
-  // volatile uint32_t stackUsage;
-  // volatile taskState State;             //Status des Tasks
   volatile uint8_t waitingForSemaphore; // Is task waiting for a semaphore
   volatile uint32_t *semVal;            // First 16bit - ID-of-Task
                              // Last  16bit - Semaphore Value

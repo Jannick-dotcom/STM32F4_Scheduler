@@ -77,7 +77,6 @@ StallardOS::StallardOS()
   // {
   //   DEBUGGER_BREAK();
   // }
-  //clutch_do_2 = false;
   initShared();
 
   #if defined(useMPU)
@@ -120,13 +119,9 @@ void StallardOS::createTCBs()
 
     temp->id = i;
 
-    // temp->State = STOPPED;                        //New Task
-    // temp->Stack = temp->vals + sizeStack - sizeof(uint32_t); //End of Stack
-
-
     temp->executable = false;
     temp->used = false;
-    temp->continueInMS = 0;
+    temp->continue_ts = 0;
 
     TCBsCreated++;
   }
@@ -371,7 +366,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
   
-  function_struct_ptr->continueInMS = 0;
+  function_struct_ptr->continue_ts = 0;
 
   //Prepare initial stack trace
   function_struct_ptr->Stack--;
@@ -595,7 +590,7 @@ void StallardOS::delay(uint32_t milliseconds)
   }
   else
   {
-    currentTask->continueInMS = StallardOSTime_getTimeMs() + (uint64_t)milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
+    currentTask->continue_ts = StallardOSTime_getTimeMs() + (uint64_t)milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
     // nextTask = taskMainStruct;
     findNextFunction();
     CALL_PENDSV();
@@ -637,7 +632,7 @@ void StallardOS::yield()
     currentTask->lastYield = StallardOSTime_getTimeMs();
     if(currentTask->refreshRate != 0)
     {
-      currentTask->continueInMS = StallardOSTime_getTimeMs() + (1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
+      currentTask->continue_ts = StallardOSTime_getTimeMs() + (1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
       findNextFunction();
       CALL_PENDSV();
       currentTask->lastStart = StallardOSTime_getTimeMs();
@@ -718,7 +713,7 @@ void StallardOS::restartTask(function_struct *task)
   }
   currentTask->waitingForSemaphore = 0;
   currentTask->semVal = 0; //Semaphore von task lösen
-  task->continueInMS = HAL_GetTick();
+  task->continue_ts = HAL_GetTick();
   task->executable = 1;
   enable_interrupts();
 }
@@ -759,7 +754,6 @@ void StallardOS::startOS(void)
   {
       DEBUGGER_BREAK();
   }
-  SysTick_Config(SystemCoreClock / (uint32_t)1000); //Counting every processor clock
 
   if (first_function_struct != nullptr)
   {
