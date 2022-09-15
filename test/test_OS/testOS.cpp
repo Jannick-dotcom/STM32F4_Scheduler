@@ -5,6 +5,9 @@
 StallardOS StallardOSJanniq;
 function_struct *ref;
 
+#define tempStep(x) #x
+#define toStr(x) "" tempStep(x) ""
+
 uint32_t stack[512] __attribute__((aligned(2048)));
 
 void setUp(void)
@@ -21,7 +24,20 @@ void testfunction() {}
 void test_addFunction()
 {
     function_struct *temp;
-    temp = StallardOSJanniq.addFunction(testfunction, 3, 128); //This should not return a nullptr
+    uint16_t i;
+    for(i = 0; i < countTasks - 2; i++) //Try to add 30 functions
+    {
+        temp = StallardOSJanniq.addFunctionStatic(testfunction, 1, stack, sizeof(stack)/sizeof(stack[0]));
+        if(temp == nullptr)
+        {
+            break;
+        }
+    }
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(nullptr, temp, "try to add " toStr(countTasks) " static functions");
+
+    StallardOSJanniq.remove_all_functions();
+
+    temp = StallardOSJanniq.addFunction(testfunction, 3, 256); //This should not return a nullptr
     TEST_ASSERT_NOT_EQUAL_MESSAGE(nullptr, temp, "normal dynamic function add");
     temp = StallardOSJanniq.addFunction(testfunction, 3, (uint32_t)(0x1<<31)); //Try allocating a lot of stack space (but x^2)
     TEST_ASSERT_EQUAL_MESSAGE(nullptr, temp, "dynamic add function with too much stack");
@@ -46,15 +62,14 @@ void test_functionModifiers()
     TEST_ASSERT_EQUAL_MESSAGE(34, ref->priority, "Change prio");
 
     StallardOSJanniq.setFunctionFrequency(ref->id, 1234);
-    TEST_ASSERT_EQUAL_MESSAGE(1234, ref->refreshRate, "change frequency");
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(1234, ref->refreshRate, "change frequency");
 }
 
 int main()
 {
     HAL_Init(); // initialize the HAL library
-    StallardOS::delay(5000);
+    StallardOS::delay(500);
     unittest_uart_begin();
-    unittest_uart_putchar(countTasks);
     UNITY_BEGIN();
 
     RUN_TEST(test_addFunction);

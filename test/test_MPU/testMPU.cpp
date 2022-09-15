@@ -54,7 +54,7 @@ void test_stackSizeOutOfRange()
 int main()
 {
     HAL_Init(); // initialize the HAL library
-    StallardOS::delay(5000);
+    StallardOS::delay(500);
     unittest_uart_begin();
     unittest_uart_putchar(countTasks);
     UNITY_BEGIN();

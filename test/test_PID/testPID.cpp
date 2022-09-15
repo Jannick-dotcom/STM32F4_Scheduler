@@ -47,7 +47,7 @@ void test_PID_d(void)
 int main()
 {
     HAL_Init(); // initialize the HAL library
-    StallardOS::delay(5000);
+    StallardOS::delay(500);
     UNITY_BEGIN();
 
     RUN_TEST(test_PID_p);
