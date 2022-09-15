@@ -10,9 +10,9 @@ constexpr static uint32_t mapr = afioBase + 0x004; // alternate pin function map
  * @param instance i2c to use
  * @param freq frequency of the transmission
  */
-StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq):
-scl(6, PORTB, AFOD, false, pullup),
-sda(7, PORTB, AFOD, false, pullup)
+StallardOSi2c::StallardOSi2c(I2C_TypeDef *instance, uint32_t freq, gpio scl, gpio sda):
+scl(scl.pin, scl.port, AFOD, false, pullup),
+sda(sda.pin, sda.port, AFOD, false, pullup)
 {   
     this->sem.take();
     __HAL_RCC_I2C1_CLK_ENABLE();

@@ -19,7 +19,7 @@ private:
 public:
     StallardOSGPIO scl;
     StallardOSGPIO sda;
-    StallardOSi2c(I2C_TypeDef *instance, uint32_t freq);
+    StallardOSi2c(I2C_TypeDef *instance, uint32_t freq, gpio scl, gpio sda);
     uint8_t write(uint16_t addr, uint8_t *data, uint16_t bytes);
     uint8_t read(uint16_t addr, uint8_t *data, uint16_t bytes);
 };
