@@ -84,7 +84,7 @@ void findNextFunction()
             continue;
         }
         
-        if (temp->executable && temp->continueInMS <= HAL_GetTick() && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if (temp->executable && temp->continue_ts <= uwTick && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
             if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is still waiting for the semaphore
             {
@@ -167,7 +167,7 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
   }
   currentTask->waitingForSemaphore = 0;
   currentTask->semVal = 0; //Semaphore von task lösen
-  task->continueInMS = HAL_GetTick();
+  task->continue_ts = HAL_GetTick();
   task->executable = 1;
 }
 
@@ -204,7 +204,7 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "STR r0, [r2]\n" //Save stack pointer
                     "LDR r1, =nextTask\n"
                     "LDR r2, [r1]\n"
-                    "STR r2, [r3]\n"
+                    "STR r2, [r3]\n" //Save next Task to currentTask
                     "DSB\n"
                     "ISB\n"
 

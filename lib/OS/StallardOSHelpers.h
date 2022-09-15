@@ -98,7 +98,7 @@ struct function_struct
   volatile uint8_t waitingForSemaphore; // Is task waiting for a semaphore
   volatile uint32_t *semVal;            // First 16bit - ID-of-Task
                              // Last  16bit - Semaphore Value
-  volatile uint64_t continueInMS; // Delay amount
+  volatile uint64_t continue_ts; //Timestamp of continuation
 };
 
 #endif

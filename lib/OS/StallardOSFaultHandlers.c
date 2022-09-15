@@ -56,7 +56,7 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
         currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
         prepareInitialStack();
         // currentTask->State = PAUSED; //Set Task state as new
-        currentTask->continueInMS = HAL_GetTick() + 500; //Restart Task in 5 s
+        currentTask->continue_ts = HAL_GetTick() + 500; //Restart Task in 5 s
         if(currentTask->semVal != NULL){
             if(currentTask->waitingForSemaphore == 0){
                 // only execute, if semaphore is actually owned by task (take finished)
