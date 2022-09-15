@@ -13,6 +13,13 @@ env.Append(
     ]
 )
 
+#add a define to check wether this is a debug build or release build (for breakpoints)
+env.Append(
+    BUILD_FLAGS=[
+        "-DBuildType=" + str(env.GetBuildType())
+    ]
+)
+
 env.AddPostAction(
     "$BUILD_DIR/${PROGNAME}.elf",
     env.VerboseAction(" ".join([

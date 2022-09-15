@@ -14,8 +14,8 @@
 #include <system_stm32f1xx.h>
 #endif
 
-#ifndef UNIT_TEST
-#define DEBUGGER_BREAK() //asm("bkpt")
+#if BuildType == debug 
+#define DEBUGGER_BREAK() asm("bkpt")
 #else
 #define DEBUGGER_BREAK()
 #endif
