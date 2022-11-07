@@ -66,8 +66,6 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, bool init
     this->dir = dir;
     this->pull = pull;
 
-    this->state = initialState;
-
     enableClockPort(this->port);
 
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -113,8 +111,6 @@ StallardOSGPIO::StallardOSGPIO(uint8_t number, ports port, pinDir dir, pullMode 
     this->port = port;
     this->dir = dir;
     this->pull = pull;
-
-    this->state = 0;
 
     enableClockPort(this->port);
     
@@ -295,11 +291,10 @@ bool StallardOSGPIO::write(bool state)
     if (this->dir == Output || this->dir == OutputOD)
     {
         HAL_GPIO_WritePin((GPIO_TypeDef *)portsToGPIOBase[this->port], 1 << this->pin, GPIO_PinState(state));
-        this->state = state;
 
         this->sem.give();
 
-        return this->state;
+        return state;
     }
     else if (this->dir == Input)
     {

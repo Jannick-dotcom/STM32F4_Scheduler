@@ -79,7 +79,6 @@ typedef enum pullMode
 class StallardOSGPIO : public NonAssignable
 {
 private:
-    bool state;
     uint32_t pin;
     ports port;
     pinDir dir;
@@ -108,7 +107,8 @@ public:
         /*Portname*/ ports port,
         /*Direction*/ pinDir dir,
         /*PullResistor*/ pullMode pull,
-        /*AlternateFunction*/ uint32_t alternate);
+        /*AlternateFunction*/ uint32_t alternate
+        );
     ~StallardOSGPIO(); //Destructor
 
     void setISR(void (*function)());
