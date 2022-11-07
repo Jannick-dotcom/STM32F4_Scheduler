@@ -1,5 +1,6 @@
 #include "StallardOScanStructs.hpp"
 
+#ifdef useOneMsgBuf
 struct STOS_CAN_PDU_Aero_Status_Message Aero_Status_Message;
 struct STOS_CAN_PDU_ARH_Offset ARH_Offset;
 struct STOS_CAN_PDU_Bat_Hybrid_Status Bat_Hybrid_Status;
@@ -153,8 +154,10 @@ struct STOS_CAN_PDU_Ignition_Rev_Ath Ignition_Rev_Ath;
 struct STOS_CAN_PDU_Ignition Ignition;
 struct STOS_CAN_PDU_Injection_2 Injection_2;
 struct STOS_CAN_PDU_Injection_1 Injection_1;
+#endif
 
 struct StallardOSCanMessage *canarray[] = {
+	#ifdef useOneMsgBuf
 	&Aero_Status_Message,
 	&ARH_Offset,
 	&Bat_Hybrid_Status,
@@ -308,9 +311,11 @@ struct StallardOSCanMessage *canarray[] = {
 	&Ignition,
 	&Injection_2,
 	&Injection_1,
+	#endif
 };
 
 uint16_t idarray[] = {
+	#ifdef useOneMsgBuf
 	Aero_Status_Message.ID,
 	ARH_Offset.ID,
 	Bat_Hybrid_Status.ID,
@@ -464,19 +469,24 @@ uint16_t idarray[] = {
 	Ignition.ID,
 	Injection_2.ID,
 	Injection_1.ID,
+	#endif
 };
 
 uint16_t idToOffset(uint16_t id) {
+	#ifdef useOneMsgBuf
 	for(uint16_t i = 0; i < sizeof(idarray) / sizeof(uint16_t); i++) {
 		if(idarray[i] == id) return i;
 	}
+	#endif
 	return -1;
 }
 
 void copyToBuffer(const StallardOSCanMessage *msg){
 	if(msg == nullptr) return;
+	#ifdef useOneMsgBuf
 	uint16_t offset = idToOffset(msg->ID);
 	if(offset < sizeof(canarray) / sizeof(StallardOSCanMessage*)) {
 		*(canarray[offset]) = *(msg);
 	}
+	#endif
 }
