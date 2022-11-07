@@ -8,8 +8,9 @@ extern stack_T taskPerfmonStack[2048];
     extern stack_T taskSFOCStack[256];
 #endif
 
-
+#ifdef BusyLoop
 void taskMain(void);
+#endif
 void taskPerfmon(void);
 
 #ifdef useSFOC

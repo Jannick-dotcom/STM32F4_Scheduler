@@ -17,6 +17,7 @@
 #define SV_SYSRESET 4
 #define SV_ACTIVATE_PRIV 5
 #define SV_DEACTIVATE_PRIV 6
+#define SV_USAGE_CALC 7
 
 
 /* callable c abstractions */

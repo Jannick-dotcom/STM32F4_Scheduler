@@ -28,6 +28,7 @@ static inline volatile uint32_t &periphBit(uint32_t addr, int bitNum) // periphe
   return MMIO32(0x42000000 + ((addr & 0xFFFFF) << 5) + (bitNum << 2)); // uses bit band memory
 }
 
+#ifndef notHaveCan
 #ifdef STM32F417xx
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
@@ -45,6 +46,7 @@ StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),S
 #endif
 #ifdef STM32F1xxxx
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
+#endif
 #endif
 
 bool StallardOSCAN::can1used = false;
@@ -93,8 +95,8 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
 #ifndef STM32F415xx
     if (port == StallardOSCAN1 && can1used == false)
     {
-        MMIO32(apb2enr) |= (1 << 3) | (1 << 0); // enable gpioB = b3 and afio = b0 clks
-        MMIO32(mapr) |= (2 << 13);              // alt func, CAN remap to B9+B8 
+        // MMIO32(apb2enr) |= (1 << 3) | (1 << 0); // enable gpioB = b3 and afio = b0 clks
+        // MMIO32(mapr) |= (2 << 13);              // alt func, CAN remap to B9+B8 
         MMIO32(crhB) &= 0xFFFFFF00;             // clear control bits for pins 8 & 9 of Port B
         MMIO32(crhB) |= 0b1000;              // pin8 for rx, b0100 = b01xx, floating, bxx00 input
         periphBit(odrB, 8) = true;            // set input will pullup resistor for single wire with pullup mode
@@ -169,9 +171,8 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     
     if (HAL_CAN_Init(&canhandle) != HAL_OK)
     {
-
         this->sem.give(); //release Semaphore
-
+        DEBUGGER_BREAK();
         StallardOSGeneralFaultHandler();
     }
 
@@ -309,12 +310,14 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
                         fifoPtr[k].used = 1;                            //Indicate Message is occupied
                         fifoPtr[k].timestamp = StallardOSTime_getTimeUs(); //Save timestamp
                         fifoPtr[k].dlc = RxHeader.DLC;
+                        #ifdef useOneMsgBuf
                         StallardOSCanMessage temp;
                         temp.ID = RxHeader.StdId;
                         temp.timestamp = fifoPtr[k].timestamp;
                         temp.Val = fifoPtr[k].Val;
                         temp.used = true;
                         copyToBuffer(&temp);
+                        #endif
                     }
                     break; //If unused found go with next message
                 }
@@ -327,12 +330,14 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
                         fifoPtr[oldestMessage].used = 1;                            //Indicate still used
                         fifoPtr[oldestMessage].timestamp = StallardOSTime_getTimeUs(); //save new Timestamp
                         fifoPtr[oldestMessage].dlc = RxHeader.DLC;
+                        #ifdef useOneMsgBuf
                         StallardOSCanMessage temp;
                         temp.ID = RxHeader.StdId;
                         temp.timestamp = fifoPtr[oldestMessage].timestamp;
                         temp.Val = fifoPtr[k].Val;
                         temp.used = true;
                         copyToBuffer(&temp);
+                        #endif
                     }
                     break; //If unused found go with next message
                 }

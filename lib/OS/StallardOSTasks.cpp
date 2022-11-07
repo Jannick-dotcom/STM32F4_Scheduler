@@ -35,8 +35,7 @@ void taskMain(void)
   
 }
 
-
-
+#ifndef notHaveCan
 void taskPerfmon(void){
 
     volatile struct function_struct *task;
@@ -90,18 +89,19 @@ void taskPerfmon(void){
     total_calc_time_us = 0;
     idle_calc_time_us = 0;
 
+    // get idle task cpu load and compare this to the total time
+    idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
+    taskMainStruct->perfmon_exec_time_us = 0;
+
     // iterate over all tasks to get used cpu time since last scan
-    task = taskMainStruct->next->next;
-    do{
+    task = taskMainStruct->next;
+    do {
       total_calc_time_us += task->perfmon_exec_time_us;
       task->perfmon_exec_time_us = 0;
       task = task->next;
-    }
-    while(task != taskMainStruct);
+    } while(task != taskMainStruct);
 
-    // get idle task cpu load and compare this to the total time
-    idle_calc_time_us = taskMainStruct->perfmon_exec_time_us;
-    cpu_load = ((100000000/total_calc_time_us)-100);
+    cpu_load = (1000*total_calc_time_us) / (idle_calc_time_us + total_calc_time_us);
     *load = cpu_load;
     
 
@@ -124,6 +124,7 @@ void taskPerfmon(void){
     StallardOS::yield();
   }
 }
+#endif // notHaveCan
 
 #ifdef useSFOC
   void taskSFOC(void){
