@@ -14,7 +14,10 @@
 #include <system_stm32f1xx.h>
 #endif
 
-#if BuildType == debug 
+#define releaseBuild 1
+#define debugBuild 0
+
+#if BuildType == debugBuild
 #define DEBUGGER_BREAK() asm("bkpt")
 #else
 #define DEBUGGER_BREAK()
