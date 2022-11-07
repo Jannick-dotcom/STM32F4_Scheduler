@@ -1,36 +1,6 @@
 #include "StallardOSconfig.h"
 #include "StallardOSHelpers.h"
 
-uint32_t findExternalClock()
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  __HAL_RCC_PWR_CLK_ENABLE();
-  /* The voltage scaling allows optimizing the power consumption when the device is
-       clocked below the maximum system frequency, to update the voltage scaling value
-       regarding system frequency refer to product datasheet. */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON; /* External xtal on OSC_IN/OSC_OUT */
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    DEBUGGER_BREAK();
-  }
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV8;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
-  {
-    DEBUGGER_BREAK();
-  }
-
-  return SystemCoreClock;
-}
-
 void StallardOS_SetSysClock(uint8_t clockspeed, oscillatorType oscType)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
