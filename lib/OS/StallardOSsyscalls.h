@@ -18,6 +18,7 @@
 #define SV_ACTIVATE_PRIV 5
 #define SV_DEACTIVATE_PRIV 6
 #define SV_USAGE_CALC 7
+#define SV_Check_Signal 8
 
 
 /* callable c abstractions */

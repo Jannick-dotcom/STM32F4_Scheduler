@@ -368,9 +368,25 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
         // jumpToBootloader();
         break;
     case SV_PENDSV:
-        pendPendSV();
+        if(nextTask != NULL) 
+        {
+            #ifndef BusyLoop
+            HAL_PWR_DisableSleepOnExit();
+            #endif
+            pendPendSV();
+        }
+        else 
+        {
+            #ifndef BusyLoop
+            HAL_PWR_EnableSleepOnExit();
+            #else
+            nextTask = taskMainStruct;
+            #endif
+        }
         break;
     case SV_STARTMAIN:
+        findNextFunction();
+        currentTask = nextTask;
         start_mainTask();
         break;
     case SV_SYSRESET:
@@ -449,9 +465,20 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         }
 
         findNextFunction();
-        if(currentTask != nextTask && !(currentTask == taskMainStruct && nextTask == NULL))
+        if(currentTask != nextTask && nextTask != NULL)
         {
+            #ifndef BusyLoop
+            HAL_PWR_DisableSleepOnExit();
+            #endif
             pendPendSV(); //If nextTask is not this task, set the PendSV to pending
+        }
+        else if(nextTask == NULL)
+        {
+            #ifndef BusyLoop
+            HAL_PWR_EnableSleepOnExit();
+            #else
+            nextTask = taskMainStruct;
+            #endif
         }
     }
     enable_interrupts(); //enable all interrupts

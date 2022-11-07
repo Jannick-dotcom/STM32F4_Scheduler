@@ -35,19 +35,77 @@ extern "C" void findNextFunction();
  */
 void taskOnEnd(void)
 {
-    currentTask->used = 0;
-    if(!currentTask->staticAlloc)
-    {
-      free((uint32_t*)currentTask->stackBase);
-    }
-    currentTask->prev->next = currentTask->next;
+  disable_interrupts();
+  currentTask->used = 0;
+  if(!currentTask->staticAlloc)
+  {
+    free((uint32_t*)currentTask->stackBase);
+  }
+  if(currentTask->next != nullptr)
+  {
     currentTask->next->prev = currentTask->prev;
-    currentTask->executable = 0;
-    currentTask = taskMainStruct;
-    nextTask = taskMainStruct;
-    CALL_PENDSV();
-    while(1);
+  }
+  if(currentTask->prev != nullptr)
+  {
+    currentTask->prev->next = currentTask->next;
+  }
+  currentTask->executable = 0;
+  enable_interrupts();
+  while(1);
 }
+
+/**
+ * Signal handler
+ * A signal from another task is handled here.
+ *
+ * @param
+ * @return
+ */
+void StallardOS::signal_handler(signals signal_code, function_struct *receivingTask)
+{
+  if(receivingTask != nullptr && receivingTask != taskMainStruct)
+  {
+    if(receivingTask->signalHandlers[signal_code] != nullptr) //if signal handler exists for this signal
+    {
+      void (*signalHandler)() = (void (*)())(receivingTask->signalHandlers[signal_code]); //call this signal handler
+      signalHandler();
+    }
+    else //Otherwise call the default handler for this signal
+    {
+      taskOnEnd();
+    }
+  }
+}
+
+uint8_t StallardOS::registerSignalHandler(signals signal_code, void (*signal_handler)())
+{
+  if(currentTask != nullptr && currentTask->signalHandlers[signal_code] == nullptr) //if signal handler was not assigned yet
+  {
+    currentTask->signalHandlers[signal_code] = (void *)signal_handler; //save signal handler
+    return 1;
+  }
+  else //otherwise not successful
+  {
+    return 0;
+  }
+}
+
+void StallardOS::sendSignal(signals signal_code, uint16_t id)
+{
+  function_struct *tmp = searchFunction(id);
+  if(tmp != nullptr)
+  {
+    for(auto i = 0U; i < sizeof(tmp->rcvSignal) / sizeof(tmp->rcvSignal[0]); i++)
+    {
+      if(tmp->rcvSignal[i] == SIG_NONE)
+      {
+        tmp->rcvSignal[i] = signal_code;
+        break;
+      }
+    }
+  }
+}
+
 
 /**
  * Create StallardOS RTOS.
@@ -68,28 +126,27 @@ StallardOS::StallardOS()
   TCBsCreated = 0;
   // //Für Context Switch
   createTCBs();
-  // #ifdef internalClock
-  //   //StallardOS_SetSysClock(runFreq, internal);
-  // #else
-  //   StallardOS_SetSysClock(runFreq, external);
-  // #endif
-  // if(SystemCoreClock != (runFreq * 1000000))
-  // {
-  //   DEBUGGER_BREAK();
-  // }
+  SysTick_Config(SystemCoreClock / 1000);
   initShared();
 
   #if defined(useMPU)
     initMPU();
   #endif // useMPU
 
+  #ifdef BusyLoop
   taskMainStruct = addFunctionStatic(taskMain, -1, taskmainStack, sizeof(taskmainStack));
+  if(taskMainStruct == nullptr) 
+  {
+    DEBUGGER_BREAK();
+    while(1);
+  };
+  #endif
+  #ifndef notHaveCan
   addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
+  #endif
   #ifdef useSFOC
      addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
   #endif
-
-  if(taskMainStruct == nullptr) while(1);
 }
 
 /**
@@ -349,6 +406,11 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
     }
   }
 
+  for (uint8_t i = 0; i < sizeof(function_struct::signalHandlers) / sizeof(void *); i++)
+  {
+    function_struct_ptr->signalHandlers[i] = nullptr;
+  }
+
 
   /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
@@ -605,6 +667,22 @@ void StallardOS::delay(uint32_t milliseconds)
     // nextTask = taskMainStruct;
     findNextFunction();
     CALL_PENDSV();
+    for(uint8_t i = 0; i < sizeof(currentTask->rcvSignal)/sizeof(signals); i++)
+    {
+      if(currentTask->rcvSignal[i] != SIG_NONE)
+      {
+        if(currentTask->signalHandlers[currentTask->rcvSignal[i]] != NULL) //if signal handler exists for this signal
+        {
+          void (*signalHandler)() = (void (*)())(currentTask->signalHandlers[currentTask->rcvSignal[i]]); //call this signal handler
+          signalHandler();
+        }
+        else //Otherwise call the default handler for this signal
+        {
+          taskOnEnd();
+        }
+        break;
+      }
+    }
   }
 }
 
@@ -643,9 +721,7 @@ void StallardOS::yield()
     currentTask->lastYield = StallardOSTime_getTimeMs();
     if(currentTask->refreshRate != 0)
     {
-      currentTask->continue_ts = StallardOSTime_getTimeMs() + (1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart); //Calculate next execution time so we can hold the refresh rate
-      findNextFunction();
-      CALL_PENDSV();
+      delay((1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart));
       currentTask->lastStart = StallardOSTime_getTimeMs();
     }
   }

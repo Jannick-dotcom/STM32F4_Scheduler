@@ -47,13 +47,20 @@ extern "C"
 }
 #endif
 
-typedef enum
+typedef enum signals
 {
-  // NEW = 0,
-  RUNNING = 1,
-  PAUSED,
-  STOPPED
-} taskState;
+  SIG_NONE = 0,
+  SIG_KILL,
+  SIG_Exception,
+  SIG_StackOverflow,
+  SIG_StackUnderflow,
+  SIG_FloatException,
+  SIG_divByZero,
+  SIG_segmentationFault,
+  SIG_Interrupt,
+  SIG_Notification,
+  StallardOS_signalcount
+} signals;
 
 typedef uint32_t stack_T;
 
@@ -80,7 +87,8 @@ struct function_struct
   volatile uint8_t used;       // Ist dieser TCB schon belegt?
   volatile uint8_t executable; // Funktion ausführen?
 
-  // volatile uint8_t error; //Error in Task scheduling has happened
+  signals rcvSignal[StallardOS_signalcount*2]; // Signal, das empfangen wurde
+  void *signalHandlers[StallardOS_signalcount]; // Signal handler for each signal
 
   // nur für KontextSwitch
   volatile uint16_t refreshRate;

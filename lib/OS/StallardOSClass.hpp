@@ -24,7 +24,7 @@ private:
   void initMPU(void);                                               // setup the static part of the MPU configuration
 
   struct function_struct *initTask(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs = 0);
-
+  void signal_handler(signals signal_code, function_struct *receivingTask);
 
 public:
   //Constructor 
@@ -33,6 +33,10 @@ public:
   //Functions to add functions
   struct function_struct *addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs=0);
   struct function_struct *addFunctionStatic(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs=0);
+
+  uint8_t registerSignalHandler(signals signal_code, void (*signal_handler)());
+  void sendSignal(signals signal_code, uint16_t id);
+
 
   void remove_all_functions(void); //Remove all functions
 

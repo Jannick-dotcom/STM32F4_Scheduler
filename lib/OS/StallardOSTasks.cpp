@@ -26,14 +26,12 @@ stack_T taskPerfmonStack[2048];
  * @param 
  * @return
  */
+#ifdef BusyLoop
 void taskMain(void)
 {
-  
-  while (1)
-  {
-  }
-  
+  while (1);
 }
+#endif
 
 #ifndef notHaveCan
 void taskPerfmon(void){
