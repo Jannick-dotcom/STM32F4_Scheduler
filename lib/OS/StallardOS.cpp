@@ -18,6 +18,7 @@ extern "C" stack_T _eshared;
 volatile struct function_struct* volatile currentTask = nullptr;
 volatile struct function_struct* volatile nextTask = nullptr;
 volatile struct function_struct* volatile taskMainStruct = nullptr;
+struct function_struct taskArray[countTasks];
 
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
@@ -41,16 +42,10 @@ void taskOnEnd(void)
   {
     free((uint32_t*)currentTask->stackBase);
   }
-  if(currentTask->next != nullptr)
-  {
-    currentTask->next->prev = currentTask->prev;
-  }
-  if(currentTask->prev != nullptr)
-  {
-    currentTask->prev->next = currentTask->next;
-  }
   currentTask->executable = 0;
   enable_interrupts();
+  findNextFunction();
+  CALL_STARTMAIN();
   while(1);
 }
 
@@ -162,7 +157,7 @@ void StallardOS::createTCBs()
     return;
   }
 
-  for (uint8_t i = 0; i < sizeof(taskArray) / sizeof(function_struct); i++)
+  for (uint16_t i = 0; i < sizeof(taskArray) / sizeof(function_struct); i++)
   {
     struct function_struct *temp;
     temp = &taskArray[i]; //new struct function_struct;
@@ -383,23 +378,15 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   if (first_function_struct == nullptr) //Wenn noch keine funktion hinzugefügt wurde
   {
     first_function_struct = function_struct_ptr; //Funktion als erste setzen
-    function_struct_ptr->next = function_struct_ptr;
-    function_struct_ptr->prev = function_struct_ptr;
   }
-  else //wenn bereits eine funktion hinzugefügt wurde
-  {
-    function_struct_ptr->next = first_function_struct;
-    first_function_struct->prev->next = function_struct_ptr;
-    function_struct_ptr->prev = first_function_struct->prev;
-    first_function_struct->prev = function_struct_ptr;
-  }
+  
   //alle Werte übertragen
   function_struct_ptr->function = function;
   function_struct_ptr->executable = true;
   function_struct_ptr->priority = prio;
-  for (uint16_t i = 0; i < countTasks+1; i++)
+  for (uint16_t i = 0; i < countTasks; i++)
   {
-    if(this->taskArray[i].used == 0)
+    if(taskArray[i].used == 0)
     {
       function_struct_ptr->id = i;
       break;
@@ -415,7 +402,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
   function_struct_ptr->lastYield = 0;
-  function_struct_ptr->lastStart = 0;
+  function_struct_ptr->lastStart = StallardOSTime_getTimeMs();
   function_struct_ptr->watchdog_limit = watchdogLimitMs;
   function_struct_ptr->watchdog_exec_time_us = 0;
   function_struct_ptr->watchdog_swapin_ts = 0;
@@ -473,7 +460,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
  * @param function Task to execute.
  * @param prio priority of the task, lower means higher.
  * @param stackSize amount of Stack bytes to allocate, must at least be 130 Bytes (FPU ctx switch), for MPU stackSize*address_len must be power of 2 in MPU mode.
- * @param refreshRate frequency of execution through the normal scheduler. <= 1000 !
+ * @param refreshRate frequency of execution through the normal scheduler. 0 > x >= 1000
  * @return pointer to the created tcb.
  */
 struct function_struct *StallardOS::addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate, uint16_t watchdogLimitMs)
@@ -564,7 +551,7 @@ struct function_struct *StallardOS::addFunctionStatic(void (*function)(), uint8_
  */
 void StallardOS::remove_all_functions()
 {
-  for (uint8_t i = 0; i < sizeof(taskArray) / sizeof(function_struct); i++)
+  for (uint16_t i = 0; i < sizeof(taskArray) / sizeof(function_struct); i++)
   {
     taskArray[i].used = false;
   }
@@ -608,28 +595,20 @@ void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
  */
 struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
 {
-  uint16_t i = 0;
-  volatile struct function_struct *temp = first_function_struct; //temporärer pointer erzeugen
+  volatile struct function_struct *temp = nullptr; //temporärer pointer erzeugen
 
   if (temp == nullptr)
   {
     return nullptr;
   }
-
-  while (temp->id != id) //Solange Funktion noch nicht gefunden wurde
+  for (uint16_t i = 0; i < countTasks; i++)
   {
-    if (temp != first_function_struct || i == 0)
+    if (taskArray[i].id == id)
     {
-      temp = temp->next; //wenn nicht nächstes element anschauen
-      i++;
-    }
-    else
-    {
-      return nullptr; //wenn am ende der liste angekommen aufhören und zurück in main springen
+      return (struct function_struct *)&taskArray[i];
     }
   }
-  //Hier haben wir das richtige element schon gefunden -> temp
-  return (function_struct*)temp; //Element übergeben
+  return nullptr; //Nicht gefunden
 }
 
 /**
@@ -638,7 +617,7 @@ struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
  */
 struct function_struct *StallardOS::searchFreeFunction(void)
 {
-  for(uint8_t i = 0; i < sizeof(this->taskArray) / sizeof(function_struct); i++)
+  for(uint16_t i = 0; i < countTasks; i++)
   {
     if(taskArray[i].used == 0)
     {
@@ -881,11 +860,11 @@ void StallardOS::startOS(void)
  * Search a task in the list
  *
  * @param id unique id of the task.
- * @param exec_freq new execution frequency of the task
+ * @param exec_freq new execution frequency of the task in Hz. 0 > x >= 1000
  */
 void StallardOS::setFunctionFrequency(/*Funktion*/ uint16_t id, float exec_freq)
 {
-  if (exec_freq <= 0) //Make sure the parameters are correct
+  if (exec_freq <= 0 || exec_freq > 1000) //Make sure the parameters are correct
   {
     return;
   }

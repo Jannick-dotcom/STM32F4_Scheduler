@@ -5,6 +5,7 @@
 extern volatile struct function_struct* volatile currentTask;
 extern volatile struct function_struct* volatile taskMainStruct;
 extern volatile struct function_struct* volatile nextTask;
+extern struct function_struct taskArray[countTasks];
 
 const stack_T watchdog_swapin_offset = offsetof(struct function_struct, watchdog_swapin_ts);
 const stack_T perfmon_swapin_offset = offsetof(struct function_struct, perfmon_swapin_ts);
@@ -67,20 +68,22 @@ __attribute__((always_inline)) inline void pendPendSV()
 
 void findNextFunction()
 {
+    #ifdef BusyLoop
     nextTask = taskMainStruct;
-    volatile struct function_struct* temp = currentTask->next;
+    #endif
+    volatile struct function_struct* temp;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
-    if(temp == NULL)
+    for (uint16_t i = 0; i < countTasks; i++)
     {
-        DEBUGGER_BREAK();  //Zeige debugger
-        return;
-    }
-    do
-    {
-        if(temp->used == 0) //If the TCB is unused, continue with the next one
+        temp = &(taskArray[i]);
+        if(temp == NULL)
         {
             DEBUGGER_BREAK();  //Zeige debugger
-            temp = temp->next;
+            return;
+        }
+        if(temp->used == 0) //If the TCB is unused, continue with the next one
+        {
+            //DEBUGGER_BREAK();  //Zeige debugger
             continue;
         }
         
@@ -88,15 +91,12 @@ void findNextFunction()
         {
             if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is still waiting for the semaphore
             {
-                temp = temp->next;
                 continue;
             }
             nextTask = temp;          //set nextF to right now highest priority task
             prioMin = temp->priority; //save prio
         }
-        temp = temp->next; //Nächsten Task
     }
-    while (temp != currentTask->next);   
 }
 
 
@@ -114,7 +114,7 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
   {
     return;
   }
-  currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
+  task->Stack = (stack_T*)((stack_T)task->stackBase + (task->stackSize - sizeof(stack_T))); //End of Stack
   //Prepare initial stack trace
   task->Stack--;
   *task->Stack = (uint32_t)0x01000000;
@@ -148,14 +148,14 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
     *task->Stack = i;
   }
   //////////////////////////////
-  if(currentTask->semVal != NULL){
-      if(currentTask->waitingForSemaphore == 0){
+  if(task->semVal != NULL){
+      if(task->waitingForSemaphore == 0){
           // only execute, if semaphore is actually owned by task (take finished)
 
           /* normal write access to semaphore is ok in this context, 
           * as no other task may execute during hardFault 
           */
-          *(currentTask->semVal) = 1; //Semaphore freigeben
+          *(task->semVal) = 1; //Semaphore freigeben
           __CLREX();  // reset exclusive monitor
       }
       else{
@@ -165,8 +165,8 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
           DEBUGGER_BREAK();
       }
   }
-  currentTask->waitingForSemaphore = 0;
-  currentTask->semVal = 0; //Semaphore von task lösen
+  task->waitingForSemaphore = 0;
+  task->semVal = 0; //Semaphore von task lösen
   task->continue_ts = HAL_GetTick();
   task->executable = 1;
 }
@@ -184,7 +184,7 @@ __attribute__((always_inline)) inline void switchTask(void)
     __ASM volatile("MRS r0, PSP\n"         //Get Process Stack Pointer
                     "ISB\n"
 
-                    #ifdef STM32F4xxxx
+                    #ifdef __FPU_PRESENT
                     #ifdef useFPU
                     "TST r14, #0x10\n"  //store vfp registers, if task was using FPU
                     "IT eq\n"
@@ -218,7 +218,7 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "LDMIA r0!, {r4-r11, r14}\n"   //load registers from memory
                     #endif
 
-                    #ifdef STM32F4xxxx
+                    #ifdef __FPU_PRESENT
                     #ifdef useFPU
                     "TST r14, #0x10\n"
                     "IT eq\n"
@@ -343,14 +343,28 @@ __attribute__((always_inline)) inline void start_mainTask(){
     "MSR PSP, r0\n"           //set PSP
     "ISB\n"
     
-    // "MOV %0, #1" //Set function state to running
     "LDR r1, =nextTask\n"
     "MOV r2, #0\n"
     "STR r2, [r1]\n"
+    
     "MOV lr, #0xfffffffd\n"
-    "bx lr\n" /*: "=r"(currentTask->State)*/);
+    "bx lr\n");
 }
 
+void clc_cpu_usage()
+{
+    asm("stmdb sp!, {r4-r11}");
+    uint64_t us_ts = (uwTick * 1000) + SysTick->LOAD - (SysTick->VAL / (SystemCoreClock / 1000000));
+
+    currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
+    currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
+
+    // watchdog can be reset independently of perfmon
+    // therefore 2 vars are required
+    nextTask->watchdog_swapin_ts = us_ts;
+    nextTask->perfmon_swapin_ts = us_ts;
+    asm("ldmia sp!, {r4-r11}");
+}
 
 __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned int *svc_args ) //Optimize Attribute makes sure no frame pointer is used
 {
@@ -386,8 +400,23 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
         break;
     case SV_STARTMAIN:
         findNextFunction();
-        currentTask = nextTask;
-        start_mainTask();
+        if(nextTask == NULL)
+        {
+            #ifndef BusyLoop
+            HAL_PWR_EnableSleepOnExit();
+            #else
+            currentTask = taskMainStruct;
+            #endif
+            // start_mainTask();
+        }
+        else 
+        {
+            currentTask = nextTask;
+            #ifndef BusyLoop
+            HAL_PWR_DisableSleepOnExit();
+            #endif
+            start_mainTask();
+        }
         break;
     case SV_SYSRESET:
         NVIC_SystemReset();
@@ -398,6 +427,9 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
         break;
     case SV_DEACTIVATE_PRIV:
         disable_privilege();
+        break;
+    case SV_USAGE_CALC:
+        clc_cpu_usage();
         break;
     #endif
     default:    /* unknown SVC */
@@ -421,7 +453,6 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler(void) //Optimize 
   ) ;
 }
 
-
 /**
  * Systick Handler for an Exception every x ms. Minimum is 11 Hz
  *
@@ -434,24 +465,20 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
     HAL_IncTick();
     if(currentTask != NULL)
     {
-        volatile struct function_struct *temp = currentTask;
-        do
+        
+        if((stack_T)currentTask->Stack > (((stack_T)currentTask->stackBase + currentTask->stackSize)) || currentTask->Stack < currentTask->stackBase) //Stack overflow and underflow check
         {
-            if((stack_T)temp->Stack > (((stack_T)temp->stackBase + temp->stackSize)) || temp->Stack < temp->stackBase) //Stack overflow and underflow check
-            {
-                DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
-                temp->executable = 0;
-            }
-
-            if(temp->refreshRate > 0 && (temp->lastYield - temp->lastStart) > (1000 / temp->refreshRate)) //Task timeout check
-            {
-                DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
-                // task is not prevented from further execution
-                // as it's not corrupting/influencing any higher prio tasks
-            }
-            temp = temp->next;
+            DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
+            enable_interrupts();
+            CALL_SYSRESET();    //System might be damaged too much to continue, so reset
         }
-        while (temp != currentTask); 
+
+        if(currentTask->refreshRate > 0 && (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate) && currentTask->used) //Task timeout check
+        {
+            DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
+            // task is not prevented from further execution
+            // as it's not corrupting/influencing any higher prio tasks
+        }
 
         // test if the currently executing task is already exceeding the watchdog
         // as watchdog calc time is only updated on task swapOut/swapIn, 
@@ -480,6 +507,10 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
             nextTask = taskMainStruct;
             #endif
         }
+        else
+        {
+            HAL_PWR_DisableSleepOnExit();
+        }
     }
     enable_interrupts(); //enable all interrupts
 }
@@ -493,104 +524,12 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
  */
 __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize Attribute makes sure no frame pointer is used
 {
+    // _SVC(SV_USAGE_CALC);
     disable_interrupts();
-
     // DO NOT USE C
     // the compiler doesn't properly restore all registers
     //
-
-    // uint32_t *SysTick_VAL = (uint32_t*)(SysTick_BASE + 0x08);
-    // uint64_t us_ts = (uwTick* 1000) + (*SysTick_VAL / (SystemCoreClock / 1000000));
-
-    // currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
-    // currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
-
-    // // watchdog can be reset independently of perfmon
-    // // therefore 2 vars are required
-    // nextTask->watchdog_swapin_ts = us_ts;
-    // nextTask->perfmon_swapin_ts = us_ts;
-
-
-    __ASM volatile(
-        "PUSH {r4-r6}\n"
-
-        "LDR r0, =#0xe000e018\n" // load &SysTick_VAL into r0
-        "LDR r0, [r0]\n" // load SysTick_VAL
-
-        // load the divisor for the systick counter (SystemCoreClock/1000000)
-        "LDR r1, =SystemCoreClock\n" // load address of SystemCoreCLok
-        "LDR r1, [r1]\n" // load value of SystemCoreClock
-        "LDR r2, =#1000000\n"
-        "UDIV r1, r2\n" // SystemCoreClock/1000000
-        "UDIV r2, r0, r1\n" // div Systick value with sysclock divisor
-        // r2 holds current ns of Systick register
-
-        "LDR r0, =#0xe000e014\n" // load &SysTick_LOAD into r0
-        "LDR r0, [r0]\n" // load SysTick_LOAD
-        "SUB r2, r0, r2\n"
-
-        // next get uwTick [ms] counter into r0
-        "LDR r0, =uwTick\n" // load address of HAL systick value
-        "LDR r0, [r0]\n" // load value of systick in ms
-
-        // and multiply with 1000 to convert to ns
-        "LDR r1, =#1000\n"
-        "UMULL r0, r1, r0, r1\n" // multiply uwTick*1000, result is r0=lowerH and r1=upperH
-        "ADDS r0, r2\n" // lowerH of 64bit + 32bit number
-        "ADC r1, #0\n" // take over carry bit
-        //===================================
-        // us_ts is now in r0 and r1
-
-        // update watchdog variables next
-        // first load required offsets
-        // currentTask into r2
-        // watchdog_exec_time_us into r3
-        // watchdog_swapin_ts into r4
-
-        "LDR r2, =currentTask\n" // **currentTask
-        "LDR r2, [r2]\n" // load pointer to currentTask
-
-        "LDR r3, =watchdog_exec_offset\n"
-        "LDR r3, [r3]\n" // offset of watchdog_exec_time_us
-        "ADD r3, r2\n" // load addr of exec_time_us
-
-        "LDR r4, =watchdog_swapin_offset\n"
-        "LDR r4, [r4]\n" // offset value of watchdog_swapin_ts
-        "ADD r4, r2\n" // load addr of swapin_ts
-
-        // // load the last swapin_ts and substract it from us_ts
-        // // then save it back to exec_offset
-        "LDM r4, {r5, r6}\n"
-
-        
-        // substraction of us_ts-sapin_ts into r5=low, r6=high
-        "SUBS r5, r0, r5\n" // 64bit sub of us_ts-watchdog_swapin
-        "SBC r6, r1, r6\n"
-        "STM r3, {r5, r6}\n" // write back to watchdog_exec_time_us
-
-        // load us_ts into watchdog_swapin_ts
-        // addr of swapin_ts is still stored in r4
-        "STM r4, {r0, r1}\n"
-
-        //==========================================
-        // repeat the same calculation for perfmon_* instead of watchdog_*
-        "LDR r3, =perfmon_exec_offset\n"
-        "LDR r3, [r3]\n"
-        "ADD r3, r2\n"
-        "LDR r4, =perfmon_swapin_offset\n"
-        "LDR r4, [r4]\n"
-        "ADD r4, r2\n"
-        "LDM r4, {r5, r6}\n"
-        "SUBS r5, r0, r5\n"
-        "SBC r6, r1, r6\n"
-        "STM r3, {r5, r6}\n"
-        "STM r4, {r0, r1}\n"
-
-        "POP {r4-r6}"
-    );
-    
-
-
+    // clc_cpu_usage();
     switchTask();
 
     #ifdef useMPU

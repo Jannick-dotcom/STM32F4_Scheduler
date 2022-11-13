@@ -77,9 +77,6 @@ struct function_struct
   uint8_t mpu_subregions;
 #endif // useMPU
 
-  volatile struct function_struct *prev; // für verkettete liste
-  volatile struct function_struct *next; // für verkettete liste
-
   // Must have Variablen
   void (*function)();          // Auszuführende Funktion
   volatile uint8_t priority;   // Priorität 0 wird nicht unterbrochen außer Prozess wünscht es durch ein Delay
