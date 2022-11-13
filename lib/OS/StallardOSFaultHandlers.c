@@ -7,6 +7,7 @@ extern struct function_struct *nextTask;
 
 void prepareInitialStack()
 {
+  currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
     //Prepare initial stack trace
   currentTask->Stack--;
   *currentTask->Stack = (uint32_t)0x01000000;
@@ -50,10 +51,9 @@ void StallardOSGeneralFaultHandler() //restarts a Task when a fault occurs
     asm("MRSNE	R0, PSP");
 
     asm("LDR	R0, [R0, #24]"); //PC is in R0
-    // DEBUGGER_BREAK();
-    if (taskMainStruct != 0)
+    DEBUGGER_BREAK();
+    if (currentTask != 0)
     {
-        currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
         prepareInitialStack();
         // currentTask->State = PAUSED; //Set Task state as new
         currentTask->continue_ts = HAL_GetTick() + 500; //Restart Task in 5 s
@@ -104,7 +104,7 @@ __attribute__((naked)) void HardFault_Handler()
     "MOV r2, #0\n"
     "STR r2, [r1]\n"
     "MOV lr, #0xfffffffd\n"
-    "bx lr\n" /*: "=r"(currentTask->State)*/);
+    "bx lr\n");
 }
 
 void NMI_Handler()
@@ -128,7 +128,7 @@ void UsageFault_Handler()
     StallardOSGeneralFaultHandler();
 }
 
-#ifdef STM32F4xxxx
+#ifdef __FPU_PRESENT
 #ifdef useFPU
 // FPU IRQ Handler
 void FPU_IRQHandler()
