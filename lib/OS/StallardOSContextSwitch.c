@@ -529,7 +529,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize A
     // DO NOT USE C
     // the compiler doesn't properly restore all registers
     //
-    // clc_cpu_usage();
+    clc_cpu_usage();
     switchTask();
 
     #ifdef useMPU
