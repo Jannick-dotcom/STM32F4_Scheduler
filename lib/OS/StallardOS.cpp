@@ -818,42 +818,44 @@ void StallardOS::startOS(void)
   StallardOS_SetSysClock(runFreq, external);
   if(SystemCoreClock != (runFreq * 1000000))
   {
-      DEBUGGER_BREAK();
+    DEBUGGER_BREAK();
   }
 
+  #ifdef BusyLoop
   if (first_function_struct != nullptr)
   {
     currentTask = first_function_struct; //The current Task is the first one in the List
-    #ifdef STM32F4xxxx
-    FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
-    #endif
-    SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
-    #ifdef useFPU
-    #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-    SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
-    #endif
-    #endif
-    __ASM volatile("DSB");
-    __ASM volatile("ISB");
-
-    SysTick_Config(SystemCoreClock / (uint32_t)1000); //Counting every processor clock
-    NVIC_SetPriority(SysTick_IRQn, 0xFF);
-    NVIC_SetPriority(PendSV_IRQn, 0xFF);
-
-    NVIC_EnableIRQ(PendSV_IRQn);
-    NVIC_EnableIRQ(SysTick_IRQn);
-    NVIC_EnableIRQ(SVCall_IRQn);
-    #if defined(useFPU) && (__FPU_PRESENT == 1)
-    NVIC_EnableIRQ(FPU_IRQn);
-    #endif
-    __ASM volatile("MRS R0, MSP\n"
-                   "SUB R0, #200\n" //Reserve some space for Handlers (200 Byte)
-                   "MSR PSP, R0");
-    __ASM volatile("dsb");
-    __ASM volatile("isb");
-    enable_interrupts();
-    CALL_STARTMAIN();
   }
+  #endif
+  #ifdef STM32F4xxxx
+  FLASH->ACR |= (1 << FLASH_ACR_PRFTEN_Pos) | (1 << FLASH_ACR_ICEN_Pos) | (1 << FLASH_ACR_DCEN_Pos); //Enable the Flash ART-Accelerator
+  #endif
+  SCB->CCR |= 1 << SCB_CCR_DIV_0_TRP_Pos | 1 << SCB_CCR_UNALIGN_TRP_Pos;
+  #ifdef useFPU
+  #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+  SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  //Set the FPU to full access
+  #endif
+  #endif
+  __ASM volatile("DSB");
+  __ASM volatile("ISB");
+
+  SysTick_Config(SystemCoreClock / (uint32_t)1000); //Counting every processor clock
+  NVIC_SetPriority(SysTick_IRQn, 0xFF);
+  NVIC_SetPriority(PendSV_IRQn, 0xFF);
+
+  NVIC_EnableIRQ(PendSV_IRQn);
+  NVIC_EnableIRQ(SysTick_IRQn);
+  NVIC_EnableIRQ(SVCall_IRQn);
+  #if defined(useFPU) && (__FPU_PRESENT == 1)
+  NVIC_EnableIRQ(FPU_IRQn);
+  #endif
+  __ASM volatile("MRS R0, MSP\n"
+                  "SUB R0, #200\n" //Reserve some space for Handlers (200 Byte)
+                  "MSR PSP, R0");
+  __ASM volatile("dsb");
+  __ASM volatile("isb");
+  enable_interrupts();
+  CALL_STARTMAIN();
 }
 
 /**
