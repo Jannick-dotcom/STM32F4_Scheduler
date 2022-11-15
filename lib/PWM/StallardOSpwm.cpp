@@ -95,7 +95,6 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
 
     this->sem.take();
 
-    // this->gpio = StallardOSGPIO(number, port, AFPP, nopull, mapToAlternateFunction(instance));
     this->freq = freq;
     this->channel = channel;
     this->bitcount = bitcount;
@@ -104,20 +103,20 @@ StallardOSpwm::StallardOSpwm(TIM_TypeDef *instance, PWMChannel channel, uint8_t 
     #ifdef STM32F4xxxx
     if(instance == TIM1 || instance == TIM8 || instance == TIM9 || instance == TIM10 || instance == TIM11)
     {
-        htim.Init.Prescaler = (168000000 / (freq)) / ((uint32_t)1 << bitcount);
+        htim.Init.Prescaler = (SystemCoreClock / (freq)) / ((uint32_t)1 << bitcount) - 1;
     }
     else
     {
-        htim.Init.Prescaler = (168000000 / (4*freq)) / ((uint32_t)1 << bitcount);
+        htim.Init.Prescaler = (SystemCoreClock / (4*freq)) / ((uint32_t)1 << bitcount) - 1;
     }
     #elif defined(STM32F1xxxx)
     if(instance == TIM1)
     {
-        htim.Init.Prescaler = (168000000 / (freq)) / ((uint32_t)1 << bitcount);
+        htim.Init.Prescaler = (SystemCoreClock / (freq)) / ((uint32_t)1 << bitcount) - 1;
     }
     else
     {
-        htim.Init.Prescaler = (168000000 / (2*freq)) / ((uint32_t)1 << bitcount);
+        htim.Init.Prescaler = (SystemCoreClock / (2*freq)) / ((uint32_t)1 << bitcount) - 1;
     }
     #endif
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
