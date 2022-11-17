@@ -1,5 +1,6 @@
 #include "StallardOSconfig.h"
 #include "StallardOSHelpers.h"
+#include "signals.h"
 #include <stdint.h>
 
 extern volatile struct function_struct* volatile currentTask;
@@ -73,6 +74,7 @@ void findNextFunction()
     #endif
     volatile struct function_struct* temp;
     uint8_t prioMin = -1;                         //Use only tasks with prio < 255
+    uint64_t earliestDeadline = -1;
     for (uint16_t i = 0; i < countTasks; i++)
     {
         temp = &(taskArray[i]);
@@ -86,15 +88,24 @@ void findNextFunction()
             //DEBUGGER_BREAK();  //Zeige debugger
             continue;
         }
+        if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is still waiting for the semaphore
+        {
+            continue;
+        }
         
         if (temp->executable && temp->continue_ts <= uwTick && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
         {
-            if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is still waiting for the semaphore
+            if(temp->refreshRate != 0 && (temp->lastStart + (1000 / temp->refreshRate)) < earliestDeadline) //If this task has the earliest deadline
             {
-                continue;
+                earliestDeadline = temp->lastStart + (1000 / temp->refreshRate);
+                nextTask = temp;          //set nextF to right now highest priority task
+                prioMin = temp->priority; //save prio
             }
-            nextTask = temp;          //set nextF to right now highest priority task
-            prioMin = temp->priority; //save prio
+            else if(temp->refreshRate == 0 && earliestDeadline == (uint64_t)-1)
+            {
+                nextTask = temp;
+                prioMin = temp->priority;
+            }
         }
     }
 }
@@ -351,7 +362,7 @@ __attribute__((always_inline)) inline void start_mainTask(){
     "bx lr\n");
 }
 
-void clc_cpu_usage()
+__attribute__((always_inline)) inline void clc_cpu_usage()
 {
     asm("stmdb sp!, {r4-r11}");
     uint64_t us_ts = (uwTick * 1000) + SysTick->LOAD - (SysTick->VAL / (SystemCoreClock / 1000000));
@@ -473,7 +484,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
             CALL_SYSRESET();    //System might be damaged too much to continue, so reset
         }
 
-        if(currentTask->refreshRate > 0 && (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate) && currentTask->used) //Task timeout check
+        if(currentTask->refreshRate > 0 && currentTask->used && currentTask->lastYield > currentTask->lastStart && (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate)) //Task timeout check
         {
             DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
             // task is not prevented from further execution
@@ -524,12 +535,9 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
  */
 __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize Attribute makes sure no frame pointer is used
 {
-    // _SVC(SV_USAGE_CALC);
     disable_interrupts();
     // DO NOT USE C
     // the compiler doesn't properly restore all registers
-    //
-    clc_cpu_usage();
     switchTask();
 
     #ifdef useMPU
