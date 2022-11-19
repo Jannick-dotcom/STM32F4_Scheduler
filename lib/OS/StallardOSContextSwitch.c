@@ -78,34 +78,38 @@ void findNextFunction()
     for (uint16_t i = 0; i < countTasks; i++)
     {
         temp = &(taskArray[i]);
-        if(temp == NULL)
+        if(temp == NULL)    //Somethin is wrong with the Task list
         {
             DEBUGGER_BREAK();  //Zeige debugger
             return;
         }
-        if(temp->used == 0) //If the TCB is unused, continue with the next one
-        {
-            //DEBUGGER_BREAK();  //Zeige debugger
-            continue;
-        }
-        if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is still waiting for the semaphore
+        if(temp->used == 0 || temp->executable == 0) //If the TCB is unused or not executable, continue with the next one
         {
             continue;
         }
-        
-        if (temp->executable && temp->continue_ts <= uwTick && temp->priority < prioMin) //Get task with lowest prio number -> highest priority
+        if(temp->semVal != NULL && (*(temp->semVal) & 0x0000FFFF) == 0 && ((*(temp->semVal) & 0xFFFF0000) >> 16) != temp->id) //If this task is waiting for the semaphore
         {
-            if(temp->refreshRate != 0 && (temp->lastStart + (1000 / temp->refreshRate)) < earliestDeadline) //If this task has the earliest deadline
-            {
-                earliestDeadline = temp->lastStart + (1000 / temp->refreshRate);
-                nextTask = temp;          //set nextF to right now highest priority task
-                prioMin = temp->priority; //save prio
-            }
-            else if(temp->refreshRate == 0 && earliestDeadline == (uint64_t)-1)
-            {
-                nextTask = temp;
-                prioMin = temp->priority;
-            }
+            continue;
+        }
+        if(temp->continue_ts >uwTick) //If the task is not ready to continue
+        {
+            continue;
+        }
+        if(temp->priority >= prioMin) //If lower priority than the current minimum, continue with the next one
+        {
+            continue;
+        }
+
+        if(temp->refreshRate == 0) //If task manages cycle time by itself
+        {
+            nextTask = temp;
+            prioMin = temp->priority;
+        }
+        else if((temp->lastStart + (1000 / temp->refreshRate)) < earliestDeadline) //if task is ready to start and has the earliest deadline
+        {
+            nextTask = temp;
+            prioMin = temp->priority;
+            earliestDeadline = temp->lastStart + (1000 / temp->refreshRate);
         }
     }
 }
