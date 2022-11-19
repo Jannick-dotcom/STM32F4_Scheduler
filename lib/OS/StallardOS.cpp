@@ -637,9 +637,10 @@ void StallardOS::delay(uint32_t milliseconds)
   }
   else
   {
+    disable_interrupts();
     currentTask->continue_ts = StallardOSTime_getTimeMs() + (uint64_t)milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-    // nextTask = taskMainStruct;
     findNextFunction();
+    enable_interrupts();
     CALL_PENDSV();
     for(uint8_t i = 0; i < sizeof(currentTask->rcvSignal)/sizeof(signals); i++)
     {
@@ -649,6 +650,7 @@ void StallardOS::delay(uint32_t milliseconds)
         {
           void (*signalHandler)() = (void (*)())(currentTask->signalHandlers[currentTask->rcvSignal[i]]); //call this signal handler
           signalHandler();
+          currentTask->rcvSignal[i] = SIG_NONE;
         }
         else //Otherwise call the default handler for this signal
         {
@@ -671,7 +673,7 @@ void StallardOS::delay_us(uint16_t microseconds)
   if(microseconds >= 1000)
   {
     delay(microseconds / 1000);
-    continueTimeStamp = microseconds - ((microseconds / 1000) * 1000);//TODO: check if this is correct
+    continueTimeStamp = microseconds - ((microseconds / 1000) * 1000);
   }
   else
   {
@@ -699,7 +701,7 @@ void StallardOS::yield()
     }
     else
     {
-      delay(1);
+      delay(0);
     }
     currentTask->lastStart = StallardOSTime_getTimeMs();
   }
