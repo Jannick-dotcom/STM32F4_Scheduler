@@ -11,7 +11,8 @@ extern "C" void StallardOSGeneralFaultHandler();
 
 typedef enum SPIBauds
 {
-    Normal = SPI_BAUDRATEPRESCALER_2
+    Normal = SPI_BAUDRATEPRESCALER_2,
+    Slow = SPI_BAUDRATEPRESCALER_64
 } SPIBauds;
 
 class StallardOSSPI
