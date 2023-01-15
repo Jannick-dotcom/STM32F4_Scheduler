@@ -85,7 +85,6 @@ struct function_struct
   volatile uint8_t executable; // Funktion ausführen?
 
   signals rcvSignal[StallardOS_signalcount*2]; // Signal, das empfangen wurde
-  void *signalHandlers[StallardOS_signalcount]; // Signal handler for each signal
 
   // nur für KontextSwitch
   volatile uint16_t refreshRate;

@@ -33,9 +33,9 @@ public:
   struct function_struct *addFunction(void (*function)(), uint8_t prio, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs=0);
   struct function_struct *addFunctionStatic(void (*function)(), uint8_t prio, uint32_t *stackPtr, stack_T stackSize, uint16_t refreshRate = 0, uint16_t watchdogLimitMs=0);
 
-  uint8_t registerSignalHandler(signals signal_code, void (*signal_handler)());
+  // uint8_t registerSignalHandler(signals signal_code, void (*signal_handler)());
   void sendSignal(signals signal_code, uint16_t id);
-
+  uint8_t waitForSignal(signals signal_code, uint32_t timeout = 0);
 
   void remove_all_functions(void); //Remove all functions
 

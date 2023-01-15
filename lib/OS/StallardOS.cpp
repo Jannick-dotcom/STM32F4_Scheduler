@@ -49,48 +49,12 @@ void taskOnEnd(void)
   while(1);
 }
 
-/**
- * Signal handler
- * A signal from another task is handled here.
- *
- * @param
- * @return
- */
-void StallardOS::signal_handler(signals signal_code, function_struct *receivingTask)
-{
-  if(receivingTask != nullptr && receivingTask != taskMainStruct)
-  {
-    if(receivingTask->signalHandlers[signal_code] != nullptr) //if signal handler exists for this signal
-    {
-      void (*signalHandler)() = (void (*)())(receivingTask->signalHandlers[signal_code]); //call this signal handler
-      signalHandler();
-    }
-    else //Otherwise call the default handler for this signal
-    {
-      taskOnEnd();
-    }
-  }
-}
-
-uint8_t StallardOS::registerSignalHandler(signals signal_code, void (*signal_handler)())
-{
-  if(currentTask != nullptr && currentTask->signalHandlers[signal_code] == nullptr) //if signal handler was not assigned yet
-  {
-    currentTask->signalHandlers[signal_code] = (void *)signal_handler; //save signal handler
-    return 1;
-  }
-  else //otherwise not successful
-  {
-    return 0;
-  }
-}
-
 void StallardOS::sendSignal(signals signal_code, uint16_t id)
 {
   function_struct *tmp = searchFunction(id);
   if(tmp != nullptr)
   {
-    for(auto i = 0U; i < sizeof(tmp->rcvSignal) / sizeof(tmp->rcvSignal[0]); i++)
+    for(uint8_t i = 0; i < sizeof(tmp->rcvSignal) / sizeof(tmp->rcvSignal[0]); i++)
     {
       if(tmp->rcvSignal[i] == SIG_NONE)
       {
@@ -98,6 +62,27 @@ void StallardOS::sendSignal(signals signal_code, uint16_t id)
         break;
       }
     }
+  }
+}
+
+uint8_t StallardOS::waitForSignal(signals signal_code, uint32_t timeout)
+{
+  uint64_t startTime = StallardOSTime_getTimeMs();
+  if(currentTask != nullptr)
+  {
+    while(StallardOSTime_getTimeMs() < startTime + timeout || timeout == 0)
+    {
+      for(uint8_t i = 0; i < sizeof(currentTask->rcvSignal)/sizeof(signals); i++)
+      {
+        if(currentTask->rcvSignal[i] == signal_code)
+        {
+          currentTask->rcvSignal[i] = signals::SIG_NONE;
+          return 1;
+        }
+      }
+      StallardOS::delay(1);
+    }
+    return 0;
   }
 }
 
@@ -393,11 +378,6 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
     }
   }
 
-  for (uint8_t i = 0; i < sizeof(function_struct::signalHandlers) / sizeof(void *); i++)
-  {
-    function_struct_ptr->signalHandlers[i] = nullptr;
-  }
-
 
   /////////////////////////////////////////////
   function_struct_ptr->refreshRate = refreshRate;
@@ -412,7 +392,6 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->stackBase = stackPtr;
   function_struct_ptr->Stack = (stack_T*)((stack_T)stackPtr + (stackSize - sizeof(stack_T))); //End of Stack
   function_struct_ptr->stackSize = stackSize;
-  function_struct_ptr->waitingForSemaphore = 0;
   function_struct_ptr->used = true;
   
   function_struct_ptr->continue_ts = 0;
@@ -642,23 +621,6 @@ void StallardOS::delay(uint32_t milliseconds)
     findNextFunction();
     enable_interrupts();
     CALL_PENDSV();
-    for(uint8_t i = 0; i < sizeof(currentTask->rcvSignal)/sizeof(signals); i++)
-    {
-      if(currentTask->rcvSignal[i] != SIG_NONE)
-      {
-        if(currentTask->signalHandlers[currentTask->rcvSignal[i]] != NULL) //if signal handler exists for this signal
-        {
-          void (*signalHandler)() = (void (*)())(currentTask->signalHandlers[currentTask->rcvSignal[i]]); //call this signal handler
-          signalHandler();
-          currentTask->rcvSignal[i] = SIG_NONE;
-        }
-        else //Otherwise call the default handler for this signal
-        {
-          taskOnEnd();
-        }
-        break;
-      }
-    }
   }
 }
 
@@ -701,7 +663,7 @@ void StallardOS::yield()
     }
     else
     {
-      delay(0);
+      delay(1);
     }
     currentTask->lastStart = StallardOSTime_getTimeMs();
   }
@@ -762,23 +724,14 @@ void StallardOS::restartTask(function_struct *task)
   }
   //////////////////////////////
   if(currentTask->semVal != NULL){
-      if(currentTask->waitingForSemaphore == 0){
-          // only execute, if semaphore is actually owned by task (take finished)
 
-          /* normal write access to semaphore is ok in this context, 
-          * as no other task may execute during hardFault 
-          */
-          *(currentTask->semVal) = 1; //Semaphore freigeben
-          __CLREX();  // reset exclusive monitor
-      }
-      else{
-          // undefined state, task may or may not own the semaphore
-          // assume it didn't own it, as that's more likely?
-          // TODO: change this???
-          DEBUGGER_BREAK();
-      }
+    /* normal write access to semaphore is ok in this context, 
+    * as no other task may execute during hardFault 
+    */
+    *(currentTask->semVal) = 1; //Semaphore freigeben
+    __CLREX();  // reset exclusive monitor
+
   }
-  currentTask->waitingForSemaphore = 0;
   currentTask->semVal = 0; //Semaphore von task lösen
   task->continue_ts = HAL_GetTick();
   task->executable = 1;
