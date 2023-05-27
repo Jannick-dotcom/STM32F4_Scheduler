@@ -72,8 +72,9 @@ void findNextFunction()
     nextTask = taskMainStruct;
     #endif
     volatile struct function_struct* temp;
-    uint8_t prioMin = -1U;                         //Use only tasks with prio < 255
+    uint8_t prioMin = (uint8_t)-1U;                         //Use only tasks with prio < 255
     uint64_t earliestDeadline = -1ULL;
+    nextTask = NULL;
     for (uint16_t i = 0; i < countTasks; i++)
     {
         temp = &(taskArray[i]);
