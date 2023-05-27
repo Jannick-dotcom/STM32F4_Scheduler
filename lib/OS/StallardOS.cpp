@@ -44,7 +44,7 @@ void taskOnEnd(void)
   }
   currentTask->executable = 0;
   enable_interrupts();
-  findNextFunction();
+  // findNextFunction();
   CALL_STARTMAIN();
   while(1);
 }
@@ -82,8 +82,8 @@ uint8_t StallardOS::waitForSignal(signals signal_code, uint32_t timeout)
       }
       StallardOS::delay(1);
     }
-    return 0;
   }
+  return 0;
 }
 
 
@@ -574,7 +574,6 @@ void StallardOS::setFunctionPriority(/*Funktion*/ uint16_t id, uint8_t prio)
  */
 struct function_struct *StallardOS::searchFunction(/*ID*/ uint16_t id)
 {
-  volatile struct function_struct *temp = nullptr; //temporärer pointer erzeugen
   for (uint16_t i = 0; i < countTasks; i++)
   {
     if (taskArray[i].id == id)

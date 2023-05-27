@@ -1,6 +1,5 @@
 #include "StallardOSconfig.h"
 #include "StallardOSHelpers.h"
-#include "signals.h"
 #include <stdint.h>
 
 extern volatile struct function_struct* volatile currentTask;
@@ -73,8 +72,8 @@ void findNextFunction()
     nextTask = taskMainStruct;
     #endif
     volatile struct function_struct* temp;
-    uint8_t prioMin = -1;                         //Use only tasks with prio < 255
-    uint64_t earliestDeadline = -1;
+    uint8_t prioMin = -1U;                         //Use only tasks with prio < 255
+    uint64_t earliestDeadline = -1ULL;
     for (uint16_t i = 0; i < countTasks; i++)
     {
         temp = &(taskArray[i]);
@@ -83,7 +82,7 @@ void findNextFunction()
             DEBUGGER_BREAK();  //Zeige debugger
             return;
         }
-        if(temp->used == 0 || temp->executable == 0) //If the TCB is unused or not executable, continue with the next one
+        if(temp->used == 0 || temp->executable == 0) //If the TCB is unused or not executable
         {
             continue;
         }
@@ -91,24 +90,27 @@ void findNextFunction()
         {
             continue;
         }
-        if(temp->continue_ts >uwTick) //If the task is not ready to continue
+        if(temp->continue_ts > uwTick) //If the task is not ready to continue
         {
             continue;
         }
-        if(temp->priority >= prioMin) //If lower priority than the current minimum, continue with the next one
+        if(temp->priority >= prioMin) //If lower priority than the current minimum
+        {
+            continue;
+        }
+        if(temp->refreshRate > 0 && (temp->lastStart + (1000 / temp->refreshRate)) > earliestDeadline) //if task doesn't have the earliest deadline
+        {
+            continue;
+        }
+        if(temp->refreshRate == 0 && earliestDeadline < (uint64_t)-1) //If the task has no deadline and the current minimum has a deadline
         {
             continue;
         }
 
-        if(temp->refreshRate == 0) //If task manages cycle time by itself
+        nextTask = temp;
+        prioMin = temp->priority;
+        if(temp->refreshRate > 0) //set earliest deadline to current tasks deadline
         {
-            nextTask = temp;
-            prioMin = temp->priority;
-        }
-        else if((temp->lastStart + (1000 / temp->refreshRate)) < earliestDeadline) //if task is ready to start and has the earliest deadline
-        {
-            nextTask = temp;
-            prioMin = temp->priority;
             earliestDeadline = temp->lastStart + (1000 / temp->refreshRate);
         }
     }
@@ -164,23 +166,13 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
   }
   //////////////////////////////
   if(task->semVal != NULL){
-      if(task->waitingForSemaphore == 0){
-          // only execute, if semaphore is actually owned by task (take finished)
+    /* normal write access to semaphore is ok in this context, 
+    * as no other task may execute during hardFault 
+    */
+    *(task->semVal) = 1; //Semaphore freigeben
+    __CLREX();  // reset exclusive monitor
 
-          /* normal write access to semaphore is ok in this context, 
-          * as no other task may execute during hardFault 
-          */
-          *(task->semVal) = 1; //Semaphore freigeben
-          __CLREX();  // reset exclusive monitor
-      }
-      else{
-          // undefined state, task may or may not own the semaphore
-          // assume it didn't own it, as that's more likely?
-          // TODO: change this???
-          DEBUGGER_BREAK();
-      }
   }
-  task->waitingForSemaphore = 0;
   task->semVal = 0; //Semaphore von task lösen
   task->continue_ts = HAL_GetTick();
   task->executable = 1;
