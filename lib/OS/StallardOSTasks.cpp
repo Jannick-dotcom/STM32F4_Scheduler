@@ -3,22 +3,16 @@
 
 #ifdef useSFOC
   #include "SFOC.hpp"
+  stack_T taskSFOCStack[256]; /* align to size in Byte */
 #endif // useSFOC
 
 // private kernel variable
 extern volatile struct function_struct* volatile taskMainStruct;
+extern struct function_struct taskArray[];
 
 // public variables (declared in header)
 stack_T taskmainStack[256];
 stack_T taskPerfmonStack[2048];
-
-#ifdef useSFOC
-  stack_T taskSFOCStack[256]; /* align to size in Byte */
-#endif
-
-
-
-
 
 /**
  * Waste Time if all tasks are in delay.
@@ -36,7 +30,7 @@ void taskMain(void)
 #ifndef notHaveCan
 void taskPerfmon(void){
 
-    volatile struct function_struct *task;
+    struct function_struct *task;
     uint64_t total_calc_time_us;
     uint64_t idle_calc_time_us;
     uint8_t cpu_load;
@@ -92,12 +86,12 @@ void taskPerfmon(void){
     taskMainStruct->perfmon_exec_time_us = 0;
 
     // iterate over all tasks to get used cpu time since last scan
-    task = taskMainStruct->next;
-    do {
+    for(uint16_t i = 0; i < countTasks; i++)
+    {
+      task = &(taskArray[i]);
       total_calc_time_us += task->perfmon_exec_time_us;
       task->perfmon_exec_time_us = 0;
-      task = task->next;
-    } while(task != taskMainStruct);
+    }
 
     cpu_load = (1000*total_calc_time_us) / (idle_calc_time_us + total_calc_time_us);
     *load = cpu_load;
