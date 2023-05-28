@@ -34,7 +34,7 @@
 ******************************************************************************
 */
 
- INCLUDE StallardOS_2021/ldscripts/STM32F417_MMAP.ld
+ INCLUDE StallardOS/ldscripts/STM32F417_MMAP.ld
 
 /* Entry Point */
 ENTRY(Reset_Handler)
