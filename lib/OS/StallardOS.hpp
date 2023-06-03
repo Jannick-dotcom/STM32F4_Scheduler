@@ -20,4 +20,5 @@
 #include "StallardOSDAC.hpp"
 #include "StallardOSAvg.hpp"
 #include "AlphaBeta.hpp"
+#include "ili9341.h"
 #endif //StallardOS_h
