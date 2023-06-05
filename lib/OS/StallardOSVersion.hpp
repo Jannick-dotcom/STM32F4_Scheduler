@@ -1,3 +1,3 @@
 #pragma once
 
-#define STOS_VERSION 0x10
+#define STOS_VERSION 55U
