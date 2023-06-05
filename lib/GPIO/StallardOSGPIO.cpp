@@ -260,7 +260,7 @@ bool StallardOSGPIO::operator=(bool state)
 
 bool StallardOSGPIO::read()
 {
-    bool returnVal;
+    bool returnVal = false;
 
     this->sem.take();
 
