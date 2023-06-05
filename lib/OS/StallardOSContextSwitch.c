@@ -436,10 +436,10 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
     case SV_DEACTIVATE_PRIV:
         disable_privilege();
         break;
+    #endif
     case SV_USAGE_CALC:
         clc_cpu_usage();
         break;
-    #endif
     default:    /* unknown SVC */
         break;
     }
