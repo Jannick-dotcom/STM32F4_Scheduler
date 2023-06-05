@@ -1,8 +1,8 @@
 import cantools
 
 def readStructs():
-    db1 = cantools.database.load_file('StallardOS_2021/CAN_System_Design_2021/Masterlist_ADCAN1.dbc')
-    db2 = cantools.database.load_file('StallardOS_2021/CAN_System_Design_2021/MS4Sport_CAN2.dbc')
+    db1 = cantools.database.load_file('StallardOS/CAN_System_Design_2021/Masterlist_ADCAN1.dbc')
+    db2 = cantools.database.load_file('StallardOS/CAN_System_Design_2021/MS4Sport_CAN2.dbc')
 
     messages = db1.messages+db2.messages
 
@@ -57,7 +57,7 @@ def readStructs():
     stringout += "}\n"
 
 
-    with open("StallardOS_2021/lib/CAN/StallardOScanArray.cpp", "w") as outfile:
+    with open("StallardOS/lib/CAN/StallardOScanArray.cpp", "w") as outfile:
         outfile.write(stringout)
 
 if __name__ == '__main__':

@@ -22,13 +22,13 @@ def roundBitcount(bitcountIn):
     return bitcount
 
 def main():
-    db1 = cantools.database.load_file('StallardOS_2021/CAN_System_Design_2021/Masterlist_ADCAN1.dbc')
-    db2 = cantools.database.load_file('StallardOS_2021/CAN_System_Design_2021/MS4Sport_CAN2.dbc')
+    db1 = cantools.database.load_file('StallardOS/CAN_System_Design_2021/Masterlist_ADCAN1.dbc')
+    db2 = cantools.database.load_file('StallardOS/CAN_System_Design_2021/MS4Sport_CAN2.dbc')
 
     messages = db1.messages+db2.messages
 
-    outfileDefs = open("StallardOS_2021/lib/CAN/StallardOScanIDs.h", "w") #the output for IDs
-    outfileStructs = open("StallardOS_2021/lib/CAN/StallardOScanStructs.hpp", "w") #the output for structs
+    outfileDefs = open("StallardOS/lib/CAN/StallardOScanIDs.h", "w") #the output for IDs
+    outfileStructs = open("StallardOS/lib/CAN/StallardOScanStructs.hpp", "w") #the output for structs
 
     outfileStructs.write(f"#ifndef StallardOScanStructs_hpp{endl}#define StallardOScanStructs_hpp{endl}")
     outfileStructs.write(f'#include "stdint.h"{endl}#include "StallardOScanTypes.hpp"{endl}#include <math.h>{endl}#include "StallardOScanIDs.h"{endl}{endl}') #include the integer types to the struct file
