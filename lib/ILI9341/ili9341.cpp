@@ -45,6 +45,7 @@ static unsigned char    lcdBuildMemoryAccessControlConfig(
 
 void lcdInit(void)
 {
+	initLCDHardware();
   lcdPortraitConfig = lcdBuildMemoryAccessControlConfig(
                                                     MemoryAccessControlNormalOrder,		// rowAddressOrder
                                                     MemoryAccessControlReverseOrder,	// columnAddressOrder

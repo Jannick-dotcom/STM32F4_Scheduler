@@ -21,4 +21,5 @@
 #include "StallardOSAvg.hpp"
 #include "AlphaBeta.hpp"
 #include "ili9341.h"
+#include "fatfs.h"
 #endif //StallardOS_h

@@ -15,6 +15,7 @@
 #include "image.h"
 #include <stdbool.h>
 #include "stm32f4xx_hal.h"
+#include "display_setup.h"
 // #include "ili9341_light.h"
 
 #define LCD_BASE0        		((uint32_t)0x60000000)
