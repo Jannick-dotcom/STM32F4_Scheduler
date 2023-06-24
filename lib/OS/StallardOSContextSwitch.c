@@ -461,6 +461,18 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler(void) //Optimize 
   ) ;
 }
 
+
+inline uint8_t checkRefreshRate()
+{
+    uint8_t temp = 1;
+    temp &= currentTask->used;              //if task has been used
+    temp &= currentTask->refreshRate > 0;   //if task has a refresh rate defined
+    temp &= currentTask->lastYield > currentTask->lastStart; //if yield was called after last start
+    temp &= (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate); //if exec time is bigger than refresh rate period
+    temp &= currentTask->lastStart != 0; //if task did not yet reach end of yield
+    return temp;
+}
+
 /**
  * Systick Handler for an Exception every x ms. Minimum is 11 Hz
  *
@@ -481,7 +493,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
             CALL_SYSRESET();    //System might be damaged too much to continue, so reset
         }
 
-        if(currentTask->refreshRate > 0 && currentTask->used && currentTask->lastYield > currentTask->lastStart && (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate)) //Task timeout check
+        if(checkRefreshRate()) //Task timeout check
         {
             DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
             // task is not prevented from further execution
