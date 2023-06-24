@@ -656,7 +656,7 @@ void StallardOS::yield()
   if (currentTask != nullptr)
   {
     currentTask->lastYield = StallardOSTime_getTimeMs();
-    if(currentTask->refreshRate != 0)
+    if(currentTask->refreshRate != 0 && (currentTask->lastYield - currentTask->lastStart) < (1000 / currentTask->refreshRate))
     {
       delay((1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart));
     }
