@@ -462,7 +462,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler(void) //Optimize 
 }
 
 
-inline uint8_t checkRefreshRate()
+uint8_t checkRefreshRate()
 {
     uint8_t temp = 1;
     temp &= currentTask->used;              //if task has been used
