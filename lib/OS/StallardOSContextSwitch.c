@@ -118,26 +118,14 @@ void findNextFunction()
 }
 
 
-/**
- * @brief restarts the given task
- *        sets executble bit to 1
- *        the lastly held semaphore is freed (not all!!!!!)
- *        sets executable to 1
- * 
- *        INFO: does NOT disable interrupts, only to be called in disabled interrupts context
- */
-__attribute__((always_inline)) inline void restartTask(struct function_struct *task)
+void prepareInitialStack(struct function_struct *task)
 {
-  if(task == NULL || task->used == 0) 
-  {
-    return;
-  }
   task->Stack = (stack_T*)((stack_T)task->stackBase + (task->stackSize - sizeof(stack_T))); //End of Stack
-  //Prepare initial stack trace
+    //Prepare initial stack trace
   task->Stack--;
   *task->Stack = (uint32_t)0x01000000;
   task->Stack--;
-  *task->Stack = (uint32_t)currentTask->function & (~1);
+  *task->Stack = (uint32_t)task->function & (~1);
   task->Stack--;
   *task->Stack = (uint32_t)taskOnEnd;
 
@@ -165,6 +153,25 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
     task->Stack--;
     *task->Stack = i;
   }
+  //////////////////////////////
+}
+
+/**
+ * @brief restarts the given task
+ *        sets executble bit to 1
+ *        the lastly held semaphore is freed (not all!!!!!)
+ *        sets executable to 1
+ * 
+ *        INFO: does NOT disable interrupts, only to be called in disabled interrupts context
+ */
+__attribute__((always_inline)) inline void restartTask(struct function_struct *task)
+{
+  if(task == NULL || task->used == 0) 
+  {
+    return;
+  }
+  task->function = currentTask->function;
+  prepareInitialStack(task);
   //////////////////////////////
   if(task->semVal != NULL){
     /* normal write access to semaphore is ok in this context, 
@@ -472,6 +479,13 @@ uint8_t checkRefreshRate()
     temp &= currentTask->lastStart != 0; //if task did not yet reach end of yield
     return temp;
 }
+uint8_t checkTaskStack()
+{
+    uint8_t temp = 0;
+    temp |= (stack_T)currentTask->Stack > ((stack_T)currentTask->stackBase + currentTask->stackSize); //If Stack underflow
+    temp |= currentTask->Stack < currentTask->stackBase; //If Stack overflow
+    return temp;
+}
 
 /**
  * Systick Handler for an Exception every x ms. Minimum is 11 Hz
@@ -483,54 +497,61 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
 {
     disable_interrupts();
     HAL_IncTick();
-    if(currentTask != NULL)
+    if(currentTask == NULL)
     {
-        
-        if((stack_T)currentTask->Stack > (((stack_T)currentTask->stackBase + currentTask->stackSize)) || currentTask->Stack < currentTask->stackBase) //Stack overflow and underflow check
-        {
-            DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
-            enable_interrupts();
-            CALL_SYSRESET();    //System might be damaged too much to continue, so reset
-        }
+        enable_interrupts();
+        return;
+    }
 
-        if(checkRefreshRate()) //Task timeout check
-        {
-            DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
-            // task is not prevented from further execution
-            // as it's not corrupting/influencing any higher prio tasks
-        }
+    if(checkTaskStack()) //Stack overflow and underflow check
+    {
+        DEBUGGER_BREAK();  //Zeige debugger STACK OVERFLOW!!!!
+        enable_interrupts();
+        CALL_SYSRESET();    //System might be damaged too much to continue, so reset
+    }
 
-        // test if the currently executing task is already exceeding the watchdog
-        // as watchdog calc time is only updated on task swapOut/swapIn, 
-        // a high prio task could slip through the detection if it never releases control
-        // 
-        // as the watchdog resolution is on ms base, this check is performed in ms aswell
-        // therefore only ms*1000 is used, instead of us readout
-        if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit){
-            DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
-            restartTask(currentTask);
-        }
+    if(checkRefreshRate()) //Task timeout check
+    {
+        DEBUGGER_BREAK();  //Zeige debugger Task too Slow!!!!
+        // task is not prevented from further execution
+        // as it's not corrupting/influencing any higher prio tasks
+    }
 
-        findNextFunction();
-        if(currentTask != nextTask && nextTask != NULL)
-        {
-            #ifndef BusyLoop
-            HAL_PWR_DisableSleepOnExit();
-            #endif
-            pendPendSV(); //If nextTask is not this task, set the PendSV to pending
-        }
-        else if(nextTask == NULL)
-        {
-            #ifndef BusyLoop
-            HAL_PWR_EnableSleepOnExit();
-            #else
-            nextTask = taskMainStruct;
-            #endif
-        }
-        else
-        {
-            HAL_PWR_DisableSleepOnExit();
-        }
+    //Calculate Stack usage for debugging
+    #if isDebug
+    volatile stack_T size = (stack_T)currentTask->stackBase + currentTask->stackSize - (stack_T)currentTask->Stack;
+    #endif
+
+    // test if the currently executing task is already exceeding the watchdog
+    // as watchdog calc time is only updated on task swapOut/swapIn, 
+    // a high prio task could slip through the detection if it never releases control
+    // 
+    // as the watchdog resolution is on ms base, this check is performed in ms aswell
+    // therefore only ms*1000 is used, instead of us readout
+    if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit){
+        DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
+        restartTask(currentTask);
+    }
+
+    findNextFunction();
+    if(currentTask != nextTask && nextTask != NULL) //if next task is different from current task and not null
+    {
+        #ifndef BusyLoop
+        HAL_PWR_DisableSleepOnExit(); //don't go to sleep after exit
+        #endif
+        pendPendSV(); //If nextTask is not this task, set the PendSV to pending
+    }
+    else if(nextTask == NULL) //if next task is not found
+    {
+        #ifndef BusyLoop
+        HAL_PWR_EnableSleepOnExit();
+        #else
+        nextTask = taskMainStruct;
+        #endif
+    }
+    else //next task same as current task or current task Null
+    {
+        HAL_PWR_DisableSleepOnExit();
     }
     enable_interrupts(); //enable all interrupts
 }

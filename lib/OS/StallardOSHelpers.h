@@ -16,8 +16,9 @@
 
 #define releaseBuild 1
 #define debugBuild 0
+#define isDebug (BuildType == debugBuild)
 
-#if BuildType == debugBuild
+#if isDebug
 #define DEBUGGER_BREAK() asm("bkpt")
 #else
 #define DEBUGGER_BREAK()
@@ -43,6 +44,8 @@ extern "C"
   void enable_interrupts();
   void disable_interrupts();
   void taskOnEnd(void);
+  struct function_struct;
+  void prepareInitialStack(struct function_struct *task);
 #ifdef __cplusplus
 }
 #endif

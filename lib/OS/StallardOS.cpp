@@ -397,37 +397,7 @@ struct function_struct *StallardOS::initTask(void (*function)(), uint8_t prio, u
   function_struct_ptr->continue_ts = 0;
 
   //Prepare initial stack trace
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)0x01000000;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)function & (~1);
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)taskOnEnd;
-
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)12;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)3;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)2;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)1;
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (uint32_t)0;
-  
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = 0xFFFFFFFD;
-
-  #ifndef unprotectedBuild
-  function_struct_ptr->Stack--;
-  *function_struct_ptr->Stack = (CONTROL_nPRIV_Msk << CONTROL_nPRIV_Pos); //Control register (unprivileged)
-  #endif
-
-  for(uint8_t i = 11; i > 3; i--)
-  {
-    function_struct_ptr->Stack--;
-    *function_struct_ptr->Stack = i;
-  }
+  prepareInitialStack(function_struct_ptr);
   //////////////////////////////
   return function_struct_ptr;
 }
@@ -688,39 +658,8 @@ void StallardOS::restartTask(function_struct *task)
     return;
   }
   disable_interrupts();
-  currentTask->Stack = (stack_T*)((stack_T)currentTask->stackBase + (currentTask->stackSize - sizeof(stack_T))); //End of Stack
-  //Prepare initial stack trace
-  task->Stack--;
-  *task->Stack = (uint32_t)0x01000000;
-  task->Stack--;
-  *task->Stack = (uint32_t)currentTask->function & (~1);
-  task->Stack--;
-  *task->Stack = (uint32_t)taskOnEnd;
-
-  task->Stack--;
-  *task->Stack = (uint32_t)12;
-  task->Stack--;
-  *task->Stack = (uint32_t)3;
-  task->Stack--;
-  *task->Stack = (uint32_t)2;
-  task->Stack--;
-  *task->Stack = (uint32_t)1;
-  task->Stack--;
-  *task->Stack = (uint32_t)0;
-  
-  task->Stack--;
-  *task->Stack = 0xFFFFFFFD;
-
-  #ifndef unprotectedBuild
-  task->Stack--;
-  *task->Stack = (CONTROL_nPRIV_Msk << CONTROL_nPRIV_Pos); //Control register (unprivileged)
-  #endif
-
-  for(uint8_t i = 11; i > 3; i--)
-  {
-    task->Stack--;
-    *task->Stack = i;
-  }
+  task->function = currentTask->function;
+  prepareInitialStack(task);
   //////////////////////////////
   if(currentTask->semVal != NULL){
 
