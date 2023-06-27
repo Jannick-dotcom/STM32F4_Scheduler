@@ -369,15 +369,18 @@ __attribute__((always_inline)) inline void start_mainTask(){
 __attribute__((always_inline)) inline void clc_cpu_usage()
 {
     asm("stmdb sp!, {r4-r11}");
-    uint64_t us_ts = (uwTick * 1000) + SysTick->LOAD - (SysTick->VAL / (SystemCoreClock / 1000000));
+    uint64_t us_ts = (uwTick * 1000) + ((SysTick->LOAD - SysTick->VAL) / (SystemCoreClock / 1000000));
 
     currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
     currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
 
     // watchdog can be reset independently of perfmon
     // therefore 2 vars are required
-    nextTask->watchdog_swapin_ts = us_ts;
-    nextTask->perfmon_swapin_ts = us_ts;
+    if(nextTask != NULL)
+    {
+        nextTask->watchdog_swapin_ts = us_ts;
+        nextTask->perfmon_swapin_ts = us_ts;
+    }
     asm("ldmia sp!, {r4-r11}");
 }
 
@@ -468,7 +471,6 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler(void) //Optimize 
   ) ;
 }
 
-
 uint8_t checkRefreshRate()
 {
     uint8_t temp = 1;
@@ -481,9 +483,22 @@ uint8_t checkRefreshRate()
 }
 uint8_t checkTaskStack()
 {
+    //Calculate Stack usage for debugging
+    #if isDebug
+    volatile stack_T size = (stack_T)currentTask->stackBase + currentTask->stackSize - (stack_T)currentTask->Stack;
+    #endif
     uint8_t temp = 0;
     temp |= (stack_T)currentTask->Stack > ((stack_T)currentTask->stackBase + currentTask->stackSize); //If Stack underflow
     temp |= currentTask->Stack < currentTask->stackBase; //If Stack overflow
+    return temp;
+}
+
+uint8_t checkWatchdog()
+{
+    uint8_t temp;
+    if(currentTask->watchdog_limit == 0 || currentTask->watchdog_swapin_ts == 0) return 0;
+    uint64_t execTimeMs = currentTask->watchdog_exec_time_us / 1000;
+    temp = execTimeMs + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit;
     return temp;
 }
 
@@ -517,20 +532,15 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         // as it's not corrupting/influencing any higher prio tasks
     }
 
-    //Calculate Stack usage for debugging
-    #if isDebug
-    volatile stack_T size = (stack_T)currentTask->stackBase + currentTask->stackSize - (stack_T)currentTask->Stack;
-    #endif
-
     // test if the currently executing task is already exceeding the watchdog
     // as watchdog calc time is only updated on task swapOut/swapIn, 
     // a high prio task could slip through the detection if it never releases control
     // 
     // as the watchdog resolution is on ms base, this check is performed in ms aswell
     // therefore only ms*1000 is used, instead of us readout
-    if(currentTask->watchdog_limit > 0 && currentTask->watchdog_exec_time_us/1000 + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit){
+    if(checkWatchdog()){
         DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
-        restartTask(currentTask);
+        restartTask((struct function_struct*)currentTask);
     }
 
     findNextFunction();
