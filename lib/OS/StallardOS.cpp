@@ -25,8 +25,7 @@ extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
 extern "C" void findNextFunction();
 
-
-
+uint8_t StallardOS::cpu_load = 0;
 
 /**
  * If a Task Returns, this function gets executed and calls the remove function of this task.
@@ -121,9 +120,7 @@ StallardOS::StallardOS()
     while(1);
   };
   #endif
-  #ifndef notHaveCan
   addFunctionStatic(taskPerfmon, -2, taskPerfmonStack, sizeof(taskPerfmonStack), 1);
-  #endif
   #ifdef useSFOC
      addFunctionStatic(taskSFOC, -3, taskSFOCStack, sizeof(taskSFOCStack), 5);
   #endif
@@ -626,6 +623,7 @@ void StallardOS::yield()
   if (currentTask != nullptr)
   {
     currentTask->lastYield = StallardOSTime_getTimeMs();
+    StallardOS::kickTheDog();
     if(currentTask->refreshRate != 0 && (currentTask->lastYield - currentTask->lastStart) < (1000 / currentTask->refreshRate))
     {
       delay((1000 / currentTask->refreshRate) - (currentTask->lastYield - currentTask->lastStart));

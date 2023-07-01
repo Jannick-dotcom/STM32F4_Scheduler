@@ -26,6 +26,7 @@ private:
   void signal_handler(signals signal_code, function_struct *receivingTask);
 
 public:
+  static uint8_t cpu_load;
   //Constructor 
   StallardOS(); //Create a Task Scheduler
   
@@ -56,7 +57,7 @@ public:
   static void delay_us(uint16_t microseconds); //RTOS wartet bis zu 1000us
   static void yield();                      //RTOS sagen, dass jetzt der Code zuende ist
   static void kickTheDog();
-  static void restartTask(function_struct *task);                //RTOS sagen dass 
+  static void restartTask(function_struct *task);
 };
 
 #endif

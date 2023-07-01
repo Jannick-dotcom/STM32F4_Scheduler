@@ -369,10 +369,13 @@ __attribute__((always_inline)) inline void start_mainTask(){
 __attribute__((always_inline)) inline void clc_cpu_usage()
 {
     asm("stmdb sp!, {r4-r11}");
-    uint64_t us_ts = (uwTick * 1000) + ((SysTick->LOAD - SysTick->VAL) / (SystemCoreClock / 1000000));
+    uint64_t us_ts = (uwTick * 1000) + ((SysTick->LOAD - SysTick->VAL) / (runFreq));
 
-    currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
-    currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
+    if(currentTask != NULL)
+    {
+        currentTask->watchdog_exec_time_us += (us_ts - currentTask->watchdog_swapin_ts);
+        currentTask->perfmon_exec_time_us += (us_ts - currentTask->perfmon_swapin_ts);
+    }
 
     // watchdog can be reset independently of perfmon
     // therefore 2 vars are required
@@ -429,6 +432,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
         }
         else 
         {
+            clc_cpu_usage();
             currentTask = nextTask;
             #ifndef BusyLoop
             HAL_PWR_DisableSleepOnExit();
@@ -497,8 +501,8 @@ uint8_t checkWatchdog()
 {
     uint8_t temp;
     if(currentTask->watchdog_limit == 0 || currentTask->watchdog_swapin_ts == 0) return 0;
-    uint64_t execTimeMs = currentTask->watchdog_exec_time_us / 1000;
-    temp = execTimeMs + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000) > currentTask->watchdog_limit;
+    uint64_t execTimeMs = (currentTask->watchdog_exec_time_us / 1000) + (HAL_GetTick() - currentTask->watchdog_swapin_ts/1000);
+    temp = execTimeMs > currentTask->watchdog_limit;
     return temp;
 }
 
@@ -540,7 +544,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
     // therefore only ms*1000 is used, instead of us readout
     if(checkWatchdog()){
         DEBUGGER_BREAK();  //Zeige debugger Watchdog timeout!!!!
-        restartTask((struct function_struct*)currentTask);
+        // restartTask((struct function_struct*)currentTask);
     }
 
     findNextFunction();
@@ -555,6 +559,8 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
     {
         #ifndef BusyLoop
         HAL_PWR_EnableSleepOnExit();
+        currentTask->perfmon_swapin_ts += 1000; //current task not executed
+        currentTask->watchdog_swapin_ts += 1000; //increase swapin ts by one millisecond to simulate it getting executed later
         #else
         nextTask = taskMainStruct;
         #endif
@@ -575,6 +581,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
  */
 __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize Attribute makes sure no frame pointer is used
 {
+    asm("svc #7");
     disable_interrupts();
     // DO NOT USE C
     // the compiler doesn't properly restore all registers
