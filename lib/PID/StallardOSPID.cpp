@@ -7,12 +7,13 @@
  * @param i_gain  gain of the i part
  * @param d_gain  gain of the d part
  */
-StallardosPID::StallardosPID(double p_gain, double i_gain, double d_gain)
+StallardosPID::StallardosPID(double p_gain = 0, double i_gain = 0, double d_gain = 0)
 {
     
     this->sem.take();
     
     this->pid_i_mem = 0;
+    this->pid_last_d_error = 0;
     this->pid_p_gain = p_gain;
     this->pid_i_gain = i_gain;
     this->pid_d_gain = d_gain;
