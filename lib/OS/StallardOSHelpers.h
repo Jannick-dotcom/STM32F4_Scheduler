@@ -43,6 +43,7 @@ extern "C"
   void StallardOS_goBootloader();
   void enable_interrupts();
   void disable_interrupts();
+  void disable_privilege();
   void taskOnEnd(void);
   struct function_struct;
   void prepareInitialStack(struct function_struct *task);
