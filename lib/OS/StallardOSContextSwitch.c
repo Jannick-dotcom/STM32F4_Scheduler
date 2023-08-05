@@ -73,7 +73,7 @@ void findNextFunction()
     #endif
     volatile struct function_struct* temp;
     uint8_t prioMin = (uint8_t)-1U;                         //Use only tasks with prio < 255
-    uint64_t earliestDeadline = -1ULL;
+    uint64_t earliestDeadline = (uint64_t)-1;
     nextTask = NULL;
     for (uint16_t i = 0; i < countTasks; i++)
     {
@@ -95,17 +95,21 @@ void findNextFunction()
         {
             continue;
         }
-        if(temp->priority >= prioMin) //If lower priority than the current minimum
+
+        if(temp->priority > prioMin) //If lower priority than the current minimum
         {
             continue;
         }
-        if(temp->refreshRate > 0 && (temp->lastStart + (1000 / temp->refreshRate)) > earliestDeadline) //if task doesn't have the earliest deadline
+        else if(temp->priority == prioMin) // if equal prio to current minimum
         {
-            continue;
-        }
-        if(temp->refreshRate == 0 && earliestDeadline < (uint64_t)-1) //If the task has no deadline and the current minimum has a deadline
-        {
-            continue;
+            if(temp->refreshRate > 0 && (temp->lastStart + (1000 / temp->refreshRate)) > earliestDeadline) //if task doesn't have the earliest deadline
+            {
+                continue;
+            }
+            if(temp->refreshRate == 0 && earliestDeadline < (uint64_t)-1) //If the task has no deadline and the current minimum has a deadline
+            {
+                continue;
+            }
         }
 
         nextTask = temp;
@@ -113,6 +117,10 @@ void findNextFunction()
         if(temp->refreshRate > 0) //set earliest deadline to current tasks deadline
         {
             earliestDeadline = temp->lastStart + (1000 / temp->refreshRate);
+        }
+        else
+        {
+            earliestDeadline = (uint64_t)-1;
         }
     }
 }
@@ -479,9 +487,15 @@ uint8_t checkRefreshRate()
 {
     uint8_t temp = 1;
     temp &= currentTask->used;              //if task has been used
-    temp &= currentTask->refreshRate > 0;   //if task has a refresh rate defined
     temp &= currentTask->lastYield > currentTask->lastStart; //if yield was called after last start
-    temp &= (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate); //if exec time is bigger than refresh rate period
+    if(currentTask->refreshRate > 0)
+    {
+        temp &= (currentTask->lastYield - currentTask->lastStart) > (1000 / currentTask->refreshRate); //if exec time is bigger than refresh rate period
+    }
+    else
+    {
+        return 0;
+    }
     temp &= currentTask->lastStart != 0; //if task did not yet reach end of yield
     return temp;
 }
@@ -581,7 +595,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
  */
 __attribute__( (__used__ , optimize("-O2")) ) void PendSV_Handler() //Optimize Attribute makes sure no frame pointer is used
 {
-    asm("svc #7");
+    _SVC(SV_USAGE_CALC);
     disable_interrupts();
     // DO NOT USE C
     // the compiler doesn't properly restore all registers
