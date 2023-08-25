@@ -28,16 +28,11 @@ private:
     StallardOSGPIO CANT;
     StallardOSGPIO CANR;
     StallardOSSemaphore sem;
-    volatile static StallardOSCanMessage StallardOSCanFifo1[CAN_FIFO_size];
-    volatile static StallardOSCanMessage StallardOSCanFifo2[CAN_FIFO_size];
+    static StallardOSCanMessage StallardOSCanFifo1[CAN_FIFO_size];
+    static StallardOSCanMessage StallardOSCanFifo2[CAN_FIFO_size];
 
     static bool can1used;
     static bool can2used;
-
-    // friend void CAN1_RX0_IRQHandler();
-    // friend void CAN1_RX1_IRQHandler();
-    // friend void CAN2_RX0_IRQHandler();
-    // friend void CAN2_RX1_IRQHandler();
 
 public:
     static CAN_HandleTypeDef can1handle;

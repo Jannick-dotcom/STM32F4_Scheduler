@@ -1,5 +1,7 @@
 #include "StallardOScan.hpp"
 
+
+#ifdef STM32F1xxxx
 // GPIO/AFIO Regs
 constexpr static uint32_t afioBase = 0x40010000UL;
 constexpr static uint32_t mapr = afioBase + 0x004; // alternate pin function mapping
@@ -27,8 +29,8 @@ static inline volatile uint32_t &periphBit(uint32_t addr, int bitNum) // periphe
 {
   return MMIO32(0x42000000 + ((addr & 0xFFFFF) << 5) + (bitNum << 2)); // uses bit band memory
 }
+#endif
 
-#ifndef notHaveCan
 #ifdef STM32F417xx
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
@@ -47,13 +49,12 @@ StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),S
 #ifdef STM32F1xxxx
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
 #endif
-#endif
 
 bool StallardOSCAN::can1used = false;
 bool StallardOSCAN::can2used = false;
 
-volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo1[CAN_FIFO_size];
-volatile StallardOSCanMessage StallardOSCAN::StallardOSCanFifo2[CAN_FIFO_size];
+StallardOSCanMessage StallardOSCAN::StallardOSCanFifo1[CAN_FIFO_size];
+StallardOSCanMessage StallardOSCAN::StallardOSCanFifo2[CAN_FIFO_size];
 
 CAN_HandleTypeDef StallardOSCAN::can1handle;
 CAN_HandleTypeDef StallardOSCAN::can2handle;
@@ -95,12 +96,12 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
 #ifndef STM32F415xx
     if (port == StallardOSCAN1 && can1used == false)
     {
-        // MMIO32(apb2enr) |= (1 << 3) | (1 << 0); // enable gpioB = b3 and afio = b0 clks
-        // MMIO32(mapr) |= (2 << 13);              // alt func, CAN remap to B9+B8 
+        #ifdef STM32F1xxxx
         MMIO32(crhB) &= 0xFFFFFF00;             // clear control bits for pins 8 & 9 of Port B
         MMIO32(crhB) |= 0b1000;              // pin8 for rx, b0100 = b01xx, floating, bxx00 input
         periphBit(odrB, 8) = true;            // set input will pullup resistor for single wire with pullup mode
         MMIO32(crhB) |= 0b1001 << 4;            // set output
+        #endif
         canhandle.Instance = CAN1;
         __CAN1_CLK_ENABLE();
         can1used = true;
@@ -257,7 +258,7 @@ StallardOSCAN::~StallardOSCAN() //Destructor
 uint16_t StallardOSCAN::getSWFiFoFillLevel()
 {
     uint16_t fillLevel = 0;
-    volatile StallardOSCanMessage *fifoPtr;
+    StallardOSCanMessage *fifoPtr;
     if(canhandle.Instance == CAN1)
         fifoPtr = StallardOSCAN::StallardOSCanFifo1;
     #ifdef STM32F4xxxx
@@ -282,7 +283,7 @@ uint16_t StallardOSCAN::getSWFiFoFillLevel()
 void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
 {
     CAN_RxHeaderTypeDef RxHeader;
-    volatile StallardOSCanMessage *fifoPtr;
+    StallardOSCanMessage *fifoPtr;
     if(canHand->Instance == CAN1)
         fifoPtr = StallardOSCAN::StallardOSCanFifo1;
     #ifdef STM32F4xxxx
@@ -297,7 +298,7 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
     for (auto currentFifo = CAN_RX_FIFO0; currentFifo <= CAN_RX_FIFO1; currentFifo++)  //Loop through the two hardware fifos
     {
         auto messageCount = HAL_CAN_GetRxFifoFillLevel(canHand, currentFifo); //Read amount of messages in HW FiFo [0,1]
-        for (auto i = uint32_t(0); i < messageCount; i++)                        //Loop through every new message in hardware FiFo
+        for (uint32_t i = 0; i < messageCount; i++)                        //Loop through every new message in hardware FiFo
         {
             auto k = CAN_FIFO_size;
             for (k = 0; k < CAN_FIFO_size; k++) //Loop through whole fifo storage
@@ -358,7 +359,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 
     this->sem.take();
 
-    receiveMessage_FIFO(&canhandle); //Receive the Messages from Hardware FiFo ->6 Messages total
+    // receiveMessage_FIFO(&canhandle); //Receive the Messages from Hardware FiFo ->6 Messages total
     if (msg == nullptr) //if provided message for storing is valid
     {
 
@@ -367,10 +368,10 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
         return false; //return false status
     }
 
-    volatile StallardOSCanMessage *fifoPtr;
+    StallardOSCanMessage *fifoPtr;
     if(canhandle.Instance == CAN1)
         fifoPtr = StallardOSCAN::StallardOSCanFifo1;
-    #ifdef STM32F4xxxx
+    #ifdef CAN2
     else if(canhandle.Instance == CAN2)
         fifoPtr = StallardOSCAN::StallardOSCanFifo2;
     #endif
@@ -383,16 +384,13 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
     {
         if (fifoPtr[k].used && (fifoPtr[k].ID == id || id == uint16_t(-1))) //If ID of message in FiFo is same as we are looking for
         {
-            // *msg = (StallardOSCanMessage)(StallardOSCAN::StallardOSCanFifo[k]);         //copy the message
             msg->dlc = fifoPtr[k].dlc;
             msg->ID = fifoPtr[k].ID;
             msg->timestamp = fifoPtr[k].timestamp;
-            msg->used = fifoPtr[k].used;
             msg->Val = fifoPtr[k].Val;
 
             fifoPtr[k].used = 0;       //set the FiFo message to unused
             fifoPtr[k].timestamp = -1; //reset timestamp
-            fifoPtr[k].dlc = 0;
 
             this->sem.give(); //release Semaphore
 
