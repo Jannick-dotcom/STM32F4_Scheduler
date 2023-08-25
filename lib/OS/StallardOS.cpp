@@ -674,25 +674,6 @@ void StallardOS::restartTask(function_struct *task)
   enable_interrupts();
 }
 
-/**
- * Check the state of a task
- *
- * @param id unique id of the task.
- * @return state of the task, see taskstate enum
- */
-// taskState StallardOS::getFunctionState(/*Funktion*/ uint16_t id)
-// {
-//   struct function_struct *temp = searchFunction(id); //Hier die Funktion suchen
-//   if (temp != nullptr)                               //Wenn die übergebene Funktion gültig ist
-//   {
-//     return temp->State;
-//   }
-//   else //Ansonsten
-//   {
-//     return STOPPED;
-//   }
-// }
-
 bool StallardOS::getPrivilegeLevel()
 {
   if(__get_CONTROL() & CONTROL_nPRIV_Msk) return true;
