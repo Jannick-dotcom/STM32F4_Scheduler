@@ -34,6 +34,8 @@ private:
     static bool can1used;
     static bool can2used;
 
+    static void copyMessageTo(CAN_HandleTypeDef *canHand, uint8_t fifoNr, StallardOSCanMessage &dest);
+
 public:
     static CAN_HandleTypeDef can1handle;
     static CAN_HandleTypeDef can2handle;
@@ -46,7 +48,12 @@ public:
     * @param[in] baud Baud rate of the CAN. Has to be same on all devices
     * @return true if a message is received, false otherwise
     */
-    StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, bool debug = false);
+    StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud
+    #ifndef notHaveCan
+    , bool debug = false);
+    #else
+    );
+    #endif
 
     /**
      *  Destroy a CAN interface
@@ -84,7 +91,9 @@ public:
     * @param[in,out] msg the message container to be filled
     * @return true if a message is received, false otherwise
     */
+    #ifdef useOneMsgBuf
     bool receiveMessageOneMsgBuff(StallardOSCanMessage *msg);
+    #endif
 
     /**
     * send a can message.

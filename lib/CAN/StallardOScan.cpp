@@ -34,19 +34,15 @@ static inline volatile uint32_t &periphBit(uint32_t addr, int bitNum) // periphe
 #ifdef STM32F417xx
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
-#endif
-#ifdef STM32F415xx
+#elif defined(STM32F415xx)
 StallardOSCAN AD_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN500k);
-#endif
-#ifdef STM32F407xx
+#elif defined(STM32F407xx)
+StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M);
+StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
+#elif defined(STM32F446xx)
 StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
-#endif
-#ifdef STM32F446xx
-StallardOSCAN MS4_CAN(gpio(CAN2_t_port,CAN2_t_pin),gpio(CAN2_r_port,CAN2_r_pin),StallardOSCAN2, CAN1M, true);
-StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k, true);
-#endif
-#ifdef STM32F1xxxx
+#elif defined(STM32F1xxxx)
 StallardOSCAN AD_CAN(gpio(CAN1_t_port,CAN1_t_pin),gpio(CAN1_r_port,CAN1_r_pin),StallardOSCAN1, CAN500k);
 #endif
 
@@ -82,7 +78,11 @@ void initFilters(CAN_HandleTypeDef *canHand)
     HAL_CAN_ConfigFilter(canHand, &sFilterConfig);
 }
 
-StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, bool debug) :
+StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud
+#ifndef notHaveCan
+, bool debug
+#endif
+) :
 #ifdef STM32F1xxxx
     CANT(tx.pin, tx.port, AFPP, nopull, portsToAF(port)),
     CANR(rx.pin, rx.port, Input, pullup, portsToAF(port))
@@ -107,7 +107,7 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
         can1used = true;
     }
 #endif
-#ifdef STM32F4xxxx
+#ifdef CAN2
     if (port == StallardOSCAN2 && can2used == false)
     {
         canhandle.Instance = CAN2;
@@ -151,7 +151,7 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     #ifndef notHaveCan
     if(debug)
     {
-        canhandle.Init.Mode = CAN_MODE_LOOPBACK; //For Debugging -> the CAN sends message to itself
+        canhandle.Init.Mode = CAN_MODE_SILENT_LOOPBACK; //For Debugging -> the CAN sends message to itself
     }
     else
     {
@@ -190,13 +190,12 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     {
         this->sem.give(); //release Semaphore
         DEBUGGER_BREAK();
-        while (1);        
         StallardOSGeneralFaultHandler();
     }
 
     NVIC_SetPriority(CAN1_RX0_IRQn, 0xFF);
     NVIC_SetPriority(CAN1_RX1_IRQn, 0xFF);
-    #ifdef STM32F4xxxx
+    #ifdef CAN2
     NVIC_SetPriority(CAN2_RX0_IRQn, 0xFF);
     NVIC_SetPriority(CAN2_RX1_IRQn, 0xFF);
     #endif
@@ -212,23 +211,21 @@ StallardOSCAN::StallardOSCAN(gpio tx, gpio rx, CANports port, CANBauds baud, boo
     }
     HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_ClearPendingIRQ(CAN1_RX1_IRQn);
-    #ifdef STM32F4xxxx
+    #ifdef CAN2
     HAL_NVIC_ClearPendingIRQ(CAN2_RX0_IRQn);
     HAL_NVIC_ClearPendingIRQ(CAN2_RX1_IRQn);
     #endif
     NVIC_EnableIRQ(CAN1_RX0_IRQn);
     NVIC_EnableIRQ(CAN1_RX1_IRQn);
-    #ifdef STM32F4xxxx
+    #ifdef CAN2
     NVIC_EnableIRQ(CAN2_RX0_IRQn);
     NVIC_EnableIRQ(CAN2_RX1_IRQn);
     #endif
     initFilters(&canhandle);
     this->sem.give(); //release Semaphore
-        
-
 }
 
-#ifdef STM32F4xxxx
+#ifdef CAN2
 extern "C" void CAN2_RX0_IRQHandler()
 {
     StallardOSCAN::receiveMessage_FIFO(&StallardOSCAN::can2handle);
@@ -280,9 +277,28 @@ uint16_t StallardOSCAN::getSWFiFoFillLevel()
     return fillLevel;
 }
 
-void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
+void StallardOSCAN::copyMessageTo(CAN_HandleTypeDef *canHand, uint8_t fifoNr, StallardOSCanMessage &dest)
 {
     CAN_RxHeaderTypeDef RxHeader;
+    if (HAL_CAN_GetRxMessage(canHand, fifoNr, &RxHeader, (uint8_t *)dest.Val) == HAL_OK) //Get Message
+    {
+        dest.ID = (uint16_t)RxHeader.StdId;                 //Copy to SW FiFo
+        dest.used = 1;                            //Indicate Message is occupied
+        dest.timestamp = StallardOSTime_getTimeUs(); //Save timestamp
+        dest.dlc = (uint8_t)RxHeader.DLC;
+        #ifdef useOneMsgBuf
+        StallardOSCanMessage temp;
+        temp.ID = RxHeader.StdId;
+        temp.timestamp = dest.timestamp;
+        temp.Val = dest.Val;
+        temp.used = true;
+        copyToBuffer(&temp);
+        #endif
+    }
+}
+
+void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
+{
     StallardOSCanMessage *fifoPtr;
     if(canHand->Instance == CAN1)
         fifoPtr = StallardOSCAN::StallardOSCanFifo1;
@@ -305,41 +321,13 @@ void StallardOSCAN::receiveMessage_FIFO(CAN_HandleTypeDef *canHand)
             {
                 if (fifoPtr[k].used == 0) //If unused
                 {
-                    if (HAL_CAN_GetRxMessage(canHand, currentFifo, &RxHeader, (uint8_t *)&fifoPtr[k].Val) == HAL_OK) //Get Message
-                    {
-                        fifoPtr[k].ID = RxHeader.StdId;                 //Copy to SW FiFo
-                        fifoPtr[k].used = 1;                            //Indicate Message is occupied
-                        fifoPtr[k].timestamp = StallardOSTime_getTimeUs(); //Save timestamp
-                        fifoPtr[k].dlc = RxHeader.DLC;
-                        #ifdef useOneMsgBuf
-                        StallardOSCanMessage temp;
-                        temp.ID = RxHeader.StdId;
-                        temp.timestamp = fifoPtr[k].timestamp;
-                        temp.Val = fifoPtr[k].Val;
-                        temp.used = true;
-                        copyToBuffer(&temp);
-                        #endif
-                    }
+                    copyMessageTo(canHand, currentFifo, fifoPtr[k]);
                     break; //If unused found go with next message
                 }
                 else if (k == CAN_FIFO_size - 2) //FIFO full?
                 {
                     //When fifo full delete the oldest message
-                    if (HAL_CAN_GetRxMessage(canHand, currentFifo, &RxHeader, (uint8_t *)&fifoPtr[oldestMessage].Val) == HAL_OK) //Get Message
-                    {
-                        fifoPtr[oldestMessage].ID = RxHeader.StdId;                 //Delete oldest message and overwrite with new
-                        fifoPtr[oldestMessage].used = 1;                            //Indicate still used
-                        fifoPtr[oldestMessage].timestamp = StallardOSTime_getTimeUs(); //save new Timestamp
-                        fifoPtr[oldestMessage].dlc = RxHeader.DLC;
-                        #ifdef useOneMsgBuf
-                        StallardOSCanMessage temp;
-                        temp.ID = RxHeader.StdId;
-                        temp.timestamp = fifoPtr[oldestMessage].timestamp;
-                        temp.Val = fifoPtr[k].Val;
-                        temp.used = true;
-                        copyToBuffer(&temp);
-                        #endif
-                    }
+                    copyMessageTo(canHand, currentFifo, fifoPtr[oldestMessage]);
                     break; //If unused found go with next message
                 }
                 else //If used and fifo not full
@@ -384,10 +372,7 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
     {
         if (fifoPtr[k].used && (fifoPtr[k].ID == id || id == uint16_t(-1))) //If ID of message in FiFo is same as we are looking for
         {
-            msg->dlc = fifoPtr[k].dlc;
-            msg->ID = fifoPtr[k].ID;
-            msg->timestamp = fifoPtr[k].timestamp;
-            msg->Val = fifoPtr[k].Val;
+            *msg = fifoPtr[k];
 
             fifoPtr[k].used = 0;       //set the FiFo message to unused
             fifoPtr[k].timestamp = -1; //reset timestamp
@@ -405,20 +390,18 @@ bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg, uint16_t id)
 
 bool StallardOSCAN::receiveMessage(StallardOSCanMessage *msg)
 {
-    if (receiveMessage(msg, msg->ID))
-    {
-        return true;
-    }
-    return false;
+    return receiveMessage(msg, msg->ID);
 }
 
+#ifdef useOneMsgBuf
 bool StallardOSCAN::receiveMessageOneMsgBuff(StallardOSCanMessage *msg)
 {
     uint16_t tempoffset = idToOffset(msg->ID);
-    if(tempoffset == -1 || canarray[tempoffset]->used == false) return false;
+    if(tempoffset == (uint16_t)-1 || canarray[tempoffset]->used == false) return false;
     msg = canarray[tempoffset];
     return true;
 }
+#endif
 
 int StallardOSCAN::sendMessage(StallardOSCanMessage *msg, uint8_t size)
 {
