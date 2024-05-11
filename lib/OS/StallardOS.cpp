@@ -23,7 +23,7 @@ struct function_struct taskArray[countTasks];
 extern "C" void StallardOS_goBootloader();
 extern "C" void enable_interrupts();
 extern "C" void disable_interrupts();
-extern "C" void findNextFunction();
+extern "C" void scheduler();
 
 uint8_t StallardOS::cpu_load = 0;
 
@@ -43,7 +43,7 @@ void taskOnEnd(void)
   }
   currentTask->executable = 0;
   enable_interrupts();
-  // findNextFunction();
+  // scheduler();
   CALL_STARTMAIN();
   while(1);
 }
@@ -64,25 +64,26 @@ void StallardOS::sendSignal(signals signal_code, uint16_t id)
   }
 }
 
-uint8_t StallardOS::waitForSignal(signals signal_code, uint32_t timeout)
+bool StallardOS::waitForSignal(signals signal_code, uint32_t timeout)
 {
   uint64_t startTime = StallardOSTime_getTimeMs();
-  if(currentTask != nullptr)
+  if(currentTask == nullptr)
   {
-    while(StallardOSTime_getTimeMs() < startTime + timeout || timeout == 0)
-    {
-      for(uint8_t i = 0; i < sizeof(currentTask->rcvSignal)/sizeof(signals); i++)
-      {
-        if(currentTask->rcvSignal[i] == signal_code)
-        {
-          currentTask->rcvSignal[i] = signals::SIG_NONE;
-          return 1;
-        }
-      }
-      StallardOS::delay(1);
-    }
+    return false;
   }
-  return 0;
+  while(StallardOSTime_getTimeMs() < startTime + timeout || timeout == 0)
+  {
+    for(uint8_t i = 0; i < sizeof(currentTask->rcvSignal)/sizeof(signals); i++)
+    {
+      if(currentTask->rcvSignal[i] == signal_code)
+      {
+        currentTask->rcvSignal[i] = signals::SIG_NONE;
+        return true;
+      }
+    }
+    StallardOS::delay(1);
+  }
+  return false;
 }
 
 
@@ -584,7 +585,7 @@ void StallardOS::delay(uint32_t milliseconds)
   {
     disable_interrupts();
     currentTask->continue_ts = StallardOSTime_getTimeMs() + (uint64_t)milliseconds; //Speichere anzahl millisekunden bis der Task weiter ausgeführt wird
-    findNextFunction();
+    scheduler();
     enable_interrupts();
     CALL_PENDSV();
   }
