@@ -15,6 +15,7 @@
   *
   ******************************************************************************
 **/
+#ifdef STM32F4xxxx
 /* Includes ------------------------------------------------------------------*/
 #include "ff_gen_drv.h"
 
@@ -120,3 +121,4 @@ uint8_t FATFS_GetAttachedDriversNbr(void)
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
+#endif

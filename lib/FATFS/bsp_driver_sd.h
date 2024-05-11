@@ -26,6 +26,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#ifdef STM32F4xxxx
 #include "stm32f4xx_hal.h"
 
 /* Exported types --------------------------------------------------------*/
@@ -86,5 +87,5 @@ void    BSP_SD_ReadCpltCallback(void);
 #ifdef __cplusplus
 }
 #endif
-
+#endif
 #endif /* __STM32F4_SD_H */

@@ -14,7 +14,9 @@
 #include "fonts.h"
 #include "image.h"
 #include <stdbool.h>
+#ifdef STM32F4xxxx
 #include "stm32f4xx_hal.h"
+#endif
 #include "display_setup.h"
 // #include "ili9341_light.h"
 

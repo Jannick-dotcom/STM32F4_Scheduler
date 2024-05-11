@@ -16,6 +16,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+#ifdef STM32F4xxxx
 #include "fatfs.h"
 
 uint8_t retSD;    /* Return value for SD */
@@ -52,3 +53,4 @@ DWORD get_fattime(void)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+#endif

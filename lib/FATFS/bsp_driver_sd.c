@@ -22,6 +22,7 @@
  */
 /* USER CODE END Header */
 
+#ifdef STM32F4xxxx
 #ifdef OLD_API
 /* kept to avoid issue when migrating old projects. */
 /* USER CODE BEGIN 0 */
@@ -309,7 +310,7 @@ __weak uint8_t BSP_SD_IsDetected(void)
 
   return status;
 }
-
+#endif
 /* USER CODE BEGIN AdditionalCode */
 /* user code can be inserted here */
 /* USER CODE END AdditionalCode */

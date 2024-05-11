@@ -7,7 +7,7 @@
 
 #ifndef ILI9341_LIGHT_H_
 #define ILI9341_LIGHT_H_
-
+#ifdef STM32F4xxxx
 /*---------------------------------------------------------------------*/
 // Register names from Peter Barrett's Microtouch code
 #define	ILI9341_NOP					0x00
@@ -116,5 +116,5 @@
 void lcdBacklightOff(void);
 void lcdBacklightOn(void);
 /*---------------------------------------------------------------------*/
-
+#endif
 #endif /* LI9341_LIGHT_H_ */

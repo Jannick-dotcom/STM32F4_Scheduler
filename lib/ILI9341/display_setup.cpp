@@ -1,3 +1,5 @@
+#ifdef STM32F4xxxx
+
 #include "display_setup.h"
 
 /**
@@ -69,3 +71,4 @@ void initLCDHardware()
     MX_GPIO_Init();
     MX_FSMC_Init();
 }
+#endif

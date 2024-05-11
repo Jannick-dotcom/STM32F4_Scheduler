@@ -1,3 +1,4 @@
+#ifdef STM32F4xxxx
 #include "SD.h"
 
 void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
@@ -52,3 +53,4 @@ void initSD_Card()
   // setupSD_handle(hsd);
   FATFS_LinkDriver(&SD_Driver, SDPath);
 }
+#endif

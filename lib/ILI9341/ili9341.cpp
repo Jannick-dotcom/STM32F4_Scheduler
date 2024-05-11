@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
+#ifdef STM32F4xxxx
 #include "ili9341.h"
 
 enum {
@@ -1142,3 +1143,4 @@ static unsigned char lcdBuildMemoryAccessControlConfig(
   if(rowAddressOrder) value 		|= ILI9341_MADCTL_MY;
   return value;
 }
+#endif

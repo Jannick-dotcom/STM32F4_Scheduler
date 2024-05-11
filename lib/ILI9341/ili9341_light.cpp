@@ -4,6 +4,7 @@
  *  Created on: 15 ����. 2019 �.
  *      Author: tabur
  */
+#ifdef STM32F4xxxx
 #include "ili9341_light.h"
 #include <stdbool.h>
 
@@ -226,3 +227,4 @@ void lcdBacklightOn(void)
 {
 	LCD_BL_ON();
 }
+#endif
