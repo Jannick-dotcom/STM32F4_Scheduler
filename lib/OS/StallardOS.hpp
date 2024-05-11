@@ -20,6 +20,8 @@
 #include "StallardOSDAC.hpp"
 #include "StallardOSAvg.hpp"
 #include "AlphaBeta.hpp"
+#ifdef STM32F4xxxx
 #include "ili9341.h"
 #include "fatfs.h"
+#endif
 #endif //StallardOS_h

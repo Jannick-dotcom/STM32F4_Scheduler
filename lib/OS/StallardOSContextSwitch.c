@@ -66,7 +66,7 @@ __attribute__((always_inline)) inline void pendPendSV()
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-void findNextFunction()
+void scheduler()
 {
     #ifdef BusyLoop
     nextTask = taskMainStruct;
@@ -78,7 +78,7 @@ void findNextFunction()
     for (uint16_t i = 0; i < countTasks; i++)
     {
         temp = &(taskArray[i]);
-        if(temp == NULL)    //Somethin is wrong with the Task list
+        if(temp == NULL)    //Something is wrong with the Task list
         {
             DEBUGGER_BREAK();  //Zeige debugger
             return;
@@ -100,7 +100,8 @@ void findNextFunction()
         {
             continue;
         }
-        else if(temp->priority == prioMin) // if equal prio to current minimum
+        
+        if(temp->priority == prioMin) // if equal prio to current minimum
         {
             if(temp->refreshRate > 0 && (temp->lastStart + (1000 / temp->refreshRate)) > earliestDeadline) //if task doesn't have the earliest deadline
             {
@@ -124,7 +125,6 @@ void findNextFunction()
         }
     }
 }
-
 
 void prepareInitialStack(struct function_struct *task)
 {
@@ -194,7 +194,6 @@ __attribute__((always_inline)) inline void restartTask(struct function_struct *t
   task->executable = 1;
 }
 
-
 /**
  * Switching of a Task happens here.
  *
@@ -256,7 +255,6 @@ __attribute__((always_inline)) inline void switchTask(void)
                     "STR r2, [r1]\n");
 }
 
-
 __attribute__((always_inline)) inline static void inline_set_mpu(){
     #ifdef useMPU
         /* KEEP THESE ASSIGNMENTS!
@@ -313,7 +311,6 @@ __attribute__((always_inline)) inline static void inline_set_mpu(){
     #endif
 }
 
-
 /**
  * @brief enables privileges for the current task
  *        by setting the nPriv bit
@@ -341,7 +338,6 @@ __attribute__((always_inline)) inline void disable_privilege(){
     "ORR r1, #1\n"
     "MSR control, r1\n");
 }
-
 
 /**
  * @brief starts the currentTask as maintask
@@ -428,7 +424,7 @@ __attribute__( (__used__ , optimize("-O2")) ) void SVC_Handler_Main( unsigned in
         }
         break;
     case SV_STARTMAIN:
-        findNextFunction();
+        scheduler();
         if(nextTask == NULL)
         {
             #ifndef BusyLoop
@@ -499,6 +495,7 @@ uint8_t checkRefreshRate()
     temp &= currentTask->lastStart != 0; //if task did not yet reach end of yield
     return temp;
 }
+
 uint8_t checkTaskStack()
 {
     //Calculate Stack usage for debugging
@@ -561,7 +558,7 @@ __attribute__( (__used__) ) void SysTick_Handler(void) //In C Language
         // restartTask((struct function_struct*)currentTask);
     }
 
-    findNextFunction();
+    scheduler();
     if(currentTask != nextTask && nextTask != NULL) //if next task is different from current task and not null
     {
         #ifndef BusyLoop
