@@ -686,7 +686,7 @@ bool StallardOS::getPrivilegeLevel()
  */
 void StallardOS::startOS(void)
 {
-  StallardOS_SetSysClock(runFreq, external);
+  StallardOS_SetSysClock(runFreq, external, 1);
   if(SystemCoreClock != (runFreq * 1000000))
   {
     DEBUGGER_BREAK();

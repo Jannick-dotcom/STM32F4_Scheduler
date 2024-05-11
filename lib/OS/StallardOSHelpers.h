@@ -39,7 +39,7 @@ typedef enum oscillatorType
 extern "C"
 {
 #endif
-  void StallardOS_SetSysClock(uint8_t clockspeed, oscillatorType oscType);
+  void StallardOS_SetSysClock(uint8_t clockspeed, oscillatorType oscType, uint8_t usePLL);
   void StallardOS_goBootloader();
   void enable_interrupts();
   void disable_interrupts();
